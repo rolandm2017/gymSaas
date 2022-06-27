@@ -7,6 +7,6 @@ RUN npm install
 RUN chown -R node /app/node_modules
 RUN npm install -g ts-node nodemon
 COPY . ./
-ENV PORT 8000
+ENV PORT 3001
 EXPOSE $PORT
 CMD ["npm", "run", "dev"]

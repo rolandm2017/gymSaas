@@ -40,6 +40,7 @@ class App {
 
     private middlewares(middlewares: any) {
         middlewares.forEach((middleware: any) => {
+            console.log("adding middleware...");
             this.app.use(middleware);
         });
     }
