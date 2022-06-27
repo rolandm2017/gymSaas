@@ -10,10 +10,10 @@ const dbUser = process.env.DB_USER as string;
 const dbHost = process.env.DB_HOST;
 const dbDriver = process.env.DB_DRIVER as Dialect;
 const dbPassword = process.env.DB_PASSWORD;
-console.log(dbName, dbUser, dbDriver, "adsfadsfsadf");
+console.log(dbName, dbUser, dbHost, dbDriver, ":: connection specifications");
 
 const sequelizeConnection = new Sequelize(dbName, dbUser, dbPassword, {
-    // host: dbHost,
+    host: dbHost,
     dialect: dbDriver,
 });
 

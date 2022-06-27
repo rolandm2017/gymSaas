@@ -30,6 +30,7 @@ class App {
                     console.log("Database Connection Established");
                     await initModels(Database);
                     await Database.sync();
+                    console.log("Done syncing...");
                 })
                 .catch((error: string) => {
                     console.log("Database connection failed", error);
@@ -38,7 +39,6 @@ class App {
     }
 
     private middlewares(middlewares: any) {
-        console.log(middlewares, "in the middlewares, 41rm");
         middlewares.forEach((middleware: any) => {
             this.app.use(middleware);
         });
@@ -46,7 +46,7 @@ class App {
 
     private routes(controllers: any) {
         controllers.forEach((controller: any) => {
-            console.log("controller use", controller.path, controller.router, controller.test, "484848");
+            console.log(controller.path, "... is running");
             this.app.use(controller.path, controller.router);
         });
     }
