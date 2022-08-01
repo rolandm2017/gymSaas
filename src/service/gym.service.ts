@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import axios, { AxiosResponse } from "axios";
 
 import { createGym } from "../database/dao/gym.dao";
+import { IGym } from "../interface/Gym.interface";
+import { GymCreationAttributes } from "../database/models/Gym";
 
 // const dotenvConfig = dotenv.config();
 dotenv.config();
@@ -15,13 +17,13 @@ class GymFinderService {
 
     constructor() {}
 
-    public async findGymsInLocation(country: string, province: string, city: string) {
+    public async findGymsInLocation(country: string, state: string, city: string): Promise<IGym[]> {
         // TODO: refuse query if query was done within the past 24 hours (before making it to this method)
         const gyms: any[] = [];
         // initial request
-        const request: string = this.embedLocation(country, province, city);
+        const request: string = this.embedLocation(country, state, city);
         let response: AxiosResponse<any, any> = await this.requestGyms(request);
-        const results = response.data.results;
+        const results = this.convertJSONToGyms(response.data.results);
         gyms.push(results);
         const firstNextPgToken = response.data.next_page_token;
 
@@ -32,15 +34,18 @@ class GymFinderService {
         await new Promise(r => setTimeout(r, 2000));
         while (nextPageToken && counter < 5) {
             const nextResponse: AxiosResponse<any, any> = await this.requestGyms(request, nextPageToken);
-            const nextPlacesBatch = nextResponse.data.results;
+            const nextPlacesBatch: object[] = nextResponse.data.results;
             nextPageToken = nextResponse.data.next_page_token;
-            gyms.push(nextPlacesBatch);
-            counter++;
-            // as per https://python.gotrained.com/google-places-api-extracting-location-data-reviews/#Search_for_Places
-            // "There is a delay until the  next_page_token is issued and validated. So you need to put a small sleep time
-            // like 2 seconds between each request. Otherwise, you will get an  INVALID_REQUEST status."
-            await new Promise(r => setTimeout(r, 2000));
-            console.log(nextPageToken ? nextPageToken.slice(0, 20) : null, counter, "30rm");
+            // convert gyms data to interfaces
+            const nextPlacesGyms: IGym[] = this.convertJSONToGyms(nextPlacesBatch);
+            gyms.push(nextPlacesGyms);
+            break;
+            // counter++;
+            // // as per https://python.gotrained.com/google-places-api-extracting-location-data-reviews/#Search_for_Places
+            // // "There is a delay until the  next_page_token is issued and validated. So you need to put a small sleep time
+            // // like 2 seconds between each request. Otherwise, you will get an  INVALID_REQUEST status."
+            // await new Promise(r => setTimeout(r, 2000)); // async delay 2 seconds
+            // console.log(nextPageToken ? nextPageToken.slice(0, 20) : null, counter, "30rm");
         }
 
         return gyms.flat();
@@ -56,7 +61,17 @@ class GymFinderService {
         return nextResponse;
     }
 
-    public async saveGyms(gyms: object[]) {
+    private convertJSONToGyms(gyms: object[]): IGym[] {
+        console.log(gyms, "63rm");
+        const output: IGym[] = [];
+        for (let i = 0; i < gyms.length; i++) {
+            const gym: IGym = gyms[i] as IGym;
+            output.push(gym);
+        }
+        return output;
+    }
+
+    public async saveGyms(gyms: IGym[], city: string, country: string) {
         // TODO: save gyms to db
         // const placeholderGym = {
         //     id: 2,
@@ -66,7 +81,20 @@ class GymFinderService {
         //     lat: 20,
         //     long: 25,
         // };
-        await createGym(placeholderGym);
+        for (let i = 0; i < gyms.length; i++) {
+            const gymCreationAttr: GymCreationAttributes = {
+                city: city,
+                street: gyms[i].formatted_address,
+                country: country,
+                url: gyms[i].icon,
+                lat: gyms[i].geometry.location.lat,
+                long: gyms[i].geometry.location.long,
+                icon: gyms[i].icon,
+                name: gyms[i].name,
+                rating: gyms[i].rating,
+            };
+            await createGym(gymCreationAttr);
+        }
     }
 }
 
