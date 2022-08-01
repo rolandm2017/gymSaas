@@ -19,12 +19,12 @@ class GooglePlacesController {
             return response.status(400).send({ err: "Parameter missing" }).end();
         }
         const gymFinderService = new GymFinderService();
-        // const gyms = await gymFinderService.findGymsInLocation(country, stateOrProvince, city);
-        const temp = [{}];
-        gymFinderService.saveGyms(temp);
+        const gyms = await gymFinderService.findGymsInLocation(country, stateOrProvince, city);
+        // const gyms = [{}];
+        // gymFinderService.saveGyms(gyms);
         // console.log(gyms.length, "Number of gyms found");
 
-        // return response.status(200).json(gyms);
+        return response.status(200).json(gyms);
     }
 }
 

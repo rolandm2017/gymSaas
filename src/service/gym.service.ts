@@ -58,14 +58,14 @@ class GymFinderService {
 
     public async saveGyms(gyms: object[]) {
         // TODO: save gyms to db
-        const placeholderGym = {
-            id: 2,
-            city: "Vancouver",
-            street: "Premier",
-            url: "www.google.ca",
-            lat: 20,
-            long: 25,
-        };
+        // const placeholderGym = {
+        //     id: 2,
+        //     city: "Vancouver",
+        //     street: "Premier",
+        //     url: "www.google.ca",
+        //     lat: 20,
+        //     long: 25,
+        // };
         await createGym(placeholderGym);
     }
 }
