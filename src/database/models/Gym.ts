@@ -1,30 +1,8 @@
-import {
-    Association,
-    DataTypes,
-    HasManyAddAssociationMixin,
-    HasManyCountAssociationsMixin,
-    HasManyCreateAssociationMixin,
-    HasManyGetAssociationsMixin,
-    HasManyHasAssociationMixin,
-    HasManySetAssociationsMixin,
-    HasManyAddAssociationsMixin,
-    HasManyHasAssociationsMixin,
-    HasManyRemoveAssociationMixin,
-    HasManyRemoveAssociationsMixin,
-    Model,
-    ModelDefined,
-    Optional,
-    Sequelize,
-    InferAttributes,
-    InferCreationAttributes,
-    CreationOptional,
-    NonAttribute,
-    ForeignKey,
-} from "sequelize";
+import { Association, DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 import sequelizeConnection from "../Database";
 
-import { LocationAttributes } from "./Location";
+// import { LocationAttributes } from "./Location";
 
 interface GymAttributes {
     id: number;
@@ -37,10 +15,13 @@ interface GymAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
-export interface GymInput extends Required<GymAttributes> {}
-export interface GymOutput extends Required<GymAttributes> {}
+// export interface GymInput extends Required<GymAttributes> {}
+// export interface GymOutput extends Required<GymAttributes> {}
 
-export class Gym extends Model<GymAttributes, GymInput> implements GymAttributes {
+export type GymOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
+export type GymCreationAttributes = Optional<GymAttributes, GymOptionalAttributes>;
+
+export class Gym extends Model<GymAttributes, GymCreationAttributes> implements GymAttributes {
     public id!: number;
     public city!: string;
     public street!: string;
@@ -48,7 +29,6 @@ export class Gym extends Model<GymAttributes, GymInput> implements GymAttributes
     public lat!: number;
     public long!: number;
 
-    // timestamps!
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
@@ -57,7 +37,7 @@ export class Gym extends Model<GymAttributes, GymInput> implements GymAttributes
         return Gym.init(
             {
                 id: {
-                    type: DataTypes.INTEGER.UNSIGNED,
+                    type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true,
                 },

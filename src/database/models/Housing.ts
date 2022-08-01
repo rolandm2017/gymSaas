@@ -1,26 +1,4 @@
-import {
-    Association,
-    DataTypes,
-    HasManyAddAssociationMixin,
-    HasManyCountAssociationsMixin,
-    HasManyCreateAssociationMixin,
-    HasManyGetAssociationsMixin,
-    HasManyHasAssociationMixin,
-    HasManySetAssociationsMixin,
-    HasManyAddAssociationsMixin,
-    HasManyHasAssociationsMixin,
-    HasManyRemoveAssociationMixin,
-    HasManyRemoveAssociationsMixin,
-    Model,
-    ModelDefined,
-    Optional,
-    Sequelize,
-    InferAttributes,
-    InferCreationAttributes,
-    CreationOptional,
-    NonAttribute,
-    ForeignKey,
-} from "sequelize";
+import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
 import sequelizeConnection from "../Database";
 
@@ -38,10 +16,13 @@ interface HousingAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
-export interface HousingInput extends Required<HousingAttributes> {}
-export interface HousingOutput extends Required<HousingAttributes> {}
+// export interface HousingInput extends Required<HousingAttributes> {}
+// export interface HousingOutput extends Required<HousingAttributes> {}
 
-export class Housing extends Model<HousingAttributes, HousingInput> implements HousingAttributes {
+export type HousingOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
+export type HousingCreationAttributes = Optional<HousingAttributes, HousingOptionalAttributes>;
+
+export class Housing extends Model<HousingAttributes, HousingCreationAttributes> implements HousingAttributes {
     public id!: number;
     public building!: "apartment" | "house";
     public transaction!: "rent" | "buy";
@@ -52,7 +33,6 @@ export class Housing extends Model<HousingAttributes, HousingInput> implements H
     public lat!: number;
     public long!: number;
 
-    // timestamps!
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
@@ -61,7 +41,7 @@ export class Housing extends Model<HousingAttributes, HousingInput> implements H
         return Housing.init(
             {
                 id: {
-                    type: DataTypes.INTEGER.UNSIGNED,
+                    type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true,
                 },

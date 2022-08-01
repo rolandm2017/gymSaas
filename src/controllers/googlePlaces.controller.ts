@@ -5,7 +5,6 @@ class GooglePlacesController {
     public test = "9000";
     public path = "/google";
     public router = express.Router();
-    private gymFinderService = new GymFinderService();
 
     constructor() {
         this.router.get("/gyms", this.getGyms);
@@ -17,11 +16,15 @@ class GooglePlacesController {
         const stateOrProvince = request.body.state;
         const country = request.body.country;
         if (!city || !stateOrProvince || !country) {
-            return response.status(500).send({ err: "Parameter missing" }).end();
+            return response.status(400).send({ err: "Parameter missing" }).end();
         }
-        const gyms = await this.gymFinderService.findGymsInLocation(country, stateOrProvince, city);
-        console.log(city, stateOrProvince, country, 19);
-        return response.status(200).json(gyms);
+        const gymFinderService = new GymFinderService();
+        // const gyms = await gymFinderService.findGymsInLocation(country, stateOrProvince, city);
+        const temp = [{}];
+        gymFinderService.saveGyms(temp);
+        // console.log(gyms.length, "Number of gyms found");
+
+        // return response.status(200).json(gyms);
     }
 }
 

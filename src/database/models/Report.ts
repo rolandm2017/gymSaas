@@ -1,26 +1,4 @@
-import {
-    Association,
-    DataTypes,
-    HasManyAddAssociationMixin,
-    HasManyCountAssociationsMixin,
-    HasManyCreateAssociationMixin,
-    HasManyGetAssociationsMixin,
-    HasManyHasAssociationMixin,
-    HasManySetAssociationsMixin,
-    HasManyAddAssociationsMixin,
-    HasManyHasAssociationsMixin,
-    HasManyRemoveAssociationMixin,
-    HasManyRemoveAssociationsMixin,
-    Model,
-    ModelDefined,
-    Optional,
-    Sequelize,
-    InferAttributes,
-    InferCreationAttributes,
-    CreationOptional,
-    NonAttribute,
-    ForeignKey,
-} from "sequelize";
+import { Sequelize, Association, DataTypes, Model, Optional } from "sequelize";
 
 import sequelizeConnection from "../Database";
 
@@ -33,26 +11,29 @@ interface ReportAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
-export interface ReportInput extends Required<ReportAttributes> {}
-export interface ReportOutput extends Required<ReportAttributes> {}
+// export interface ReportInput extends Required<ReportAttributes> {}
+// export interface ReportOutput extends Required<ReportAttributes> {}
 
-export class Report extends Model<ReportAttributes, ReportInput> implements ReportAttributes {
+export type ReportOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
+export type ReportCreationAttributes = Optional<ReportAttributes, ReportOptionalAttributes>;
+
+export class Report extends Model<ReportAttributes, ReportCreationAttributes> implements ReportAttributes {
     public id!: number;
     // TODO: add foreign key association
     public delivered!: boolean;
     public timesAccessed!: number;
     public accessedAt?: Date;
+    // TODO: add "Number of credits given" and "number of credits used" fields
 
-    // timestamps!
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
 
-    static initModel(sequelize: Sequelize.Sequelize): typeof Report {
+    static initModel(sequelize: Sequelize): typeof Report {
         return Report.init(
             {
                 id: {
-                    type: DataTypes.INTEGER.UNSIGNED,
+                    type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true,
                 },
