@@ -72,7 +72,7 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
                 },
                 icon: { type: DataTypes.STRING, allowNull: true },
                 name: { type: DataTypes.STRING, allowNull: false },
-                rating: { type: DataTypes.INTEGER, allowNull: true },
+                rating: { type: DataTypes.FLOAT, allowNull: true },
             },
             {
                 timestamps: true,

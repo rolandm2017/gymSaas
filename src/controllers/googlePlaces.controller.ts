@@ -8,6 +8,7 @@ class GooglePlacesController {
 
     constructor() {
         this.router.get("/gyms", this.getGyms);
+        this.router.get("/saved", this.getSavedGymsFromDB);
     }
 
     async getGyms(request: Request, response: Response) {
@@ -25,6 +26,14 @@ class GooglePlacesController {
         // console.log(gyms.length, "Number of gyms found");
 
         return response.status(200).json(gyms);
+    }
+
+    async getSavedGymsFromDB(request: Request, response: Response) {
+        console.log("32rm");
+        const gymFinderService = new GymFinderService();
+        const gymsFromDB = await gymFinderService.getSavedGymsFromDB();
+
+        return response.status(200).json(gymsFromDB);
     }
 }
 

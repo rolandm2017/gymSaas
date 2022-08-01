@@ -4,16 +4,16 @@ export interface IGym {
     geometry: {
         location: {
             lat: number;
-            long: number;
+            lng: number;
         };
         viewport?: {
             northeast?: {
                 lat: number;
-                long: number;
+                lng: number;
             };
             southwest?: {
                 lat: number;
-                long: number;
+                lng: number;
             };
         };
     };

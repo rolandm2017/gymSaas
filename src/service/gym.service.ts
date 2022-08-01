@@ -4,7 +4,7 @@ import express from "express";
 import dotenv from "dotenv";
 import axios, { AxiosResponse } from "axios";
 
-import { createGym } from "../database/dao/gym.dao";
+import { createGym, getMultipleGyms } from "../database/dao/gym.dao";
 import { IGym } from "../interface/Gym.interface";
 import { GymCreationAttributes } from "../database/models/Gym";
 
@@ -88,13 +88,19 @@ class GymFinderService {
                 country: country,
                 url: gyms[i].icon,
                 lat: gyms[i].geometry.location.lat,
-                long: gyms[i].geometry.location.long,
+                long: gyms[i].geometry.location.lng,
                 icon: gyms[i].icon,
                 name: gyms[i].name,
                 rating: gyms[i].rating,
             };
             await createGym(gymCreationAttr);
         }
+    }
+
+    public async getSavedGymsFromDB(): Promise<any> {
+        const gyms = await getMultipleGyms(30);
+        console.log(gyms, "TODO expecting or trying to get IGym[] here -- 102rm");
+        return gyms;
     }
 }
 
