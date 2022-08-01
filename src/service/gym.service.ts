@@ -30,9 +30,10 @@ class GymFinderService {
         // gather future responses
         let counter = 0;
         let nextPageToken = firstNextPgToken;
-        console.log(nextPageToken.slice(0, 20), counter, 24);
+        console.log(nextPageToken, counter, 24);
         await new Promise(r => setTimeout(r, 2000));
-        while (nextPageToken && counter < 5) {
+        const TEMP_LIMIT_FOR_DEVELOPMENT = 5;
+        while (nextPageToken && counter < TEMP_LIMIT_FOR_DEVELOPMENT) {
             const nextResponse: AxiosResponse<any, any> = await this.requestGyms(request, nextPageToken);
             const nextPlacesBatch: object[] = nextResponse.data.results;
             nextPageToken = nextResponse.data.next_page_token;
@@ -106,31 +107,7 @@ class GymFinderService {
 
 // const key = process.env.GOOGLE_PLACES_API_KEY;
 
-// const request = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=burgers+chelsea+manhattan+new+york+city&type=restaurant&key=${key}`
-
-// const city = "Vancouver";
-// const province = "BC";
-// const country = "Canada";
-
-// const totalPlaces = [];
-
-// let request = await requestGyms(bareRequest, "");
-// const results = request.data.results;
-// let nextPageToken = request.data.next_page_token;
-// totalPlaces.push(results);
-// let counter = 0;
-// while (request.data.next_page_token && counter < 4) {
-//     const nextResponse = await requestGyms(bareRequest, nextPageToken);
-//     const nextPlacesBatch = nextResponse.data.results;
-//     nextPageToken = request.data.next_page_token;
-//     totalPlaces.push(nextPlacesBatch);
-//     counter++;
-// }
-// console.log(totalPlaces, totalPlaces.length, 33);
-// .then(res => {
-//     console.log(res.data.results, res.data.results.length, 20);
-//     const nextPageToken = res.data.next_page_token;
-//     console.log(nextPageToken, 22)
-// })
+// const request = `https://maps.googleapis.com/maps/api/place/textsearch/json?`
+// const query = `query=burgers+chelsea+manhattan+new+york+city&type=restaurant&key=${key}`
 
 export default GymFinderService;
