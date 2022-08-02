@@ -30,11 +30,14 @@ export function convertKMChangeToLatLong(kmNorth: number, kmEast: number, starti
     return newCoordinates;
 }
 
-export function convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator: number): number {
-    if (degreesFromEquator < latitudeAtEquator || degreesFromEquator > maxDegreesLatitude) {
-        throw new Error("Degrees from Equator must be between 0 and 90, inclusive");
+export function convertProgressTowardsNorthPoleAsPercentage(degreesLatitudeFromEquator: number): number {
+    if (degreesLatitudeFromEquator < latitudeAtEquator) {
+        throw new Error("Southern hemisphere not yet served by application logic");
     }
-    return degreesFromEquator / maxDegreesLatitude;
+    if (degreesLatitudeFromEquator > maxDegreesLatitude) {
+        throw new Error("Latitude out bounds");
+    }
+    return degreesLatitudeFromEquator / maxDegreesLatitude;
 }
 
 export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLat: number): number {
@@ -52,14 +55,22 @@ export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLa
 
 export function eastWestChangeInKMToLongitudeDegrees(kmEast: number, currentLat: number, currentLong: number): number {
     // TODO: Test this method
+    const noChange = kmEast === 0;
+    if (noChange) {
+        return currentLong;
+    }
     if (currentLat < latitudeAtEquator) {
         throw new Error("Southern hemisphere not yet served by application logic");
     }
+    console.log(currentLat, maxDegreesLatitude, "62rm");
     if (currentLat > maxDegreesLatitude) {
         throw new Error("Latitude out bounds");
     }
     if (currentLong > 180 || currentLong < -180) {
         throw new Error("Longitude out of bounds");
+    }
+    if (currentLat < 10) {
+        throw new Error("We don't bother doing math at the North Pole");
     }
     const degreesFromEquator = currentLat;
     const progressTowardsNorthPoleAsPercentage = convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator);
