@@ -24,8 +24,10 @@ import {
 // TODO: review all function names and return values. Many function names and return values are lying slightly.
 
 export function convertKMChangeToLatLong(kmNorth: number, kmEast: number, startingLat: number, startingLong: number): ILatLong {
-    const changeInLatitude = northSouthChangeInKMToLatitudeDegrees(kmNorth, startingLat);
-    const changeInLongitude = eastWestChangeInKMToLongitudeDegrees(kmEast, startingLat, startingLong);
+    const changeInLatitude = changeInNorthSouthKMToLatitudeDegrees(kmNorth, startingLat);
+    const changeInLongitude = changeInEastWestKMToLongitudeDegrees(kmEast, startingLat, startingLong);
+    console.log(kmNorth, kmEast, startingLat, startingLong, "29rm");
+    console.log(changeInLatitude, changeInLongitude, "29rm");
     const newLatitude = startingLat + changeInLatitude;
     const newLongitude = startingLong + changeInLongitude;
     const newCoordinates = { lat: newLatitude, long: newLongitude };
@@ -42,7 +44,7 @@ export function convertProgressTowardsNorthPoleAsPercentage(degreesLatitudeFromE
     return degreesLatitudeFromEquator / maxDegreesLatitude;
 }
 
-export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLat: number): number {
+export function changeInNorthSouthKMToLatitudeDegrees(kmNorth: number, currentLat: number): number {
     if (currentLat < latitudeAtEquator) {
         throw new Error("Southern hemisphere not yet served by application logic");
     }
@@ -56,15 +58,14 @@ export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLa
 
 // Q for reviewers: would throwing an error if any arg is undefined or null be too much?
 
-export function eastWestChangeInKMToLongitudeDegrees(kmEast: number, currentLat: number, currentLong: number): number {
+export function changeInEastWestKMToLongitudeDegrees(kmEast: number, currentLat: number, currentLong: number): number {
     const noChange = kmEast === 0;
     if (noChange) {
-        return currentLong;
+        return 0;
     }
     if (currentLat < latitudeAtEquator) {
         throw new Error("Southern hemisphere not yet served by application logic");
     }
-    console.log(currentLat, maxDegreesLatitude, "62rm");
     if (currentLat > maxDegreesLatitude) {
         throw new Error("Latitude out bounds");
     }
@@ -80,7 +81,6 @@ export function eastWestChangeInKMToLongitudeDegrees(kmEast: number, currentLat:
     const progressTowardsNorthPoleAsPercentage = convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator);
     const changeInLongitude = kmEast / ((1 - progressTowardsNorthPoleAsPercentage) * KMDistanceBetweenOneDegreeLongitudeAtMax);
     // const newLongitude = currentLong + changeInLongitude;
-    console.log(changeInLongitude, "83rm");
     return changeInLongitude;
 }
 
