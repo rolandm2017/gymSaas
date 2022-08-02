@@ -22,7 +22,7 @@ import {
 // And going from 179 long to 180 long at 89 deg lat is almost 0 miles.
 
 export function convertKMChangeToLatLong(kmNorth: number, kmEast: number, startingLat: number, startingLong: number): ILatLong {
-    const changeInLatitude = northSouthChangeInKMToLatitudeDegrees(kmNorth, startingLat, startingLong);
+    const changeInLatitude = northSouthChangeInKMToLatitudeDegrees(kmNorth, startingLat);
     const changeInLongitude = eastWestChangeInKMToLongitudeDegrees(kmEast, startingLat, startingLong);
     const newLatitude = startingLat + changeInLatitude;
     const newLongitude = startingLong + changeInLongitude;
@@ -32,12 +32,18 @@ export function convertKMChangeToLatLong(kmNorth: number, kmEast: number, starti
 
 export function convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator: number): number {
     if (degreesFromEquator < latitudeAtEquator || degreesFromEquator > maxDegreesLatitude) {
-        throw new Error("Degrees from equator must be between 0 and 90, inclusive");
+        throw new Error("Degrees from Equator must be between 0 and 90, inclusive");
     }
     return degreesFromEquator / maxDegreesLatitude;
 }
 
-export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLat: number, currentLong: number): number {
+export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLat: number): number {
+    if (currentLat < latitudeAtEquator) {
+        throw new Error("Southern hemisphere not yet served by application logic");
+    }
+    if (currentLat > maxDegreesLatitude) {
+        throw new Error("Latitude out bounds");
+    }
     // TODO: Test this method
     const changeInLatitude = kmNorth / KMDistanceBetweenOneDegreeLatitude;
     const newLatitude = currentLat + changeInLatitude;
@@ -46,8 +52,14 @@ export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLa
 
 export function eastWestChangeInKMToLongitudeDegrees(kmEast: number, currentLat: number, currentLong: number): number {
     // TODO: Test this method
-    if (currentLat < 0) {
+    if (currentLat < latitudeAtEquator) {
         throw new Error("Southern hemisphere not yet served by application logic");
+    }
+    if (currentLat > maxDegreesLatitude) {
+        throw new Error("Latitude out bounds");
+    }
+    if (currentLong > 180 || currentLong < -180) {
+        throw new Error("Longitude out of bounds");
     }
     const degreesFromEquator = currentLat;
     const progressTowardsNorthPoleAsPercentage = convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator);
