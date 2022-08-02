@@ -21,6 +21,8 @@ import {
 // So going from 179 deg long to 180 deg long at 0 deg lat is 69.172 miles.
 // And going from 179 long to 180 long at 89 deg lat is almost 0 miles.
 
+// TODO: review all function names and return values. Many function names and return values are lying slightly.
+
 export function convertKMChangeToLatLong(kmNorth: number, kmEast: number, startingLat: number, startingLong: number): ILatLong {
     const changeInLatitude = northSouthChangeInKMToLatitudeDegrees(kmNorth, startingLat);
     const changeInLongitude = eastWestChangeInKMToLongitudeDegrees(kmEast, startingLat, startingLong);
@@ -49,8 +51,8 @@ export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLa
     }
     // TODO: Test this method
     const changeInLatitude = kmNorth / KMDistanceBetweenOneDegreeLatitude;
-    const newLatitude = currentLat + changeInLatitude;
-    return newLatitude;
+    // const newLatitude = currentLat + changeInLatitude;
+    return changeInLatitude;
 }
 
 export function eastWestChangeInKMToLongitudeDegrees(kmEast: number, currentLat: number, currentLong: number): number {
@@ -69,14 +71,17 @@ export function eastWestChangeInKMToLongitudeDegrees(kmEast: number, currentLat:
     if (currentLong > 180 || currentLong < -180) {
         throw new Error("Longitude out of bounds");
     }
-    if (currentLat < 10) {
+    const tenDegrees = 10;
+    const prettyCloseToNorthPole = maxDegreesLatitude - tenDegrees;
+    if (currentLat > prettyCloseToNorthPole) {
         throw new Error("We don't bother doing math at the North Pole");
     }
     const degreesFromEquator = currentLat;
     const progressTowardsNorthPoleAsPercentage = convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator);
-    const changeInLongitude = kmEast / (progressTowardsNorthPoleAsPercentage * KMDistanceBetweenOneDegreeLongitudeAtMax);
-    const newLongitude = currentLong + changeInLongitude;
-    return newLongitude;
+    const changeInLongitude = kmEast / ((1 - progressTowardsNorthPoleAsPercentage) * KMDistanceBetweenOneDegreeLongitudeAtMax);
+    // const newLongitude = currentLong + changeInLongitude;
+    console.log(changeInLongitude, "83rm");
+    return changeInLongitude;
 }
 
 // Zombie code from Aug 1 - replaced by the stackOverflow solution
