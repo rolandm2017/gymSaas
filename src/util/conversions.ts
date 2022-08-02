@@ -49,14 +49,14 @@ export function northSouthChangeInKMToLatitudeDegrees(kmNorth: number, currentLa
     if (currentLat > maxDegreesLatitude) {
         throw new Error("Latitude out bounds");
     }
-    // TODO: Test this method
     const changeInLatitude = kmNorth / KMDistanceBetweenOneDegreeLatitude;
     // const newLatitude = currentLat + changeInLatitude;
     return changeInLatitude;
 }
 
+// Q for reviewers: would throwing an error if any arg is undefined or null be too much?
+
 export function eastWestChangeInKMToLongitudeDegrees(kmEast: number, currentLat: number, currentLong: number): number {
-    // TODO: Test this method
     const noChange = kmEast === 0;
     if (noChange) {
         return currentLong;

@@ -6,13 +6,27 @@ import {
     eastWestChangeInKMToLongitudeDegrees,
 } from "../src/util/conversions";
 
+// **
+// Testing conversions from lat,long => km and vice versa
+// **
+
 // todo: kmChangeToLatlong
 const outOfBoundsLatitude = 91;
 const southernHemisphereLatitude = -1;
 const outOfBoundsLongitude = 181;
 const outOfBoundsLongitude2 = -181;
 
-describe("Testing conversions from lat,long => km and vice versa", () => {
+describe("convert KM change to lat,long", () => {
+    test("travelling North/South yields expected values", () => {
+        expect(convertKMChangeToLatLong(111, 0, 10, 1)).toBe({ lat: 11, long: 1 });
+        expect(convertKMChangeToLatLong(222, 0, 10, 1)).toBe({ lat: 12, long: 1 });
+        expect(convertKMChangeToLatLong(-111, 0, 10, 1)).toBe({ lat: 9, long: 1 });
+        expect(convertKMChangeToLatLong(-222, 0, 10, 1)).toBe({ lat: 8, long: 1 });
+    });
+    test("travelling east/west yields expected values", () => {});
+});
+
+describe("return the progress towards the North Pole as a percentage", () => {
     test("two number inputs should yield a number between 0 and 1", () => {
         expect(convertProgressTowardsNorthPoleAsPercentage(1)).toBe(1 / maxDegreesLatitude);
         expect(convertProgressTowardsNorthPoleAsPercentage(89)).toBe(89 / maxDegreesLatitude);
