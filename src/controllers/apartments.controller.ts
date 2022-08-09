@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import ApartmentScraperService from "../service/apartment.service";
 
 class HousingController {
     public path = "/housing";
@@ -8,6 +9,7 @@ class HousingController {
         this.router.get("/scrape", this.scrapeApartments);
         this.router.get("/saved", this.getSavedApartments);
         this.router.post("/task", this.queueScrape);
+        this.router.get("/hardcode", this.getHardcodeApartments);
     }
 
     async scrapeApartments(request: Request, response: Response) {
@@ -44,6 +46,26 @@ class HousingController {
         console.log(city, stateOrProvince, country, 19);
         // TODO: store a job in a Jobs table.
         return response.status(200).send("You made it");
+    }
+
+    async getHardcodeApartments(request: Request, response: Response) {
+        try {
+            let providers = request.body.providers;
+            if (!providers) {
+                return response.status(500).send({ err: "Provider missing" }).end();
+            }
+            providers = providers.includes(",") ? providers.split(",") : [providers];
+
+            let apartments = [];
+            const apartmentService = new ApartmentScraperService();
+            for (let i = 0; i < providers.length; i++) {
+                apartments.push(apartmentService.getDummyData(providers[i]));
+            }
+            apartments = apartments.flat();
+            return response.status(200).json({ apartments: apartments }).end();
+        } catch (error) {
+            return response.status(500).send({ error }).end();
+        }
     }
 }
 

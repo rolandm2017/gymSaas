@@ -21,8 +21,6 @@ import {
 // So going from 179 deg long to 180 deg long at 0 deg lat is 69.172 miles.
 // And going from 179 long to 180 long at 89 deg lat is almost 0 miles.
 
-// TODO: review all function names and return values. Many function names and return values are lying slightly.
-
 export function convertKMChangeToLatLong(kmNorth: number, kmEast: number, startingLat: number, startingLong: number): ILatLong {
     const changeInLatitude = changeInNorthSouthKMToLatitudeDegrees(kmNorth, startingLat);
     const changeInLongitude = changeInEastWestKMToLongitudeDegrees(kmEast, startingLat, startingLong);
@@ -84,7 +82,7 @@ export function changeInEastWestKMToLongitudeDegrees(kmEast: number, currentLat:
     return changeInLongitude;
 }
 
-// Zombie code from Aug 1 - replaced by the stackOverflow solution
+// // Zombie code from Aug 1 - replaced by the stackOverflow solution
 // export function convertLatitudeChangeToKM(latitudeChange: number): number {
 //     return latitudeChange * KMDistanceBetweenOneDegreeLatitude;
 // }
@@ -94,7 +92,7 @@ export function changeInEastWestKMToLongitudeDegrees(kmEast: number, currentLat:
 //     // "To convert a given latitude into the approximate distance in miles between 1 longitude at that point:
 //     // (90 - Decimal degrees) * Pi / 180 * 69.172"
 //     const degreesFromEquator = currentLat;
-//     const progressTowardsNorthPoleAsPercentage = convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator, maxDegreesLatitude);
+//     // const progressTowardsNorthPoleAsPercentage = convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator);
 //     const changeInMiles = (((maxDegreesLatitude - longitudeChange) * 3.1415927) / 180) * milesBetweenOneDegreeOfLongitudeAtMax;
 //     // Note: I have no idea what the "180" represents. It's from the stackExchange discussion linked above.
 //     const changeInKilometers = changeInMiles * oneMileAsKM;
