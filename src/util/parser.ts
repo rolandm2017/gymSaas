@@ -2,9 +2,9 @@ import { Provider } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
 
 class Parser {
-    provider: string;
+    provider: Provider;
 
-    constructor(source: string) {
+    constructor(source: Provider) {
         this.provider = source;
     }
 
@@ -33,6 +33,7 @@ class Parser {
                 address: unit.address,
                 state: unit.state,
                 price: undefined,
+                source: this.provider,
             };
             apList.push(ap);
         }
@@ -55,6 +56,7 @@ class Parser {
                 price: unit.price,
                 lat: unit.latitude,
                 long: unit.longitude,
+                source: this.provider,
             };
             apList.push(ap);
         }
@@ -77,6 +79,7 @@ class Parser {
                 url: unit.url,
                 lat: unit._geoloc.lat,
                 long: unit._geoloc.lng,
+                source: this.provider,
             };
             apList.push(ap);
         }

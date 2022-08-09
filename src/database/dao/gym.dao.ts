@@ -1,7 +1,7 @@
 import { Gym, GymCreationAttributes } from "../models/Gym";
 
-export const getMultipleGyms = (limit: number, offset?: number) => {
-    return Gym.findAndCountAll({ offset, limit });
+export const getMultipleGyms = (city: string, limit?: number, offset?: number) => {
+    return Gym.findAndCountAll({ where: { city }, limit, offset });
 };
 
 export const getGymById = (id: number) => {

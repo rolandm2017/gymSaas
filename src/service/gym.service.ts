@@ -98,8 +98,8 @@ class GymFinderService {
         }
     }
 
-    public async getSavedGymsFromDB(): Promise<any> {
-        const gyms = await getMultipleGyms(30);
+    public async getSavedGymsFromDB(city: string): Promise<any> {
+        const gyms = await getMultipleGyms(city);
         console.log(gyms, "TODO expecting or trying to get IGym[] here -- 102rm");
         return gyms;
     }

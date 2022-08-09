@@ -30,8 +30,9 @@ class GooglePlacesController {
 
     async getSavedGymsFromDB(request: Request, response: Response) {
         console.log("32rm");
+        const city = request.body.city;
         const gymFinderService = new GymFinderService();
-        const gymsFromDB = await gymFinderService.getSavedGymsFromDB();
+        const gymsFromDB = await gymFinderService.getSavedGymsFromDB(city);
 
         return response.status(200).json(gymsFromDB);
     }

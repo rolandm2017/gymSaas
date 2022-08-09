@@ -28,27 +28,29 @@ class ApartmentScraperService {
         return [];
     }
 
-    public async getDummyData(provider: string): Promise<IHousing[]> {
+    public async getDummyData(provider: Provider): Promise<IHousing[]> {
         // open data based on input string
+        const parser = new Parser(provider);
         let rawData;
         let unprocessedHousingData;
         let path;
         console.log(__dirname, "31rm");
         if (provider === Provider.rentCanada) {
-            path = __dirname + "/../../hardcodeReplies/rentCanada.json";
+            // path = __dirname + "/../../hardcodeReplies/rentCanada.json";
             // const path2 = __dirname + "/../../hardcodeReplies/rentCanadaPg2.json";
+            return parser.parse(rc);
         } else if (provider === Provider.rentFaster) {
-            path = __dirname + "/../../hardcodeReplies/rentFaster.json";
+            // path = __dirname + "/../../hardcodeReplies/rentFaster.json";
+            return parser.parse(rf);
         } else if (provider === Provider.rentSeeker) {
-            path = __dirname + "/../../hardcodeReplies/rentSeeker.json";
+            // path = __dirname + "/../../hardcodeReplies/rentSeeker.json";
+            return parser.parse(rs);
         } else {
             throw new Error("Provider not included or invalid");
         }
-        rawData = fs.readFileSync(path, "utf8");
+        rawData = fs.readFileSync(path).toString();
         unprocessedHousingData = JSON.parse(rawData);
         console.log(typeof rawData, rawData.length, unprocessedHousingData.length, "49rm");
-
-        const parser = new Parser(provider);
 
         return parser.parse(unprocessedHousingData);
     }

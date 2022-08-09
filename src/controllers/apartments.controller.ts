@@ -59,7 +59,10 @@ class HousingController {
             let apartments = [];
             const apartmentService = new ApartmentScraperService();
             for (let i = 0; i < providers.length; i++) {
-                apartments.push(apartmentService.getDummyData(providers[i]));
+                const stuff = await apartmentService.getDummyData(providers[i]);
+                console.log(typeof stuff, stuff.length, "63rm");
+                // TODO: feed stuff into a "geolocation service" via google to turn addr => lat,long
+                apartments.push(stuff);
             }
             apartments = apartments.flat();
             return response.status(200).json({ apartments: apartments }).end();
