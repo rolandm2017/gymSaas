@@ -1,3 +1,4 @@
+import { IAssociation } from "../interface/Association.interface";
 import { IGym } from "../interface/Gym.interface";
 import { IHousing } from "../interface/Housing.interface";
 import { ILatLong } from "../interface/LatLong.interface";
@@ -5,13 +6,11 @@ import { ILatLong } from "../interface/LatLong.interface";
 export function qualify(apartments: IHousing[], gyms: IGym[], qualifyingDistance: number): IGym[] {
     const sortedAps: IHousing[] = sortWestToEast(apartments) as IHousing[];
     const sortedGyms: IGym[] = sortWestToEast(gyms) as IGym[];
-    for (const g of sortedGyms) {
-        const hitRegion = binarySearch(sortedAps, g, qualifyingDistance);
-        const qualifiedUnits = [
-            ...look("west", sortedAps, g, hitRegion, qualifyingDistance),
-            ...look("east", sortedAps, g, hitRegion, qualifyingDistance),
-        ];
-        g.associatedUnits = qualifiedUnits;
+    for (const gym of sortedGyms) {
+        const hitRegion: number = binarySearch(sortedAps, gym, qualifyingDistance);
+        const qualifiedUnits: IHousing[] = [...lookAroundForQualifiedApartments(sortedAps, gym, hitRegion, qualifyingDistance)];
+        const associations: IAssociation[] = createAssociations(qualifiedUnits, gym);
+        gym.associatedUnits = associations;
     }
     return gyms;
 }
@@ -77,8 +76,37 @@ function isCloseEnough(apartment: IHousing, gym: IGym, qualifyingDistance: numbe
 //     return {};
 // }
 
-export function look(direction: "west" | "east", apartments: IHousing[], gym: IGym, start: number, qDist: number): IHousing[] {
+export function lookAroundForQualifiedApartments(apartments: IHousing[], gym: IGym, start: number, qDist: number): IHousing[] {
     // todo: look west, look east. Return all qualified apartments.
+    const qualifiedUnits: IHousing[] = [];
+    for (let i = start; i >= 0; i--) {
+        if (isCloseEnough(apartments[i], gym, qDist)) {
+            qualifiedUnits.push(apartments[i]);
+        } else {
+            break;
+        }
+    }
+    for (let i = start + 1; i < apartments.length; i++) {
+        if (isCloseEnough(apartments[i], gym, qDist)) {
+            qualifiedUnits.push(apartments[i]);
+        } else {
+            break;
+        }
+    }
+    return qualifiedUnits;
+}
+
+export function createAssociations(apartments: IHousing[], gym: IGym): IAssociation[] {
+    const associations: IAssociation[] = [];
+    for (const ap of apartments) {
+        const d: number = getDistance(ap, gym);
+        const i: IAssociation = {
+            apartment: ap,
+            distance: d,
+        };
+        associations.push(i);
+    }
+    return associations;
 }
 
 export function pythagoras(a: number, b: number): number {
