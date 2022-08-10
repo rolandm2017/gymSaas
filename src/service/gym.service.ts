@@ -67,6 +67,8 @@ class GymFinderService {
         const output: IGym[] = [];
         for (let i = 0; i < gyms.length; i++) {
             const gym: IGym = gyms[i] as IGym;
+            gym.lat = gym.geometry.location.lat;
+            gym.long = gym.geometry.location.lng;
             output.push(gym);
         }
         return output;

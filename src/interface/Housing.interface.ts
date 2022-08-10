@@ -9,8 +9,8 @@ export interface IHousing {
     price?: number;
     phone?: string;
     url?: string;
-    lat?: number;
-    long?: number;
+    lat: number;
+    long: number;
     source: Provider;
     // TODO: consider adding "availability"
 }

@@ -1,6 +1,6 @@
 import { ILatLong } from "../interface/LatLong.interface";
 
-// The service converts e.g. "vancouver, BC, Canada" into lat and long.
+// The service converts e.g. "vancouver, BC, Canada" into lat and long. Or an address into a long/lat.
 class LocationDiscoveryService {
     constructor() {}
 

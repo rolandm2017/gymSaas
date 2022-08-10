@@ -1,3 +1,5 @@
+import { IAssociation } from "./Association.interface";
+
 export interface IGym {
     business_status: "OPERATIONAL" | any; // There are other statuses other than "Operational" but we dont know them yet
     formatted_address: string;
@@ -32,4 +34,7 @@ export interface IGym {
     rating: number;
     types?: string[];
     user_ratings_total?: number;
+    lat: number;
+    long: number; // duplicate value? sure is!
+    associatedUnits?: IAssociation[];
 }

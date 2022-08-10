@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { Provider } from "../enum/provider.enum";
 import ApartmentScraperService from "../service/apartment.service";
 
 class HousingController {
@@ -50,16 +51,24 @@ class HousingController {
 
     async getHardcodeApartments(request: Request, response: Response) {
         try {
-            let providers = request.body.providers;
-            if (!providers) {
+            let startProviders = request.query.providers;
+            // console.log(startProviders, request.query.providers, "55rm");
+            if (typeof startProviders !== "string") {
                 return response.status(500).send({ err: "Provider missing" }).end();
             }
-            providers = providers.includes(",") ? providers.split(",") : [providers];
+            let providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
+            if (providers.map(p => p in Provider).every(p => p)) {
+                // providers must all be in Provider
+            } else {
+                return response.status(500).send({ err: "Provider specified is not a provider" }).end();
+            }
 
             let apartments = [];
             const apartmentService = new ApartmentScraperService();
             for (let i = 0; i < providers.length; i++) {
-                const stuff = await apartmentService.getDummyData(providers[i]);
+                const p: Provider = providers[i] as Provider;
+                console.log(p, "69rm");
+                const stuff = await apartmentService.getDummyData(p);
                 console.log(typeof stuff, stuff.length, "63rm");
                 // TODO: feed stuff into a "geolocation service" via google to turn addr => lat,long
                 apartments.push(stuff);
