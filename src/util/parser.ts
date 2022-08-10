@@ -34,6 +34,9 @@ class Parser {
                 state: unit.state,
                 price: undefined,
                 source: this.provider,
+                // TODO: if coords MIA, query geoCoding API with address IF not present in noSQL db. also store in DB for next time.
+                lat: 0,
+                long: 0,
             };
             apList.push(ap);
         }

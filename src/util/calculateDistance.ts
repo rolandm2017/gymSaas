@@ -2,9 +2,23 @@ import { IGym } from "../interface/Gym.interface";
 import { IHousing } from "../interface/Housing.interface";
 import { ILatLong } from "../interface/LatLong.interface";
 
+export function qualify(apartments: IHousing[], gyms: IGym[], qualifyingDistance: number): IGym[] {
+    const sortedAps: IHousing[] = sortWestToEast(apartments) as IHousing[];
+    const sortedGyms: IGym[] = sortWestToEast(gyms) as IGym[];
+    for (const g of sortedGyms) {
+        const hitRegion = binarySearch(sortedAps, g, qualifyingDistance);
+        const qualifiedUnits = [
+            ...look("west", sortedAps, g, hitRegion, qualifyingDistance),
+            ...look("east", sortedAps, g, hitRegion, qualifyingDistance),
+        ];
+        g.associatedUnits = qualifiedUnits;
+    }
+    return gyms;
+}
+
 export function sortWestToEast(places: IHousing[] | IGym[]): IHousing[] | IGym[] {
     // todo: implement
-    function compare(a: IHousing | IGym, b: IHousing | IGym) {
+    function compare(a: IHousing | IGym, b: IHousing | IGym): number {
         if (a.lat === undefined) {
             return -1; // put the undefined ones at the end
         }
@@ -28,16 +42,16 @@ export function sortWestToEast(places: IHousing[] | IGym[]): IHousing[] | IGym[]
 // once the apartments are too far east for the current gym, move to the next gym.
 // ah: binary search? "i found a reasonably close gym; let's switch to linear search now"
 
-function binarySearch(nums: Array<IHousing>, key: IGym, qualifyingDistance: number): number {
+function binarySearch(aps: Array<IHousing>, target: IGym, qualifyingDistance: number): number {
     let low = 0;
-    let high = nums.length - 1;
+    let high = aps.length - 1;
     while (low <= high) {
         let index = Math.floor((low + high) / 2);
         index;
-        if (isCloseEnough(nums[index], key, qualifyingDistance)) {
+        if (isCloseEnough(aps[index], target, qualifyingDistance)) {
             return index;
         }
-        const currentApartmentIsWestOfGym = nums[index].lat < key.lat;
+        const currentApartmentIsWestOfGym = aps[index].lat < target.lat;
         if (currentApartmentIsWestOfGym) {
             low = index + 1; // move low a bit further east
         } else {
@@ -62,6 +76,10 @@ function isCloseEnough(apartment: IHousing, gym: IGym, qualifyingDistance: numbe
 //     }
 //     return {};
 // }
+
+export function look(direction: "west" | "east", apartments: IHousing[], gym: IGym, start: number, qDist: number): IHousing[] {
+    // todo: look west, look east. Return all qualified apartments.
+}
 
 export function pythagoras(a: number, b: number): number {
     const aSquared = a ** 2;

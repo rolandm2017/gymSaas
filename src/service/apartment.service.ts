@@ -36,23 +36,19 @@ class ApartmentScraperService {
         let path;
         console.log(__dirname, "31rm");
         if (provider === Provider.rentCanada) {
-            // path = __dirname + "/../../hardcodeReplies/rentCanada.json";
-            // const path2 = __dirname + "/../../hardcodeReplies/rentCanadaPg2.json";
             return parser.parse(rc);
         } else if (provider === Provider.rentFaster) {
-            // path = __dirname + "/../../hardcodeReplies/rentFaster.json";
             return parser.parse(rf);
         } else if (provider === Provider.rentSeeker) {
-            // path = __dirname + "/../../hardcodeReplies/rentSeeker.json";
             return parser.parse(rs);
         } else {
             throw new Error("Provider not included or invalid");
         }
-        rawData = fs.readFileSync(path).toString();
-        unprocessedHousingData = JSON.parse(rawData);
-        console.log(typeof rawData, rawData.length, unprocessedHousingData.length, "49rm");
+        // rawData = fs.readFileSync(path).toString();
+        // unprocessedHousingData = JSON.parse(rawData);
+        // console.log(typeof rawData, rawData.length, unprocessedHousingData.length, "49rm");
 
-        return parser.parse(unprocessedHousingData);
+        // return parser.parse(unprocessedHousingData);
     }
 }
 
