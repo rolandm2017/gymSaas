@@ -85,7 +85,7 @@ class HousingController {
 
     async getQualifiedHardcodeApartments(request: Request, response: Response) {
         try {
-            const qualificationRadiusInKM = 5; // todo: try 1 km, 2, 3, 0.5, 0.3, 0.25 (0.25 km = 3 min @ 5 km/ 60 min)
+            const qualificationRadiusInKM = 1; // todo: try 1 km, 2, 3, 0.5, 0.3, 0.25 (0.25 km = 3 min @ 5 km/ 60 min)
             const startProviders = request.query.providers;
             // console.log(startProviders, request.query.providers, "55rm");
             if (typeof startProviders !== "string") {

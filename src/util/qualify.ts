@@ -2,6 +2,7 @@ import { IAssociation } from "../interface/Association.interface";
 import { IGym } from "../interface/Gym.interface";
 import { IHousing } from "../interface/Housing.interface";
 import { ILatLong } from "../interface/LatLong.interface";
+import { convertLatLongDifferenceIntoKM, getDistanceFromLatLongInKm } from "./conversions";
 
 // NOTE: Everything in this file presumes a flat surface.
 // Therefore feeding a qualifying distance of "50 km" will get slightly off #s due to the curvature of the Earth.
@@ -70,17 +71,10 @@ export function isCloseEnough(apartment: IHousing, gym: IGym, qualifyingDistance
     if (apartment.lat === undefined || apartment.long === undefined || gym.lat === undefined || gym.long === undefined) {
         throw new Error("Place location data missing");
     }
-    const distance = pythagoras(difference(apartment.lat, gym.lat), difference(apartment.lat, gym.lat));
+    // const distance = pythagoras(difference(apartment.lat, gym.lat), difference(apartment.lat, gym.lat));
+    const distance = convertLatLongDifferenceIntoKM(apartment.lat, apartment.long, gym.lat, gym.long);
     return distance < qualifyingDistance;
 }
-
-// export function binarySearch(aps: IHousing[], gym: IGym): IGym {
-//     const qualifiedUnits:IHousing[] = [];
-//     for (let i = 0;i<aps.length;i++){
-
-//     }
-//     return {};
-// }
 
 export function lookAroundForQualifiedApartments(apartments: IHousing[], gym: IGym, start: number, qDist: number): IHousing[] {
     // todo: look west, look east. Return all qualified apartments.
@@ -105,37 +99,38 @@ export function lookAroundForQualifiedApartments(apartments: IHousing[], gym: IG
 export function createAssociations(apartments: IHousing[], gym: IGym): IAssociation[] {
     const associations: IAssociation[] = [];
     for (const ap of apartments) {
-        const d: number = getDistanceBetween(ap, gym);
+        const d: number = convertLatLongDifferenceIntoKM(ap.lat, ap.long, gym.lat, gym.long);
         const i: IAssociation = {
             apartment: ap,
-            distance: d,
+            distanceInKM: d,
         };
         associations.push(i);
     }
     return associations;
 }
 
-export function pythagoras(a: number, b: number): number {
-    if (a < 0 || b < 0) {
-        throw new Error("Non-negative integers only");
-    }
-    const aSquared = a ** 2;
-    const bSquared = b ** 2;
-    const cSquared = aSquared + bSquared;
-    const c = Math.sqrt(cSquared);
-    return c;
-}
+//     // FIXME: this has bugs. the logic isn't right even though the words make sense.
+// export function pythagoras(a: number, b: number): number {
+//     if (a < 0 || b < 0) {
+//         throw new Error("Non-negative integers only");
+//     }
+//     const aSquared = a ** 2;
+//     const bSquared = b ** 2;
+//     const cSquared = aSquared + bSquared;
+//     const c = Math.sqrt(cSquared);
+//     return c;
+// }
 
-export function difference(a: number, b: number): number {
-    return Math.abs(a - b);
-}
+// export function difference(a: number, b: number): number {
+//     return Math.abs(a - b);
+// }
 
-export function getDistanceBetween(apartment: IHousing | ILatLong, gym: IGym | ILatLong): number {
-    if (apartment.lat === undefined || apartment.long === undefined || gym.lat === undefined || gym.long === undefined) {
-        throw new Error("Place location data missing");
-    }
-    const northSouthDifference: number = difference(apartment.lat, gym.lat);
-    const eastWestDifference: number = difference(apartment.long, gym.long);
-    console.log(northSouthDifference, eastWestDifference, "139rm");
-    return pythagoras(northSouthDifference, eastWestDifference);
-}
+// export function getDistanceBetween(apartment: IHousing | ILatLong, gym: IGym | ILatLong): number {
+//     if (apartment.lat === undefined || apartment.long === undefined || gym.lat === undefined || gym.long === undefined) {
+//         throw new Error("Place location data missing");
+//     }
+
+//     const northSouthDifference: number = difference(apartment.lat, gym.lat);
+//     const eastWestDifference: number = difference(apartment.long, gym.long);
+//     return pythagoras(northSouthDifference, eastWestDifference);
+// }

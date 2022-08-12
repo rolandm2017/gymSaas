@@ -8,9 +8,9 @@ import {
     binarySearch,
     isCloseEnough,
     lookAroundForQualifiedApartments,
-    pythagoras,
-    difference,
-    getDistanceBetween,
+    // pythagoras,
+    // difference,
+    // getDistanceBetween,
 } from "../src/util/qualify";
 
 // Note for reviewers: I am unsure about almost every test involving mathematics.
@@ -99,36 +99,38 @@ const gyms = [gym1, gym2];
 //     });
 // });
 
-describe("getDistanceBetween works as expected", () => {
-    test("Only positive values from math.abs", () => {
-        expect(difference(3, -5)).toEqual(8);
-        expect(difference(-8, -5)).toEqual(3);
-        expect(difference(-5, -8)).toEqual(3);
-        expect(difference(5, -5)).toEqual(10);
-    });
+// Zombie code as of Aug 12 2022 - think its replaced by code from "conversions.ts"
 
-    test("only positive integers", () => {
-        expect(() => {
-            pythagoras(-1, 1);
-        }).toThrow("Non-negative integers only");
-        expect(() => {
-            pythagoras(-0.0005, 1);
-        }).toThrow("Non-negative integers only");
-        expect(() => {
-            pythagoras(1, -0.01);
-        }).toThrow("Non-negative integers only");
-    });
+// describe("getDistanceBetween works as expected", () => {
+//     test("Only positive values from math.abs", () => {
+//         expect(difference(3, -5)).toEqual(8);
+//         expect(difference(-8, -5)).toEqual(3);
+//         expect(difference(-5, -8)).toEqual(3);
+//         expect(difference(5, -5)).toEqual(10);
+//     });
 
-    test("verify math", () => {
-        expect(pythagoras(2, 2)).toEqual(2.8284271247461903);
-        expect(pythagoras(3, 3)).toEqual(4.242640687119285);
-        expect(pythagoras(5, 8)).toEqual(9.433981132056603);
-    });
+//     test("only positive integers", () => {
+//         expect(() => {
+//             pythagoras(-1, 1);
+//         }).toThrow("Non-negative integers only");
+//         expect(() => {
+//             pythagoras(-0.0005, 1);
+//         }).toThrow("Non-negative integers only");
+//         expect(() => {
+//             pythagoras(1, -0.01);
+//         }).toThrow("Non-negative integers only");
+//     });
 
-    test("two places with defined coords yield a distance", () => {
-        expect(getDistanceBetween(ap1, gym1)).toEqual(0.00010000000000331966); // TODO: Come back here in a month and
-        expect(getDistanceBetween(ap2, gym1)).toEqual(0.0009000000000014552); // see if this all looks correct still
-        expect(getDistanceBetween(ap3, gym2)).toEqual(1.0020099999999985); // because its difficult to say if its
-        expect(getDistanceBetween(ap4, gym2)).toEqual(1.0010100000000008); // right without viewing the results on a map.
-    });
-});
+//     test("verify math", () => {
+//         expect(pythagoras(2, 2)).toEqual(2.8284271247461903);
+//         expect(pythagoras(3, 3)).toEqual(4.242640687119285);
+//         expect(pythagoras(5, 8)).toEqual(9.433981132056603);
+//     });
+
+//     test("two places with defined coords yield a distance", () => {
+//         expect(getDistanceBetween(ap1, gym1)).toEqual(0.00010000000000331966); // TODO: Come back here in a month and
+//         expect(getDistanceBetween(ap2, gym1)).toEqual(0.0009000000000014552); // see if this all looks correct still
+//         expect(getDistanceBetween(ap3, gym2)).toEqual(1.0020099999999985); // because its difficult to say if its
+//         expect(getDistanceBetween(ap4, gym2)).toEqual(1.0010100000000008); // right without viewing the results on a map.
+//     });
+// });

@@ -10,7 +10,7 @@ export interface GymAttributes {
     street: string; // street address, e.g. 123 Fake St, 596 Unreal Boulevard
     // FIXME: street => streetAddr
     country: string;
-    url: string;
+    url: string; // link to the biz's website
     lat: number;
     long: number;
     icon?: string;

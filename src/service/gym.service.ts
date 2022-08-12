@@ -7,6 +7,7 @@ import axios, { AxiosResponse } from "axios";
 import { createGym, getMultipleGyms } from "../database/dao/gym.dao";
 import { IGym } from "../interface/Gym.interface";
 import { Gym, GymCreationAttributes } from "../database/models/Gym";
+import { gymDbEntryToIGym } from "../util/gymDbEntryToIGym";
 
 // const dotenvConfig = dotenv.config();
 dotenv.config();
@@ -105,23 +106,8 @@ class GymFinderService {
         const rowsOfGyms: Gym[] = gymsFromDb.rows;
         const gyms: IGym[] = [];
         for (const row of rowsOfGyms) {
-            const g: IGym = {
-                business_status: "OPERATIONAL",
-                formatted_address: "",
-                geometry: {
-                    location: {
-                        lat: row.lat,
-                        lng: row.long,
-                    },
-                },
-                icon: "",
-                name: "",
-                opening_hours: { open_now: true },
-                place_id: "",
-                rating: 5,
-                lat: row.lat,
-                long: row.long,
-            };
+            const g: IGym = gymDbEntryToIGym(row);
+            gyms.push(g);
         }
         console.log(gyms, "TODO expecting or trying to get IGym[] here -- 102rm");
         return gyms;
