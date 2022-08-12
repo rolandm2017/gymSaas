@@ -101,11 +101,27 @@ class GymFinderService {
     }
 
     public async getSavedGymsFromDB(city: string): Promise<IGym[]> {
-        let rowsOfGyms = await getMultipleGyms(city);
-        rowsOfGyms: Gym[] = rowsOfGyms.rows;
+        const gymsFromDb = await getMultipleGyms(city);
+        const rowsOfGyms: Gym[] = gymsFromDb.rows;
         const gyms: IGym[] = [];
         for (const row of rowsOfGyms) {
-            
+            const g: IGym = {
+                business_status: "OPERATIONAL",
+                formatted_address: "",
+                geometry: {
+                    location: {
+                        lat: row.lat,
+                        lng: row.long,
+                    },
+                },
+                icon: "",
+                name: "",
+                opening_hours: { open_now: true },
+                place_id: "",
+                rating: 5,
+                lat: row.lat,
+                long: row.long,
+            };
         }
         console.log(gyms, "TODO expecting or trying to get IGym[] here -- 102rm");
         return gyms;

@@ -8,6 +8,7 @@ export interface GymAttributes {
     id?: number;
     city: string;
     street: string; // street address, e.g. 123 Fake St, 596 Unreal Boulevard
+    // FIXME: street => streetAddr
     country: string;
     url: string;
     lat: number;
