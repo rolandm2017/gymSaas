@@ -8,7 +8,8 @@ import {
 } from "../src/util/conversions";
 
 // **
-// Testing conversions from lat,long => km and vice versa
+// Testing conversions from lat,long => km and vice versa.
+// Note going back and forth doesn't work precisely: Some functions give only approximations.
 // **
 
 // todo: kmChangeToLatlong

@@ -3,7 +3,14 @@ import { IGym } from "../interface/Gym.interface";
 import { IHousing } from "../interface/Housing.interface";
 import { ILatLong } from "../interface/LatLong.interface";
 
+// NOTE: Everything in this file presumes a flat surface.
+// Therefore feeding a qualifying distance of "50 km" will get slightly off #s due to the curvature of the Earth.
+// (Probably irrelevant)
+
 export function qualify(apartments: IHousing[], gyms: IGym[], qualifyingDistance: number): IGym[] {
+    if (qualifyingDistance < 0) {
+        throw new Error("Can't qualify with negative distance");
+    }
     const sortedAps: IHousing[] = sortWestToEast(apartments) as IHousing[];
     const sortedGyms: IGym[] = sortWestToEast(gyms) as IGym[];
     for (const gym of sortedGyms) {
@@ -16,7 +23,6 @@ export function qualify(apartments: IHousing[], gyms: IGym[], qualifyingDistance
 }
 
 export function sortWestToEast(places: IHousing[] | IGym[]): IHousing[] | IGym[] {
-    // todo: implement
     function compare(a: IHousing | IGym, b: IHousing | IGym): number {
         if (a.lat === undefined) {
             return -1; // put the undefined ones at the end
@@ -41,7 +47,7 @@ export function sortWestToEast(places: IHousing[] | IGym[]): IHousing[] | IGym[]
 // once the apartments are too far east for the current gym, move to the next gym.
 // ah: binary search? "i found a reasonably close gym; let's switch to linear search now"
 
-function binarySearch(aps: Array<IHousing>, target: IGym, qualifyingDistance: number): number {
+export function binarySearch(aps: Array<IHousing>, target: IGym, qualifyingDistance: number): number {
     let low = 0;
     let high = aps.length - 1;
     while (low <= high) {
@@ -60,7 +66,7 @@ function binarySearch(aps: Array<IHousing>, target: IGym, qualifyingDistance: nu
     return -1;
 }
 
-function isCloseEnough(apartment: IHousing, gym: IGym, qualifyingDistance: number): boolean {
+export function isCloseEnough(apartment: IHousing, gym: IGym, qualifyingDistance: number): boolean {
     if (apartment.lat === undefined || apartment.long === undefined || gym.lat === undefined || gym.long === undefined) {
         throw new Error("Place location data missing");
     }
@@ -99,7 +105,7 @@ export function lookAroundForQualifiedApartments(apartments: IHousing[], gym: IG
 export function createAssociations(apartments: IHousing[], gym: IGym): IAssociation[] {
     const associations: IAssociation[] = [];
     for (const ap of apartments) {
-        const d: number = getDistance(ap, gym);
+        const d: number = getDistanceBetween(ap, gym);
         const i: IAssociation = {
             apartment: ap,
             distance: d,
@@ -110,6 +116,9 @@ export function createAssociations(apartments: IHousing[], gym: IGym): IAssociat
 }
 
 export function pythagoras(a: number, b: number): number {
+    if (a <= 0 || b <= 0) {
+        throw new Error("Positive integers only");
+    }
     const aSquared = a ** 2;
     const bSquared = b ** 2;
     const cSquared = aSquared + bSquared;
@@ -121,11 +130,9 @@ export function difference(a: number, b: number): number {
     return Math.abs(a - b);
 }
 
-function getDistance(apartment: IHousing | ILatLong, gym: IGym | ILatLong): number {
+export function getDistanceBetween(apartment: IHousing | ILatLong, gym: IGym | ILatLong): number {
     if (apartment.lat === undefined || apartment.long === undefined || gym.lat === undefined || gym.long === undefined) {
         throw new Error("Place location data missing");
     }
     return pythagoras(difference(apartment.lat, gym.lat), difference(apartment.long, gym.long));
 }
-
-export default getDistance;

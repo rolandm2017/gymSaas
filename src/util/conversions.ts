@@ -24,8 +24,6 @@ import {
 export function convertKMChangeToLatLong(kmNorth: number, kmEast: number, startingLat: number, startingLong: number): ILatLong {
     const changeInLatitude = changeInNorthSouthKMToLatitudeDegrees(kmNorth, startingLat);
     const changeInLongitude = changeInEastWestKMToLongitudeDegrees(kmEast, startingLat, startingLong);
-    console.log(kmNorth, kmEast, startingLat, startingLong, "29rm");
-    console.log(changeInLatitude, changeInLongitude, "29rm");
     const newLatitude = startingLat + changeInLatitude;
     const newLongitude = startingLong + changeInLongitude;
     const newCoordinates = { lat: newLatitude, long: newLongitude };
