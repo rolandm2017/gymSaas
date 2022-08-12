@@ -116,8 +116,8 @@ export function createAssociations(apartments: IHousing[], gym: IGym): IAssociat
 }
 
 export function pythagoras(a: number, b: number): number {
-    if (a <= 0 || b <= 0) {
-        throw new Error("Positive integers only");
+    if (a < 0 || b < 0) {
+        throw new Error("Non-negative integers only");
     }
     const aSquared = a ** 2;
     const bSquared = b ** 2;
@@ -134,5 +134,8 @@ export function getDistanceBetween(apartment: IHousing | ILatLong, gym: IGym | I
     if (apartment.lat === undefined || apartment.long === undefined || gym.lat === undefined || gym.long === undefined) {
         throw new Error("Place location data missing");
     }
-    return pythagoras(difference(apartment.lat, gym.lat), difference(apartment.long, gym.long));
+    const northSouthDifference: number = difference(apartment.lat, gym.lat);
+    const eastWestDifference: number = difference(apartment.long, gym.long);
+    console.log(northSouthDifference, eastWestDifference, "139rm");
+    return pythagoras(northSouthDifference, eastWestDifference);
 }

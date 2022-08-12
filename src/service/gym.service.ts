@@ -6,7 +6,7 @@ import axios, { AxiosResponse } from "axios";
 
 import { createGym, getMultipleGyms } from "../database/dao/gym.dao";
 import { IGym } from "../interface/Gym.interface";
-import { GymCreationAttributes } from "../database/models/Gym";
+import { Gym, GymCreationAttributes } from "../database/models/Gym";
 
 // const dotenvConfig = dotenv.config();
 dotenv.config();
@@ -100,8 +100,13 @@ class GymFinderService {
         }
     }
 
-    public async getSavedGymsFromDB(city: string): Promise<any> {
-        const gyms = await getMultipleGyms(city);
+    public async getSavedGymsFromDB(city: string): Promise<IGym[]> {
+        let rowsOfGyms = await getMultipleGyms(city);
+        rowsOfGyms: Gym[] = rowsOfGyms.rows;
+        const gyms: IGym[] = [];
+        for (const row of rowsOfGyms) {
+            
+        }
         console.log(gyms, "TODO expecting or trying to get IGym[] here -- 102rm");
         return gyms;
     }

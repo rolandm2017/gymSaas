@@ -7,4 +7,8 @@ class LocationDiscoveryService {
     public async latLongDiscovery(city: string, state: string, country: string) {
         // TODO: go to Google, type in "citty string country lat long" and return the result.
     }
+
+    public async geocoding(addr: string, city: string, state: string, country: string): ILatLong {
+        // use google geocoding api to get the coords of an address
+    }
 }

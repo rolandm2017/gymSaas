@@ -31,9 +31,6 @@ class ApartmentScraperService {
     public async getDummyData(provider: Provider): Promise<IHousing[]> {
         // open data based on input string
         const parser = new Parser(provider);
-        let rawData;
-        let unprocessedHousingData;
-        let path;
         console.log(__dirname, "31rm");
         if (provider === Provider.rentCanada) {
             return parser.parse(rc);

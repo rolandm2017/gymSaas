@@ -1,6 +1,8 @@
 import express, { Request, Response } from "express";
 import { Provider } from "../enum/provider.enum";
 import ApartmentScraperService from "../service/apartment.service";
+import GymFinderService from "../service/gym.service";
+import { qualify } from "../util/qualify";
 
 class HousingController {
     public path = "/housing";
@@ -11,6 +13,7 @@ class HousingController {
         this.router.get("/saved", this.getSavedApartments);
         this.router.post("/task", this.queueScrape);
         this.router.get("/hardcode", this.getHardcodeApartments);
+        this.router.get("/qualified", this.getQualifiedHardcodeApartments);
     }
 
     async scrapeApartments(request: Request, response: Response) {
@@ -51,12 +54,12 @@ class HousingController {
 
     async getHardcodeApartments(request: Request, response: Response) {
         try {
-            let startProviders = request.query.providers;
+            const startProviders = request.query.providers;
             // console.log(startProviders, request.query.providers, "55rm");
             if (typeof startProviders !== "string") {
                 return response.status(500).send({ err: "Provider missing" }).end();
             }
-            let providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
+            const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
             if (providers.map(p => p in Provider).every(p => p)) {
                 // providers must all be in Provider
             } else {
@@ -75,6 +78,44 @@ class HousingController {
             }
             apartments = apartments.flat();
             return response.status(200).json({ apartments: apartments }).end();
+        } catch (error) {
+            return response.status(500).send({ error }).end();
+        }
+    }
+
+    async getQualifiedHardcodeApartments(request: Request, response: Response) {
+        try {
+            const qualificationRadiusInKM = 5; // todo: try 1 km, 2, 3, 0.5, 0.3, 0.25 (0.25 km = 3 min @ 5 km/ 60 min)
+            const startProviders = request.query.providers;
+            // console.log(startProviders, request.query.providers, "55rm");
+            if (typeof startProviders !== "string") {
+                return response.status(500).send({ err: "Provider missing" }).end();
+            }
+            const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
+            if (providers.map(p => p in Provider).every(p => p)) {
+                // providers must all be in Provider
+            } else {
+                return response.status(500).send({ err: "Provider specified is not a provider" }).end();
+            }
+
+            let apartments = [];
+            const apartmentService = new ApartmentScraperService();
+            for (let i = 0; i < providers.length; i++) {
+                const p: Provider = providers[i] as Provider;
+                console.log(p, "69rm");
+                const stuff = await apartmentService.getDummyData(p);
+                console.log(typeof stuff, stuff.length, "63rm");
+                // TODO: feed stuff into a "geolocation service" via google to turn addr => lat,long
+                apartments.push(stuff);
+            }
+            apartments = apartments.flat();
+
+            const gymService = new GymFinderService();
+            const gyms = await gymService.getSavedGymsFromDB("Montreal");
+            // TODO: organize controllers. Does this endpoint belong in apartments, gyms, or "places"?
+            const gymsWithAssociations = qualify(apartments, gyms, qualificationRadiusInKM);
+
+            return response.status(200).json({ gyms: gymsWithAssociations }).end();
         } catch (error) {
             return response.status(500).send({ error }).end();
         }
