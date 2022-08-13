@@ -20,6 +20,7 @@ export function qualify(apartments: IHousing[], gyms: IGym[], qualifyingDistance
         const qualifiedUnits: IHousing[] = [...lookAroundForQualifiedApartments(sortedAps, gym, hitRegion, qualifyingDistance)];
         const associations: IAssociation[] = createAssociations(qualifiedUnits, gym);
         if (associations.length > 0) {
+            // only return gyms with at least 1 nearby apartment
             gym.associatedUnits = associations;
             gymsWithAssociations.push(gym);
         }
