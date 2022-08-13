@@ -13,7 +13,6 @@ export function gymDbEntryToIGym(gym: Gym): IGym {
         },
         icon: "",
         name: "",
-        opening_hours: { open_now: true },
         place_id: "",
         rating: 5,
         lat: gym.lat,

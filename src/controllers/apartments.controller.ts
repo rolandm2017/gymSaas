@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { Provider } from "../enum/provider.enum";
+import { IHousing } from "../interface/Housing.interface";
 import ApartmentScraperService from "../service/apartment.service";
 import GymFinderService from "../service/gym.service";
 import { qualify } from "../util/qualify";
@@ -85,10 +86,12 @@ class HousingController {
 
     async getQualifiedHardcodeApartments(request: Request, response: Response) {
         try {
-            const qualificationRadiusInKM = 1; // todo: try 1 km, 2, 3, 0.5, 0.3, 0.25 (0.25 km = 3 min @ 5 km/ 60 min)
-            const startProviders = request.query.providers;
+            // todo: try 1 km, 2, 3, 0.5, 0.3, 0.25 (0.25 km = 3 min @ 5 km/ 60 min)
+            const qualificationRadiusInKM: number = typeof request.query.maxDistance === "string" ? parseInt(request.query.maxDistance, 10) : 0.75;
+            const startProviders: string | undefined = typeof request.query.providers === "string" ? request.query.providers : "";
+            console.log(qualificationRadiusInKM, typeof qualificationRadiusInKM, "90rm");
             // console.log(startProviders, request.query.providers, "55rm");
-            if (typeof startProviders !== "string") {
+            if (typeof startProviders !== "string" || startProviders.length === 0) {
                 return response.status(500).send({ err: "Provider missing" }).end();
             }
             const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
@@ -103,10 +106,10 @@ class HousingController {
             for (let i = 0; i < providers.length; i++) {
                 const p: Provider = providers[i] as Provider;
                 console.log(p, "69rm");
-                const stuff = await apartmentService.getDummyData(p);
-                console.log(typeof stuff, stuff.length, "63rm");
+                const savedApartments: IHousing[] = await apartmentService.getDummyData(p);
+                console.log(typeof savedApartments, savedApartments.length, "63rm");
                 // TODO: feed stuff into a "geolocation service" via google to turn addr => lat,long
-                apartments.push(stuff);
+                apartments.push(savedApartments);
             }
             apartments = apartments.flat();
 

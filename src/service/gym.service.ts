@@ -109,7 +109,6 @@ class GymFinderService {
             const g: IGym = gymDbEntryToIGym(row);
             gyms.push(g);
         }
-        console.log(gyms, "TODO expecting or trying to get IGym[] here -- 102rm");
         return gyms;
     }
 }

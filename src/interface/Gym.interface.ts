@@ -21,9 +21,6 @@ export interface IGym {
     };
     icon: string; // a url
     name: string; // business name
-    opening_hours: {
-        open_now: boolean;
-    };
     // photos: not using this because I can't yet make sense of the data the API responds with
     // from docs: "A PlacePhoto can be used to obtain a photo with the getUrl() method" => ???
     // from docs, place_id is: "A textual identifier that uniquely identifies a place and

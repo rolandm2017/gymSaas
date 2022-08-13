@@ -14,13 +14,17 @@ export function qualify(apartments: IHousing[], gyms: IGym[], qualifyingDistance
     }
     const sortedAps: IHousing[] = sortWestToEast(apartments) as IHousing[];
     const sortedGyms: IGym[] = sortWestToEast(gyms) as IGym[];
+    const gymsWithAssociations = [];
     for (const gym of sortedGyms) {
         const hitRegion: number = binarySearch(sortedAps, gym, qualifyingDistance);
         const qualifiedUnits: IHousing[] = [...lookAroundForQualifiedApartments(sortedAps, gym, hitRegion, qualifyingDistance)];
         const associations: IAssociation[] = createAssociations(qualifiedUnits, gym);
-        gym.associatedUnits = associations;
+        if (associations.length > 0) {
+            gym.associatedUnits = associations;
+            gymsWithAssociations.push(gym);
+        }
     }
-    return gyms;
+    return gymsWithAssociations;
 }
 
 export function sortWestToEast(places: IHousing[] | IGym[]): IHousing[] | IGym[] {
