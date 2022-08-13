@@ -8,24 +8,24 @@ import { convertLatLongDifferenceIntoKM, getDistanceFromLatLongInKm } from "./co
 // Therefore feeding a qualifying distance of "50 km" will get slightly off #s due to the curvature of the Earth.
 // (Probably irrelevant)
 
-export function qualify(apartments: IHousing[], gyms: IGym[], qualifyingDistance: number): IGym[] {
+export function qualify(apartments: IHousing[], gyms: IGym[], qualifyingDistance: number): IHousing[] {
     if (qualifyingDistance < 0) {
         throw new Error("Can't qualify with negative distance");
     }
     const sortedAps: IHousing[] = sortWestToEast(apartments) as IHousing[];
     const sortedGyms: IGym[] = sortWestToEast(gyms) as IGym[];
-    const gymsWithAssociations = [];
-    for (const gym of sortedGyms) {
-        const hitRegion: number = binarySearch(sortedAps, gym, qualifyingDistance);
-        const qualifiedUnits: IHousing[] = [...lookAroundForQualifiedApartments(sortedAps, gym, hitRegion, qualifyingDistance)];
-        const associations: IAssociation[] = createAssociations(qualifiedUnits, gym);
+    const apsWithNearbyGyms = [];
+    for (const ap of sortedAps) {
+        const hitRegion: number = binarySearch(ap, sortedGyms, qualifyingDistance);
+        const nearbyGyms: IGym[] = [...lookAroundForNearbyGyms(ap, sortedGyms, hitRegion, qualifyingDistance)];
+        const associations: IAssociation[] = createAssociations(ap, nearbyGyms);
         if (associations.length > 0) {
             // only return gyms with at least 1 nearby apartment
-            gym.associatedUnits = associations;
-            gymsWithAssociations.push(gym);
+            ap.nearbyGyms = associations;
+            apsWithNearbyGyms.push(ap);
         }
     }
-    return gymsWithAssociations;
+    return apsWithNearbyGyms;
 }
 
 export function sortWestToEast(places: IHousing[] | IGym[]): IHousing[] | IGym[] {
@@ -53,17 +53,17 @@ export function sortWestToEast(places: IHousing[] | IGym[]): IHousing[] | IGym[]
 // once the apartments are too far east for the current gym, move to the next gym.
 // ah: binary search? "i found a reasonably close gym; let's switch to linear search now"
 
-export function binarySearch(aps: Array<IHousing>, target: IGym, qualifyingDistance: number): number {
+export function binarySearch(target: IHousing, gyms: IGym[], qualifyingDistance: number): number {
     let low = 0;
-    let high = aps.length - 1;
+    let high = gyms.length - 1;
     while (low <= high) {
         let index = Math.floor((low + high) / 2);
         index;
-        if (isCloseEnough(aps[index], target, qualifyingDistance)) {
+        if (isCloseEnough(target, gyms[index], qualifyingDistance)) {
             return index;
         }
-        const currentApartmentIsWestOfGym = aps[index].lat < target.lat;
-        if (currentApartmentIsWestOfGym) {
+        const currentGymIsWestOfApartment = gyms[index].lat < target.lat;
+        if (currentGymIsWestOfApartment) {
             low = index + 1; // move low a bit further east
         } else {
             high = index - 1; // move high a bit further west
@@ -79,6 +79,26 @@ export function isCloseEnough(apartment: IHousing, gym: IGym, qualifyingDistance
     // const distance = pythagoras(difference(apartment.lat, gym.lat), difference(apartment.lat, gym.lat));
     const distance = convertLatLongDifferenceIntoKM(apartment.lat, apartment.long, gym.lat, gym.long);
     return distance < qualifyingDistance;
+}
+
+export function lookAroundForNearbyGyms(apartment: IHousing, gyms: IGym[], start: number, qDist: number): IGym[] {
+    // todo: look west, look east. Return all qualified apartments.
+    const nearbyGyms: IGym[] = [];
+    for (let i = start; i >= 0; i--) {
+        if (isCloseEnough(apartment, gyms[i], qDist)) {
+            nearbyGyms.push(gyms[i]);
+        } else {
+            break;
+        }
+    }
+    for (let i = start + 1; i < gyms.length; i++) {
+        if (isCloseEnough(apartment, gyms[i], qDist)) {
+            nearbyGyms.push(gyms[i]);
+        } else {
+            break;
+        }
+    }
+    return nearbyGyms;
 }
 
 export function lookAroundForQualifiedApartments(apartments: IHousing[], gym: IGym, start: number, qDist: number): IHousing[] {
@@ -101,12 +121,12 @@ export function lookAroundForQualifiedApartments(apartments: IHousing[], gym: IG
     return qualifiedUnits;
 }
 
-export function createAssociations(apartments: IHousing[], gym: IGym): IAssociation[] {
+export function createAssociations(apartment: IHousing, gyms: IGym[]): IAssociation[] {
     const associations: IAssociation[] = [];
-    for (const ap of apartments) {
-        const d: number = convertLatLongDifferenceIntoKM(ap.lat, ap.long, gym.lat, gym.long);
+    for (const gym of gyms) {
+        const d: number = convertLatLongDifferenceIntoKM(apartment.lat, apartment.long, gym.lat, gym.long);
         const i: IAssociation = {
-            apartment: ap,
+            gym: gym,
             distanceInKM: d,
         };
         associations.push(i);

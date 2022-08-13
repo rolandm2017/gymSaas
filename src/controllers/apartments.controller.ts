@@ -116,9 +116,9 @@ class HousingController {
             const gymService = new GymFinderService();
             const gyms = await gymService.getSavedGymsFromDB("Montreal");
             // TODO: organize controllers. Does this endpoint belong in apartments, gyms, or "places"?
-            const gymsWithAssociations = qualify(apartments, gyms, qualificationRadiusInKM);
+            const apartmentsWithNearbyGyms = qualify(apartments, gyms, qualificationRadiusInKM);
 
-            return response.status(200).json({ gyms: gymsWithAssociations }).end();
+            return response.status(200).json({ apartments: apartmentsWithNearbyGyms }).end();
         } catch (error) {
             return response.status(500).send({ error }).end();
         }

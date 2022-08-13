@@ -1,4 +1,5 @@
 import { Provider } from "../enum/provider.enum";
+import { IAssociation } from "./Association.interface";
 
 export interface IHousing {
     type: "apartment" | "house";
@@ -12,5 +13,6 @@ export interface IHousing {
     lat: number;
     long: number;
     source: Provider;
+    nearbyGyms?: IAssociation[];
     // TODO: consider adding "availability"
 }
