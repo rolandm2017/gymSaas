@@ -25,6 +25,7 @@ class ApartmentScraperService {
     public async scrapeApartments(country: string, state: string, city: string): Promise<IHousing[]> {
         // fwd request to Flask scraper services.
         // Note: Expect scraping to take 5-10 minutes in the future, when we have 4 scrapers handling 1 to 100 screens worth of data.
+        
         return [];
     }
 

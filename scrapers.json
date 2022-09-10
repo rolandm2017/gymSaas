@@ -1,24 +1,35 @@
 {
-    "scrapers": [
-        {
-            "site": "rentcanada.com",
-            "type": "lat,long",
-            "port": 8081
-        },
-        {
-            "site": "apartments.com",
-            "type": "city,state",
-            "port": 8082
-        },
-        {
-            "site": "rentals.ca",
-            "type": "lat,long",
-            "port": 8083
-        },
-        {
-            "site": "TODO: fill in rentFaster, rentSeeker",
-            "type": null,
-            "port": 8084
-        }
-    ]
+    "scrapers": {
+        "canadian": [
+            {
+                "site": "rentals.ca",
+                "type": "lat,long",
+                "port": 8081,
+                "active": false
+            },
+            {
+                "site": "rentcanada.com",
+                "type": "lat,long",
+                "port": 8082
+            },
+
+            {
+                "site": "rentfaster.ca",
+                "type": "lat,long",
+                "port": 8083
+            }
+            {
+                "site": "rentseeker.ca",
+                "type": "lat,long",
+                "port": 8084
+            }
+        ],
+        "american": [
+            {
+                "site": "apartments.com",
+                "type": "city,state",
+                "port": 8085
+            }
+        ]
+    }
 }

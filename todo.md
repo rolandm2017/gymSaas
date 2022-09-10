@@ -15,3 +15,5 @@
 8. add system that uses a credit for each apartment loaded.
 
 9. figure out pricing model
+
+10. Get links for EVERY apartment. If the apartment has no link, show the site where its from. (Is there any point in showing a non-direct link?)

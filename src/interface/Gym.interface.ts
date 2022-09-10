@@ -33,5 +33,6 @@ export interface IGym {
     user_ratings_total?: number;
     lat: number;
     long: number; // duplicate value? sure is!
+    url?: string;
     associatedUnits?: IAssociation[];
 }
