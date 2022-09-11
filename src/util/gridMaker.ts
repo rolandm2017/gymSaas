@@ -3,23 +3,24 @@
 
 import { changeInEastWestKMToLongitudeDegrees, changeInNorthSouthKMToLatitudeDegrees } from "./conversions";
 
-function generateGrid(startLong: number, startLat: number, jump: number, radius: number) {
+import { ILatLong } from "../interface/LatLong.interface";
+
+export function generateGrid(startCoords: ILatLong, jump: number, radius: number): ILatLong[] {
     /*
      * jump - the space between the focal point ("center") of any two grid positions
      * radius - how far from the origin we want to go.
      */
-    const start = { x: startLong, y: startLat };
-    const ringDistances = [];
+    const ringDistances: number[] = [];
     let d = 0;
     for (let i = 0; d < radius; i++) {
         d = jump * i;
         ringDistances.push(d);
     }
-    const nodes = ringDistances.map(d => getNextRing(start, jump, d));
+    const nodes = ringDistances.map(d => getNextRing(startCoords, jump, d));
     return nodes.flat();
 }
 
-function getNextRing(focalPoint: { x: number; y: number }, jump: number, ringDistance: number) {
+function getNextRing(focalPoint: ILatLong, jump: number, ringDistance: number): ILatLong[] {
     // from the focal point, calculate distance to sides.
     // then divide the sides into Y subsections.
     /*
@@ -27,10 +28,10 @@ function getNextRing(focalPoint: { x: number; y: number }, jump: number, ringDis
      * ringDistance - distance from focalPoint to the nearest point on the perimeter of the ring (which is a square)
      */
 
-    const minX = focalPoint.x - ringDistance;
-    const maxX = focalPoint.x + ringDistance;
-    const minY = focalPoint.y - ringDistance;
-    const maxY = focalPoint.y + ringDistance;
+    const minX = focalPoint.long - ringDistance;
+    const maxX = focalPoint.long + ringDistance;
+    const minY = focalPoint.lat - ringDistance;
+    const maxY = focalPoint.lat + ringDistance;
 
     // const topLeftCorner = { x: minX, y: maxY };
     // const topRightCorner = { x: maxX, y: maxY };
@@ -49,10 +50,10 @@ function getNextRing(focalPoint: { x: number; y: number }, jump: number, ringDis
     for (let i = 0; i < subdivisions; i++) {
         const progressAlongEdge = i * jump;
         // clockwise
-        topEdge.push({ x: minX + progressAlongEdge, y: maxY });
-        rightEdge.push({ x: maxX, y: maxY - progressAlongEdge });
-        bottomEdge.push({ x: maxX - progressAlongEdge, y: minY });
-        leftEdge.push({ x: minX, y: minY + progressAlongEdge });
+        topEdge.push({ long: minX + progressAlongEdge, lat: maxY });
+        rightEdge.push({ long: maxX, lat: maxY - progressAlongEdge });
+        bottomEdge.push({ long: maxX - progressAlongEdge, lat: minY });
+        leftEdge.push({ long: minX, lat: minY + progressAlongEdge });
     }
 
     return [topEdge, rightEdge, bottomEdge, leftEdge].flat();

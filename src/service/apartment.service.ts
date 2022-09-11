@@ -11,6 +11,10 @@ import axios from "axios";
 import { IHousing } from "../interface/Housing.interface";
 import Parser from "../util/parser";
 import { Provider } from "../enum/provider.enum";
+import Scraper from "../scrapers/scraper";
+import ScraperFactory from "../scrapers/factory";
+import { detectViewportSize } from "../util/viewportSizeDetector";
+import { IBounds } from "../interface/Bounds.interface";
 
 const rc = require("../../hardcodeReplies/rentCanada.json");
 const rf = require("../../hardcodeReplies/rentFaster.json");
@@ -22,11 +26,27 @@ dotenv.config();
 class ApartmentScraperService {
     constructor() {}
 
-    public async scrapeApartments(country: string, state: string, city: string): Promise<IHousing[]> {
+    public async scrapeApartments(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IHousing[]> {
         // fwd request to Flask scraper services.
         // Note: Expect scraping to take 5-10 minutes in the future, when we have 4 scrapers handling 1 to 100 screens worth of data.
-        
+
         return [];
+    }
+
+    public async detectProviderViewportWidth(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IBounds> {
+        try {
+            const scraper = new ScraperFactory().createScraperOfType(provider);
+            if (country !== "Canada" && country !== "canada") {
+                throw new Error("Invalid country");
+            }
+            const results = scraper.scrape(city, stateOrProvince, country);
+            // const dimensions = detectViewportSize(results);
+            const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
+            return dimensions;
+        } catch {
+            const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
+            return dimensions;
+        }
     }
 
     public async getDummyData(provider: Provider): Promise<IHousing[]> {

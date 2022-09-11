@@ -5,12 +5,13 @@ import ApartmentScraperService from "../service/apartment.service";
 import GymFinderService from "../service/gym.service";
 import { qualify } from "../util/qualify";
 
-class HousingController {
+class ApartmentsController {
     public path = "/housing";
     public router = express.Router();
 
     constructor() {
         this.router.get("/scrape", this.scrapeApartments);
+        this.router.get("/test_viewport", this.detectProviderViewportWidth);
         this.router.get("/saved", this.getSavedApartments);
         this.router.post("/task", this.queueScrape);
         this.router.get("/hardcode", this.getHardcodeApartments);
@@ -25,8 +26,28 @@ class HousingController {
             return response.status(500).send({ err: "Parameter missing" }).end();
         }
         console.log(city, stateOrProvince, country, 19);
+        const scraper = new ApartmentScraperService();
+        const aps: IHousing[] = await scraper.scrapeApartments(Provider.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
         // TODO: forward request to flask servers
         return response.status(200).send("You made it");
+    }
+
+    async detectProviderViewportWidth(request: Request, response: Response) {
+        try {
+            const city = request.body.city;
+            const stateOrProvince = request.body.state;
+            const country = request.body.country;
+            if (!city || !stateOrProvince || !country) {
+                return response.status(500).send({ err: "Parameter missing" }).end();
+            }
+            console.log(city, stateOrProvince, country, 19);
+            const scraper = new ApartmentScraperService();
+            await scraper.detectProviderViewportWidth(Provider.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
+            // const aps: IHousing[] =
+            return response.status(200).send("You made it");
+        } catch {
+            return response.status(500).send();
+        }
     }
 
     async getSavedApartments(request: Request, response: Response) {
@@ -125,4 +146,4 @@ class HousingController {
     }
 }
 
-export default HousingController;
+export default ApartmentsController;
