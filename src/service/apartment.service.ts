@@ -16,6 +16,8 @@ import ScraperFactory from "../scrapers/factory";
 import { detectViewportSize } from "../util/viewportSizeDetector";
 import { IBounds } from "../interface/Bounds.interface";
 import LocationDiscoveryService from "./locationDiscovery.service";
+import { ILatLong } from "../interface/LatLong.interface";
+import { generateGrid } from "../util/gridMaker";
 
 const rc = require("../../hardcodeReplies/rentCanada.json");
 const rf = require("../../hardcodeReplies/rentFaster.json");
@@ -25,7 +27,7 @@ const rs = require("../../hardcodeReplies/rentSeeker.json");
 dotenv.config();
 
 class ApartmentScraperService {
-    constructor() {}
+    constructor(providerDbService: ) {}
 
     public async scrapeApartments(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IHousing[]> {
         // fwd request to Flask scraper services.
@@ -35,6 +37,7 @@ class ApartmentScraperService {
     }
 
     public async detectProviderViewportWidth(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IBounds> {
+        // step 1: discover the viewport width. To be used in the grid maker as "jump" size.
         try {
             const scraper = new ScraperFactory().createScraperOfType(provider);
             if (country !== "Canada" && country !== "canada") {
@@ -47,14 +50,24 @@ class ApartmentScraperService {
             const results = await scraper.scrape(coords.lat, coords.long, provider);
             console.log("HERE");
             const dimensions = detectViewportSize(results);
-            // const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
             return dimensions;
+            // todo: put detected width into db so dont have to keep redoing this.
         } catch (err) {
-            console.log("error 53rm");
-            // const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
-            // return dimensions;
             console.log(err);
         }
+    }
+
+    public async planGrid(startCoords: ILatLong, bounds: IBounds, radius: number): Promise<ILatLong[]> {
+        // step 2: plan the grid pattern the apis will scan in.
+        const theSmallerOfTheTwo = bounds.kmEastWest > bounds.kmNorthSouth ? bounds.kmNorthSouth : bounds.kmEastWest;
+        // choose the smaller of the two distances because we prefer some overlap instead of some space between snapshots
+        const subdivisionLocations = generateGrid(startCoords, theSmallerOfTheTwo, radius);
+        // todo: retrieve stored grid dimensions if they exist.
+        return subdivisionLocations;
+    }
+
+    public async scanGrid(coords: ILatLong[], zoomWidth: number): Promise<IHousing[]> {
+        //
     }
 
     public async getDummyData(provider: Provider): Promise<IHousing[]> {
@@ -70,11 +83,6 @@ class ApartmentScraperService {
         } else {
             throw new Error("Provider not included or invalid");
         }
-        // rawData = fs.readFileSync(path).toString();
-        // unprocessedHousingData = JSON.parse(rawData);
-        // console.log(typeof rawData, rawData.length, unprocessedHousingData.length, "49rm");
-
-        // return parser.parse(unprocessedHousingData);
     }
 }
 

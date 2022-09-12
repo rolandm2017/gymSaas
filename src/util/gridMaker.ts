@@ -33,11 +33,6 @@ function getNextRing(focalPoint: ILatLong, jump: number, ringDistance: number): 
     const minY = focalPoint.lat - ringDistance;
     const maxY = focalPoint.lat + ringDistance;
 
-    // const topLeftCorner = { x: minX, y: maxY };
-    // const topRightCorner = { x: maxX, y: maxY };
-    // const bottomLeftCorner = { x: minX, y: minY };
-    // const bottomRightCorner = { x: maxX, y: minY };
-
     // because the distance from the center to the nearest point on the perimeter * 2 = a full side
     const sideLength = ringDistance * 2;
     const subdivisions: number = sideLength / jump; // note: expecting integer values

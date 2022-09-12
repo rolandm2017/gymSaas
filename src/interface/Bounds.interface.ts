@@ -3,6 +3,8 @@ export interface IBounds {
     south: number;
     east: number;
     west: number;
+    latitudeChange: number;
+    longitudeChange: number;
     kmEastWest: number;
     kmNorthSouth: number;
 }
