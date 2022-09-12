@@ -16,35 +16,17 @@ class Scraper {
     }
 
     async scrape(lat: number, long: number, provider: Provider): Promise<IHousing[]> {
-        // async scrape(city: string, state: string, country: "Canada" | "canada") {
-        console.log("here");
         const url: string = this.ip + ":" + this.port;
         const json: string = JSON.stringify({ lat, long });
-        console.log(url, json, "20rm");
-        // try {
         const results: AxiosResponse<any, any> = await axios.post(url, json, {
             headers: {
                 "Content-Type": "application/json",
             },
         });
+        // note for reviewers: I argue that organizing (parsing) the data is part of the action, "to scrape"
         const parser = new Parser(provider);
         const housingData: IHousing[] = parser.parse(results.data);
-        return housingData;
-        // const aps = [];
-
-        // console.log(housingData, "21rm");
-        // const apartments: IHousing[] = [];
-        // for (const a of housingData) {
-        //     const ap = a as IHousing;
-        //     apartments.push(ap);
-        // }
-
-        // console.log(apartments, "18rm");
-        // return apartments;
-        // } catch (err) {
-        //     console.log("error");
-        //     console.log(err);
-        // }
+        return results.data;
     }
 }
 

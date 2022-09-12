@@ -27,21 +27,18 @@ class ScraperFactory {
 
     createScraperOfType(source: Provider) {
         console.log("here!");
-        if (source === Provider.rentCanada) {
-            const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);
-            console.log(s, 14);
-            return s;
-        } else if (source === Provider.rentFaster) {
-            const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);
-            console.log(s, 14);
-            return s;
-        } else if (source === Provider.rentSeeker) {
-            const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);
-            console.log(s, 14);
-            return s;
-        } else {
-            throw new Error("Invalid provider type");
-        }
+        // if (source === Provider.rentCanada) {
+        const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);
+        return s;
+        // } else if (source === Provider.rentFaster) {
+        //     const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);
+        //     return s;
+        // } else if (source === Provider.rentSeeker) {
+        //     const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);
+        //     return s;
+        // } else {
+        //     throw new Error("Invalid provider type");
+        // }
     }
 }
 
