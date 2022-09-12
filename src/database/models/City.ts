@@ -4,7 +4,7 @@ import sequelizeConnection from "../Database";
 
 // import { LocationAttributes } from "./Location";
 
-export interface ProviderAttributes {
+export interface CityAttributes {
     id: number;
     city: string;
     state: string;
@@ -16,13 +16,11 @@ export interface ProviderAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
-// export interface ProviderInput extends Required<ProviderAttributes> {}
-// export interface ProviderOutput extends Required<ProviderAttributes> {}
 
-export type ProviderOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
-export type ProviderCreationAttributes = Optional<ProviderAttributes, ProviderOptionalAttributes>;
+export type CityOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
+export type CityCreationAttributes = Optional<CityAttributes, CityOptionalAttributes>;
 
-export class Provider extends Model<ProviderAttributes, ProviderCreationAttributes> implements ProviderAttributes {
+export class City extends Model<CityAttributes, CityCreationAttributes> implements CityAttributes {
     public id!: number;
     public city!: string;
     public state!: string;
@@ -35,8 +33,8 @@ export class Provider extends Model<ProviderAttributes, ProviderCreationAttribut
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
 
-    static initModel(sequelize: Sequelize): typeof Provider {
-        return Provider.init(
+    static initModel(sequelize: Sequelize): typeof City {
+        return City.init(
             {
                 id: {
                     type: DataTypes.INTEGER,

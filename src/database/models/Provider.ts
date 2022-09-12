@@ -13,8 +13,6 @@ export interface ProviderAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
-// export interface ProviderInput extends Required<ProviderAttributes> {}
-// export interface ProviderOutput extends Required<ProviderAttributes> {}
 
 export type ProviderOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type ProviderCreationAttributes = Optional<ProviderAttributes, ProviderOptionalAttributes>;
