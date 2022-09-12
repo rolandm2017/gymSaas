@@ -1,6 +1,8 @@
 import axios, { AxiosResponse } from "axios";
+import { createTask } from "../database/dao/task.dao";
 import { Provider } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
+import { ILatLong } from "../interface/LatLong.interface";
 import Parser from "../util/parser";
 
 // class will handle info about various scraper types. "is it a long/lat or city input? does it return aps with streets, coords, both?"
@@ -27,6 +29,20 @@ class Scraper {
         const parser = new Parser(provider);
         const housingData: IHousing[] = parser.parse(results.data);
         return results.data;
+    }
+
+    async queueGridScrape(tasks: ILatLong[], zoomWidth: number): Promise<boolean> {
+        try {
+            // todo: go into shared db and queue tasks.
+            for (const task of tasks) {
+                const t = { ...task, zoomWidth: zoomWidth, lastScan: undefined };
+                await createTask(t, zoomWidth);
+            }
+            return true;
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
     }
 }
 

@@ -1,12 +1,14 @@
 import { Provider, ProviderCreationAttributes } from "../models/Provider";
 
-export const getMultipleCities = (limit: number, offset?: number) => {
+export const getMultipleProviders = (limit: number, offset?: number) => {
     return Provider.findAndCountAll({ offset, limit });
 };
 
 export const getProviderById = (id: number) => {
     return Provider.findByPk(id);
 };
+
+// todo: create "get provider by name" i.e. rentCanada, rentSeeker, rentFaster
 
 export const createProvider = (provider: ProviderCreationAttributes) => {
     return Provider.create(provider);

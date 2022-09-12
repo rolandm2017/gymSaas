@@ -43,12 +43,9 @@ class ApartmentScraperService {
             if (country !== "Canada" && country !== "canada") {
                 throw new Error("Invalid country");
             }
-            console.log("here!!");
             const locationDiscovery = new LocationDiscoveryService();
             const coords = await locationDiscovery.geocoding("", city, stateOrProvince, country);
-            console.log(coords, "46rm");
             const results = await scraper.scrape(coords.lat, coords.long, provider);
-            console.log("HERE");
             const dimensions = detectViewportSize(results);
             return dimensions;
             // todo: put detected width into db so dont have to keep redoing this.
@@ -66,8 +63,16 @@ class ApartmentScraperService {
         return subdivisionLocations;
     }
 
-    public async scanGrid(coords: ILatLong[], zoomWidth: number): Promise<IHousing[]> {
-        //
+    public async scanGrid(provider:Provider, coords: ILatLong[], zoomWidth: number): Promise<boolean> {
+        // step 3: fwd the grid coords to the scraper along with the bounds.
+        // the scraper will scan every subdivision of the grid and report back its results. 
+        const scraper: Scraper = new ScraperFactory().createScraperOfType(provider);
+        const successfullyQueued:boolean = await scraper.queueGridScrape(coords, zoomWidth);
+        // TODO: figure out what to do here. scrapeGrid might take 1 hour. 
+        // what if the process is interrupted?
+        // what if the scraper crashes halfway thru?
+        // I think the scraper should receive jobs from a queue, and report results to a db.
+        return successfullyQueued;
     }
 
     public async getDummyData(provider: Provider): Promise<IHousing[]> {
