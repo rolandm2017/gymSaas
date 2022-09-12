@@ -44,7 +44,7 @@ class ApartmentScraperService {
             const locationDiscovery = new LocationDiscoveryService();
             const coords = await locationDiscovery.geocoding("", city, stateOrProvince, country);
             console.log(coords, "46rm");
-            const results = await scraper.scrape(coords.lat, coords.long);
+            const results = await scraper.scrape(coords.lat, coords.long, provider);
             console.log("HERE");
             const dimensions = detectViewportSize(results);
             // const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp

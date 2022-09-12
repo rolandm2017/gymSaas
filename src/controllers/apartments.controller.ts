@@ -42,9 +42,9 @@ class ApartmentsController {
             }
             console.log(city, stateOrProvince, country, 19);
             const scraper = new ApartmentScraperService();
-            await scraper.detectProviderViewportWidth(Provider.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
+            const dimensions = await scraper.detectProviderViewportWidth(Provider.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
             // const aps: IHousing[] =
-            return response.status(200).send("You made it");
+            return response.status(200).json(dimensions);
         } catch {
             return response.status(500).send();
         }
