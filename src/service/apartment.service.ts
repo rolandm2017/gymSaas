@@ -15,6 +15,7 @@ import Scraper from "../scrapers/scraper";
 import ScraperFactory from "../scrapers/factory";
 import { detectViewportSize } from "../util/viewportSizeDetector";
 import { IBounds } from "../interface/Bounds.interface";
+import LocationDiscoveryService from "./locationDiscovery.service";
 
 const rc = require("../../hardcodeReplies/rentCanada.json");
 const rf = require("../../hardcodeReplies/rentFaster.json");
@@ -40,13 +41,19 @@ class ApartmentScraperService {
                 throw new Error("Invalid country");
             }
             console.log("here!!");
-            const results = scraper.scrape(city, stateOrProvince, country);
-            // const dimensions = detectViewportSize(results);
-            const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
+            const locationDiscovery = new LocationDiscoveryService();
+            const coords = await locationDiscovery.geocoding("", city, stateOrProvince, country);
+            console.log(coords, "46rm");
+            const results = await scraper.scrape(coords.lat, coords.long);
+            console.log("HERE");
+            const dimensions = detectViewportSize(results);
+            // const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
             return dimensions;
-        } catch {
-            const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
-            return dimensions;
+        } catch (err) {
+            console.log("error 53rm");
+            // const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
+            // return dimensions;
+            console.log(err);
         }
     }
 

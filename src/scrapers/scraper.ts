@@ -13,10 +13,11 @@ class Scraper {
         this.port = port;
     }
 
-    async scrape(city: string, state: string, country: "Canada" | "canada") {
+    async scrape(lat: number, long: number): Promise<IHousing[]> {
+        // async scrape(city: string, state: string, country: "Canada" | "canada") {
         console.log("here");
         const url: string = this.ip + ":" + this.port;
-        const json: string = JSON.stringify({ city, state, country });
+        const json: string = JSON.stringify({ lat, long });
         console.log(url, json, "20rm");
         try {
             const results: AxiosResponse<any, any> = await axios.post(url, json, {
