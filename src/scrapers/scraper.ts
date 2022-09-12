@@ -14,18 +14,30 @@ class Scraper {
     }
 
     async scrape(city: string, state: string, country: "Canada" | "canada") {
+        console.log("here");
         const url: string = this.ip + ":" + this.port;
         const json: string = JSON.stringify({ city, state, country });
-        const results: AxiosResponse<any, any> = await axios.post(url, json);
+        console.log(url, json, "20rm");
+        try {
+            const results: AxiosResponse<any, any> = await axios.post(url, json, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            const data = results.data;
 
-        console.log(results, "21rm");
-        // const apartments:IHousing[] = [];
-        // for (const a of results) {
+            console.log(data, "21rm");
+            // const apartments:IHousing[] = [];
+            // for (const a of results) {
 
-        // }
+            // }
 
-        // console.log(apartments, "18rm");
-        // return apartments;
+            // console.log(apartments, "18rm");
+            // return apartments;
+        } catch (err) {
+            console.log("error");
+            console.log(err);
+        }
     }
 }
 

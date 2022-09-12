@@ -39,6 +39,7 @@ class ApartmentScraperService {
             if (country !== "Canada" && country !== "canada") {
                 throw new Error("Invalid country");
             }
+            console.log("here!!");
             const results = scraper.scrape(city, stateOrProvince, country);
             // const dimensions = detectViewportSize(results);
             const dimensions = { north: 1, south: 1, east: 1, west: 1, kmEastWest: 1, kmNorthSouth: 1 }; // temp
