@@ -4,13 +4,21 @@ import { Gym as _Gym } from "./Gym";
 import { Housing as _Housing } from "./Housing";
 import { Report as _Report } from "./Report";
 
+import { City as _City } from "./City";
+import { Provider as _Provider } from "./Provider";
+import { Task as _Task } from "./Task";
+
 function initModels(sequelize: Sequelize) {
     const Account = _Account.initModel(sequelize);
     const Report = _Report.initModel(sequelize);
     const Housing = _Housing.initModel(sequelize);
     const Gym = _Gym.initModel(sequelize);
 
-    return { Account, Report, Housing, Gym };
+    const City = _City.initModel(sequelize);
+    const Provider = _Provider.initModel(sequelize);
+    const Task = _Task.initModel(sequelize);
+
+    return { Account, Report, Housing, Gym, City, Provider, Task };
 }
 
 export default initModels;

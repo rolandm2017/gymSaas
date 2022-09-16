@@ -8,7 +8,7 @@ export const getTaskById = (id: number) => {
     return Task.findByPk(id);
 };
 
-export const createTask = (task: TaskCreationAttributes, zoomWidth: number) => {
+export const createTask = (task: TaskCreationAttributes) => {
     return Task.create(task);
 };
 

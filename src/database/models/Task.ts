@@ -3,7 +3,7 @@ import { Association, DataTypes, Model, Optional, Sequelize } from "sequelize";
 import sequelizeConnection from "../Database";
 
 export interface TaskAttributes {
-    id: number;
+    id?: number;
     lat: number;
     long: number;
     zoomWidth: number;
@@ -17,7 +17,7 @@ export type TaskOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type TaskCreationAttributes = Optional<TaskAttributes, TaskOptionalAttributes>;
 
 export class Task extends Model<TaskAttributes, TaskCreationAttributes> implements TaskAttributes {
-    public id!: number;
+    public id?: number;
     public lat!: number;
     public long!: number;
     public zoomWidth!: number;
@@ -46,7 +46,7 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
                 zoomWidth: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
-                }
+                },
                 lastScan: {
                     type: DataTypes.DATE,
                     allowNull: true,
