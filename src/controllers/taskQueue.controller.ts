@@ -11,6 +11,7 @@ class TaskQueueController {
         this.router.post("/gridScan", this.addGridScanToQueue);
         this.router.get("/nextTaskForScraper", this.getNextTaskForScraper);
         this.router.post("/markTaskComplete", this.markTaskComplete);
+        this.router.delete("/cleanup", this.cleanOldTasks);
     }
 
     async addGridScanToQueue(request: Request, response: Response) {
@@ -59,6 +60,13 @@ class TaskQueueController {
         const complete = await taskQueue.markTaskComplete(taskId);
 
         return response.status(200).json({ complete });
+    }
+
+    async cleanOldTasks(request: Request, response: Response) {
+        const taskQueue = new TaskQueueService();
+        const deleted = await taskQueue.cleanOldTasks();
+
+        return response.status(200).json({ deleted });
     }
 }
 

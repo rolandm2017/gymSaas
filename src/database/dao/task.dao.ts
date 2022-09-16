@@ -1,3 +1,5 @@
+import sequelize, { Op } from "sequelize";
+import moment from "moment";
 import { ProviderEnum } from "../../enum/provider.enum";
 import { Task, TaskCreationAttributes } from "../models/Task";
 
@@ -46,12 +48,13 @@ export const getNextUnfinishedTaskForProvider = (provider: ProviderEnum, batchNu
     });
 };
 
-// export const getNextUnfinishedBatchesForProvider = (provider: ProviderEnum) => {
-//     return Task.findAll({
-//         where: { providerName: provider, lastScan: undefined },
-//         order: [["createdAt", "DESC"]],
-//     });
-// };
+export const getAllUnfinishedBatchesForProvider = (provider: ProviderEnum) => {
+    // note: used to be "getNextUnfinishedBatch" but was impossible to figure out implementation
+    return Task.findAll({
+        where: { providerName: provider },
+        order: [["createdAt", "DESC"]],
+    });
+};
 
 export const updateTask = (task: TaskCreationAttributes, id: number) => {
     return Task.update(task, { where: { id } });
@@ -59,4 +62,12 @@ export const updateTask = (task: TaskCreationAttributes, id: number) => {
 
 export const deleteTask = (id: number) => {
     return Task.destroy({ where: { id } });
+};
+
+export const deleteTasksOlderThanTwoMonths = () => {
+    return Task.destroy({
+        where: {
+            createdAt: { [Op.lte]: moment().subtract(2, "months").toDate() },
+        },
+    });
 };

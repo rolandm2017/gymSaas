@@ -1,6 +1,13 @@
 import express from "express";
 
-import { createTask, getMostRecentTaskForProvider, getNextUnfinishedTaskForProvider, getTaskById, updateTask } from "../database/dao/task.dao";
+import {
+    createTask,
+    deleteTasksOlderThanTwoMonths,
+    getMostRecentTaskForProvider,
+    getNextUnfinishedTaskForProvider,
+    getTaskById,
+    updateTask,
+} from "../database/dao/task.dao";
 import { getProviderByName } from "../database/dao/provider.dao";
 import { ProviderEnum } from "../enum/provider.enum";
 import { ILatLong } from "../interface/LatLong.interface";
@@ -50,6 +57,10 @@ class TaskQueueService {
         s.lastScan = new Date();
         await updateTask(s, taskId);
         return true;
+    }
+
+    public async cleanOldTasks(): Promise<number> {
+        return await deleteTasksOlderThanTwoMonths();
     }
 }
 
