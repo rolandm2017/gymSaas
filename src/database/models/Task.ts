@@ -8,15 +8,18 @@ import {
     Optional,
     Sequelize,
 } from "sequelize";
+import { ProviderEnum } from "../../enum/provider.enum";
 
 import sequelizeConnection from "../Database";
 import { Provider, ProviderId } from "./Provider";
 
 export interface TaskAttributes {
     id?: number;
+    providerName: ProviderEnum;
     lat: number;
     long: number;
     zoomWidth: number;
+    batch: number;
     lastScan: Date | undefined;
     createdAt?: Date;
     updatedAt?: Date;
@@ -29,9 +32,11 @@ export type TaskCreationAttributes = Optional<TaskAttributes, TaskOptionalAttrib
 
 export class Task extends Model<TaskAttributes, TaskCreationAttributes> implements TaskAttributes {
     public id?: number;
+    public providerName!: ProviderEnum;
     public lat!: number;
     public long!: number;
     public zoomWidth!: number;
+    public batch!: number;
     public lastScan: Date | undefined;
 
     public readonly createdAt!: Date;
@@ -52,6 +57,10 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
                     autoIncrement: true,
                     primaryKey: true,
                 },
+                providerName: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
                 lat: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
@@ -61,6 +70,10 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
                     allowNull: false,
                 },
                 zoomWidth: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                },
+                batch: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
                 },

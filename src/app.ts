@@ -4,7 +4,6 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import initModels from "./database/models/init-models";
 import Database from "./database/Database";
-// import ErrorMiddleware from "./middleware/error.middleware";
 
 class App {
     public app: Application;
