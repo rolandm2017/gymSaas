@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { Provider } from "../enum/provider.enum";
+import { ProviderEnum } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
 import ApartmentScraperService from "../service/apartment.service";
 import GymFinderService from "../service/gym.service";
@@ -27,7 +27,7 @@ class ApartmentsController {
         }
         console.log(city, stateOrProvince, country, 19);
         const scraper = new ApartmentScraperService();
-        const aps: IHousing[] = await scraper.scrapeApartments(Provider.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
+        const aps: IHousing[] = await scraper.scrapeApartments(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
         // TODO: forward request to flask servers
         return response.status(200).send("You made it");
     }
@@ -42,7 +42,7 @@ class ApartmentsController {
             }
             console.log(city, stateOrProvince, country, 19);
             const scraper = new ApartmentScraperService();
-            const dimensions = await scraper.detectProviderViewportWidth(Provider.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
+            const dimensions = await scraper.detectProviderViewportWidth(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
             // const aps: IHousing[] =
             return response.status(200).json(dimensions);
         } catch {
@@ -82,7 +82,7 @@ class ApartmentsController {
                 return response.status(500).send({ err: "Provider missing" }).end();
             }
             const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
-            if (providers.map(p => p in Provider).every(p => p)) {
+            if (providers.map(p => p in ProviderEnum).every(p => p)) {
                 // providers must all be in Provider
             } else {
                 return response.status(500).send({ err: "Provider specified is not a provider" }).end();
@@ -91,7 +91,7 @@ class ApartmentsController {
             let apartments = [];
             const apartmentService = new ApartmentScraperService();
             for (let i = 0; i < providers.length; i++) {
-                const p: Provider = providers[i] as Provider;
+                const p: ProviderEnum = providers[i] as ProviderEnum;
                 console.log(p, "69rm");
                 const stuff = await apartmentService.getDummyData(p);
                 console.log(typeof stuff, stuff.length, "63rm");
@@ -116,7 +116,7 @@ class ApartmentsController {
                 return response.status(500).send({ err: "Provider missing" }).end();
             }
             const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
-            if (providers.map(p => p in Provider).every(p => p)) {
+            if (providers.map(p => p in ProviderEnum).every(p => p)) {
                 // providers must all be in Provider
             } else {
                 return response.status(500).send({ err: "Provider specified is not a provider" }).end();
@@ -125,7 +125,7 @@ class ApartmentsController {
             let apartments = [];
             const apartmentService = new ApartmentScraperService();
             for (let i = 0; i < providers.length; i++) {
-                const p: Provider = providers[i] as Provider;
+                const p: ProviderEnum = providers[i] as ProviderEnum;
                 console.log(p, "69rm");
                 const savedApartments: IHousing[] = await apartmentService.getDummyData(p);
                 console.log(typeof savedApartments, savedApartments.length, "63rm");

@@ -1,4 +1,4 @@
-export enum Provider {
+export enum ProviderEnum {
     rentCanada = "rentCanada",
     rentFaster = "rentFaster",
     rentSeeker = "rentSeeker",

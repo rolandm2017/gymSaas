@@ -1,19 +1,19 @@
-import { Provider } from "../enum/provider.enum";
+import { ProviderEnum } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
 
 class Parser {
-    provider: Provider;
+    provider: ProviderEnum;
 
-    constructor(source: Provider) {
+    constructor(source: ProviderEnum) {
         this.provider = source;
     }
 
     parse(unprocessed: string) {
-        if (this.provider === Provider.rentCanada) {
+        if (this.provider === ProviderEnum.rentCanada) {
             return this.parseRentCanada(unprocessed);
-        } else if (this.provider === Provider.rentFaster) {
+        } else if (this.provider === ProviderEnum.rentFaster) {
             return this.parseRentFaster(unprocessed);
-        } else if (this.provider === Provider.rentSeeker) {
+        } else if (this.provider === ProviderEnum.rentSeeker) {
             return this.parseRentSeeker(unprocessed);
         } else {
             throw new Error("Provider not selected");

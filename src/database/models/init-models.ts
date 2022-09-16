@@ -37,10 +37,10 @@ function initModels(sequelize: Sequelize) {
     City.hasMany(Housing);
     City.hasMany(Gym);
 
-    //Provider
+    // Provider
     Provider.hasMany(Task);
 
-    //Task
+    // Task
     Task.belongsTo(Provider);
 
     return { Account, Report, Housing, Gym, City, Provider, Task };

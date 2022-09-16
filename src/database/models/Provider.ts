@@ -13,6 +13,7 @@ import {
     HasManyRemoveAssociationsMixin,
     HasManyCountAssociationsMixin,
 } from "sequelize";
+import { ProviderEnum } from "../../enum/provider.enum";
 
 import sequelizeConnection from "../Database";
 import { Task, TaskId } from "./Task";
@@ -21,8 +22,9 @@ import { Task, TaskId } from "./Task";
 
 export interface ProviderAttributes {
     id: number;
-    viewportWidth: number;
-    scanRadius: number;
+    name: ProviderEnum;
+    viewportWidth: number | undefined;
+    scanRadius: number | undefined;
     lastScan: Date | undefined;
     createdAt?: Date;
     updatedAt?: Date;
@@ -35,8 +37,9 @@ export type ProviderCreationAttributes = Optional<ProviderAttributes, ProviderOp
 
 export class Provider extends Model<ProviderAttributes, ProviderCreationAttributes> implements ProviderAttributes {
     public id!: number;
-    public viewportWidth!: number;
-    public scanRadius!: number;
+    public name!: ProviderEnum;
+    public viewportWidth!: number | undefined;
+    public scanRadius!: number | undefined;
     public lastScan: Date | undefined;
 
     public readonly createdAt!: Date;
@@ -64,13 +67,17 @@ export class Provider extends Model<ProviderAttributes, ProviderCreationAttribut
                     autoIncrement: true,
                     primaryKey: true,
                 },
+                name: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
                 viewportWidth: {
                     type: DataTypes.INTEGER,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 scanRadius: {
                     type: DataTypes.INTEGER,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 lastScan: {
                     type: DataTypes.DATE,

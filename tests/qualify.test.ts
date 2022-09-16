@@ -1,4 +1,4 @@
-import { Provider } from "../src/enum/provider.enum";
+import { ProviderEnum } from "../src/enum/provider.enum";
 import { IAssociation } from "../src/interface/Association.interface";
 import { IGym } from "../src/interface/Gym.interface";
 import { IHousing } from "../src/interface/Housing.interface";
@@ -23,11 +23,11 @@ import {
 // with lat/long for each, and calculate the distance between them by hand
 // TODO: Do the above 3 times.
 
-const ap1: IHousing = { type: "apartment", agreement: "rent", lat: 45.001, long: -73.0, source: Provider.rentCanada };
-const ap2: IHousing = { type: "apartment", agreement: "rent", lat: 45.002, long: -73.0, source: Provider.rentCanada };
-const ap3: IHousing = { type: "apartment", agreement: "rent", lat: 44.0, long: -73.0, source: Provider.rentCanada };
-const ap4: IHousing = { type: "apartment", agreement: "rent", lat: 44.001, long: -73.0, source: Provider.rentCanada };
-const ap5: IHousing = { type: "apartment", agreement: "rent", lat: 47.001, long: -73.0, source: Provider.rentCanada };
+const ap1: IHousing = { type: "apartment", agreement: "rent", lat: 45.001, long: -73.0, source: ProviderEnum.rentCanada };
+const ap2: IHousing = { type: "apartment", agreement: "rent", lat: 45.002, long: -73.0, source: ProviderEnum.rentCanada };
+const ap3: IHousing = { type: "apartment", agreement: "rent", lat: 44.0, long: -73.0, source: ProviderEnum.rentCanada };
+const ap4: IHousing = { type: "apartment", agreement: "rent", lat: 44.001, long: -73.0, source: ProviderEnum.rentCanada };
+const ap5: IHousing = { type: "apartment", agreement: "rent", lat: 47.001, long: -73.0, source: ProviderEnum.rentCanada };
 
 const gym1: IGym = {
     business_status: "OPERATIONAL",
