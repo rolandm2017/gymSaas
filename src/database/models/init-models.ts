@@ -18,6 +18,31 @@ function initModels(sequelize: Sequelize) {
     const Provider = _Provider.initModel(sequelize);
     const Task = _Task.initModel(sequelize);
 
+    // Account
+    Account.hasMany(Report);
+
+    // Report
+    Report.hasMany(Housing);
+    Report.hasMany(Gym);
+
+    // Housing
+    Housing.belongsTo(Report);
+    Housing.belongsTo(City);
+
+    // Gym
+    Gym.belongsTo(Report);
+    Gym.belongsTo(City);
+
+    // City
+    City.hasMany(Housing);
+    City.hasMany(Gym);
+
+    //Provider
+    Provider.hasMany(Task);
+
+    //Task
+    Task.belongsTo(Provider);
+
     return { Account, Report, Housing, Gym, City, Provider, Task };
 }
 

@@ -12,6 +12,11 @@ export const createTask = (task: TaskCreationAttributes) => {
     return Task.create(task);
 };
 
+// Can't work because it doesn't allow create with associations.
+// export const bulkCreateTask = (tasks: TaskCreationAttributes[]) => {
+//     return Task.bulkCreate(tasks);
+// };
+
 export const updateTask = (task: TaskCreationAttributes, id: number) => {
     return Task.update(task, { where: { id } });
 };

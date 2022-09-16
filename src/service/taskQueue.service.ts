@@ -12,6 +12,7 @@ class TaskQueueService {
         // the scraper will scan every subdivision of the grid and report back its results.
         const successes = [];
         //todo: associate task with provider by foreign key
+        // TODO: Acquire Provider from db via provider arg. Use Provider to "addProvider_tasks" I think?
         for (let i = 0; i < coords.length; i++) {
             // FIXME: probably 'id' is missing somehow in the db
             try {
@@ -31,6 +32,7 @@ class TaskQueueService {
 
     public async getNextTaskForScraper(provider: Provider): Promise<ITask> {
         //
+        
     }
 
     public async getNextBatchForScraper(provider: Provider): Promise<ITask[]> {

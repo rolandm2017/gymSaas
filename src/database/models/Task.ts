@@ -1,6 +1,16 @@
-import { Association, DataTypes, Model, Optional, Sequelize } from "sequelize";
+import {
+    Association,
+    BelongsToCreateAssociationMixin,
+    BelongsToGetAssociationMixin,
+    BelongsToSetAssociationMixin,
+    DataTypes,
+    Model,
+    Optional,
+    Sequelize,
+} from "sequelize";
 
 import sequelizeConnection from "../Database";
+import { Provider, ProviderId } from "./Provider";
 
 export interface TaskAttributes {
     id?: number;
@@ -13,6 +23,7 @@ export interface TaskAttributes {
     deletedAt?: Date;
 }
 
+export type TaskId = "id";
 export type TaskOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type TaskCreationAttributes = Optional<TaskAttributes, TaskOptionalAttributes>;
 
@@ -26,6 +37,12 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
+
+    // Task belongsTo Provider via ????
+    provider!: Provider;
+    getProvider!: BelongsToGetAssociationMixin<Provider>;
+    setProvider!: BelongsToSetAssociationMixin<Provider, ProviderId>;
+    createProvider!: BelongsToCreateAssociationMixin<Provider>;
 
     static initModel(sequelize: Sequelize): typeof Task {
         return Task.init(
