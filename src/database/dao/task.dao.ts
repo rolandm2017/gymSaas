@@ -37,10 +37,11 @@ export const createTask = (task: TaskCreationAttributes) => {
 export const getNextUnfinishedTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
     let conditions;
     if (batchNum) {
-        conditions = { providerName: provider, lastScan: undefined, batch: batchNum };
+        conditions = { providerName: provider, batch: batchNum };
     } else {
-        conditions = { providerName: provider, lastScan: undefined };
+        conditions = { providerName: provider };
     }
+    console.log("conditions", conditions, "44rm");
     return Task.findAll({
         limit: 1,
         where: conditions,
