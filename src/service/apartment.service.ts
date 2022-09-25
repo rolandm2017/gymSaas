@@ -55,15 +55,13 @@ class ApartmentScraperService {
     }
 
     public async planGrid(startCoords: ILatLong, bounds: IBounds, radius: number): Promise<ILatLong[]> {
-        // step 2: plan the grid pattern the apis will scan in.
+        // step 2 of 3: plan the grid pattern the apis will scan in.
         const theSmallerOfTheTwo = bounds.kmEastWest > bounds.kmNorthSouth ? bounds.kmNorthSouth : bounds.kmEastWest;
         // choose the smaller of the two distances because we prefer some overlap instead of some space between snapshots
         const subdivisionLocations = generateGrid(startCoords, theSmallerOfTheTwo, radius);
         // todo: retrieve stored grid dimensions if they exist.
         return subdivisionLocations;
     }
-
-
 
     public async getDummyData(provider: Provider): Promise<IHousing[]> {
         // open data based on input string

@@ -1,6 +1,8 @@
 import express, { Request, Response } from "express";
 import { ProviderEnum } from "../enum/provider.enum";
+import { IBounds } from "../interface/Bounds.interface";
 import { IHousing } from "../interface/Housing.interface";
+import { ILatLong } from "../interface/LatLong.interface";
 import ApartmentScraperService from "../service/apartment.service";
 import GymFinderService from "../service/gym.service";
 import { qualify } from "../util/qualify";
@@ -12,10 +14,11 @@ class ApartmentsController {
     constructor() {
         this.router.get("/scrape", this.scrapeApartments);
         this.router.get("/test_viewport", this.detectProviderViewportWidth);
+        this.router.get("/grid_scan_plan", this.getGridForScan);
         this.router.get("/saved", this.getSavedApartments);
-        this.router.post("/task", this.queueScrape);
-        this.router.get("/hardcode", this.getHardcodeApartments);
-        this.router.get("/qualified", this.getQualifiedHardcodeApartments);
+        // this.router.post("/task", this.queueScrape);
+        this.router.get("/hardcode", this.getHardcodeApartments); // old test route
+        this.router.get("/qualified", this.getQualifiedHardcodeApartments); // old test route
     }
 
     async scrapeApartments(request: Request, response: Response) {
@@ -42,12 +45,21 @@ class ApartmentsController {
             }
             console.log(city, stateOrProvince, country, 19);
             const scraper = new ApartmentScraperService();
-            const dimensions = await scraper.detectProviderViewportWidth(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
-            // const aps: IHousing[] =
+            const dimensions: IBounds = await scraper.detectProviderViewportWidth(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
             return response.status(200).json(dimensions);
         } catch {
             return response.status(500).send();
         }
+    }
+
+    async getGridForScan(request: Request, response: Response) {
+        const startCoords: ILatLong = request.body.startCoords;
+        const bounds: IBounds = request.body.bounds;
+        const radius: number = request.body.radius;
+        // not doing input validation here.
+        const scraper = new ApartmentScraperService();
+        const gridCoords = scraper.planGrid(startCoords, bounds, radius);
+        return response.status(200).json(gridCoords);
     }
 
     async getSavedApartments(request: Request, response: Response) {
@@ -62,17 +74,17 @@ class ApartmentsController {
         return response.status(200).send("You made it");
     }
 
-    async queueScrape(request: Request, response: Response) {
-        const city = request.body.city;
-        const stateOrProvince = request.body.state;
-        const country = request.body.country;
-        if (!city || !stateOrProvince || !country) {
-            return response.status(500).send({ err: "Parameter missing" }).end();
-        }
-        console.log(city, stateOrProvince, country, 19);
-        // TODO: store a job in a Jobs table.
-        return response.status(200).send("You made it");
-    }
+    // async queueScrape(request: Request, response: Response) {
+    //     const city = request.body.city;
+    //     const stateOrProvince = request.body.state;
+    //     const country = request.body.country;
+    //     if (!city || !stateOrProvince || !country) {
+    //         return response.status(500).send({ err: "Parameter missing" }).end();
+    //     }
+    //     console.log(city, stateOrProvince, country, 19);
+    //     // TODO: store a job in a Jobs table.
+    //     return response.status(200).send("You made it");
+    // }
 
     async getHardcodeApartments(request: Request, response: Response) {
         try {

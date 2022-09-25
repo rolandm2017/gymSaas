@@ -3,6 +3,7 @@ import express from "express";
 import {
     createTask,
     deleteTasksOlderThanTwoMonths,
+    getAllTasksForProvider,
     getMostRecentTaskForProvider,
     getNextUnfinishedTaskForProvider,
     getTaskById,
@@ -22,15 +23,13 @@ class TaskQueueService {
         // the scraper will scan every subdivision of the grid and report back its results.
         const successes: Task[] = [];
         //todo: associate task with provider by foreign key
-        // TODO: Acquire Provider from db via provider arg. Use Provider to "addProvider_tasks" I think?
 
         const mostRecentTask: Task[] = await getMostRecentTaskForProvider(provider);
         const mostRecentBatchNum: number = mostRecentTask[0].batch;
 
         for (let i = 0; i < coords.length; i++) {
-            // FIXME: probably 'id' is missing somehow in the db
+            // FIXME: probably 'id' is missing somehow in the db *unless* autoassignment worked
             try {
-                // const s = await
                 const s = await createTask({ providerName: provider, ...coords[i], zoomWidth, lastScan: undefined, batch: mostRecentBatchNum + 1 });
                 successes.push(s);
             } catch (err) {
@@ -61,6 +60,11 @@ class TaskQueueService {
 
     public async cleanOldTasks(): Promise<number> {
         return await deleteTasksOlderThanTwoMonths();
+    }
+
+    public async examineDbContents(provider: ProviderEnum): Promise<ITask[]> {
+        // used for testing and admin
+        return await getAllTasksForProvider(provider);
     }
 }
 

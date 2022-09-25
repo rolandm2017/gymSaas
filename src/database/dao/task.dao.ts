@@ -57,6 +57,12 @@ export const getAllUnfinishedBatchesForProvider = (provider: ProviderEnum) => {
     });
 };
 
+export const getAllTasksForProvider = (provider: ProviderEnum) => {
+    return Task.findAll({
+        where: { providerName: provider },
+    });
+};
+
 export const updateTask = (task: TaskCreationAttributes, id: number) => {
     return Task.update(task, { where: { id } });
 };

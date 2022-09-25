@@ -25,8 +25,20 @@ export function detectViewportSize(places: IHousing[]): IBounds {
         }
     }
 
+    const latitudeChange = Math.abs(northMax - southMax);
+    const longitudeChange = Math.abs(eastMax - westMax);
+
     const kmChangeNorthSouth = getDistanceFromLatLongInKm(westMax, northMax, westMax, southMax);
     const kmChangeEastWest = getDistanceFromLatLongInKm(westMax, southMax, eastMax, southMax);
 
-    return { north: northMax, east: eastMax, south: southMax, west: westMax, kmNorthSouth: kmChangeNorthSouth, kmEastWest: kmChangeEastWest };
+    return {
+        north: northMax,
+        east: eastMax,
+        south: southMax,
+        west: westMax,
+        latitudeChange,
+        longitudeChange,
+        kmNorthSouth: kmChangeNorthSouth,
+        kmEastWest: kmChangeEastWest,
+    };
 }

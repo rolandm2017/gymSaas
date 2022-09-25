@@ -17,7 +17,7 @@
                 "site": "rentfaster.ca",
                 "type": "lat,long",
                 "port": 8083
-            }
+            },
             {
                 "site": "rentseeker.ca",
                 "type": "lat,long",
@@ -30,8 +30,6 @@
                 "type": "city,state",
                 "port": 8085
             }
-        ],
-
-
+        ]
     }
 }
