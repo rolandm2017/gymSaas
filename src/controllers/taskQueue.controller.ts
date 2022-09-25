@@ -8,11 +8,12 @@ class TaskQueueController {
     public router = express.Router();
 
     constructor() {
-        this.router.post("/grid_scan", this.addGridScanToQueue);
+        this.router.post("/queue_grid_scan", this.addGridScanToQueue);
         this.router.get("/next_task_for_scraper", this.getNextTaskForScraper);
         this.router.post("/report_findings", this.reportFindingsToDb);
         this.router.post("/mark_task_complete", this.markTaskComplete);
         this.router.delete("/cleanup", this.cleanOldTasks);
+        // this.router.get("/db_contents", )
         this.router.get("/health_check", this.healthCheck);
     }
 

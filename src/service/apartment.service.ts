@@ -10,7 +10,7 @@ import axios from "axios";
 
 import { IHousing } from "../interface/Housing.interface";
 import Parser from "../util/parser";
-import { Provider } from "../enum/provider.enum";
+import { ProviderEnum } from "../enum/provider.enum";
 import Scraper from "../scrapers/scraper";
 import ScraperFactory from "../scrapers/factory";
 import { detectViewportSize } from "../util/viewportSizeDetector";
@@ -29,29 +29,25 @@ dotenv.config();
 class ApartmentScraperService {
     constructor() {}
 
-    public async scrapeApartments(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IHousing[]> {
+    public async scrapeApartments(provider: ProviderEnum, city: string, stateOrProvince: string, country: string): Promise<IHousing[]> {
         // fwd request to Flask scraper services.
         // Note: Expect scraping to take 5-10 minutes in the future, when we have 4 scrapers handling 1 to 100 screens worth of data.
 
         return [];
     }
 
-    public async detectProviderViewportWidth(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IBounds> {
+    public async detectProviderViewportWidth(provider: ProviderEnum, city: string, stateOrProvince: string, country: string): Promise<IBounds> {
         // step 1: discover the viewport width. To be used in the grid maker as "jump" size.
-        try {
-            const scraper = new ScraperFactory().createScraperOfType(provider);
-            if (country !== "Canada" && country !== "canada") {
-                throw new Error("Invalid country");
-            }
-            const locationDiscovery = new LocationDiscoveryService();
-            const coords = await locationDiscovery.geocoding("", city, stateOrProvince, country);
-            const results = await scraper.scrape(coords.lat, coords.long, provider);
-            const dimensions = detectViewportSize(results);
-            return dimensions;
-            // todo: put detected width into db so dont have to keep redoing this.
-        } catch (err) {
-            console.log(err);
+        const scraper = new ScraperFactory().createScraperOfType(provider);
+        if (country !== "Canada" && country !== "canada") {
+            throw new Error("Invalid country");
         }
+        const locationDiscovery = new LocationDiscoveryService();
+        const coords = await locationDiscovery.geocoding("", city, stateOrProvince, country);
+        const results = await scraper.scrape(coords.lat, coords.long, provider);
+        const dimensions = detectViewportSize(results);
+        return dimensions;
+        // todo: put detected width into db so dont have to keep redoing this. something like a "viewportWidth" model
     }
 
     public async planGrid(startCoords: ILatLong, bounds: IBounds, radius: number): Promise<ILatLong[]> {
@@ -63,15 +59,15 @@ class ApartmentScraperService {
         return subdivisionLocations;
     }
 
-    public async getDummyData(provider: Provider): Promise<IHousing[]> {
+    public async getDummyData(provider: ProviderEnum): Promise<IHousing[]> {
         // open data based on input string
         const parser = new Parser(provider);
         console.log(__dirname, "31rm");
-        if (provider === Provider.rentCanada) {
+        if (provider === ProviderEnum.rentCanada) {
             return parser.parse(rc);
-        } else if (provider === Provider.rentFaster) {
+        } else if (provider === ProviderEnum.rentFaster) {
             return parser.parse(rf);
-        } else if (provider === Provider.rentSeeker) {
+        } else if (provider === ProviderEnum.rentSeeker) {
             return parser.parse(rs);
         } else {
             throw new Error("Provider not included or invalid");

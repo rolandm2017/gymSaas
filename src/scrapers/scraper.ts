@@ -19,8 +19,10 @@ class Scraper {
     }
 
     async scrape(lat: number, long: number, provider: ProviderEnum): Promise<IHousing[]> {
-        const url: string = this.ip + ":" + this.port;
-        const json: string = JSON.stringify({ lat, long });
+        const url: string = this.ip + ":" + this.port + "/";
+        const json: string = JSON.stringify({ lat, long, provider });
+        console.log(url, json, "24rm");
+        // fixme2: url goes to nowhere in the scraper service
         const results: AxiosResponse<any, any> = await axios.post(url, json, {
             headers: {
                 "Content-Type": "application/json",
@@ -28,8 +30,10 @@ class Scraper {
         });
         // note for reviewers: I argue that organizing (parsing) the data is part of the action, "to scrape"
         const parser = new Parser(provider);
+        console.log(parser, "32rm");
         const housingData: IHousing[] = parser.parse(results.data);
-        return results.data;
+        console.log(housingData.length, "33rm");
+        return housingData;
     }
 
     async queueGridScrape(tasks: ILatLong[], zoomWidth: number): Promise<boolean> {

@@ -13,7 +13,7 @@ class ApartmentsController {
 
     constructor() {
         this.router.get("/scrape", this.scrapeApartments);
-        this.router.get("/test_viewport", this.detectProviderViewportWidth);
+        this.router.get("/viewport_width", this.detectProviderViewportWidth);
         this.router.get("/grid_scan_plan", this.getGridForScan);
         this.router.get("/saved", this.getSavedApartments);
         // this.router.post("/task", this.queueScrape);
@@ -28,7 +28,7 @@ class ApartmentsController {
         if (!city || !stateOrProvince || !country) {
             return response.status(500).send({ err: "Parameter missing" }).end();
         }
-        console.log(city, stateOrProvince, country, 19);
+        console.log(city, stateOrProvince, country, "31rm");
         const scraper = new ApartmentScraperService();
         const aps: IHousing[] = await scraper.scrapeApartments(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
         // TODO: forward request to flask servers
@@ -43,7 +43,7 @@ class ApartmentsController {
             if (!city || !stateOrProvince || !country) {
                 return response.status(500).send({ err: "Parameter missing" }).end();
             }
-            console.log(city, stateOrProvince, country, 19);
+            console.log(city, stateOrProvince, country, "46rm");
             const scraper = new ApartmentScraperService();
             const dimensions: IBounds = await scraper.detectProviderViewportWidth(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
             return response.status(200).json(dimensions);

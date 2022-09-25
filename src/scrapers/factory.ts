@@ -3,7 +3,7 @@ import Scraper from "./scraper";
 
 const scraperAccess = {
     rentCanada: {
-        site: "rentcanada,com",
+        site: "rentcanada.com",
         scraper_ip: "http://127.0.0.1",
         scraper_port: 5000,
         type: "lat,long",

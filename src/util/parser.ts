@@ -22,6 +22,7 @@ class Parser {
 
     parseRentCanada(unprocessed: any): IHousing[] {
         // list of objects
+        console.log("25rm");
         const mainList = unprocessed.listings;
         // properties of interest: address (for geolocating), city, province, url, description, externalUrl
         const apList: IHousing[] = [];
@@ -41,6 +42,7 @@ class Parser {
             apList.push(ap);
         }
         // TODO: convert address => lat/long for these
+        console.log(apList.length, "44rm");
         return apList;
     }
 
