@@ -31,7 +31,7 @@ export type TaskOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type TaskCreationAttributes = Optional<TaskAttributes, TaskOptionalAttributes>;
 
 export class Task extends Model<TaskAttributes, TaskCreationAttributes> implements TaskAttributes {
-    public id?: number;
+    public id!: number;
     public providerName!: ProviderEnum;
     public lat!: number;
     public long!: number;

@@ -35,26 +35,6 @@ class Scraper {
         console.log(housingData.length, "33rm");
         return housingData;
     }
-
-    async queueGridScrape(tasks: ILatLong[], zoomWidth: number): Promise<boolean> {
-        try {
-            // todo: go into shared db and queue tasks.
-            for (const task of tasks) {
-                const newTask: TaskCreationAttributes = {
-                    ...task,
-                    zoomWidth: zoomWidth,
-                    lastScan: undefined,
-                    batch: 1,
-                    providerName: ProviderEnum.rentCanada, // TODO: distribute tasks to all 3 providers when ready
-                };
-                await createTask(newTask);
-            }
-            return true;
-        } catch (err) {
-            console.log(err);
-            return false;
-        }
-    }
 }
 
 export default Scraper;

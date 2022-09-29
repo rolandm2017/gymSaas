@@ -32,7 +32,6 @@ class TaskQueueService {
         const mostRecentBatchNum: number = mostRecentTask.length > 0 ? mostRecentTask[0].batch : 0;
 
         for (let i = 0; i < coords.length; i++) {
-            // FIXME: probably 'id' is missing somehow in the db *unless* autoassignment worked
             let t = {
                 providerName: provider,
                 lat: coords[i].lat,
