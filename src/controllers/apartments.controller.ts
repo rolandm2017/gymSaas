@@ -36,6 +36,7 @@ class ApartmentsController {
     }
 
     async detectProviderViewportWidth(request: Request, response: Response) {
+        // step 1 to prepare a city sweep
         try {
             const city = request.body.city;
             const stateOrProvince = request.body.state;
@@ -53,12 +54,13 @@ class ApartmentsController {
     }
 
     async getGridForScan(request: Request, response: Response) {
-        const startCoords: ILatLong = request.body.startCoords;
-        const bounds: IBounds = request.body.bounds;
-        const radius: number = request.body.radius;
-        // not doing input validation here.
+        // step 2 to prepare a city sweep
+        const startCoords: ILatLong = request.body.startCoords; // found by looking up a city's lat,long
+        const bounds: IBounds = request.body.bounds; // from the request in step 1
+        const radius: number = request.body.radius; // found by looking up a sane radius to check for a city. note some have weird shapes.
+        // todo: determine sane radius to check. not greater than the width of the GTA
         const scraper = new ApartmentScraperService();
-        const gridCoords = scraper.planGrid(startCoords, bounds, radius);
+        const gridCoords = await scraper.planGrid(startCoords, bounds, radius);
         return response.status(200).json(gridCoords);
     }
 

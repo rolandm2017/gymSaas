@@ -16,7 +16,7 @@ export function generateGrid(startCoords: ILatLong, jump: number, radius: number
         d = jump * i;
         ringDistances.push(d);
     }
-    const nodes = ringDistances.map(d => getNextRing(startCoords, jump, d));
+    const nodes: ILatLong[][] = ringDistances.map(d => getNextRing(startCoords, jump, d));
     return nodes.flat();
 }
 

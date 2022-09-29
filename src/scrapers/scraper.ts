@@ -30,7 +30,7 @@ class Scraper {
         });
         // note for reviewers: I argue that organizing (parsing) the data is part of the action, "to scrape"
         const parser = new Parser(provider);
-        console.log(parser, "32rm");
+        console.log(parser, results.data.listings, "32rm");
         const housingData: IHousing[] = parser.parse(results.data);
         console.log(housingData.length, "33rm");
         return housingData;

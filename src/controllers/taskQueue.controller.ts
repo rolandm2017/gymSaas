@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { ProviderEnum } from "../enum/provider.enum";
+import { ILatLong } from "../interface/LatLong.interface";
 import { ITask } from "../interface/Task.interface";
 import TaskQueueService from "../service/taskQueue.service";
 
@@ -18,9 +19,9 @@ class TaskQueueController {
     }
 
     async addGridScanToQueue(request: Request, response: Response) {
-        const provider = request.body.provider;
-        const coords = request.body.coords;
-        const zoomWidth = request.body.zoomWidth;
+        const provider: ProviderEnum = request.body.provider;
+        const coords: ILatLong[] = request.body.coords;
+        const zoomWidth: number = request.body.zoomWidth; // fixme: how do you discover the zoomWidth?
         // todo: validation
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return response.status(400).send("Invalid provider input");
@@ -32,6 +33,7 @@ class TaskQueueController {
             return response.status(400).send("Invalid zoomWidth input");
         }
 
+        console.log(provider, coords.length, zoomWidth, "36rm");
         const taskQueue = new TaskQueueService();
         const queued = await taskQueue.queueGridScan(provider, coords, zoomWidth);
 
