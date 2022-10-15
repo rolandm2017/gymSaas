@@ -27,7 +27,8 @@ const rs = require("../../hardcodeReplies/rentSeeker.json");
 dotenv.config();
 
 class ApartmentScraperService {
-    constructor(providerDbService: ) {}
+    // fixme: install a private db provider service or, take this out
+    constructor() {}
 
     public async scrapeApartments(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IHousing[]> {
         // fwd request to Flask scraper services.
@@ -63,12 +64,12 @@ class ApartmentScraperService {
         return subdivisionLocations;
     }
 
-    public async scanGrid(provider:Provider, coords: ILatLong[], zoomWidth: number): Promise<boolean> {
+    public async scanGrid(provider: Provider, coords: ILatLong[], zoomWidth: number): Promise<boolean> {
         // step 3: fwd the grid coords to the scraper along with the bounds.
-        // the scraper will scan every subdivision of the grid and report back its results. 
+        // the scraper will scan every subdivision of the grid and report back its results.
         const scraper: Scraper = new ScraperFactory().createScraperOfType(provider);
-        const successfullyQueued:boolean = await scraper.queueGridScrape(coords, zoomWidth);
-        // TODO: figure out what to do here. scrapeGrid might take 1 hour. 
+        const successfullyQueued: boolean = await scraper.queueGridScrape(coords, zoomWidth);
+        // TODO: figure out what to do here. scrapeGrid might take 1 hour.
         // what if the process is interrupted?
         // what if the scraper crashes halfway thru?
         // I think the scraper should receive jobs from a queue, and report results to a db.

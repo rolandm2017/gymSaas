@@ -1,7 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
-import jwt from "express-jwt";
+import { expressjwt as jwt } from "express-jwt";
+import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
+if (secret === "YOLO") {
+    throw new Error("secret not found in env file");
+}
 
 // const jwt = require("express-jwt");
 // const db = require("_helpers/db");
@@ -20,7 +24,7 @@ function authorize(roles = []) {
         jwt({ secret, algorithms: ["HS256"] }),
 
         // authorize based on user role
-        async (req: Request, res: Response, next: NextFunction) => {
+        async (req: RequestWithUser, res: Response, next: NextFunction) => {
             const account = await db.Account.findById(req.user.id);
             const refreshTokens = await db.RefreshToken.find({ account: account.id });
 
@@ -31,7 +35,8 @@ function authorize(roles = []) {
 
             // authentication and authorization successful
             req.user.role = account.role;
-            req.user.ownsToken = token => !!refreshTokens.find(x => x.token === token);
+            // req.user.ownsToken = token => !!refreshTokens.find((x: any) => x.token === token);
+            req.user.ownsToken = (token: string) => !!refreshTokens.find((x: any) => x.token === token);
             next();
         },
     ];

@@ -73,6 +73,25 @@ function revokeTokenSchema(req: Request, res: Response, next: NextFunction) {
     validateRequest(req, next, schema);
 }
 
+function updateRoleSchema(req: Request, res: Response, next: NextFunction) {
+    const schemaRules = {
+        title: Joi.string().empty(""),
+        firstName: Joi.string().empty(""),
+        lastName: Joi.string().empty(""),
+        email: Joi.string().email().empty(""),
+        password: Joi.string().min(6).empty(""),
+        confirmPassword: Joi.string().valid(Joi.ref("password")).empty(""),
+    };
+
+    // only admins can update role
+    if (req.user.role === Role.Admin) {
+        schemaRules.role = Joi.string().valid(Role.Admin, Role.User).empty("");
+    }
+
+    const schema = Joi.object(schemaRules).with("password", "confirmPassword");
+    validateRequest(req, next, schema);
+}
+
 export {
     authenticateUserSchema,
     registerUserSchema,
@@ -82,4 +101,5 @@ export {
     resetPasswordSchema,
     validateResetTokenSchema,
     revokeTokenSchema,
+    updateRoleSchema,
 };
