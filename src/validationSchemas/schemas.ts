@@ -1,6 +1,6 @@
 import Joi, { ObjectSchema } from "joi";
 import express, { NextFunction, Request, Response } from "express";
-import validateRequest from "../middleware/validate-request.middleware";
+import validateRequest from "../middleware/validateRequest.middleware";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
 

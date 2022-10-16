@@ -43,12 +43,18 @@ class AuthController {
 
     public async authenticate(request: Request, response: Response) {
         //
-        this.accountService.authenticate();
+        const email: string = request.body.email;
+        const password: string = request.body.password;
+        const ipAddress: string = request.ip;
+        this.accountService.authenticate(email, password, ipAddress);
     }
 
     public async register(request: Request, response: Response, next: NextFunction) {
-        //
-        const result = await this.accountService.register(request.body, request.get("origin"));
+        const origin = request.get("origin");
+        if (origin === undefined) {
+            return response.status(400).json({ message: "Origin is required and was undefined" });
+        }
+        await this.accountService.register(request.body, origin);
         // .then(() => response.json({ message: 'Registration successful, please check your email for verification instructions' }))
         return response.json({ message: "Registration successful, please check your email for verification instructions" });
         // .catch(next);
@@ -59,7 +65,7 @@ class AuthController {
         //
         const token = request.cookies.refreshToken;
         const ipAddress = request.ip;
-        const { refreshToken, ...account } = await this.accountService.refreshToken({ token, ipAddress });
+        const { refreshToken, ...account } = await this.accountService.refreshToken(token, ipAddress);
         // .then(({ refreshToken, ...account }) => {
         //     setTokenCookie(res, refreshToken);
         //     response.json(account);
@@ -73,41 +79,48 @@ class AuthController {
         //
         const token = request.body.token || request.cookies.refreshToken;
         const ipAddress = request.ip;
+        if (request.user === undefined) return response.status(400).json({ message: "User is required" });
         if (!token) return response.status(400).json({ message: "Token is required" });
         // users can revoke their own tokens and admins can revoke any tokens
         if (!request.user.ownsToken(token) && request.user.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
-        await this.accountService.revokeToken({ token, ipAddress });
+        await this.accountService.revokeToken(token, ipAddress);
         // .then(() => response.json({ message: "Token revoked" }))
         return response.json({ message: "Token revoked" });
         // .catch(next);
     }
 
     public async verifyEmail(request: Request, response: Response) {
-        const email = request.body.email;
-        // todo:L see what else watmore feeds into this method
-        await this.accountService.verifyEmail(email);
+        const token = request.body.token;
+        await this.accountService.verifyEmail(token);
         // .then(() => response.json({ message: 'Verification successful, you can now login' }))
         return response.json({ message: "Verification successful, you can now login" });
         // .catch(next);
     }
 
     public async forgotPassword(request: Request, response: Response) {
-        await this.accountService.forgotPassword(request.body, request.get("origin"));
+        const email = request.body.email;
+        const origin = request.get("origin");
+        if (origin === undefined) {
+            return response.status(400).json({ message: "Origin is required and was undefined" });
+        }
+        await this.accountService.forgotPassword(email, origin);
         return response.json({ message: "Please check your email for password reset instructions" });
         // .catch(next);
     }
 
     public async validateResetToken(request: Request, response: Response) {
-        //
-        await this.accountService.validateResetToken(request.body);
+        const token = request.body.token;
+        await this.accountService.validateResetToken(token);
         return response.json({ message: "Token is valid" });
         // .catch(next);
     }
 
     public async resetPassword(request: Request, response: Response) {
-        this.accountService.resetPassword(request.body).then(() => response.json({ message: "Password reset successful, you can now login" }));
+        const token = request.body.token;
+        const password = request.body.password;
+        this.accountService.resetPassword(token, password).then(() => response.json({ message: "Password reset successful, you can now login" }));
         // .catch(next);
     }
 
@@ -149,6 +162,7 @@ class AuthController {
 
     public async _deleteAccount(request: RequestWithUser, response: Response) {
         // users can delete their own account and admins can delete any account
+        if (request.user === undefined) return response.status(400).json({ message: "User missing" });
         if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }

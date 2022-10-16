@@ -7,7 +7,6 @@ if (secret === "YOLO") {
     throw new Error("secret not found in env file");
 }
 
-// const jwt = require("express-jwt");
 // const db = require("_helpers/db");
 
 module.exports = authorize;
