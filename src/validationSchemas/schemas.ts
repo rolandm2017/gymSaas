@@ -14,9 +14,9 @@ function authenticateUserSchema(req: Request, res: Response, next: NextFunction)
 
 function registerUserSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema<any> = Joi.object({
-        title: Joi.string().required(),
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
+        // title: Joi.string().required(),
+        // firstName: Joi.string().required(),
+        // lastName: Joi.string().required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref("password")).required(),
@@ -27,9 +27,9 @@ function registerUserSchema(req: Request, res: Response, next: NextFunction) {
 
 function createAccountSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema<any> = Joi.object({
-        title: Joi.string().required(),
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
+        // title: Joi.string().required(),
+        // firstName: Joi.string().required(),
+        // lastName: Joi.string().required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref("password")).required(),
@@ -78,9 +78,9 @@ function revokeTokenSchema(req: Request, res: Response, next: NextFunction) {
 function updateRoleSchema(req: RequestWithUser, res: Response, next: NextFunction) {
     interface rolesUpdateSchema {
         // defined here explicitly only so that TS doesn't whine when .role property is added
-        title: Joi.StringSchema<string>;
-        firstName: Joi.StringSchema<string>;
-        lastName: Joi.StringSchema<string>;
+        // title: Joi.StringSchema<string>;
+        // firstName: Joi.StringSchema<string>;
+        // lastName: Joi.StringSchema<string>;
         email: Joi.StringSchema<string>;
         password: Joi.StringSchema<string>;
         confirmPassword: Joi.StringSchema<string>;
@@ -88,9 +88,9 @@ function updateRoleSchema(req: RequestWithUser, res: Response, next: NextFunctio
     }
 
     const schemaRules: rolesUpdateSchema = {
-        title: Joi.string().empty(""),
-        firstName: Joi.string().empty(""),
-        lastName: Joi.string().empty(""),
+        // title: Joi.string().empty(""),
+        // firstName: Joi.string().empty(""),
+        // lastName: Joi.string().empty(""),
         email: Joi.string().email().empty(""),
         password: Joi.string().min(6).empty(""),
         confirmPassword: Joi.string().valid(Joi.ref("password")).empty(""),

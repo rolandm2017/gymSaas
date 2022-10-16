@@ -2,9 +2,6 @@ import { Role } from "../enum/role.enum";
 
 export interface IAccount {
     id: string;
-    title: string;
-    firstName: string;
-    lastName: string;
     email: string;
     role: Role;
     created: Date;

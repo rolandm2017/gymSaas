@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import {
     createAccount,
     deleteAccount,
+    findAllAccounts,
     getAccountById,
     getAccountByVerificationToken,
     getByEmail,
@@ -72,7 +73,7 @@ class AccountService {
         const { account } = refreshToken;
 
         // replace old refresh token with a new one and save
-        const newRefreshToken = this.accountUtil.generateRefreshToken(account, ipAddress);
+        const newRefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
         refreshToken.revoked = Date.now();
         refreshToken.revokedByIp = ipAddress;
         refreshToken.replacedByToken = newRefreshToken.token;
@@ -153,12 +154,12 @@ class AccountService {
     // authorized
 
     public async getAllAccounts() {
-        const accounts: IAccount[] = await db.Account.find();
-        return accounts.map((a: IAccount) => this.basicDetails(a));
+        const accounts: Account[] = await findAllAccounts();
+        return accounts.map((a: Account) => this.basicDetails(a));
     }
 
-    public async getAccountById(id: string) {
-        const account: IAccount = await this.getAccount(id);
+    public async getAccountById(id: number) {
+        const account: Account = await this.getAccount(id);
         return this.basicDetails(account);
     }
 
@@ -181,7 +182,7 @@ class AccountService {
         return this.basicDetails(account);
     }
 
-    public async updateAccount(id: string, params: any) {
+    public async updateAccount(id: number, params: any) {
         const account = await this.getAccount(id);
 
         // validate (if email was changed)
@@ -196,24 +197,22 @@ class AccountService {
 
         // copy params to account and save
         Object.assign(account, params);
-        account.updatedAt = Date.now();
+        account.updated = Date.now();
         await account.save();
 
         return this.basicDetails(account);
     }
 
     public async deleteAccount(id: string) {
-        const account = await this.getAccount(id);
-        await account.remove();
+        await this.deleteAccount(id);
     }
 
-    private basicDetails(account: IAccount) {
-        const { id, title, firstName, lastName, email, role, created, updated, isVerified } = account;
-        return { id, title, firstName, lastName, email, role, created, updated, isVerified };
+    private basicDetails(account: IAccount | Account) {
+        const { id, email, role, updated, isVerified } = account;
+        return { id, email, role, updated, isVerified };
     }
 
-    private async getAccount(id: string) {
-        if (!db.isValidId(id)) throw "Account not found";
+    private async getAccount(id: number) {
         const account = await getAccountById(id);
         if (!account) throw "Account not found";
         return account;

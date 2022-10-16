@@ -1,5 +1,10 @@
 import { Account, AccountCreationAttributes } from "../models/Account";
 
+export const findAllAccounts = () => {
+    // 'find' instead of 'get' because 'getAllAccounts' is taken
+    return Account.findAll();
+};
+
 export const getMultipleAccounts = (limit: number, offset?: number) => {
     return Account.findAndCountAll({ offset, limit });
 };
