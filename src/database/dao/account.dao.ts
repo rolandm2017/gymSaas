@@ -1,4 +1,5 @@
 import { Account, AccountCreationAttributes } from "../models/Account";
+import { RefreshToken } from "../models/RefreshToken";
 
 export const findAllAccounts = () => {
     // 'find' instead of 'get' because 'getAllAccounts' is taken
@@ -17,6 +18,11 @@ export const getAccountByEmail = (email: string) => {
     return Account.findAll({
         where: { email },
     });
+};
+
+export const getAccountByRefreshToken = (token: RefreshToken) => {
+    // TODO: convert this to ... "get the account associated w/ this rt"
+    return Account.findOne({ where: { refreshToken: token } });
 };
 
 export const getAccountByVerificationToken = (token: string) => {

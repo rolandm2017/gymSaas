@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { IAccount } from "../interface/Account.interface";
 import { createRefreshToken, getRefreshTokenByToken } from "../database/dao/refreshToken.dao";
 import { IRefreshToken } from "../interface/RefreshToken.interface";
+import { Account } from "../database/models/Account";
+import { Role } from "../enum/role.enum";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
 if (secret === "YOLO") {
@@ -40,6 +42,24 @@ class AccountUtil {
         const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const createdByIp = ipAddress;
         return createRefreshToken(accountId, token, expires, createdByIp);
+    }
+
+    public convertAccountModelToInterface(startAccount: Account): IAccount {
+        if (startAccount.role !== Role.Admin && startAccount.role !== Role.User) {
+            throw Error("No valid role found for user. Value was: " + startAccount.role);
+        }
+        const account: IAccount = {
+            id: startAccount.id,
+            email: startAccount.email,
+            isVerified: startAccount.isVerified,
+            updated: new Date(startAccount.updated),
+            role: startAccount.role,
+            passwordHash: startAccount.passwordHash,
+        };
+        if (account.passwordHash === undefined) {
+            throw Error("No hashed password found");
+        }
+        return account;
     }
 }
 export default AccountUtil;

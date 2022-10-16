@@ -1,14 +1,15 @@
 import { Role } from "../enum/role.enum";
 
 export interface IAccount {
-    id: string;
+    id: number;
     email: string;
-    role: Role;
-    created: Date;
-    updated: Date;
     isVerified: boolean;
+    updated: Date;
+    role: Role;
+    created?: Date;
     verificationToken?: string;
     passwordHash?: string;
+    passwordReset?: number; // Date.now()
     resetToken?: {
         token: string;
         expires: Date;

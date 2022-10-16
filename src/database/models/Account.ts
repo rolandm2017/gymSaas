@@ -12,6 +12,7 @@ interface AccountAttributes {
     verified: number;
     updated: number;
     role: string;
+    passwordReset: number; // Date.now()
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -31,6 +32,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public verified!: number;
     public updated!: number;
     public role!: string;
+    public passwordReset!: number;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -71,6 +73,10 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 role: {
                     type: DataTypes.STRING,
                     allowNull: false,
+                },
+                passwordReset: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
                 },
             },
             {
