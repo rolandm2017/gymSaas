@@ -3,13 +3,14 @@ import { DataTypes, Sequelize, Model, Optional } from "sequelize";
 import sequelizeConnection from "../Database";
 
 interface RefreshTokenAttributes {
-    accountId: number; // todo: link to User model
+    accountId: string; // todo: link to User model
     token: string;
+    isActive: boolean;
     expires: Date;
     createdByIp: string;
-    revoked: Date;
-    revokedByIp: string;
-    replacedByToken: string;
+    revoked?: number; // time since utc init represented as # of ms
+    revokedByIp?: string;
+    replacedByToken?: string;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -19,11 +20,12 @@ export type RefreshTokenOptionalAttributes = "createdAt" | "updatedAt" | "delete
 export type RefreshTokenCreationAttributes = Optional<RefreshTokenAttributes, RefreshTokenOptionalAttributes>;
 
 export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCreationAttributes> implements RefreshTokenAttributes {
-    public accountId!: number;
+    public accountId!: string;
     public token!: string;
+    public isActive!: boolean;
     public expires!: Date;
     public createdByIp!: string;
-    public revoked!: Date;
+    public revoked!: number;
     public revokedByIp!: string;
     public replacedByToken!: string;
 
@@ -35,12 +37,16 @@ export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCrea
         return RefreshToken.init(
             {
                 accountId: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.INTEGER, // todo: link to user model.
                     autoIncrement: true,
                     primaryKey: true,
                 },
                 token: {
                     type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                isActive: {
+                    type: DataTypes.BOOLEAN,
                     allowNull: false,
                 },
                 expires: {
@@ -52,7 +58,7 @@ export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCrea
                     allowNull: false,
                 },
                 revoked: {
-                    type: DataTypes.DATE,
+                    type: DataTypes.INTEGER,
                     allowNull: true,
                 },
                 revokedByIp: {

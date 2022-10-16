@@ -1,12 +1,17 @@
 import { DataTypes, Sequelize, Model, Optional } from "sequelize";
+import { Role } from "../../enum/role.enum";
 
 import sequelizeConnection from "../Database";
 
 interface AccountAttributes {
     id: number;
     email: string;
-    password: string;
+    passwordHash: string;
     isVerified: boolean;
+    verificationToken: string;
+    verified: number;
+    updated: number;
+    role: string;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -20,8 +25,12 @@ export type AccountCreationAttributes = Optional<AccountAttributes, AccountOptio
 export class Account extends Model<AccountAttributes, AccountCreationAttributes> implements AccountAttributes {
     public id!: number;
     public email!: string;
-    public password!: string;
+    public passwordHash!: string;
     public isVerified!: boolean;
+    public verificationToken!: string;
+    public verified!: number;
+    public updated!: number;
+    public role!: string;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -39,13 +48,29 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-                password: {
+                passwordHash: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
                 isVerified: {
                     type: DataTypes.BOOLEAN,
                     allowNull: true,
+                },
+                verificationToken: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                },
+                verified: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
+                },
+                updated: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
+                },
+                role: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
                 },
             },
             {

@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { IAccount } from "../interface/Account.interface";
+import { createRefreshToken, getByToken } from "../database/dao/refreshToken.dao";
+import { IRefreshToken } from "../interface/RefreshToken.interface";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
 if (secret === "YOLO") {
@@ -20,7 +22,8 @@ class AccountUtil {
     }
 
     public async getRefreshToken(token: string) {
-        const refreshToken = await db.RefreshToken.findOne({ token }).populate("account");
+        const refreshToken = await getByToken(token);
+        // fixme: .populate("account"); does what? see line 64         const { account } = refreshToken;
         if (!refreshToken || !refreshToken.isActive) throw "Invalid token";
         return refreshToken;
     }
@@ -32,12 +35,11 @@ class AccountUtil {
 
     public async generateRefreshToken(account: IAccount, ipAddress: string) {
         // create a refresh token that expires in 7 days
-        return new db.RefreshToken({
-            account: account.id,
-            token: this.randomTokenString(),
-            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            createdByIp: ipAddress,
-        });
+        const accountId = account.id;
+        const token = this.randomTokenString();
+        const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const createdByIp = ipAddress;
+        return createRefreshToken(accountId, token, expires, createdByIp);
     }
 }
 export default AccountUtil;

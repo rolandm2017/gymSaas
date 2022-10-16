@@ -8,10 +8,14 @@ export const getAccountById = (id: number) => {
     return Account.findByPk(id);
 };
 
-export const getByEmail = (email: string) => {
+export const getAccountByEmail = (email: string) => {
     return Account.findAll({
         where: { email },
     });
+};
+
+export const getAccountByVerificationToken = (token: string) => {
+    return Account.findOne({ where: { verificationToken: token } });
 };
 
 export const createAccount = (account: AccountCreationAttributes) => {

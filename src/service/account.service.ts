@@ -1,6 +1,15 @@
 import bcrypt from "bcrypt";
-import { deleteAccount, getByEmail } from "../database/dao/account.dao";
+import {
+    createAccount,
+    deleteAccount,
+    getAccountById,
+    getAccountByVerificationToken,
+    getByEmail,
+    getMultipleAccounts,
+} from "../database/dao/account.dao";
+import { getByToken } from "../database/dao/refreshToken.dao";
 import { Account } from "../database/models/Account";
+import { RefreshToken } from "../database/models/RefreshToken";
 import { Role } from "../enum/role.enum";
 import { IAccount } from "../interface/Account.interface";
 import AccountUtil from "../util/accountUtil";
@@ -19,7 +28,7 @@ class AccountService {
 
         // authentication successful so generate jwt and refresh tokens
         const jwtToken = this.accountUtil.generateJwtToken(account);
-        const refreshToken = this.accountUtil.generateRefreshToken(account, ipAddress);
+        const refreshToken: RefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
 
         // save refresh token
         await refreshToken.save();
@@ -34,16 +43,17 @@ class AccountService {
 
     public async register(params: any, origin: string) {
         // "what's in params?" => consult registerUserSchema
-        if (await db.Account.findOne({ email: params.email })) {
+        if (await getByEmail(params.email)) {
             // send already registered error in email to prevent account enumeration
             return await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
         }
 
         // create account object
-        const account = new db.Account(params);
+        const account: Account = await createAccount(params);
 
         // first registered account is an admin
-        const isFirstAccount = (await db.Account.countDocuments({})) === 0;
+        const allAccountsInSystem = await getMultipleAccounts(5);
+        const isFirstAccount = allAccountsInSystem.count === 0;
         account.role = isFirstAccount ? Role.Admin : Role.User;
         account.verificationToken = this.accountUtil.randomTokenString();
 
@@ -90,17 +100,17 @@ class AccountService {
     }
 
     public async verifyEmail(token: string) {
-        const account = await db.Account.findOne({ verificationToken: token });
+        const account = await getAccountByVerificationToken(token);
 
         if (!account) throw "Verification failed";
 
         account.verified = Date.now();
-        account.verificationToken = undefined;
+        account.verificationToken = ""; // string value that is closest to 'undefined'
         await account.save();
     }
 
     public async forgotPassword(email: string, origin: string) {
-        const account = await db.Account.findOne({ email });
+        const account = await getByEmail(email);
 
         // always return ok response to prevent email enumeration
         if (!account) return;
@@ -134,7 +144,7 @@ class AccountService {
         if (!account) throw "Invalid token";
 
         // update password and remove reset token
-        account.passwordHash = hash(password);
+        account.passwordHash = this.accountUtil.hash(password);
         account.passwordReset = Date.now();
         account.resetToken = undefined;
         await account.save();
@@ -155,11 +165,11 @@ class AccountService {
     public async createAccount(params: any) {
         // "what's in params?" => consult registerUserSchema
         // validate
-        if (await db.Account.findOne({ email: params.email })) {
+        if (await getByEmail(params.email)) {
             throw 'Email "' + params.email + '" is already registered';
         }
 
-        const account = new db.Account(params);
+        const account: Account = await createAccount(params);
         account.verified = Date.now();
 
         // hash password
@@ -175,7 +185,7 @@ class AccountService {
         const account = await this.getAccount(id);
 
         // validate (if email was changed)
-        if (params.email && account.email !== params.email && (await db.Account.findOne({ email: params.email }))) {
+        if (params.email && account.email !== params.email && (await getByEmail(params.email))) {
             throw 'Email "' + params.email + '" is already taken';
         }
 
@@ -186,7 +196,7 @@ class AccountService {
 
         // copy params to account and save
         Object.assign(account, params);
-        account.updated = Date.now();
+        account.updatedAt = Date.now();
         await account.save();
 
         return this.basicDetails(account);
@@ -204,7 +214,7 @@ class AccountService {
 
     private async getAccount(id: string) {
         if (!db.isValidId(id)) throw "Account not found";
-        const account = await db.Account.findById(id);
+        const account = await getAccountById(id);
         if (!account) throw "Account not found";
         return account;
     }
