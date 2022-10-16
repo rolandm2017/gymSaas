@@ -6,6 +6,7 @@ interface AccountAttributes {
     id: number;
     email: string;
     password: string;
+    isVerified: boolean;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -20,6 +21,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public id!: number;
     public email!: string;
     public password!: string;
+    public isVerified!: boolean;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -40,6 +42,10 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 password: {
                     type: DataTypes.STRING,
                     allowNull: false,
+                },
+                isVerified: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: true,
                 },
             },
             {

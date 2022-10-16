@@ -1,17 +1,17 @@
 import bcrypt from "bcrypt";
-import { deleteAccount } from "../database/dao/account.dao";
+import { deleteAccount, getByEmail } from "../database/dao/account.dao";
+import { Account } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
 import { IAccount } from "../interface/Account.interface";
 import AccountUtil from "../util/accountUtil";
 import EmailService from "./email.service";
 
 class AccountService {
-    constructor(private emailService: EmailService, private accountUtil: AccountUtil) {
-        const accountUtil = new AccountUtil();
-    }
+    accountUtil = new AccountUtil();
+    constructor(private emailService: EmailService) {}
 
     public async authenticate(email: string, password: string, ipAddress: string) {
-        const account = await db.Account.findOne({ email });
+        const account: Account[] = await getByEmail(email);
 
         if (!account || !account.isVerified || !bcrypt.compareSync(password, account.passwordHash)) {
             throw "Email or password is incorrect";
@@ -32,7 +32,7 @@ class AccountService {
         };
     }
 
-    public async register(params: any, origin: string | undefined) {
+    public async register(params: any, origin: string) {
         // "what's in params?" => consult registerUserSchema
         if (await db.Account.findOne({ email: params.email })) {
             // send already registered error in email to prevent account enumeration

@@ -23,7 +23,7 @@ class EmailService {
         });
     }
 
-    public async sendAlreadyRegisteredEmail(email, origin: string) {
+    public async sendAlreadyRegisteredEmail(email: string, origin: string) {
         let message;
         if (origin) {
             message = `<p>If you don't know your password please visit the <a href="${origin}/account/forgot-password">forgot password</a> page.</p>`;

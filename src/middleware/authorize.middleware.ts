@@ -1,5 +1,6 @@
 import { NextFunction, Response } from "express";
 import { expressjwt as jwt } from "express-jwt";
+import { getAccountById } from "../database/dao/account.dao";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
@@ -27,7 +28,7 @@ function authorize(roles = []) {
             if (request.user === undefined) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
-            const account = await db.Account.findById(request.user.id);
+            const account = await getAccountById(request.user.id);
             const refreshTokens = await db.RefreshToken.find({ account: account.id });
 
             if (!account || (roles.length && !roles.includes(account.role))) {
