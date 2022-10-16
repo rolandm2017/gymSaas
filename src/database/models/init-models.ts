@@ -14,6 +14,17 @@ function initModels(sequelize: Sequelize) {
     const Housing = _Housing.initModel(sequelize);
     const Gym = _Gym.initModel(sequelize);
 
+    Account.hasMany(RefreshToken);
+    RefreshToken.belongsTo(Account);
+
+    Account.hasMany(ResetToken);
+    ResetToken.belongsTo(Account);
+
+    Account.hasMany(Report);
+    Report.hasOne(Account);
+
+    // todo: make city model. city has many gyms, has many apartments
+
     return { Account, RefreshToken, ResetToken, Report, Housing, Gym };
 }
 
