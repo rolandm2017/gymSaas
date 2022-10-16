@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { IAccount } from "../interface/Account.interface";
-import { createRefreshToken, getByToken } from "../database/dao/refreshToken.dao";
+import { createRefreshToken, getRefreshTokenByToken } from "../database/dao/refreshToken.dao";
 import { IRefreshToken } from "../interface/RefreshToken.interface";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
@@ -22,7 +22,7 @@ class AccountUtil {
     }
 
     public async getRefreshToken(token: string) {
-        const refreshToken = await getByToken(token);
+        const refreshToken = await getRefreshTokenByToken(token);
         // fixme: .populate("account"); does what? see line 64         const { account } = refreshToken;
         if (!refreshToken || !refreshToken.isActive) throw "Invalid token";
         return refreshToken;

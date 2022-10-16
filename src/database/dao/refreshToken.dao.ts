@@ -8,6 +8,14 @@ export const getRefreshTokenByToken = (token: string) => {
     });
 };
 
-export const createRefreshToken = (id: string, token: string, expires: Date, createdByIp: string) => {
+export const getAllRefreshTokensForAccount = (accountId: number) => {
+    return RefreshToken.findAll({
+        where: {
+            accountId: accountId,
+        },
+    });
+};
+
+export const createRefreshToken = (id: number, token: string, expires: Date, createdByIp: string) => {
     return RefreshToken.create({ accountId: id, token, expires, createdByIp, isActive: true });
 };

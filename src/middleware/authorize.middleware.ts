@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { expressjwt as jwt } from "express-jwt";
 import { getAccountById } from "../database/dao/account.dao";
+import { getAllRefreshTokensForAccount } from "../database/dao/refreshToken.dao";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
@@ -12,7 +13,7 @@ if (secret === "YOLO") {
 
 module.exports = authorize;
 
-function authorize(roles = []) {
+function authorize(roles: string[] = []) {
     // roles param can be a single role string (e.g. Role.User or 'User')
     // or an array of roles (e.g. [Role.Admin, Role.User] or ['Admin', 'User'])
     if (typeof roles === "string") {
@@ -29,9 +30,10 @@ function authorize(roles = []) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
             const account = await getAccountById(request.user.id);
-            const refreshTokens = await db.RefreshToken.find({ account: account.id });
+            if (!account) return res.status(401).json({ message: "Unauthorized" });
+            const refreshTokens = await getAllRefreshTokensForAccount(account.id);
 
-            if (!account || (roles.length && !roles.includes(account.role))) {
+            if (roles.length && !roles.includes(account.role)) {
                 // account no longer exists or role not authorized
                 return res.status(401).json({ message: "Unauthorized" });
             }

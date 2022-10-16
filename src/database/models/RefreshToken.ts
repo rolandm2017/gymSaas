@@ -3,7 +3,7 @@ import { DataTypes, Sequelize, Model, Optional } from "sequelize";
 import sequelizeConnection from "../Database";
 
 interface RefreshTokenAttributes {
-    accountId: string; // todo: link to User model
+    accountId: number; // todo: link to User model
     token: string;
     isActive: boolean;
     expires: Date;
@@ -20,7 +20,7 @@ export type RefreshTokenOptionalAttributes = "createdAt" | "updatedAt" | "delete
 export type RefreshTokenCreationAttributes = Optional<RefreshTokenAttributes, RefreshTokenOptionalAttributes>;
 
 export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCreationAttributes> implements RefreshTokenAttributes {
-    public accountId!: string;
+    public accountId!: number;
     public token!: string;
     public isActive!: boolean;
     public expires!: Date;
