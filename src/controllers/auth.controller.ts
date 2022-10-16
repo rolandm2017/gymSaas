@@ -13,7 +13,8 @@ import {
 } from "../validationSchemas/schemas";
 import { authorize } from "../middleware/authorize.middleware";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
-// import
+import { Role } from "../enum/role.enum";
+import AccountService from "../service/account.service";
 
 class AuthController {
     public path = "/auth";
@@ -120,7 +121,7 @@ class AuthController {
     }
 
     public async getAccountById(request: RequestWithUser, response: Response) {
-        if (request.params.id !== request.user.id && request.user.role !== Role.Admin) {
+        if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
 
@@ -137,22 +138,22 @@ class AuthController {
 
     public async updateAccount(request: RequestWithUser, response: Response) {
         // users can update their own account and admins can update any account
-        if (request.params.id !== request.user.id && request.user.role !== Role.Admin) {
+        if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
 
-        const account = this.accountService.update(request.params.id, request.body);
+        const account = this.accountService.updateAccount(request.params.id, request.body);
         return response.json(account);
         // .catch(next);
     }
 
     public async _deleteAccount(request: RequestWithUser, response: Response) {
         // users can delete their own account and admins can delete any account
-        if (request.params.id !== request.user.id && request.user.role !== Role.Admin) {
+        if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
 
-        await this.accountService.delete(request.params.id);
+        await this.accountService.deleteAccount(request.params.id);
         return response.json({ message: "Account deleted successfully" });
         // .catch(next);
     }

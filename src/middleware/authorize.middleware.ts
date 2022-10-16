@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { expressjwt as jwt } from "express-jwt";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
@@ -24,8 +24,11 @@ function authorize(roles = []) {
         jwt({ secret, algorithms: ["HS256"] }),
 
         // authorize based on user role
-        async (req: RequestWithUser, res: Response, next: NextFunction) => {
-            const account = await db.Account.findById(req.user.id);
+        async (request: RequestWithUser, res: Response, next: NextFunction) => {
+            if (request.user === undefined) {
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+            const account = await db.Account.findById(request.user.id);
             const refreshTokens = await db.RefreshToken.find({ account: account.id });
 
             if (!account || (roles.length && !roles.includes(account.role))) {
@@ -34,9 +37,9 @@ function authorize(roles = []) {
             }
 
             // authentication and authorization successful
-            req.user.role = account.role;
+            request.user.role = account.role;
             // req.user.ownsToken = token => !!refreshTokens.find((x: any) => x.token === token);
-            req.user.ownsToken = (token: string) => !!refreshTokens.find((x: any) => x.token === token);
+            request.user.ownsToken = (token: string) => !!refreshTokens.find((x: any) => x.token === token);
             next();
         },
     ];

@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import initModels from "./database/models/init-models";
 import Database from "./database/Database";
 // import ErrorMiddleware from "./middleware/error.middleware";
+import errorHandler from "./middleware/error.middleware";
 
 class App {
     public app: Application;
@@ -17,6 +18,8 @@ class App {
         this.app.use(cors());
         this.app.use(morgan("dev"));
         this.app.use(cookieParser());
+        this.app.use(errorHandler);
+
         this.middlewares(appInit.middlewares);
         // this.app.use(ErrorMiddleware.handleRouteErrors); // this will catch any error thrown routes
         this.routes(appInit.controllers);

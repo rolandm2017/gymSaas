@@ -1,6 +1,8 @@
 import Joi, { ObjectSchema } from "joi";
 import express, { NextFunction, Request, Response } from "express";
 import validateRequest from "../middleware/validate-request.middleware";
+import { RequestWithUser } from "../interface/RequestWithUser.interface";
+import { Role } from "../enum/role.enum";
 
 function authenticateUserSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema<any> = Joi.object({
@@ -73,8 +75,19 @@ function revokeTokenSchema(req: Request, res: Response, next: NextFunction) {
     validateRequest(req, next, schema);
 }
 
-function updateRoleSchema(req: Request, res: Response, next: NextFunction) {
-    const schemaRules = {
+function updateRoleSchema(req: RequestWithUser, res: Response, next: NextFunction) {
+    interface rolesUpdateSchema {
+        // defined here explicitly only so that TS doesn't whine when .role property is added
+        title: Joi.StringSchema<string>;
+        firstName: Joi.StringSchema<string>;
+        lastName: Joi.StringSchema<string>;
+        email: Joi.StringSchema<string>;
+        password: Joi.StringSchema<string>;
+        confirmPassword: Joi.StringSchema<string>;
+        role?: Joi.StringSchema<string>;
+    }
+
+    const schemaRules: rolesUpdateSchema = {
         title: Joi.string().empty(""),
         firstName: Joi.string().empty(""),
         lastName: Joi.string().empty(""),
@@ -84,7 +97,7 @@ function updateRoleSchema(req: Request, res: Response, next: NextFunction) {
     };
 
     // only admins can update role
-    if (req.user.role === Role.Admin) {
+    if (req.user?.role === Role.Admin) {
         schemaRules.role = Joi.string().valid(Role.Admin, Role.User).empty("");
     }
 
