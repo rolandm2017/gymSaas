@@ -41,6 +41,10 @@ class App {
         });
     }
 
+    public getServer() {
+        return this.app;
+    }
+
     private middlewares(middlewares: any) {
         middlewares.forEach((middleware: any) => {
             console.log("adding middleware...");

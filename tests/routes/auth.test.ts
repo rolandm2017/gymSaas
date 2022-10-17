@@ -1,7 +1,7 @@
 import { cookie } from "express-validator";
 import request from "supertest";
 
-import { server } from "../mocks/server";
+import server from "../mocks/server";
 import { REGISTERED_USER_ATTRIBUTES, REGISTERED_USER_CREDENTIALS } from "../mocks/userCredentials";
 
 const path = "/auth";
