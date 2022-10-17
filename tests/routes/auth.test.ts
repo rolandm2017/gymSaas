@@ -34,9 +34,10 @@ const validCredentials = {
 describe("Test auth controller", () => {
     describe("/register", () => {
         describe("well formed", () => {
-            test("POST /register responds with ... if body is populated properly", async () => {
+            test("POST /register responds with success msg if body is populated properly", async () => {
                 await request(server)
                     .post(`${path}/register`)
+                    .set("origin", "testSuite")
                     .send(validCredentials)
                     .expect({ message: "Registration successful, please check your email for verification instructions" });
             });

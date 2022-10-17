@@ -52,6 +52,7 @@ class AuthController {
 
     public async register(request: Request, response: Response, next: NextFunction) {
         const origin = request.get("origin");
+        console.log(request.body, origin, "55rm");
         if (origin === undefined) {
             return response.status(400).json({ message: "Origin is required and was undefined" });
         }

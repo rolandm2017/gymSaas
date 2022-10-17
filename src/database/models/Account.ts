@@ -1,7 +1,8 @@
-import { DataTypes, Sequelize, Model, Optional } from "sequelize";
+import Sequelize as S, { DataTypes, Sequelize, Model, Optional } from "sequelize";
 import { Role } from "../../enum/role.enum";
 
 import sequelizeConnection from "../Database";
+import { RefreshToken } from "./RefreshToken";
 
 interface AccountAttributes {
     id: number;
@@ -17,6 +18,9 @@ interface AccountAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
+
+export type AccountPk = "id";
+export type AccountId = Account[AccountPk];
 
 export type AccountOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type AccountCreationAttributes = Optional<AccountAttributes, AccountOptionalAttributes>;
@@ -35,6 +39,19 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
+
+    // Account hasMany RefreshTokens via refresh_token_id
+    refreshTokens!: RefreshToken[];
+    getAccount!: Sequelize.HasManyGetAssociationsMixin<RefreshToken>;
+    setRefreshToken!: Sequelize.HasManySetAssociationsMixin<RefreshToken, RefreshTokenId>;
+    addRefreshToken!: Sequelize.HasManyAddAssociationMixin<RefreshToken, RefreshTokenId>;
+    addRefreshTokens!: Sequelize.HasManyAddAssociationsMixin<RefreshToken, RefreshTokenId>;
+    createRefreshToken!: Sequelize.HasManyCreateAssociationMixin<RefreshToken>;
+    removeRefreshToken!: Sequelize.HasManyRemoveAssociationMixin<RefreshToken, RefreshTokenId>;
+    removeRefreshTokens!: Sequelize.HasManyRemoveAssociationsMixin<RefreshToken, RefreshTokenId>;
+    hasRefreshToken!: Sequelize.HasManyHasAssociationMixin<RefreshToken, RefreshTokenId>;
+    hasRefreshTokens!: Sequelize.HasManyHasAssociationsMixin<RefreshToken, RefreshTokenId>;
+    countRefreshTokens!: Sequelize.HasManyCountAssociationsMixin;
 
     static initModel(sequelize: Sequelize): typeof Account {
         return Account.init(

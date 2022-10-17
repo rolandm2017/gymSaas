@@ -15,16 +15,16 @@ function initModels(sequelize: Sequelize) {
     const Gym = _Gym.initModel(sequelize);
 
     Account.hasMany(RefreshToken, {
-        as: "owner",
-        foreignKey: "owner_id",
+        as: "refresh_token_owner",
+        foreignKey: "refresh_token_owner_id",
     });
-    RefreshToken.belongsTo(Account, { as: "refresh_token", foreignKey: "refresh_token" });
+    RefreshToken.belongsTo(Account, { as: "refresh_token", foreignKey: "refresh_token_id" });
 
     Account.hasMany(ResetToken, {
-        as: "owner",
-        foreignKey: "owner_id",
+        as: "reset_token_owner",
+        foreignKey: "reset_token_owner_id",
     });
-    ResetToken.belongsTo(Account, { as: "refresh_token", foreignKey: "refresh_token" });
+    ResetToken.belongsTo(Account, { as: "reset_token", foreignKey: "reset_token_id" });
 
     Account.hasMany(Report);
     Report.hasOne(Account);

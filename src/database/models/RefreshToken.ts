@@ -1,9 +1,10 @@
-import { DataTypes, Sequelize, Model, Optional } from "sequelize";
+import Sequelize, { DataTypes, Model, Optional } from "sequelize";
 
 import sequelizeConnection from "../Database";
+import { Account, AccountId } from "./Account";
 
 interface RefreshTokenAttributes {
-    accountId: number; // todo: link to User model
+    id?: number;
     token: string;
     isActive: boolean;
     expires: Date;
@@ -20,7 +21,7 @@ export type RefreshTokenOptionalAttributes = "createdAt" | "updatedAt" | "delete
 export type RefreshTokenCreationAttributes = Optional<RefreshTokenAttributes, RefreshTokenOptionalAttributes>;
 
 export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCreationAttributes> implements RefreshTokenAttributes {
-    public accountId!: number;
+    public id!: number;
     public token!: string;
     public isActive!: boolean;
     public expires!: Date;
@@ -33,11 +34,16 @@ export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCrea
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
 
+    // RefreshToken belongsTo Account via refresh_token_owner_id <= lying comment probably
+    getAccount!: Sequelize.BelongsToGetAssociationMixin<Account>;
+    setAccount!: Sequelize.BelongsToSetAssociationMixin<Account, AccountId>;
+    createAccount!: Sequelize.BelongsToCreateAssociationMixin<Account>;
+
     static initModel(sequelize: Sequelize): typeof RefreshToken {
         return RefreshToken.init(
             {
-                accountId: {
-                    type: DataTypes.INTEGER, // todo: link to user model.
+                id: {
+                    type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true,
                 },
