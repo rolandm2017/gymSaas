@@ -48,6 +48,8 @@ class ApartmentScraperService {
             // todo: put detected width into db so dont have to keep redoing this.
         } catch (err) {
             console.log(err);
+            // return something to appease the return type
+            return { north: 0, south: 0, east: 0, west: 0, latitudeChange: 0, longitudeChange: 0, kmEastWest: 0, kmNorthSouth: 0 };
         }
     }
 

@@ -14,16 +14,17 @@ import {
 import authorize from "../middleware/authorize.middleware";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
-import AccountService from "../service/account.service";
+import AuthService from "../service/auth.service";
 
 class AuthController {
     public path = "/auth";
     public router = express.Router();
 
-    constructor(private accountService: AccountService) {
+    constructor(private authService: AuthService) {
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate);
         this.router.post("/register", registerUserSchema, this.register);
+        // todo: log out route
         // tokens
         this.router.post("/refresh_token", this.refreshToken);
         this.router.post("/revoke_token", authorize(), revokeTokenSchema, this.revokeToken);
@@ -46,7 +47,7 @@ class AuthController {
         const email: string = request.body.email;
         const password: string = request.body.password;
         const ipAddress: string = request.ip;
-        this.accountService.authenticate(email, password, ipAddress);
+        this.authService.authenticate(email, password, ipAddress);
     }
 
     public async register(request: Request, response: Response, next: NextFunction) {
@@ -54,7 +55,7 @@ class AuthController {
         if (origin === undefined) {
             return response.status(400).json({ message: "Origin is required and was undefined" });
         }
-        await this.accountService.register(request.body, origin);
+        await this.authService.register(request.body, origin);
         // .then(() => response.json({ message: 'Registration successful, please check your email for verification instructions' }))
         return response.json({ message: "Registration successful, please check your email for verification instructions" });
         // .catch(next);
@@ -65,7 +66,7 @@ class AuthController {
         //
         const token = request.cookies.refreshToken;
         const ipAddress = request.ip;
-        const { refreshToken, ...account } = await this.accountService.refreshToken(token, ipAddress);
+        const { refreshToken, ...account } = await this.authService.refreshToken(token, ipAddress);
         // .then(({ refreshToken, ...account }) => {
         //     setTokenCookie(res, refreshToken);
         //     response.json(account);
@@ -85,7 +86,7 @@ class AuthController {
         if (!request.user.ownsToken(token) && request.user.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
-        await this.accountService.revokeToken(token, ipAddress);
+        await this.authService.revokeToken(token, ipAddress);
         // .then(() => response.json({ message: "Token revoked" }))
         return response.json({ message: "Token revoked" });
         // .catch(next);
@@ -93,7 +94,7 @@ class AuthController {
 
     public async verifyEmail(request: Request, response: Response) {
         const token = request.body.token;
-        await this.accountService.verifyEmail(token);
+        await this.authService.verifyEmail(token);
         // .then(() => response.json({ message: 'Verification successful, you can now login' }))
         return response.json({ message: "Verification successful, you can now login" });
         // .catch(next);
@@ -105,14 +106,14 @@ class AuthController {
         if (origin === undefined) {
             return response.status(400).json({ message: "Origin is required and was undefined" });
         }
-        await this.accountService.forgotPassword(email, origin);
+        await this.authService.forgotPassword(email, origin);
         return response.json({ message: "Please check your email for password reset instructions" });
         // .catch(next);
     }
 
     public async validateResetToken(request: Request, response: Response) {
         const token = request.body.token;
-        await this.accountService.validateResetToken(token);
+        await this.authService.validateResetToken(token);
         return response.json({ message: "Token is valid" });
         // .catch(next);
     }
@@ -120,7 +121,7 @@ class AuthController {
     public async resetPassword(request: Request, response: Response) {
         const token = request.body.token;
         const password = request.body.password;
-        this.accountService.resetPassword(token, password).then(() => response.json({ message: "Password reset successful, you can now login" }));
+        this.authService.resetPassword(token, password).then(() => response.json({ message: "Password reset successful, you can now login" }));
         // .catch(next);
     }
 
@@ -128,7 +129,7 @@ class AuthController {
     // authorized routes
     // **
     public async getAllAccounts(request: Request, response: Response) {
-        const accounts = await this.accountService.getAllAccounts();
+        const accounts = await this.authService.getAllAccounts();
         return response.json(accounts);
         // .catch(next);
     }
@@ -139,13 +140,13 @@ class AuthController {
         }
         const idAsNumber = parseInt(request.params.id, 10);
 
-        const account = await this.accountService.getAccountById(idAsNumber);
+        const account = await this.authService.getAccountById(idAsNumber);
         return account ? response.json(account) : response.sendStatus(404);
         // .catch(next);
     }
 
     public async createAccount(request: Request, response: Response) {
-        const account = this.accountService.createAccount(request.body);
+        const account = this.authService.createAccount(request.body);
         return response.json(account);
         // .catch(next);
     }
@@ -157,7 +158,7 @@ class AuthController {
         }
         const idAsNumber = parseInt(request.params.id, 10);
 
-        const account = this.accountService.updateAccount(idAsNumber, request.body);
+        const account = this.authService.updateAccount(idAsNumber, request.body);
         return response.json(account);
         // .catch(next);
     }
@@ -169,7 +170,7 @@ class AuthController {
             return response.status(401).json({ message: "Unauthorized" });
         }
 
-        await this.accountService.deleteAccount(request.params.id);
+        await this.authService.deleteAccount(request.params.id);
         return response.json({ message: "Account deleted successfully" });
         // .catch(next);
     }

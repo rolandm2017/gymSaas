@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 import { expressjwt as jwt } from "express-jwt";
 import { getAccountById } from "../database/dao/account.dao";
 import { getAllRefreshTokensForAccount } from "../database/dao/refreshToken.dao";
+import { Account } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
@@ -28,11 +29,13 @@ function authorize(roles: Role[] = []) {
             if (request.user === undefined) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
-            const account = await getAccountById(request.user.id);
+            const account: Account | null = await getAccountById(request.user.id);
             if (!account) return res.status(401).json({ message: "Unauthorized" });
             const refreshTokens = await getAllRefreshTokensForAccount(account.id);
 
-            if (roles.length && !roles.includes(account.role)) {
+            const validRoles = Object.values(Role);
+            const acctRole: Role = account.role as Role;
+            if (roles.length && !validRoles.includes(acctRole)) {
                 // account no longer exists or role not authorized
                 return res.status(401).json({ message: "Unauthorized" });
             }

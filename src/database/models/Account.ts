@@ -17,8 +17,6 @@ interface AccountAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
-// export interface AccountInput extends Required<AccountAttributes> {}
-// export interface AccountOutput extends Required<AccountAttributes> {}
 
 export type AccountOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type AccountCreationAttributes = Optional<AccountAttributes, AccountOptionalAttributes>;

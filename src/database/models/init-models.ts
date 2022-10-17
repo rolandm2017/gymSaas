@@ -14,11 +14,17 @@ function initModels(sequelize: Sequelize) {
     const Housing = _Housing.initModel(sequelize);
     const Gym = _Gym.initModel(sequelize);
 
-    Account.hasMany(RefreshToken);
-    RefreshToken.belongsTo(Account);
+    Account.hasMany(RefreshToken, {
+        as: "owner",
+        foreignKey: "owner_id",
+    });
+    RefreshToken.belongsTo(Account, { as: "refresh_token", foreignKey: "refresh_token" });
 
-    Account.hasMany(ResetToken);
-    ResetToken.belongsTo(Account);
+    Account.hasMany(ResetToken, {
+        as: "owner",
+        foreignKey: "owner_id",
+    });
+    ResetToken.belongsTo(Account, { as: "refresh_token", foreignKey: "refresh_token" });
 
     Account.hasMany(Report);
     Report.hasOne(Account);

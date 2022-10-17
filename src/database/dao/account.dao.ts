@@ -21,8 +21,13 @@ export const getAccountByEmail = (email: string) => {
 };
 
 export const getAccountByRefreshToken = (token: RefreshToken) => {
-    // TODO: convert this to ... "get the account associated w/ this rt"
-    return Account.findOne({ where: { refreshToken: token } });
+    return Account.findAll({
+        where: { "$RefreshTokens.token$": token.token },
+        include: {
+            model: RefreshToken,
+            as: RefreshToken.tableName,
+        },
+    });
 };
 
 export const getAccountByVerificationToken = (token: string) => {

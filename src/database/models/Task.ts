@@ -3,7 +3,7 @@ import { Association, DataTypes, Model, Optional, Sequelize } from "sequelize";
 import sequelizeConnection from "../Database";
 
 export interface TaskAttributes {
-    id: number;
+    id?: number;
     lat: number;
     long: number;
     zoomWidth: number;

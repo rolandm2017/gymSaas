@@ -19,7 +19,7 @@ import { IAccount } from "../interface/Account.interface";
 import AccountUtil from "../util/accountUtil";
 import EmailService from "./email.service";
 
-class AccountService {
+class AuthService {
     accountUtil = new AccountUtil();
     constructor(private emailService: EmailService) {}
 
@@ -71,8 +71,9 @@ class AccountService {
 
     public async refreshToken(token: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshToken(token);
-        const acct: Account = await getAccountByRefreshToken(refreshToken);
-        const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct);
+        const acct: Account[] = await getAccountByRefreshToken(refreshToken);
+        // todo: throw err if multiple accts found & report
+        const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct[0]);
 
         // replace old refresh token with a new one and save
         const newRefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
@@ -228,4 +229,4 @@ class AccountService {
     }
 }
 
-export default AccountService;
+export default AuthService;
