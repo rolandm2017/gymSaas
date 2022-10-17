@@ -1,8 +1,8 @@
-import Sequelize as S, { DataTypes, Sequelize, Model, Optional } from "sequelize";
+import Sequelize, { DataTypes, Sequelize as S, Model, Optional } from "sequelize";
 import { Role } from "../../enum/role.enum";
 
 import sequelizeConnection from "../Database";
-import { RefreshToken } from "./RefreshToken";
+import { RefreshToken, RefreshTokenId } from "./RefreshToken";
 
 interface AccountAttributes {
     id: number;
@@ -53,7 +53,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     hasRefreshTokens!: Sequelize.HasManyHasAssociationsMixin<RefreshToken, RefreshTokenId>;
     countRefreshTokens!: Sequelize.HasManyCountAssociationsMixin;
 
-    static initModel(sequelize: Sequelize): typeof Account {
+    static initModel(sequelize: S): typeof Account {
         return Account.init(
             {
                 id: {

@@ -1,4 +1,4 @@
-import Sequelize, { DataTypes, Model, Optional } from "sequelize";
+import Sequelize, { DataTypes, Sequelize as S, Model, Optional } from "sequelize";
 
 import sequelizeConnection from "../Database";
 import { Account, AccountId } from "./Account";
@@ -16,6 +16,9 @@ interface RefreshTokenAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
+
+export type RefreshTokenPk = "id";
+export type RefreshTokenId = RefreshToken[RefreshTokenPk];
 
 export type RefreshTokenOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type RefreshTokenCreationAttributes = Optional<RefreshTokenAttributes, RefreshTokenOptionalAttributes>;
@@ -39,7 +42,7 @@ export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCrea
     setAccount!: Sequelize.BelongsToSetAssociationMixin<Account, AccountId>;
     createAccount!: Sequelize.BelongsToCreateAssociationMixin<Account>;
 
-    static initModel(sequelize: Sequelize): typeof RefreshToken {
+    static initModel(sequelize: S): typeof RefreshToken {
         return RefreshToken.init(
             {
                 id: {

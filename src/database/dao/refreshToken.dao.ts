@@ -22,5 +22,6 @@ export const createRefreshToken = async (id: number, token: string, expires: Dat
     const rt: RefreshToken = await RefreshToken.create({ token, expires, createdByIp, isActive: true });
     const associatedAcct: Account | null = await getAccountById(id);
     if (associatedAcct === null) throw Error("Account not found");
-    rt.setAccount(associatedAcct); // fixme: p sure setAccount exists
+    rt.setAccount(associatedAcct);
+    return rt;
 };
