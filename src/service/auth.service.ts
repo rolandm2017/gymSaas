@@ -21,7 +21,8 @@ import EmailService from "./email.service";
 
 class AuthService {
     accountUtil = new AccountUtil();
-    constructor(private emailService: EmailService) {}
+    private emailService = new EmailService();
+    constructor() {}
 
     public async authenticate(email: string, password: string, ipAddress: string) {
         const acct: Account[] = await getAccountByEmail(email);
