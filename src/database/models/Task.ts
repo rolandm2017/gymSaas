@@ -46,7 +46,7 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
                 zoomWidth: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
-                }
+                },
                 lastScan: {
                     type: DataTypes.DATE,
                     allowNull: true,

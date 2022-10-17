@@ -1,5 +1,5 @@
-const nodemailer = require("nodemailer");
-const config = require("config.json");
+import config from "./config.json";
+import nodemailer from "nodemailer";
 
 interface ISendEmail {
     to: string;

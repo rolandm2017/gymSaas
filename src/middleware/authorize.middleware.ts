@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 import { expressjwt as jwt } from "express-jwt";
 import { getAccountById } from "../database/dao/account.dao";
 import { getAllRefreshTokensForAccount } from "../database/dao/refreshToken.dao";
+import { Role } from "../enum/role.enum";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
@@ -11,9 +12,7 @@ if (secret === "YOLO") {
 
 // const db = require("_helpers/db");
 
-module.exports = authorize;
-
-function authorize(roles: string[] = []) {
+function authorize(roles: Role[] = []) {
     // roles param can be a single role string (e.g. Role.User or 'User')
     // or an array of roles (e.g. [Role.Admin, Role.User] or ['Admin', 'User'])
     if (typeof roles === "string") {
@@ -46,3 +45,5 @@ function authorize(roles: string[] = []) {
         },
     ];
 }
+
+export default authorize;

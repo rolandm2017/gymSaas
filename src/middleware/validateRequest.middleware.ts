@@ -10,7 +10,7 @@ function validateRequest(req: Request, next: NextFunction, schema: ObjectSchema<
     };
     const { error, value } = schema.validate(req.body, options);
     if (error) {
-        next(`Validation error: ${error.details.map(x => x.message).join(", ")}`);
+        next(`Validation error: ${error.details.map(x => x.message.replaceAll('"', "")).join(", ")}`);
     } else {
         req.body = value;
         next();

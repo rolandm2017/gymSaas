@@ -19,15 +19,11 @@ import LocationDiscoveryService from "./locationDiscovery.service";
 import { ILatLong } from "../interface/LatLong.interface";
 import { generateGrid } from "../util/gridMaker";
 
-const rc = require("../../hardcodeReplies/rentCanada.json");
-const rf = require("../../hardcodeReplies/rentFaster.json");
-const rs = require("../../hardcodeReplies/rentSeeker.json");
-
 // const dotenvConfig = dotenv.config();
 dotenv.config();
 
 class ApartmentScraperService {
-    // fixme: install a private db provider service or, take this out
+    // todo: declare service dependencies using 'private' kwd
     constructor() {}
 
     public async scrapeApartments(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IHousing[]> {
@@ -76,20 +72,20 @@ class ApartmentScraperService {
         return successfullyQueued;
     }
 
-    public async getDummyData(provider: Provider): Promise<IHousing[]> {
-        // open data based on input string
-        const parser = new Parser(provider);
-        console.log(__dirname, "31rm");
-        if (provider === Provider.rentCanada) {
-            return parser.parse(rc);
-        } else if (provider === Provider.rentFaster) {
-            return parser.parse(rf);
-        } else if (provider === Provider.rentSeeker) {
-            return parser.parse(rs);
-        } else {
-            throw new Error("Provider not included or invalid");
-        }
-    }
+    // public async getDummyData(provider: Provider): Promise<IHousing[]> {
+    //     // open data based on input string
+    //     const parser = new Parser(provider);
+    //     console.log(__dirname, "31rm");
+    //     if (provider === Provider.rentCanada) {
+    //         return parser.parse(rc);
+    //     } else if (provider === Provider.rentFaster) {
+    //         return parser.parse(rf);
+    //     } else if (provider === Provider.rentSeeker) {
+    //         return parser.parse(rs);
+    //     } else {
+    //         throw new Error("Provider not included or invalid");
+    //     }
+    // }
 }
 
 export default ApartmentScraperService;

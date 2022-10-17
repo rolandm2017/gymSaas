@@ -75,74 +75,70 @@ class ApartmentsController {
     }
 
     async getHardcodeApartments(request: Request, response: Response) {
-        try {
-            const startProviders = request.query.providers;
-            // console.log(startProviders, request.query.providers, "55rm");
-            if (typeof startProviders !== "string") {
-                return response.status(500).send({ err: "Provider missing" }).end();
-            }
-            const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
-            if (providers.map(p => p in Provider).every(p => p)) {
-                // providers must all be in Provider
-            } else {
-                return response.status(500).send({ err: "Provider specified is not a provider" }).end();
-            }
-
-            let apartments = [];
-            const apartmentService = new ApartmentScraperService();
-            for (let i = 0; i < providers.length; i++) {
-                const p: Provider = providers[i] as Provider;
-                console.log(p, "69rm");
-                const stuff = await apartmentService.getDummyData(p);
-                console.log(typeof stuff, stuff.length, "63rm");
-                // TODO: feed stuff into a "geolocation service" via google to turn addr => lat,long
-                apartments.push(stuff);
-            }
-            apartments = apartments.flat();
-            return response.status(200).json({ apartments: apartments }).end();
-        } catch (error) {
-            return response.status(500).send({ error }).end();
-        }
+        //     try {
+        //         const startProviders = request.query.providers;
+        //         // console.log(startProviders, request.query.providers, "55rm");
+        //         if (typeof startProviders !== "string") {
+        //             return response.status(500).send({ err: "Provider missing" }).end();
+        //         }
+        //         const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
+        //         if (providers.map(p => p in Provider).every(p => p)) {
+        //             // providers must all be in Provider
+        //         } else {
+        //             return response.status(500).send({ err: "Provider specified is not a provider" }).end();
+        //         }
+        //         let apartments = [];
+        //         const apartmentService = new ApartmentScraperService();
+        //         for (let i = 0; i < providers.length; i++) {
+        //             const p: Provider = providers[i] as Provider;
+        //             console.log(p, "69rm");
+        //             const stuff = await apartmentService.getDummyData(p);
+        //             console.log(typeof stuff, stuff.length, "63rm");
+        //             // TODO: feed stuff into a "geolocation service" via google to turn addr => lat,long
+        //             apartments.push(stuff);
+        //         }
+        //         apartments = apartments.flat();
+        //         return response.status(200).json({ apartments: apartments }).end();
+        //     } catch (error) {
+        //         return response.status(500).send({ error }).end();
+        //     }
     }
 
     async getQualifiedHardcodeApartments(request: Request, response: Response) {
-        try {
-            // todo: try 1 km, 2, 3, 0.5, 0.3, 0.25 (0.25 km = 3 min @ 5 km/ 60 min)
-            const qualificationRadiusInKM: number = typeof request.query.maxDistance === "string" ? parseInt(request.query.maxDistance, 10) : 0.75;
-            const startProviders: string | undefined = typeof request.query.providers === "string" ? request.query.providers : "";
-            console.log(qualificationRadiusInKM, typeof qualificationRadiusInKM, "90rm");
-            // console.log(startProviders, request.query.providers, "55rm");
-            if (typeof startProviders !== "string" || startProviders.length === 0) {
-                return response.status(500).send({ err: "Provider missing" }).end();
-            }
-            const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
-            if (providers.map(p => p in Provider).every(p => p)) {
-                // providers must all be in Provider
-            } else {
-                return response.status(500).send({ err: "Provider specified is not a provider" }).end();
-            }
-
-            let apartments = [];
-            const apartmentService = new ApartmentScraperService();
-            for (let i = 0; i < providers.length; i++) {
-                const p: Provider = providers[i] as Provider;
-                console.log(p, "69rm");
-                const savedApartments: IHousing[] = await apartmentService.getDummyData(p);
-                console.log(typeof savedApartments, savedApartments.length, "63rm");
-                // TODO: feed stuff into a "geolocation service" via google to turn addr => lat,long
-                apartments.push(savedApartments);
-            }
-            apartments = apartments.flat();
-
-            const gymService = new GymFinderService();
-            const gyms = await gymService.getSavedGymsFromDB("Montreal");
-            // TODO: organize controllers. Does this endpoint belong in apartments, gyms, or "places"?
-            const apartmentsWithNearbyGyms = qualify(apartments, gyms, qualificationRadiusInKM);
-
-            return response.status(200).json({ apartments: apartmentsWithNearbyGyms }).end();
-        } catch (error) {
-            return response.status(500).send({ error }).end();
-        }
+        //     try {
+        //         // todo: try 1 km, 2, 3, 0.5, 0.3, 0.25 (0.25 km = 3 min @ 5 km/ 60 min)
+        //         const qualificationRadiusInKM: number = typeof request.query.maxDistance === "string" ? parseInt(request.query.maxDistance, 10) : 0.75;
+        //         const startProviders: string | undefined = typeof request.query.providers === "string" ? request.query.providers : "";
+        //         console.log(qualificationRadiusInKM, typeof qualificationRadiusInKM, "90rm");
+        //         // console.log(startProviders, request.query.providers, "55rm");
+        //         if (typeof startProviders !== "string" || startProviders.length === 0) {
+        //             return response.status(500).send({ err: "Provider missing" }).end();
+        //         }
+        //         const providers = startProviders.includes(",") ? startProviders.split(",") : [startProviders];
+        //         if (providers.map(p => p in Provider).every(p => p)) {
+        //             // providers must all be in Provider
+        //         } else {
+        //             return response.status(500).send({ err: "Provider specified is not a provider" }).end();
+        //         }
+        //         let apartments = [];
+        //         const apartmentService = new ApartmentScraperService();
+        //         for (let i = 0; i < providers.length; i++) {
+        //             const p: Provider = providers[i] as Provider;
+        //             console.log(p, "69rm");
+        //             const savedApartments: IHousing[] = await apartmentService.getDummyData(p);
+        //             console.log(typeof savedApartments, savedApartments.length, "63rm");
+        //             // TODO: feed stuff into a "geolocation service" via google to turn addr => lat,long
+        //             apartments.push(savedApartments);
+        //         }
+        //         apartments = apartments.flat();
+        //         const gymService = new GymFinderService();
+        //         const gyms = await gymService.getSavedGymsFromDB("Montreal");
+        //         // TODO: organize controllers. Does this endpoint belong in apartments, gyms, or "places"?
+        //         const apartmentsWithNearbyGyms = qualify(apartments, gyms, qualificationRadiusInKM);
+        //         return response.status(200).json({ apartments: apartmentsWithNearbyGyms }).end();
+        //     } catch (error) {
+        //         return response.status(500).send({ error }).end();
+        //     }
     }
 }
 

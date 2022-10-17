@@ -11,7 +11,7 @@ import {
     validateResetTokenSchema,
     verifyEmailSchema,
 } from "../validationSchemas/schemas";
-import { authorize } from "../middleware/authorize.middleware";
+import authorize from "../middleware/authorize.middleware";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
 import AccountService from "../service/account.service";
@@ -34,9 +34,9 @@ class AuthController {
         this.router.post("/validate_reset_token", validateResetTokenSchema, this.validateResetToken);
         this.router.post("/reset_password", resetPasswordSchema, this.resetPassword);
         // authorized routes
-        this.router.get("/", authorize(Role.Admin), this.getAllAccounts);
+        this.router.get("/", authorize([Role.Admin]), this.getAllAccounts);
         this.router.get("/:id", authorize(), this.getAccountById);
-        this.router.post("/", authorize(Role.Admin), createAccountSchema, this.createAccount);
+        this.router.post("/", authorize([Role.Admin]), createAccountSchema, this.createAccount);
         this.router.put("/:id", authorize(), updateRoleSchema, this.updateAccount);
         this.router.delete("/:id", authorize(), this._deleteAccount);
     }
@@ -137,8 +137,9 @@ class AuthController {
         if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
+        const idAsNumber = parseInt(request.params.id, 10);
 
-        const account = await this.accountService.getAccountById(request.params.id);
+        const account = await this.accountService.getAccountById(idAsNumber);
         return account ? response.json(account) : response.sendStatus(404);
         // .catch(next);
     }
@@ -154,8 +155,9 @@ class AuthController {
         if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
+        const idAsNumber = parseInt(request.params.id, 10);
 
-        const account = this.accountService.updateAccount(request.params.id, request.body);
+        const account = this.accountService.updateAccount(idAsNumber, request.body);
         return response.json(account);
         // .catch(next);
     }
@@ -181,3 +183,5 @@ class AuthController {
         response.cookie("refreshToken", token, cookieOptions);
     }
 }
+
+export default AuthController;

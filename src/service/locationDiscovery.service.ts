@@ -5,6 +5,7 @@ const APIKEY = process.env.GOOGLE_GEOCODING_API_KEY;
 
 // The service converts e.g. "vancouver, BC, Canada" into lat and long. Or an address into a long/lat.
 class LocationDiscoveryService {
+    // todo: declare service dependencies using 'private' kwd
     constructor() {}
 
     public async latLongDiscovery(city: string, state: string, country: string) {

@@ -10,13 +10,7 @@ import {
     getAccountByRefreshToken,
 } from "../database/dao/account.dao";
 import { getRefreshTokenByToken } from "../database/dao/refreshToken.dao";
-import {
-    createResetToken,
-    deleteResetToken,
-    deleteResetTokenByModel,
-    getAllResetTokensForAccount,
-    getResetTokenByToken,
-} from "../database/dao/resetToken.dao";
+import { createResetToken, deleteResetTokenByModel, getAllResetTokensForAccount, getResetTokenByToken } from "../database/dao/resetToken.dao";
 import { Account } from "../database/models/Account";
 import { RefreshToken } from "../database/models/RefreshToken";
 import { ResetToken } from "../database/models/ResetToken";
@@ -30,8 +24,8 @@ class AccountService {
     constructor(private emailService: EmailService) {}
 
     public async authenticate(email: string, password: string, ipAddress: string) {
-        const acct: Account = await getAccountByEmail(email);
-        const account = this.accountUtil.convertAccountModelToInterface(acct);
+        const acct: Account[] = await getAccountByEmail(email);
+        const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
 
         // authentication successful so generate jwt and refresh tokens
         const jwtToken = this.accountUtil.generateJwtToken(account);
@@ -77,7 +71,8 @@ class AccountService {
 
     public async refreshToken(token: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshToken(token);
-        const { account } = await getAccountByRefreshToken(refreshToken);
+        const acct: Account = await getAccountByRefreshToken(refreshToken);
+        const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct);
 
         // replace old refresh token with a new one and save
         const newRefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
