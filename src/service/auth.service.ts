@@ -16,6 +16,8 @@ import { RefreshToken } from "../database/models/RefreshToken";
 import { ResetToken } from "../database/models/ResetToken";
 import { Role } from "../enum/role.enum";
 import { IAccount } from "../interface/Account.interface";
+import { IBasicDetails } from "../interface/BasicDetails.interface.";
+import { ISmallError } from "../interface/SmallError.interface";
 import AccountUtil from "../util/accountUtil";
 import EmailService from "./email.service";
 
@@ -24,12 +26,20 @@ class AuthService {
     private emailService = new EmailService();
     constructor() {}
 
-    public async authenticate(email: string, password: string, ipAddress: string) {
-        const acct: Account[] = await getAccountByEmail(email);
-        const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
+    public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
+        let acctArr: Account[] = await getAccountByEmail(email);
+        console.log(acctArr, "29rm");
+        if (acctArr.length === 0) return { error: "No account found for this email" };
+        if (acctArr.length >= 2) return { error: "More than one account found for this email" };
+
+        const acct = acctArr[0];
+        if (!acct || !acct.isVerified || !bcrypt.compareSync(password, acct.passwordHash)) {
+            throw "Email or password is incorrect";
+        }
+        const account = this.accountUtil.convertAccountModelToInterface(acct);
 
         // authentication successful so generate jwt and refresh tokens
-        const jwtToken = this.accountUtil.generateJwtToken(account);
+        const jwtToken = await this.accountUtil.generateJwtToken(account);
         const refreshToken: RefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
 
         // save refresh token
@@ -45,7 +55,10 @@ class AuthService {
 
     public async register(params: any, origin: string) {
         // "what's in params?" => consult registerUserSchema
-        if (await getAccountByEmail(params.email)) {
+        console.log(params, "48rm");
+        const emailAlreadyExists: Account[] = await getAccountByEmail(params.email);
+        console.log(emailAlreadyExists, "50rm");
+        if (emailAlreadyExists) {
             // send already registered error in email to prevent account enumeration
             return await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
         }
@@ -107,7 +120,7 @@ class AuthService {
     public async verifyEmail(token: string) {
         const account = await getAccountByVerificationToken(token);
 
-        if (!account) throw "Verification failed";
+        if (!account) throw new Error("Verification failed");
 
         account.verified = Date.now();
         account.verificationToken = ""; // string value that is closest to 'undefined'
@@ -117,7 +130,7 @@ class AuthService {
     public async forgotPassword(email: string, origin: string) {
         const acctArr: Account[] = await getAccountByEmail(email);
         if (acctArr.length > 1) {
-            throw "More than one account found for this email";
+            throw new Error("More than one account found for this email");
             // todo: error logging
         }
         const acct = acctArr[0];
@@ -138,18 +151,18 @@ class AuthService {
 
     public async validateResetToken(token: string) {
         const resetToken: ResetToken | null = await getResetTokenByToken(token);
-        if (!resetToken) throw "Invalid token";
+        if (!resetToken) throw new Error("Invalid token");
         const account = await getAccountById(resetToken.accountId);
 
-        if (!account) throw "Invalid token";
+        if (!account) throw new Error("Invalid token");
     }
 
     public async resetPassword(token: string, password: string) {
         const resetToken: ResetToken | null = await getResetTokenByToken(token);
-        if (!resetToken) throw "Invalid token";
+        if (!resetToken) throw new Error("Invalid token");
         const account = await getAccountById(resetToken.accountId);
 
-        if (!account) throw "Invalid token";
+        if (!account) throw new Error("Invalid token");
 
         // update password and remove reset token
         account.passwordHash = this.accountUtil.hash(password);
@@ -218,14 +231,15 @@ class AuthService {
         await this.deleteAccount(id);
     }
 
-    private basicDetails(account: IAccount | Account) {
+    private basicDetails(account: IAccount | Account): IBasicDetails {
         const { id, email, role, updated, isVerified } = account;
-        return { id, email, role, updated, isVerified };
+        const definitelyARole = role as Role;
+        return { id, email, role: definitelyARole, updated, isVerified };
     }
 
     private async getAccount(id: number) {
         const account = await getAccountById(id);
-        if (!account) throw "Account not found";
+        if (!account) throw new Error("Account not found");
         return account;
     }
 }

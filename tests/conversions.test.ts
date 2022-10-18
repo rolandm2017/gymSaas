@@ -106,7 +106,6 @@ describe("Accurately convert travelling east/west in km to longitude", () => {
 
     test("Throws errors for non-supported values", () => {
         expect(() => {
-            console.log(outOfBoundsLatitude, "67rm");
             changeInEastWestKMToLongitudeDegrees(1, outOfBoundsLatitude, 100);
         }).toThrow("Latitude out bounds");
         expect(() => {

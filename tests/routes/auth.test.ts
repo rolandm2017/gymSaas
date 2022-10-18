@@ -31,6 +31,27 @@ const validCredentials = {
     acceptTerms: true,
 };
 
+const invalidCredentials1 = {
+    email: emails[0],
+    password: passwords[0],
+    confirmPassword: passwords[0],
+    acceptTerms: false, // false is a problem
+};
+
+const invalidCredentials2 = {
+    email: emails[0],
+    password: passwords[0],
+    confirmPassword: passwords[1], // if pw no match, problem!
+    acceptTerms: true,
+};
+
+const invalidCredentials3 = {
+    email: "notAnEmail",
+    password: passwords[1],
+    confirmPassword: passwords[1],
+    acceptTerms: true,
+};
+
 describe("Test auth controller", () => {
     describe("/register", () => {
         describe("well formed", () => {
@@ -44,7 +65,9 @@ describe("Test auth controller", () => {
         });
         test("POST /register, malformed and edge cases", async () => {
             await request(server).post(`${path}/register`).expect(400);
-            //
+            await request(server).post(`${path}/register`).send(invalidCredentials1).expect(400);
+            await request(server).post(`${path}/register`).send(invalidCredentials2).expect(400);
+            await request(server).post(`${path}/register`).send(invalidCredentials3).expect(400);
         });
     });
 });

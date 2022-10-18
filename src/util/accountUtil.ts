@@ -26,7 +26,7 @@ class AccountUtil {
     public async getRefreshToken(token: string) {
         const refreshToken = await getRefreshTokenByToken(token);
         // fixme: .populate("account"); does what? see line 64         const { account } = refreshToken;
-        if (!refreshToken || !refreshToken.isActive) throw "Invalid token";
+        if (!refreshToken || !refreshToken.isActive) throw new Error("Invalid token");
         return refreshToken;
     }
 
@@ -53,7 +53,7 @@ class AccountUtil {
             email: startAccount.email,
             isVerified: startAccount.isVerified,
             updated: new Date(startAccount.updated),
-            role: startAccount.role,
+            role: startAccount.role as Role,
             passwordHash: startAccount.passwordHash,
         };
         if (account.passwordHash === undefined) {

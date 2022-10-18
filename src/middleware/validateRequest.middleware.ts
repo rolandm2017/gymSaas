@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 
 import Joi, { ObjectSchema } from "joi";
+import errorHandler from "./error.middleware";
 
 function validateRequest(req: Request, next: NextFunction, schema: ObjectSchema<any>) {
     const options = {
@@ -10,7 +11,9 @@ function validateRequest(req: Request, next: NextFunction, schema: ObjectSchema<
     };
     const { error, value } = schema.validate(req.body, options);
     if (error) {
-        next(`Validation error: ${error.details.map(x => x.message.replaceAll('"', "")).join(", ")}`);
+        const err = new Error(`Validation error: ${error.details.map(x => x.message.replaceAll('"', "")).join(", ")}`);
+        err.name = "ValidationError";
+        next(err);
     } else {
         req.body = value;
         next();

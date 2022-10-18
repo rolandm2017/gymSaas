@@ -6,7 +6,8 @@
     "scripts": {
         "test": "jest",
         "dev": "nodemon ./src/server.ts",
-        "start": "node ./dist/server.js"
+        "start": "node ./dist/server.js",
+        "test:dao": "jest -i tests/dao/*"
     },
     "repository": {
         "type": "git",

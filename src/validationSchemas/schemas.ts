@@ -14,9 +14,6 @@ function authenticateUserSchema(req: Request, res: Response, next: NextFunction)
 
 function registerUserSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema<any> = Joi.object({
-        // title: Joi.string().required(),
-        // firstName: Joi.string().required(),
-        // lastName: Joi.string().required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref("password")).required(),

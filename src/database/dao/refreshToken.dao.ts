@@ -14,6 +14,7 @@ export const getAllRefreshTokensForAccount = (accountId: number) => {
     return RefreshToken.findAll({
         where: { "$Account.id$": accountId },
         include: [{ model: Account, as: Account.tableName }],
+        // read: https://stackoverflow.com/questions/74092426/proper-way-to-find-an-account-via-one-of-its-associated-refreshtokens-in-sequeli
     });
 };
 

@@ -18,11 +18,11 @@ class App {
         this.app.use(cors());
         this.app.use(morgan("dev"));
         this.app.use(cookieParser());
-        this.app.use(errorHandler);
 
         this.middlewares(appInit.middlewares);
         // this.app.use(ErrorMiddleware.handleRouteErrors); // this will catch any error thrown routes
         this.routes(appInit.controllers);
+        this.app.use(errorHandler);
     }
 
     public listen() {
