@@ -18,6 +18,7 @@ import AuthService from "../service/auth.service";
 import errorHandler from "../middleware/error.middleware";
 import { IAccount } from "../interface/Account.interface";
 import { ISmallError } from "../interface/SmallError.interface";
+import { IBasicDetails } from "../interface/BasicDetails.interface.";
 
 class AuthController {
     public path = "/auth";
@@ -53,10 +54,8 @@ class AuthController {
         const ipAddress: string = request.ip;
 
         const authService = new AuthService();
-        const accountDetails: IAccount | ISmallError = await authService.authenticate(email, password, ipAddress);
-        const err = accountDetails as ISmallError;
-        console.log(err, "58rm");
-        if (err.error) return response.json({ error: err.error });
+        const accountDetails: IBasicDetails | ISmallError = await authService.authenticate(email, password, ipAddress);
+        if ("error" in accountDetails) return response.json({ error: accountDetails.error });
         return response.json({ accountDetails });
     }
 
@@ -70,9 +69,10 @@ class AuthController {
                 return response.status(400).json({ message: "Origin is required and was undefined" });
             }
             const authService = new AuthService();
-            await authService.register(request.body, origin);
+            const accountDetails: IBasicDetails | ISmallError = await authService.register(request.body, origin);
+            if ("error" in accountDetails) return response.json({ error: accountDetails.error });
             // .then(() => response.json({ message: 'Registration successful, please check your email for verification instructions' }))
-            return response.json({ message: "Registration successful, please check your email for verification instructions" });
+            return response.json({ message: "Registration successful, please check your email for verification instructions", accountDetails });
         } catch (err) {
             console.log(err, "71rm");
             next(err);

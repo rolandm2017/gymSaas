@@ -53,14 +53,15 @@ class AuthService {
         };
     }
 
-    public async register(params: any, origin: string) {
+    public async register(params: any, origin: string): Promise<IBasicDetails | ISmallError> {
         // "what's in params?" => consult registerUserSchema
         console.log(params, "48rm");
         const emailAlreadyExists: Account[] = await getAccountByEmail(params.email);
         console.log(emailAlreadyExists, "50rm");
         if (emailAlreadyExists) {
             // send already registered error in email to prevent account enumeration
-            return await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
+            await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
+            return { error: "Account with this email already exists" };
         }
 
         // create account object
@@ -81,6 +82,9 @@ class AuthService {
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct);
         await this.emailService.sendVerificationEmail(account, origin);
+        return {
+            ...this.basicDetails(account),
+        };
     }
 
     public async refreshToken(token: string, ipAddress: string) {
