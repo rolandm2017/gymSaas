@@ -26,18 +26,17 @@ class App {
     }
 
     public listen() {
-        this.app.listen(this.port, () => {
+        this.app.listen(this.port, async () => {
             console.log(`App has started on port ${this.port}`);
-            Database.authenticate()
-                .then(async () => {
-                    console.log("Database Connection Established");
-                    await initModels(Database);
-                    await Database.sync();
-                    console.log("Done syncing...");
-                })
-                .catch((error: string) => {
-                    console.log("Database connection failed", error);
-                });
+            try {
+                await Database.authenticate();
+                console.log("Database Connection Established");
+                await initModels(Database);
+                await Database.sync();
+                console.log("Done syncing...");
+            } catch (err) {
+                console.log("Database connection failed", err);
+            }
         });
     }
 

@@ -55,6 +55,7 @@ class AccountUtil {
             updated: new Date(startAccount.updated),
             role: startAccount.role as Role,
             passwordHash: startAccount.passwordHash,
+            verificationToken: startAccount.verificationToken,
         };
         if (account.passwordHash === undefined) {
             throw Error("No hashed password found");

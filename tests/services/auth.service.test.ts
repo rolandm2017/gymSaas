@@ -5,7 +5,7 @@ import { IBasicDetails } from "../../src/interface/BasicDetails.interface.";
 import { ISmallError } from "../../src/interface/SmallError.interface";
 import AuthService from "../../src/service/auth.service";
 
-import server from "../mocks/server";
+import { server } from "../mocks/server";
 
 import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
 const validCredentials = {
@@ -24,7 +24,11 @@ const someOrigin = "whatever";
 beforeAll(async () => {
     // todo: create an account to be authed as
     const authService = new AuthService();
-    await authService.register(validCredentials, someOrigin);
+    const emailBypass = { token: "" };
+    function tokenReporter(token: string): void {
+        emailBypass.token = token;
+    }
+    await authService.register(validCredentials, someOrigin, tokenReporter);
 });
 
 describe("test auth service on its own", () => {

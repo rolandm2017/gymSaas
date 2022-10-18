@@ -14,6 +14,7 @@ class EmailService {
                        <p><code>${account.verificationToken}</code></p>`;
         }
 
+        console.log(account.verificationToken, "token for next step");
         await sendEmail({
             to: account.email,
             subject: "Sign-up Verification API - Verify Email",

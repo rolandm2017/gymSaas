@@ -53,7 +53,7 @@ class AuthService {
         };
     }
 
-    public async register(params: any, origin: string): Promise<IBasicDetails | ISmallError> {
+    public async register(params: any, origin: string, tokenReporter?: Function): Promise<IBasicDetails | ISmallError> {
         // "what's in params?" => consult registerUserSchema
         console.log(params, "48rm");
         const emailAlreadyExists: Account[] = await getAccountByEmail(params.email);
@@ -82,6 +82,7 @@ class AuthService {
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct);
         await this.emailService.sendVerificationEmail(account, origin);
+        if (tokenReporter) tokenReporter(account.verificationToken);
         return {
             ...this.basicDetails(account),
         };
