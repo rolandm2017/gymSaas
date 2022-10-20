@@ -41,30 +41,32 @@ describe("Test auth controller", () => {
         req.body.password = "validPassword999*";
         req.ip = "195.1.1.3";
         const res: Response = mockResponse();
-        res.json = jest.fn();
+        const resJsonMock = jest.fn();
+        res.json = resJsonMock;
         const n: NextFunction = {} as NextFunction;
         const response: Response = await controller.authenticate(req, res, n);
         // expect(response.email).toEqual(validEmail);
-        expect(res.json).toHaveBeenCalledWith({
+        expect(resJsonMock).toHaveBeenCalledWith({
             accountDetails: fakeButValidAccount,
         });
         expect(res.json).toHaveBeenCalled();
     });
-    test("authenticate route errors for invalid inputs", () => {
+    test("authenticate route errors for invalid inputs", async () => {
         s.authenticate = jest.fn().mockReturnValue({ error: "hats" });
         const req: Request = {} as Request;
         const res: Response = mockResponse();
-        res.json = jest.fn();
+        const resJsonMock = jest.fn();
+        res.json = resJsonMock;
         const n: NextFunction = {} as NextFunction;
         req.body = {
             email: "hats@gmail.com",
         };
-        const response = controller.authenticate(req, res, n);
-        expect(res.json).toHaveBeenCalledWith({ error: "hats" });
-        expect(res.json).toHaveBeenCalled();
+        const response = await controller.authenticate(req, res, n);
+        expect(resJsonMock).toHaveBeenCalledWith({ error: "hats" });
+        expect(resJsonMock).toHaveBeenCalled();
     });
 
-    test("register route succeeds for valid inputs", () => {
+    test("register route succeeds for valid inputs", async () => {
         s.register = jest.fn().mockReturnValue(fakeButValidAccount);
         const req: any = {};
         req.get = function () {
@@ -73,10 +75,10 @@ describe("Test auth controller", () => {
         const res: Response = mockResponse();
         res.json = jest.fn();
         const n: NextFunction = {} as NextFunction;
-        const response = controller.register(req, res, n);
+        const response = await controller.register(req, res, n);
         expect(res.json).toHaveBeenCalled();
     });
-    test("register route errors for invalid inputs", () => {
+    test("register route errors for invalid inputs", async () => {
         s.register = jest.fn().mockReturnValue({ error: "hats" });
         const req: any = {};
         req.get = function () {
@@ -85,7 +87,7 @@ describe("Test auth controller", () => {
         const res: Response = mockResponse();
         res.json = jest.fn();
         const n: NextFunction = {} as NextFunction;
-        const response = controller.register(req, res, n);
+        const response = await controller.register(req, res, n);
         expect(res.json).toHaveBeenCalledWith({
             error: "hats",
         });
