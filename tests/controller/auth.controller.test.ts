@@ -7,6 +7,7 @@ import AuthService from "../../src/service/auth.service";
 import { Role } from "../../src/enum/role.enum";
 import EmailService from "../../src/service/email.service";
 import AccountUtil from "../../src/util/accountUtil";
+import { RequestWithUser } from "../../src/interface/RequestWithUser.interface";
 
 let s: AuthService;
 let controller: AuthController;
@@ -28,6 +29,10 @@ beforeAll(() => {
     controller = new AuthController(s);
 });
 
+afterEach(() => {
+    jest.clearAllMocks();
+});
+
 const mockResponse = () => {
     // from https://github.com/HugoDF/mock-express-request-response/blob/master/express-handlers.jest-test.js
     // and from https://codewithhugo.com/express-request-response-mocking/
@@ -45,8 +50,7 @@ describe("Test auth controller", () => {
         req.body.password = "validPassword999*";
         req.ip = "195.1.1.3";
         const res: Response = mockResponse();
-        const resJsonMock = jest.fn();
-        res.json = resJsonMock;
+        res.json = jest.fn();
         const n: NextFunction = {} as NextFunction;
         const response: Response = await controller.authenticate(req, res, n);
         // expect(response.email).toEqual(validEmail);
@@ -59,12 +63,12 @@ describe("Test auth controller", () => {
         s.authenticate = jest.fn().mockReturnValue({ error: "hats" });
         const req: Request = {} as Request;
         const res: Response = mockResponse();
-        const resJsonMock = jest.fn();
-        res.json = resJsonMock;
-        const n: NextFunction = {} as NextFunction;
+        res.json = jest.fn();
+        // const n: NextFunction = {} as NextFunction;
         req.body = {
             email: "hats@gmail.com",
         };
+        const n: NextFunction = {} as NextFunction;
         const response = await controller.authenticate(req, res, n);
         expect(res.json).toHaveBeenCalledWith({ error: "hats" });
         expect(res.json).toHaveBeenCalled();
@@ -78,6 +82,7 @@ describe("Test auth controller", () => {
         };
         const res: Response = mockResponse();
         res.json = jest.fn();
+        // const n: NextFunction = {} as NextFunction;
         const n: NextFunction = {} as NextFunction;
         const response = await controller.register(req, res, n);
         expect(res.json).toHaveBeenCalledWith({
@@ -100,5 +105,68 @@ describe("Test auth controller", () => {
             error: "hats",
         });
         expect(res.json).toHaveBeenCalled();
+    });
+
+    describe("revoke token returns 'token revoked' when inputs are proper", () => {
+        test("works with .token", async () => {
+            // setup
+            s.revokeToken = jest.fn();
+            const req: RequestWithUser = { body: {} } as Request;
+            req.body.token = "aaaaaaaaa";
+            req.ip = "195.1.1.3";
+            req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), id: "hats" };
+            const res: Response = mockResponse();
+            const n: NextFunction = {} as NextFunction;
+            // ready
+            const response = await controller.revokeToken(req, res, n);
+            console.log(response);
+            expect(req.user.ownsToken).toBeCalled();
+            expect(s.revokeToken).toHaveBeenCalled();
+            expect(res.json).toHaveBeenCalledWith({ message: "Token revoked" });
+        });
+        test("works with .refreshToken", async () => {
+            // setup
+            s.revokeToken = jest.fn();
+            const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
+            req.cookies.refreshToken = "bbbbbb";
+            req.ip = "195.1.1.3";
+            req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), id: "hats" };
+            const res: Response = mockResponse();
+            const n: NextFunction = {} as NextFunction;
+            // ready
+            const response = await controller.revokeToken(req, res, n);
+            console.log(response);
+            expect(req.user.ownsToken).toBeCalled();
+            expect(s.revokeToken).toHaveBeenCalled();
+            expect(res.json).toHaveBeenCalledWith({ message: "Token revoked" });
+        });
+    });
+
+    describe("revoke token fails the way I expect", () => {
+        test("kicks you out when user is undefined", async () => {
+            // setup
+            s.revokeToken = jest.fn();
+            const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
+            req.user = undefined;
+            const res: Response = mockResponse();
+            const n: NextFunction = {} as NextFunction;
+            // ready
+            const response = await controller.revokeToken(req, res, n);
+            expect(response.json).toHaveBeenCalledWith({ message: "User is required" });
+            expect(s.revokeToken).not.toHaveBeenCalled();
+        });
+        test("says 'token is required' when there is none", async () => {
+            // setup
+            s.revokeToken = jest.fn();
+            const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
+            req.user = { role: "User", ownsToken: jest.fn(), id: "hats" };
+            const res: Response = mockResponse();
+            const n: NextFunction = {} as NextFunction;
+            // ready
+            const response = await controller.revokeToken(req, res, n);
+            expect(response.json).toHaveBeenCalledWith({ message: "Token is required" });
+            expect(s.revokeToken).not.toHaveBeenCalled();
+            expect(req.user.ownsToken).not.toHaveBeenCalled();
+        });
     });
 });

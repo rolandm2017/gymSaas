@@ -57,21 +57,17 @@ class AuthController {
 
         const accountDetails: IBasicDetails | ISmallError = await this.authService.authenticate(email, password, ipAddress);
         if ("error" in accountDetails) return response.json({ error: accountDetails.error });
-        console.log(accountDetails, "59rm");
         return response.json({ accountDetails });
     }
 
     public async register(request: Request, response: Response, next: NextFunction) {
         try {
-            // console.log(authService, "54rm");
             const origin = request.get("origin");
             if (origin === undefined) {
                 return response.status(400).json({ message: "Origin is required and was undefined" });
             }
             const accountDetails: IBasicDetails | ISmallError = await this.authService.register(request.body, origin);
             if ("error" in accountDetails) return response.json({ error: accountDetails.error });
-            console.log(accountDetails, "72rm");
-            // .then(() => response.json({ message: 'Registration successful, please check your email for verification instructions' }))
             return response.json({ message: "Registration successful, please check your email for verification instructions", accountDetails });
         } catch (err) {
             console.log(err, "71rm");
@@ -88,7 +84,7 @@ class AuthController {
         return response.json(account);
     }
 
-    public async revokeToken(request: RequestWithUser, response: Response) {
+    public async revokeToken(request: RequestWithUser, response: Response, next: NextFunction) {
         //
         const token = request.body.token || request.cookies.refreshToken;
         const ipAddress = request.ip;
