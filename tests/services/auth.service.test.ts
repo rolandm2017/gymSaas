@@ -4,6 +4,8 @@ import { IAccount } from "../../src/interface/Account.interface";
 import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
 import { ISmallError } from "../../src/interface/SmallError.interface";
 import AuthService from "../../src/service/auth.service";
+import EmailService from "../../src/service/email.service";
+import AccountUtil from "../../src/util/accountUtil";
 
 // import { server } from "../mocks/server";
 import { app } from "../mocks/server";
@@ -22,23 +24,26 @@ const JWT_TOKEN_LENGTH = 40; // todo: add real length of jwt
 const REFRESH_TOKEN_LENGTH = 40; // todo: get real length
 const someOrigin = "whatever";
 
+let authService: AuthService;
+let e: EmailService;
+let a: AccountUtil;
+
 beforeAll(async () => {
     // todo: create an account to be authed as
-    const authService = new AuthService();
-    const emailBypass = { token: "" };
-    function tokenReporter(token: string): void {
-        emailBypass.token = token;
-    }
-    validCredentials.email = makeValidEmail();
-    await authService.register(validCredentials, someOrigin, tokenReporter);
+    authService = new AuthService(e, a);
+    // const emailBypass = { token: "" };
+    // function tokenReporter(token: string): void {
+    // emailBypass.token = token;
+    // }
+    // validCredentials.email = makeValidEmail();
+    await authService.register(validCredentials, someOrigin);
 });
 
 describe("test auth service on its own", () => {
-    describe("sign up, log in, log out", () => {
+    describe("sign up, log in", () => {
         //
         test("you can log in with an account", async () => {
             // todo: beforeAll an account into the db so this test ISNT dependent on another test creating an account to auth as.
-            const authService = new AuthService();
             const account: IBasicDetails | ISmallError = await authService.authenticate(
                 validCredentials.email,
                 validCredentials.password,
@@ -56,7 +61,6 @@ describe("test auth service on its own", () => {
             }
         });
         test("you can register an account", async () => {
-            const authService = new AuthService();
             const registered: IBasicDetails | ISmallError = await authService.register(validCredentials, someOrigin);
             console.log(registered);
             if ("email" in registered) {
@@ -71,11 +75,15 @@ describe("test auth service on its own", () => {
         });
     });
 
-    describe("refresh tokens work as intended", () => {
+    describe("[revoke token] if you log out, you really get logged out", async () => {
+        await authService.revokeToken();
+    });
+
+    describe("refresh tokens work as intended", async () => {
         //
     });
 
-    describe("password reset flow works, minus the email part that we won't test", () => {
+    describe("password reset flow works, minus the email part that we won't test", async () => {
         // todo: use callback to grab a bool "yes we got to the end of the email flow"
     });
 });

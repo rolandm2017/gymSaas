@@ -31,9 +31,9 @@ class AuthController {
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate);
         this.router.post("/register", registerUserSchema, this.register);
-        // todo: log out route
         // tokens
         this.router.post("/refresh_token", this.refreshToken);
+        // note: /revoke_token === /log_out
         this.router.post("/revoke_token", authorize(), revokeTokenSchema, this.revokeToken);
         // verify email
         this.router.post("/verify_email", verifyEmailSchema, this.verifyEmail);

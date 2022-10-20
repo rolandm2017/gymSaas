@@ -69,6 +69,7 @@ describe("Test auth controller", () => {
             email: "hats@gmail.com",
         };
         const n: NextFunction = {} as NextFunction;
+        // ready
         const response = await controller.authenticate(req, res, n);
         expect(res.json).toHaveBeenCalledWith({ error: "hats" });
         expect(res.json).toHaveBeenCalled();
@@ -82,8 +83,8 @@ describe("Test auth controller", () => {
         };
         const res: Response = mockResponse();
         res.json = jest.fn();
-        // const n: NextFunction = {} as NextFunction;
         const n: NextFunction = {} as NextFunction;
+        // ready
         const response = await controller.register(req, res, n);
         expect(res.json).toHaveBeenCalledWith({
             message: "Registration successful, please check your email for verification instructions",
@@ -100,6 +101,7 @@ describe("Test auth controller", () => {
         const res: Response = mockResponse();
         res.json = jest.fn();
         const n: NextFunction = {} as NextFunction;
+        // ready
         const response = await controller.register(req, res, n);
         expect(res.json).toHaveBeenCalledWith({
             error: "hats",
