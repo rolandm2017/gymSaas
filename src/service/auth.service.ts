@@ -1,14 +1,5 @@
 import bcrypt from "bcrypt";
-import {
-    createAccount,
-    deleteAccount,
-    findAllAccounts,
-    getAccountById,
-    getAccountByVerificationToken,
-    getAccountByEmail,
-    getMultipleAccounts,
-    getAccountByRefreshToken,
-} from "../database/dao/account.dao";
+import AccountDAO from "../database/dao/account.dao";
 import { getRefreshTokenByToken } from "../database/dao/refreshToken.dao";
 import { createResetToken, deleteResetTokenByModel, getAllResetTokensForAccount, getResetTokenByToken } from "../database/dao/resetToken.dao";
 import { Account } from "../database/models/Account";
@@ -23,14 +14,16 @@ import EmailService from "./email.service";
 
 class AuthService {
     private accountUtil: AccountUtil;
+    private accountDAO: AccountDAO;
     private emailService: EmailService;
-    constructor(e: EmailService, a: AccountUtil) {
+    constructor(e: EmailService, accountDAO: AccountDAO, a: AccountUtil) {
+        this.accountDAO = accountDAO;
         this.emailService = e;
         this.accountUtil = a;
     }
 
     public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
-        let acctArr: Account[] = await getAccountByEmail(email);
+        let acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
         console.log(acctArr, "29rm");
         if (acctArr.length === 0) return { error: "No account found for this email" };
         if (acctArr.length >= 2) return { error: "More than one account found for this email" };
@@ -59,7 +52,7 @@ class AuthService {
     public async register(params: any, origin: string): Promise<IBasicDetails | ISmallError> {
         // "what's in params?" => consult registerUserSchema
         console.log(params, "48rm");
-        const emailAlreadyExists: Account[] = await getAccountByEmail(params.email);
+        const emailAlreadyExists: Account[] = await this.accountDAO.getAccountByEmail(params.email);
         console.log(emailAlreadyExists, "50rm");
         if (emailAlreadyExists) {
             // send already registered error in email to prevent account enumeration
@@ -68,10 +61,10 @@ class AuthService {
         }
 
         // create account object
-        const acct: Account = await createAccount(params);
+        const acct: Account = await this.accountDAO.createAccount(params);
 
         // first registered account is an admin
-        const allAccountsInSystem = await getMultipleAccounts(5);
+        const allAccountsInSystem = await this.accountDAO.getMultipleAccounts(5);
         const isFirstAccount = allAccountsInSystem.count === 0;
         acct.role = isFirstAccount ? Role.Admin : Role.User;
         acct.verificationToken = this.accountUtil.randomTokenString();
@@ -92,7 +85,7 @@ class AuthService {
 
     public async refreshToken(token: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshToken(token);
-        const acct: Account[] = await getAccountByRefreshToken(refreshToken);
+        const acct: Account[] = await this.accountDAO.getAccountByRefreshToken(refreshToken);
         // todo: throw err if multiple accts found & report
         const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct[0]);
 
@@ -125,7 +118,7 @@ class AuthService {
     }
 
     public async verifyEmail(token: string) {
-        const account = await getAccountByVerificationToken(token);
+        const account = await this.accountDAO.getAccountByVerificationToken(token);
 
         if (!account) throw new Error("Verification failed");
 
@@ -135,7 +128,7 @@ class AuthService {
     }
 
     public async forgotPassword(email: string, origin: string) {
-        const acctArr: Account[] = await getAccountByEmail(email);
+        const acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
         if (acctArr.length > 1) {
             throw new Error("More than one account found for this email");
             // todo: error logging
@@ -159,7 +152,7 @@ class AuthService {
     public async validateResetToken(token: string) {
         const resetToken: ResetToken | null = await getResetTokenByToken(token);
         if (!resetToken) throw new Error("Invalid token");
-        const account = await getAccountById(resetToken.accountId);
+        const account = await this.accountDAO.getAccountById(resetToken.accountId);
 
         if (!account) throw new Error("Invalid token");
     }
@@ -167,7 +160,7 @@ class AuthService {
     public async resetPassword(token: string, password: string) {
         const resetToken: ResetToken | null = await getResetTokenByToken(token);
         if (!resetToken) throw new Error("Invalid token");
-        const account = await getAccountById(resetToken.accountId);
+        const account = await this.accountDAO.getAccountById(resetToken.accountId);
 
         if (!account) throw new Error("Invalid token");
 
@@ -185,7 +178,7 @@ class AuthService {
     // authorized
 
     public async getAllAccounts() {
-        const accounts: Account[] = await findAllAccounts();
+        const accounts: Account[] = await this.accountDAO.findAllAccounts();
         return accounts.map((a: Account) => this.basicDetails(a));
     }
 
@@ -197,11 +190,11 @@ class AuthService {
     public async createAccount(params: any) {
         // "what's in params?" => consult registerUserSchema
         // validate
-        if (await getAccountByEmail(params.email)) {
+        if (await this.accountDAO.getAccountByEmail(params.email)) {
             throw 'Email "' + params.email + '" is already registered';
         }
 
-        const account: Account = await createAccount(params);
+        const account: Account = await this.accountDAO.createAccount(params);
         account.verified = Date.now();
 
         // hash password
@@ -217,7 +210,7 @@ class AuthService {
         const account = await this.getAccount(id);
 
         // validate (if email was changed)
-        if (params.email && account.email !== params.email && (await getAccountByEmail(params.email))) {
+        if (params.email && account.email !== params.email && (await this.accountDAO.getAccountByEmail(params.email))) {
             throw 'Email "' + params.email + '" is already taken';
         }
 
@@ -245,7 +238,7 @@ class AuthService {
     }
 
     private async getAccount(id: number) {
-        const account = await getAccountById(id);
+        const account = await this.accountDAO.getAccountById(id);
         if (!account) throw new Error("Account not found");
         return account;
     }

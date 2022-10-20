@@ -9,6 +9,7 @@ class EmailService {
 
     constructor(testing?: string) {
         this.testingMode = testing === "testing"; // safeguard to prevent accidentally setting to testing mode
+        this.emailSender = sendEmail;
     }
 
     public async sendVerificationEmail(account: IAccount, origin: string) {
