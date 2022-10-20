@@ -17,6 +17,7 @@ import Database from "../../src/database/Database";
 import errorHandler from "../../src/middleware/error.middleware";
 
 import { TEST_DB_HOST, TEST_DB_NAME, TEST_DB_PASSWORD, TEST_DB_PORT, TEST_DB_USER } from "../config";
+import AuthService from "../../src/service/auth.service";
 
 class App {
     public app: Application;
@@ -68,6 +69,11 @@ class App {
         this.dbConnOpen = true;
     }
 
+    public async dropAllTables() {
+        if (!this.dbConnOpen) return;
+        await App.Database.drop();
+    }
+
     public async closeDB() {
         if (this.dbConnOpen) {
             await App.Database.close();
@@ -98,10 +104,12 @@ class App {
 const port = parseInt(process.env.PORT!, 10);
 console.log("hello world!", port);
 
+const a = new AuthService();
+
 export const app = new App({
     port: port || 8000,
 
-    controllers: [new AuthController(), new GooglePlacesController(), new ApartmentsController(), new HealthCheckController()],
+    controllers: [new AuthController(a), new GooglePlacesController(), new ApartmentsController(), new HealthCheckController()],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });
 

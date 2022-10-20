@@ -18,14 +18,16 @@ import AuthService from "../service/auth.service";
 import errorHandler from "../middleware/error.middleware";
 import { IAccount } from "../interface/Account.interface";
 import { ISmallError } from "../interface/SmallError.interface";
-import { IBasicDetails } from "../interface/BasicDetails.interface.";
+import { IBasicDetails } from "../interface/BasicDetails.interface";
 
 class AuthController {
     public path = "/auth";
     public router = express.Router();
-    private authService = new AuthService();
+    private authService: AuthService;
 
-    constructor() {
+    constructor(a: AuthService) {
+        // console.warn(a, "29rm");
+        this.authService = a;
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate);
         this.router.post("/register", registerUserSchema, this.register);
@@ -47,30 +49,28 @@ class AuthController {
         this.router.delete("/:id", authorize(), this._deleteAccount);
     }
 
-    public async authenticate(request: Request, response: Response) {
+    public async authenticate(request: Request, response: Response, next: NextFunction) {
         //
         const email: string = request.body.email;
         const password: string = request.body.password;
         const ipAddress: string = request.ip;
 
-        const authService = new AuthService();
-        const accountDetails: IBasicDetails | ISmallError = await authService.authenticate(email, password, ipAddress);
+        const accountDetails: IBasicDetails | ISmallError = await this.authService.authenticate(email, password, ipAddress);
         if ("error" in accountDetails) return response.json({ error: accountDetails.error });
+        console.log(accountDetails, "59rm");
         return response.json({ accountDetails });
     }
 
     public async register(request: Request, response: Response, next: NextFunction) {
-        console.log("in register 58rm");
         try {
             // console.log(authService, "54rm");
             const origin = request.get("origin");
-            console.log(request.body, origin, "55rm");
             if (origin === undefined) {
                 return response.status(400).json({ message: "Origin is required and was undefined" });
             }
-            const authService = new AuthService();
-            const accountDetails: IBasicDetails | ISmallError = await authService.register(request.body, origin);
+            const accountDetails: IBasicDetails | ISmallError = await this.authService.register(request.body, origin);
             if ("error" in accountDetails) return response.json({ error: accountDetails.error });
+            console.log(accountDetails, "72rm");
             // .then(() => response.json({ message: 'Registration successful, please check your email for verification instructions' }))
             return response.json({ message: "Registration successful, please check your email for verification instructions", accountDetails });
         } catch (err) {
@@ -86,7 +86,7 @@ class AuthController {
         const { refreshToken, ...account } = await authService.refreshToken(token, ipAddress);
 
         this.setTokenCookie(response, refreshToken);
-        response.json(account);
+        return response.json(account);
     }
 
     public async revokeToken(request: RequestWithUser, response: Response) {

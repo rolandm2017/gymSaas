@@ -7,7 +7,8 @@
         "test": "jest",
         "dev": "nodemon ./src/server.ts",
         "start": "node ./dist/server.js",
-        "test:dao": "jest -i tests/dao/*"
+        "test:dao": "jest -i tests/dao/*",
+        "test:c": "jest -i tests/controller/*"
     },
     "repository": {
         "type": "git",

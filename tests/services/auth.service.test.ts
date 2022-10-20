@@ -1,13 +1,14 @@
 import { cookie } from "express-validator";
 import request from "supertest";
 import { IAccount } from "../../src/interface/Account.interface";
-import { IBasicDetails } from "../../src/interface/BasicDetails.interface.";
+import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
 import { ISmallError } from "../../src/interface/SmallError.interface";
 import AuthService from "../../src/service/auth.service";
 
-import { server } from "../mocks/server";
+// import { server } from "../mocks/server";
+import { app } from "../mocks/server";
 
-import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
+import { makeValidEmail, emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
 const validCredentials = {
     email: emails[0],
     password: passwords[0],
@@ -22,12 +23,24 @@ const REFRESH_TOKEN_LENGTH = 40; // todo: get real length
 const someOrigin = "whatever";
 
 beforeAll(async () => {
+    console.log("\n====\n====\nstarting app...\n===\n===");
+    await app.connectDB();
+});
+
+afterAll(async () => {
+    console.log("***\n***\n***\nclosing app...");
+    await app.dropAllTables();
+    await app.closeDB();
+});
+
+beforeAll(async () => {
     // todo: create an account to be authed as
     const authService = new AuthService();
     const emailBypass = { token: "" };
     function tokenReporter(token: string): void {
         emailBypass.token = token;
     }
+    validCredentials.email = makeValidEmail();
     await authService.register(validCredentials, someOrigin, tokenReporter);
 });
 
@@ -42,6 +55,7 @@ describe("test auth service on its own", () => {
                 validCredentials.password,
                 validIPAddress,
             );
+            console.log(account);
             if ("email" in account) {
                 expect(account.email).toEqual(validCredentials.email);
                 expect(account.jwtToken).toBeDefined();
@@ -49,12 +63,13 @@ describe("test auth service on its own", () => {
                 expect(account.refreshToken).toBeDefined();
                 expect(account.refreshToken!.length).toEqual(REFRESH_TOKEN_LENGTH);
             } else {
-                fail("it should not reach here");
+                throw new Error("failed test");
             }
         });
         test("you can register an account", async () => {
             const authService = new AuthService();
             const registered: IBasicDetails | ISmallError = await authService.register(validCredentials, someOrigin);
+            console.log(registered);
             if ("email" in registered) {
                 expect(registered.email).toEqual(validCredentials.email);
                 expect(registered.jwtToken).toBeDefined();
@@ -62,7 +77,7 @@ describe("test auth service on its own", () => {
                 expect(registered.refreshToken).toBeDefined();
                 expect(registered.refreshToken!.length).toEqual(REFRESH_TOKEN_LENGTH);
             } else {
-                fail("it should not reach here");
+                throw new Error("failed test");
             }
         });
     });

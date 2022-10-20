@@ -2,7 +2,7 @@ import { cookie } from "express-validator";
 import request from "supertest";
 
 import { app, server } from "../mocks/server";
-import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
+import { emails, makeValidEmail, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
 
 const path = "/auth";
 const timestamp = Date.now();
@@ -14,15 +14,6 @@ const TEST_SIGNUP = {
 
 let TOKEN_COOKIES = "";
 let ACCESS_TOKEN = "";
-// beforeAll(async () => {
-//     const tokenResponse = await request(server)
-//         .post(`${path}/signin`)
-//         .set("Content-type", "application/json")
-//         .send(REGISTERED_USER_CREDENTIALS)
-//         .expect(200);
-//     TOKEN_COOKIES = tokenResponse.headers["set-cookie"];
-//     ACCESS_TOKEN = tokenResponse.body.access_token;
-// });
 
 const validCredentials = {
     email: emails[0],
@@ -51,6 +42,18 @@ const invalidCredentials3 = {
     confirmPassword: passwords[1],
     acceptTerms: true,
 };
+
+beforeAll(async () => {
+    console.log("\n====\n====\nstarting app...\n===\n===");
+    await app.connectDB();
+    validCredentials.email = makeValidEmail(); // fresh every time
+});
+
+afterAll(async () => {
+    console.log("***\n***\n***\nclosing app...");
+    await app.dropAllTables();
+    await app.closeDB();
+});
 
 describe("Test auth controller", () => {
     describe("/register", () => {

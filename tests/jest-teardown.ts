@@ -1,8 +1,8 @@
-import { app } from "./mocks/server";
+// import { app } from "./mocks/server";
 
-// afterEach(async () => {
-// await server.closeDB();
+// // afterEach(async () => {
+// // await server.closeDB();
+// // });
+// afterAll(async () => {
+//     await app.closeDB();
 // });
-afterAll(async () => {
-    await app.closeDB();
-});

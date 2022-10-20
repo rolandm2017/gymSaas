@@ -16,7 +16,7 @@ import { RefreshToken } from "../database/models/RefreshToken";
 import { ResetToken } from "../database/models/ResetToken";
 import { Role } from "../enum/role.enum";
 import { IAccount } from "../interface/Account.interface";
-import { IBasicDetails } from "../interface/BasicDetails.interface.";
+import { IBasicDetails } from "../interface/BasicDetails.interface";
 import { ISmallError } from "../interface/SmallError.interface";
 import AccountUtil from "../util/accountUtil";
 import EmailService from "./email.service";

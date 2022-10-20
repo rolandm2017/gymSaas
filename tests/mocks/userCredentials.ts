@@ -6,3 +6,11 @@ export const passwords: string[] = ["hats888*I", "hats777&U", "hats666^Y", "hats
 export const badPasswords: string[] = ["hatshats", "HATSHATS", "243509432", "hatsHATS234", "hats234@#$", "HATS234@#$"];
 
 export const tooShortPassword: string = "short";
+
+export function makeValidEmail() {
+    const ending = "@gmail.com";
+    const start = "captainPlaceholder";
+    const middle = Math.random().toString(36).slice(2);
+
+    return start + middle + ending;
+}

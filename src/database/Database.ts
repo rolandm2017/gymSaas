@@ -11,7 +11,7 @@ const dbPassword = process.env.DB_PASSWORD;
 const dbPort = process.env.DB_PORT;
 const dbAddress = process.env.DB_ADDRESS;
 
-console.log(dbName, dbUser, dbHost, dbDriver, ":: connection specifications");
+// console.log(dbName, dbUser, dbHost, dbDriver, ":: connection specifications");
 
 const sequelizeConnection = new Sequelize(dbName, dbUser, dbPassword, {
     host: dbHost,
