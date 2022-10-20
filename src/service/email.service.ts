@@ -13,7 +13,7 @@ class EmailService {
 
     public async sendVerificationEmail(account: IAccount, origin: string) {
         let message;
-        if (account.verificationToken === undefined) throw new Error("Verification token missing");
+        if (account.verificationToken === undefined || account.verificationToken === "") throw new Error("Verification token missing");
         if (origin) {
             const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
             message = `<p>Please click the below link to verify your email address:</p>
@@ -23,7 +23,6 @@ class EmailService {
                        <p><code>${account.verificationToken}</code></p>`;
         }
 
-        // console.log(account.verificationToken, "token for next step");
         const args = {
             to: account.email,
             subject: "Sign-up Verification API - Verify Email",
@@ -62,7 +61,7 @@ class EmailService {
 
     public async sendPasswordResetEmail(account: IAccount, origin: string) {
         let message;
-        if (account.resetToken === undefined || account.resetToken.token === undefined) {
+        if (account.resetToken === undefined || account.resetToken.token === undefined || account.resetToken.token === "") {
             throw new Error("Reset token missing");
         }
         if (origin) {
