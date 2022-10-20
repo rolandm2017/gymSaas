@@ -23,17 +23,6 @@ const REFRESH_TOKEN_LENGTH = 40; // todo: get real length
 const someOrigin = "whatever";
 
 beforeAll(async () => {
-    console.log("\n====\n====\nstarting app...\n===\n===");
-    await app.connectDB();
-});
-
-afterAll(async () => {
-    console.log("***\n***\n***\nclosing app...");
-    await app.dropAllTables();
-    await app.closeDB();
-});
-
-beforeAll(async () => {
     // todo: create an account to be authed as
     const authService = new AuthService();
     const emailBypass = { token: "" };

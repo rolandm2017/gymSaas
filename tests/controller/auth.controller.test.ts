@@ -5,9 +5,13 @@ import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
 import AuthController from "../../src/controllers/auth.controller";
 import AuthService from "../../src/service/auth.service";
 import { Role } from "../../src/enum/role.enum";
+import EmailService from "../../src/service/email.service";
+import AccountUtil from "../../src/util/accountUtil";
 
 let s: AuthService;
 let controller: AuthController;
+let e: EmailService;
+let a: AccountUtil;
 
 const validEmail = "someValidEmail@gmail.com";
 const fakeButValidAccount: IBasicDetails = {
@@ -19,7 +23,7 @@ const fakeButValidAccount: IBasicDetails = {
 };
 
 beforeAll(() => {
-    s = new AuthService();
+    s = new AuthService(e, a);
 
     controller = new AuthController(s);
 });
@@ -46,7 +50,7 @@ describe("Test auth controller", () => {
         const n: NextFunction = {} as NextFunction;
         const response: Response = await controller.authenticate(req, res, n);
         // expect(response.email).toEqual(validEmail);
-        expect(resJsonMock).toHaveBeenCalledWith({
+        expect(res.json).toHaveBeenCalledWith({
             accountDetails: fakeButValidAccount,
         });
         expect(res.json).toHaveBeenCalled();
@@ -62,8 +66,8 @@ describe("Test auth controller", () => {
             email: "hats@gmail.com",
         };
         const response = await controller.authenticate(req, res, n);
-        expect(resJsonMock).toHaveBeenCalledWith({ error: "hats" });
-        expect(resJsonMock).toHaveBeenCalled();
+        expect(res.json).toHaveBeenCalledWith({ error: "hats" });
+        expect(res.json).toHaveBeenCalled();
     });
 
     test("register route succeeds for valid inputs", async () => {
@@ -76,6 +80,10 @@ describe("Test auth controller", () => {
         res.json = jest.fn();
         const n: NextFunction = {} as NextFunction;
         const response = await controller.register(req, res, n);
+        expect(res.json).toHaveBeenCalledWith({
+            message: "Registration successful, please check your email for verification instructions",
+            accountDetails: fakeButValidAccount,
+        });
         expect(res.json).toHaveBeenCalled();
     });
     test("register route errors for invalid inputs", async () => {

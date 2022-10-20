@@ -22,9 +22,12 @@ import AccountUtil from "../util/accountUtil";
 import EmailService from "./email.service";
 
 class AuthService {
-    accountUtil = new AccountUtil();
-    private emailService = new EmailService();
-    constructor() {}
+    private accountUtil: AccountUtil;
+    private emailService: EmailService;
+    constructor(e: EmailService, a: AccountUtil) {
+        this.emailService = e;
+        this.accountUtil = a;
+    }
 
     public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
         let acctArr: Account[] = await getAccountByEmail(email);
