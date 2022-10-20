@@ -1,13 +1,16 @@
 import { IAccount } from "../interface/Account.interface";
 
 import sendEmail from "../util/sendEmail";
+import AccountDAO from "../database/dao/account.dao";
 
 class EmailService {
+    private accountDAO: AccountDAO;
     private emailSender: any;
     private testingMode: boolean | undefined;
     public emailSenderReached: Function = (a: any) => {};
 
-    constructor(testing?: string) {
+    constructor(acctDAO: AccountDAO, testing?: string) {
+        this.accountDAO = acctDAO;
         this.testingMode = testing === "testing"; // safeguard to prevent accidentally setting to testing mode
         this.emailSender = sendEmail;
     }

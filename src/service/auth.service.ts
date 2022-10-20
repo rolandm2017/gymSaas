@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import AccountDAO from "../database/dao/account.dao";
 import { getRefreshTokenByToken } from "../database/dao/refreshToken.dao";
-import { createResetToken, deleteResetTokenByModel, getAllResetTokensForAccount, getResetTokenByToken } from "../database/dao/resetToken.dao";
+import ResetTokenDAO from "../database/dao/resetToken.dao";
 import { Account } from "../database/models/Account";
 import { RefreshToken } from "../database/models/RefreshToken";
 import { ResetToken } from "../database/models/ResetToken";
@@ -15,9 +15,11 @@ import EmailService from "./email.service";
 class AuthService {
     private accountUtil: AccountUtil;
     private accountDAO: AccountDAO;
+    private resetTokenDAO: ResetTokenDAO;
     private emailService: EmailService;
-    constructor(e: EmailService, accountDAO: AccountDAO, a: AccountUtil) {
+    constructor(e: EmailService, accountDAO: AccountDAO, resetTokenDAO: ResetTokenDAO, a: AccountUtil) {
         this.accountDAO = accountDAO;
+        this.resetTokenDAO = resetTokenDAO;
         this.emailService = e;
         this.accountUtil = a;
     }
@@ -142,7 +144,7 @@ class AuthService {
         // todo: add reset token to reset token table linked to user
         const token = this.accountUtil.randomTokenString();
         const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        createResetToken(acct.id, token, expires);
+        this.resetTokenDAO.createResetToken(acct.id, token, expires);
 
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct);
@@ -150,7 +152,7 @@ class AuthService {
     }
 
     public async validateResetToken(token: string) {
-        const resetToken: ResetToken | null = await getResetTokenByToken(token);
+        const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
         if (!resetToken) throw new Error("Invalid token");
         const account = await this.accountDAO.getAccountById(resetToken.accountId);
 
@@ -158,7 +160,7 @@ class AuthService {
     }
 
     public async resetPassword(token: string, password: string) {
-        const resetToken: ResetToken | null = await getResetTokenByToken(token);
+        const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
         if (!resetToken) throw new Error("Invalid token");
         const account = await this.accountDAO.getAccountById(resetToken.accountId);
 
@@ -168,9 +170,9 @@ class AuthService {
         account.passwordHash = this.accountUtil.hash(password);
         account.passwordReset = Date.now();
         // account.resetToken = undefined;
-        const resetTokenForAccount = await getAllResetTokensForAccount(account.id);
+        const resetTokenForAccount = await this.resetTokenDAO.getAllResetTokensForAccount(account.id);
         for (const token of resetTokenForAccount) {
-            deleteResetTokenByModel(token);
+            this.resetTokenDAO.deleteResetTokenByModel(token);
         }
         await account.save();
     }

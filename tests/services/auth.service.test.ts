@@ -1,5 +1,7 @@
 import { cookie } from "express-validator";
 import request from "supertest";
+import AccountDAO from "../../src/database/dao/account.dao";
+import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import { IAccount } from "../../src/interface/Account.interface";
 import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
 import { ISmallError } from "../../src/interface/SmallError.interface";
@@ -11,6 +13,8 @@ import AccountUtil from "../../src/util/accountUtil";
 import { app } from "../mocks/server";
 
 import { makeValidEmail, emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
+import expectedAccount from "../premades/expectedAccount";
+
 const validCredentials = {
     email: emails[0],
     password: passwords[0],
@@ -25,18 +29,37 @@ const REFRESH_TOKEN_LENGTH = 40; // todo: get real length
 const someOrigin = "whatever";
 
 let authService: AuthService;
-let e: EmailService;
-let a: AccountUtil;
+let acctDAO: AccountDAO;
+let resetTokenDAO: ResetTokenDAO;
+let emailService: EmailService;
+let accountUtil: AccountUtil;
 
 beforeAll(async () => {
-    // todo: create an account to be authed as
-    authService = new AuthService(e, a);
+    acctDAO = new AccountDAO();
+    acctDAO.getAccountByEmail = jest.fn().mockReturnValue(expectedAccount);
+    acctDAO.createAccount = jest.fn();
+    acctDAO.getMultipleAccounts = jest.fn();
+    acctDAO.getAccountByRefreshToken = jest.fn();
+    acctDAO.getAccountByVerificationToken = jest.fn();
+    acctDAO.getAccountById = jest.fn();
+    resetTokenDAO = new ResetTokenDAO();
+    resetTokenDAO.createResetToken = jest.fn();
+    emailService = new EmailService(acctDAO);
+    emailService.sendAlreadyRegisteredEmail = jest.fn();
+    emailService.sendPasswordResetEmail = jest.fn();
+    emailService.sendVerificationEmail = jest.fn();
+    accountUtil = new AccountUtil();
+    authService = new AuthService(emailService, acctDAO, resetTokenDAO, accountUtil);
     // const emailBypass = { token: "" };
     // function tokenReporter(token: string): void {
     // emailBypass.token = token;
     // }
     // validCredentials.email = makeValidEmail();
     await authService.register(validCredentials, someOrigin);
+});
+
+beforeEach(() => {
+    jest.clearAllMocks();
 });
 
 describe("test auth service on its own", () => {
@@ -49,7 +72,6 @@ describe("test auth service on its own", () => {
                 validCredentials.password,
                 validIPAddress,
             );
-            console.log(account);
             if ("email" in account) {
                 expect(account.email).toEqual(validCredentials.email);
                 expect(account.jwtToken).toBeDefined();
@@ -75,15 +97,30 @@ describe("test auth service on its own", () => {
         });
     });
 
-    describe("[revoke token] if you log out, you really get logged out", async () => {
-        await authService.revokeToken();
-    });
+    // no test for .refreshToken or .revokeToken because they depend on too many things.
 
-    describe("refresh tokens work as intended", async () => {
-        //
-    });
-
-    describe("password reset flow works, minus the email part that we won't test", async () => {
-        // todo: use callback to grab a bool "yes we got to the end of the email flow"
+    describe("password reset flow works, minus the email part that we won't test", () => {
+        test("password reset flow with expected inputs", async () => {
+            //
+            const goodEmail = expectedAccount.email;
+            const goodOrigin = "https://www.google.ca";
+            await authService.forgotPassword(goodEmail, goodOrigin);
+            expect(acctDAO.getAccountByEmail).toHaveBeenCalledWith(goodEmail);
+            expect(resetTokenDAO.createResetToken).toHaveBeenCalled();
+            expect(emailService.sendPasswordResetEmail).toHaveBeenCalledWith();
+        });
+        test("password reset flow with multiple returned accounts for an email error out", async () => {
+            const emailThatsInTheDBTwice = "someEmail@gmail.com";
+            acctDAO.getAccountByEmail = jest.fn().mockReturnValueOnce([1, 2]);
+            expect(authService.forgotPassword(emailThatsInTheDBTwice, "anywhere")).rejects.toThrow("More than one account found for this email");
+        });
+        test("password reset flow with zero returned accounts for an email error out", async () => {
+            const emailThatsInTheDBZeroTimes = "aTestEmail@gmail.com";
+            const goodOrigin = "https://www.google.ca";
+            acctDAO.getAccountByEmail = jest.fn().mockReturnValueOnce([]);
+            accountUtil.randomTokenString = jest.fn();
+            await authService.forgotPassword(emailThatsInTheDBZeroTimes, goodOrigin);
+            expect(accountUtil.randomTokenString).not.toHaveBeenCalled();
+        });
     });
 });

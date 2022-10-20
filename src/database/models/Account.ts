@@ -31,7 +31,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public passwordHash!: string;
     public isVerified!: boolean;
     public verificationToken!: string;
-    public verified!: number;
+    public verified!: number; // this is a timestamp
     public updated!: number;
     public role!: string;
     public passwordReset!: number;
