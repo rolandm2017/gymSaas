@@ -1,11 +1,11 @@
-import { latitudeAtEquator, maxDegreesLatitude } from "../src/util/constants";
+import { latitudeAtEquator, maxDegreesLatitude } from "../../src/util/constants";
 import {
     convertKMChangeToLatLong,
     convertProgressTowardsNorthPoleAsPercentage,
     changeInNorthSouthKMToLatitudeDegrees,
     changeInEastWestKMToLongitudeDegrees,
     getDistanceFromLatLongInKm,
-} from "../src/util/conversions";
+} from "../../src/util/conversions";
 
 // **
 // Testing conversions from lat,long => km and vice versa.

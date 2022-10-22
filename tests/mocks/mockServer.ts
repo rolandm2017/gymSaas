@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
-import { Sequelize } from "sequelize";
+import { Model, Sequelize } from "sequelize";
 
 // import App from "../../src/app"; // this tests server is *different* from the dev server, but close to it.
 import GooglePlacesController from "../../src/controllers/googlePlaces.controller";
@@ -13,7 +13,6 @@ import HealthCheckController from "../../src/controllers/healthCheck.controller"
 import AuthController from "../../src/controllers/auth.controller";
 
 import initModels from "../../src/database/models/init-models";
-import Database from "../../src/database/Database";
 import errorHandler from "../../src/middleware/error.middleware";
 
 import { TEST_DB_HOST, TEST_DB_NAME, TEST_DB_PASSWORD, TEST_DB_PORT, TEST_DB_USER } from "../config";
@@ -22,25 +21,20 @@ import EmailService from "../../src/service/email.service";
 import AccountUtil from "../../src/util/accountUtil";
 import AccountDAO from "../../src/database/dao/account.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
+import { Account } from "../../src/database/models/Account";
+import { testDatabase } from "../database/Database";
 
 class App {
     public app: Application;
     public port: number;
+    private models: any;
 
     public static Database: Sequelize;
     public dbConnOpen: boolean = false;
 
     private static initDB() {
         // intialize testing database
-        App.Database = new Sequelize({
-            dialect: "postgres",
-            host: TEST_DB_HOST,
-            port: TEST_DB_PORT,
-            database: TEST_DB_NAME,
-            username: TEST_DB_USER,
-            password: TEST_DB_PASSWORD,
-            logging: false,
-        });
+        App.Database = testDatabase;
     }
 
     constructor(appInit: { port: number; middlewares: any; controllers: any }) {
@@ -68,14 +62,26 @@ class App {
         await App.Database.authenticate();
         console.log("Database Connection Established");
         await initModels(App.Database);
+        // this.models = models;
         await App.Database.sync({ force: true });
+        // await App.Database.drop();
         console.log("Database Sync");
         this.dbConnOpen = true;
     }
 
     public async dropAllTables() {
         if (!this.dbConnOpen) return;
+        console.log("Dropping all tables...");
         await App.Database.drop();
+        // fixme: Never managed to make this work
+        await App.Database.sync({ force: true });
+    }
+
+    public async dropTable(tableName: string): Promise<void> {
+        // await table.sync({ force: true })
+        if (tableName === "account") {
+            await Account.destroy({ where: {} });
+        }
     }
 
     public async closeDB() {

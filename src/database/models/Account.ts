@@ -97,7 +97,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
             {
                 timestamps: true,
                 sequelize: sequelizeConnection,
-                paranoid: true,
+                paranoid: false,
             },
         );
     }

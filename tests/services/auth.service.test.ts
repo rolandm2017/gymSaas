@@ -10,10 +10,9 @@ import EmailService from "../../src/service/email.service";
 import AccountUtil from "../../src/util/accountUtil";
 
 // import { server } from "../mocks/server";
-import { app } from "../mocks/server";
+import { app } from "../mocks/mockServer";
 
 import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
-import expectedAccount from "../premades/expectedAccount";
 
 const validCredentials = {
     email: emails[0],

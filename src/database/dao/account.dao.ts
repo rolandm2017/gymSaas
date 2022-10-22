@@ -24,7 +24,6 @@ class AccountDAO {
         const acct: Account[] = await Account.findAll({
             where: { email: email },
         });
-        console.log(acct.length + " accounts found");
         return acct;
     };
 
@@ -43,12 +42,11 @@ class AccountDAO {
         return Account.findOne({ where: { verificationToken: token } });
     };
 
-    public createAccount = (account: AccountCreationAttributes) => {
+    public createAccount = async (account: AccountCreationAttributes) => {
         const isReallyEmail = isEmail(account.email);
-        console.log(account.email, isReallyEmail, "48rm");
-        console.log(account, "49rm");
         if (!isReallyEmail) throw new Error("Email field wasn't an email");
-        return Account.create(account);
+        const created: Account = await Account.create(account);
+        return created;
     };
 
     public updateAccount = (account: AccountCreationAttributes, id: number) => {

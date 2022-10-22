@@ -2,7 +2,4 @@
 module.exports = {
     preset: "ts-jest",
     testEnvironment: "node",
-    // globalSetup: "./tests/jest-setup.ts",
-    // globalTeardown: "." // maybe have separate teardown file?
-    setupFilesAfterEnv: ["./tests/jest-setup.ts"],
 };
