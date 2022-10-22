@@ -19,11 +19,11 @@ class AccountDAO {
 
     public getAccountByEmail = async (email: string) => {
         console.log(email, "18rm");
-        // return null;
-        console.log(Account.tableName, "20rm");
-        return Account.findAll({
-            where: { email: "hats" },
+        const acct: Account[] = await Account.findAll({
+            where: { email: email },
         });
+        console.log(acct.length + " accounts found");
+        return acct;
     };
 
     public getAccountByRefreshToken = (token: RefreshToken) => {

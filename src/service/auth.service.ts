@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import AccountDAO from "../database/dao/account.dao";
-import { getRefreshTokenByToken } from "../database/dao/refreshToken.dao";
+import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import ResetTokenDAO from "../database/dao/resetToken.dao";
 import { Account } from "../database/models/Account";
 import { RefreshToken } from "../database/models/RefreshToken";
@@ -17,20 +17,21 @@ class AuthService {
     private accountDAO: AccountDAO;
     private resetTokenDAO: ResetTokenDAO;
     private emailService: EmailService;
-    constructor(e: EmailService, accountDAO: AccountDAO, resetTokenDAO: ResetTokenDAO, a: AccountUtil) {
-        this.accountDAO = accountDAO;
-        this.resetTokenDAO = resetTokenDAO;
+    constructor(e: EmailService, a: AccountUtil, accountDAO: AccountDAO, resetTokenDAO: ResetTokenDAO) {
         this.emailService = e;
         this.accountUtil = a;
+        this.resetTokenDAO = resetTokenDAO;
+        this.accountDAO = accountDAO;
     }
 
     public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
         let acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
-        console.log(acctArr, "29rm");
+        // console.log(acctArr, "29rm");
         if (acctArr.length === 0) return { error: "No account found for this email" };
         if (acctArr.length >= 2) return { error: "More than one account found for this email" };
 
         const acct = acctArr[0];
+        console.log(acct, "34rm");
         if (!acct || !acct.isVerified || !bcrypt.compareSync(password, acct.passwordHash)) {
             throw "Email or password is incorrect";
         }
@@ -53,9 +54,9 @@ class AuthService {
 
     public async register(params: any, origin: string): Promise<IBasicDetails | ISmallError> {
         // "what's in params?" => consult registerUserSchema
-        console.log(params, "48rm");
-        const emailAlreadyExists: Account[] = await this.accountDAO.getAccountByEmail(params.email);
-        console.log(emailAlreadyExists, "50rm");
+        // console.log(params, "48rm");
+        const acctsWithThisEmail: Account[] = await this.accountDAO.getAccountByEmail(params.email);
+        const emailAlreadyExists: boolean = acctsWithThisEmail.length !== 0;
         if (emailAlreadyExists) {
             // send already registered error in email to prevent account enumeration
             await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
@@ -130,24 +131,22 @@ class AuthService {
     }
 
     public async forgotPassword(email: string, origin: string) {
-        const acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
-        if (acctArr.length > 1) {
-            throw new Error("More than one account found for this email");
-            // todo: error logging
-        }
-        const acct = acctArr[0];
+        const acct: Account[] = await this.accountDAO.getAccountByEmail(email);
+        console.log(acct, "139rm");
+        console.log(acct.length, "139rm");
 
         // always return ok response to prevent email enumeration
-        if (!acct) return;
+        if (acct.length === 0) return;
 
         // create reset token that expires after 24 hours
         // todo: add reset token to reset token table linked to user
         const token = this.accountUtil.randomTokenString();
         const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        this.resetTokenDAO.createResetToken(acct.id, token, expires);
+        console.log(this.resetTokenDAO.createResetToken, "147rm");
+        this.resetTokenDAO.createResetToken(acct[0].id, token, expires);
 
         // send email
-        const account = this.accountUtil.convertAccountModelToInterface(acct);
+        const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
         await this.emailService.sendPasswordResetEmail(account, origin);
     }
 

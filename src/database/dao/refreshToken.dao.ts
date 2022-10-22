@@ -32,3 +32,5 @@ class RefreshTokenDAO {
         return rt;
     };
 }
+
+export default RefreshTokenDAO;

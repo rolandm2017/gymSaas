@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { expressjwt as jwt } from "express-jwt";
-import { getAccountById } from "../database/dao/account.dao";
-import { getAllRefreshTokensForAccount } from "../database/dao/refreshToken.dao";
+import AccountDAO from "../database/dao/account.dao";
+import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import { Account } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
@@ -11,7 +11,8 @@ if (secret === "YOLO") {
     throw new Error("secret not found in env file");
 }
 
-// const db = require("_helpers/db");
+const acctDAO = new AccountDAO();
+const rtDAO = new RefreshTokenDAO();
 
 function authorize(roles: Role[] = []) {
     // roles param can be a single role string (e.g. Role.User or 'User')
@@ -29,9 +30,9 @@ function authorize(roles: Role[] = []) {
             if (request.user === undefined) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
-            const account: Account | null = await getAccountById(request.user.id);
+            const account: Account | null = await acctDAO.getAccountById(request.user.id);
             if (!account) return res.status(401).json({ message: "Unauthorized" });
-            const refreshTokens = await getAllRefreshTokensForAccount(account.id);
+            const refreshTokens = await rtDAO.getAllRefreshTokensForAccount(account.id);
 
             const validRoles = Object.values(Role);
             const acctRole: Role = account.role as Role;

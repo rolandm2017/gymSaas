@@ -9,7 +9,7 @@ const expectedAccount: Account = {
     verified: 9409254384,
     updated: 24332,
     role: "User",
-    // many fields missing
+    // many fields missing (intentionally)
 } as Account;
 
 export default expectedAccount;

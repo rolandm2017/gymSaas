@@ -12,7 +12,7 @@ import AccountUtil from "../../src/util/accountUtil";
 // import { server } from "../mocks/server";
 import { app } from "../mocks/server";
 
-import { makeValidEmail, emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
+import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
 import expectedAccount from "../premades/expectedAccount";
 
 const validCredentials = {
@@ -36,7 +36,7 @@ let accountUtil: AccountUtil;
 
 beforeAll(async () => {
     acctDAO = new AccountDAO();
-    acctDAO.getAccountByEmail = jest.fn().mockReturnValue(expectedAccount);
+    // acctDAO.getAccountByEmail = jest.fn().mockReturnValue(expectedAccount);
     acctDAO.createAccount = jest.fn();
     acctDAO.getMultipleAccounts = jest.fn();
     acctDAO.getAccountByRefreshToken = jest.fn();
@@ -49,13 +49,9 @@ beforeAll(async () => {
     emailService.sendPasswordResetEmail = jest.fn();
     emailService.sendVerificationEmail = jest.fn();
     accountUtil = new AccountUtil();
-    authService = new AuthService(emailService, acctDAO, resetTokenDAO, accountUtil);
-    // const emailBypass = { token: "" };
-    // function tokenReporter(token: string): void {
-    // emailBypass.token = token;
-    // }
-    // validCredentials.email = makeValidEmail();
-    await authService.register(validCredentials, someOrigin);
+    authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
+    console.log("Creating account with credentials:", validCredentials);
+    await authService.register(validCredentials, someOrigin); // so there's always an acct to check up on in the db
 });
 
 beforeEach(() => {
@@ -83,6 +79,7 @@ describe("test auth service on its own", () => {
             }
         });
         test("you can register an account", async () => {
+            //fixme: use 2nd valid credentails
             const registered: IBasicDetails | ISmallError = await authService.register(validCredentials, someOrigin);
             console.log(registered);
             if ("email" in registered) {
@@ -98,21 +95,17 @@ describe("test auth service on its own", () => {
     });
 
     // no test for .refreshToken or .revokeToken because they depend on too many things.
+    // todo: test those^^
 
     describe("password reset flow works, minus the email part that we won't test", () => {
         test("password reset flow with expected inputs", async () => {
             //
-            const goodEmail = expectedAccount.email;
+            const goodEmail = validCredentials.email;
             const goodOrigin = "https://www.google.ca";
             await authService.forgotPassword(goodEmail, goodOrigin);
             expect(acctDAO.getAccountByEmail).toHaveBeenCalledWith(goodEmail);
             expect(resetTokenDAO.createResetToken).toHaveBeenCalled();
             expect(emailService.sendPasswordResetEmail).toHaveBeenCalledWith();
-        });
-        test("password reset flow with multiple returned accounts for an email error out", async () => {
-            const emailThatsInTheDBTwice = "someEmail@gmail.com";
-            acctDAO.getAccountByEmail = jest.fn().mockReturnValueOnce([1, 2]);
-            expect(authService.forgotPassword(emailThatsInTheDBTwice, "anywhere")).rejects.toThrow("More than one account found for this email");
         });
         test("password reset flow with zero returned accounts for an email error out", async () => {
             const emailThatsInTheDBZeroTimes = "aTestEmail@gmail.com";

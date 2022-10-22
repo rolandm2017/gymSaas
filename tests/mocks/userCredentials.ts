@@ -7,10 +7,14 @@ export const badPasswords: string[] = ["hatshats", "HATSHATS", "243509432", "hat
 
 export const tooShortPassword: string = "short";
 
-export function makeValidEmail() {
-    const ending = "@gmail.com";
-    const start = "captainPlaceholder";
-    const middle = Math.random().toString(36).slice(2);
-
-    return start + middle + ending;
-}
+export const FAKE_ACCOUNT = {
+    id: 9999,
+    email: "foobarbazman@gmail.com",
+    passwordHash: "9n3p9maefadf",
+    isVerified: true,
+    verificationToken: "asdfadf",
+    verified: 1000,
+    updated: 1000,
+    role: "User",
+    passwordReset: 999,
+};

@@ -5,12 +5,6 @@ import { app, server } from "../mocks/server";
 import { emails, makeValidEmail, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
 
 const path = "/auth";
-const timestamp = Date.now();
-const TEST_SIGNUP = {
-    email: "test" + timestamp + "@newworld.inch",
-    password: "Test@" + timestamp,
-    re_password: "Test@" + timestamp,
-};
 
 let TOKEN_COOKIES = "";
 let ACCESS_TOKEN = "";
@@ -46,7 +40,6 @@ const invalidCredentials3 = {
 beforeAll(async () => {
     console.log("\n====\n====\nstarting app...\n===\n===");
     await app.connectDB();
-    validCredentials.email = makeValidEmail(); // fresh every time
 });
 
 afterAll(async () => {

@@ -8,11 +8,15 @@ import { Role } from "../../src/enum/role.enum";
 import EmailService from "../../src/service/email.service";
 import AccountUtil from "../../src/util/accountUtil";
 import { RequestWithUser } from "../../src/interface/RequestWithUser.interface";
+import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
+import AccountDAO from "../../src/database/dao/account.dao";
 
 let s: AuthService;
 let controller: AuthController;
-let e: EmailService;
-let a: AccountUtil;
+let aDAO: AccountDAO = new AccountDAO();
+let e: EmailService = new EmailService(aDAO, "testing");
+let a: AccountUtil = new AccountUtil();
+let rDAO: ResetTokenDAO = new ResetTokenDAO();
 
 const validEmail = "someValidEmail@gmail.com";
 const fakeButValidAccount: IBasicDetails = {
@@ -24,7 +28,7 @@ const fakeButValidAccount: IBasicDetails = {
 };
 
 beforeAll(() => {
-    s = new AuthService(e, a);
+    s = new AuthService(e, a, aDAO, rDAO);
 
     controller = new AuthController(s);
 });
@@ -140,7 +144,7 @@ describe("Test auth controller", () => {
             console.log(response);
             expect(req.user.ownsToken).toBeCalled();
             expect(s.revokeToken).toHaveBeenCalled();
-            expect(res.json).toHaveBeenCalledWith({ message: "Token revoked" });
+            expect(response.json).toHaveBeenCalledWith({ message: "Token revoked" });
         });
     });
 

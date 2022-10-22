@@ -2,10 +2,11 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { IAccount } from "../interface/Account.interface";
-import { createRefreshToken, getRefreshTokenByToken } from "../database/dao/refreshToken.dao";
+import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import { IRefreshToken } from "../interface/RefreshToken.interface";
 import { Account } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
+import { RefreshToken } from "../database/models/RefreshToken";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
 if (secret === "YOLO") {
@@ -13,7 +14,10 @@ if (secret === "YOLO") {
 }
 
 class AccountUtil {
-    constructor() {}
+    private refreshTokenDAO: RefreshTokenDAO;
+    constructor() {
+        this.refreshTokenDAO = new RefreshTokenDAO();
+    }
 
     public randomTokenString() {
         return crypto.randomBytes(40).toString("hex");
@@ -23,8 +27,8 @@ class AccountUtil {
         return bcrypt.hashSync(password, 10);
     }
 
-    public async getRefreshToken(token: string) {
-        const refreshToken = await getRefreshTokenByToken(token);
+    public async getRefreshToken(token: string): Promise<RefreshToken> {
+        const refreshToken = await this.refreshTokenDAO.getRefreshTokenByToken(token);
         // fixme: .populate("account"); does what? see line 64         const { account } = refreshToken;
         if (!refreshToken || !refreshToken.isActive) throw new Error("Invalid token");
         return refreshToken;
@@ -35,13 +39,13 @@ class AccountUtil {
         return jwt.sign({ sub: account.id, id: account.id }, secret, { expiresIn: "15m" });
     }
 
-    public async generateRefreshToken(account: IAccount, ipAddress: string) {
+    public async generateRefreshToken(account: IAccount, ipAddress: string): Promise<RefreshToken> {
         // create a refresh token that expires in 7 days
         const accountId = account.id;
         const token = this.randomTokenString();
         const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const createdByIp = ipAddress;
-        return createRefreshToken(accountId, token, expires, createdByIp);
+        return await this.refreshTokenDAO.createRefreshToken(accountId, token, expires, createdByIp);
     }
 
     public convertAccountModelToInterface(startAccount: Account): IAccount {
