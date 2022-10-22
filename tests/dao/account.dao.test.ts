@@ -17,6 +17,10 @@ afterAll(async () => {
 });
 
 describe("account DAO tests", () => {
+    test("i see 0 accounts in the db when it is freshly started", async () => {
+        const x = await activeAcctDAO.findAllAccounts();
+        expect(x.length).toBe(0);
+    });
     test("I can create an account and then find it in the db", async () => {
         const created: Account = await activeAcctDAO.createAccount(FAKE_ACCOUNT);
 
