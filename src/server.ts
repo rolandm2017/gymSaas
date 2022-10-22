@@ -20,7 +20,7 @@ const acctDAO: AccountDAO = new AccountDAO();
 const e: EmailService = new EmailService(acctDAO);
 const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO();
 const accountUtil: AccountUtil = new AccountUtil();
-const authService: AuthService = new AuthService(e, acctDAO, resetTokenDAO, accountUtil);
+const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
 
 const app = new App({
     port: port || 8000,

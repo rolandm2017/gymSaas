@@ -1,3 +1,4 @@
+import { isEmail } from "../../validationSchemas/schemas";
 import { Account, AccountCreationAttributes } from "../models/Account";
 import { RefreshToken } from "../models/RefreshToken";
 
@@ -18,7 +19,8 @@ class AccountDAO {
     };
 
     public getAccountByEmail = async (email: string) => {
-        console.log(email, "18rm");
+        const isReallyEmail = isEmail(email);
+        if (!isReallyEmail) throw new Error("Email field wasn't an email");
         const acct: Account[] = await Account.findAll({
             where: { email: email },
         });
@@ -42,6 +44,10 @@ class AccountDAO {
     };
 
     public createAccount = (account: AccountCreationAttributes) => {
+        const isReallyEmail = isEmail(account.email);
+        console.log(account.email, isReallyEmail, "48rm");
+        console.log(account, "49rm");
+        if (!isReallyEmail) throw new Error("Email field wasn't an email");
         return Account.create(account);
     };
 

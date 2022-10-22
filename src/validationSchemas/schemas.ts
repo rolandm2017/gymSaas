@@ -4,9 +4,16 @@ import validateRequest from "../middleware/validateRequest.middleware";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
 
+function isEmail(maybeEmail: string): boolean {
+    const schema: ObjectSchema<any> = Joi.object({ email: Joi.string().email().required() });
+    const { error, value } = schema.validate({ email: maybeEmail });
+    if (error) return false;
+    else return true;
+}
+
 function authenticateUserSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema<any> = Joi.object({
-        email: Joi.string().required(),
+        email: Joi.string().email().required(),
         password: Joi.string().required(),
     });
     validateRequest(req, next, schema);
@@ -103,6 +110,7 @@ function updateRoleSchema(req: RequestWithUser, res: Response, next: NextFunctio
 }
 
 export {
+    isEmail,
     authenticateUserSchema,
     registerUserSchema,
     createAccountSchema,

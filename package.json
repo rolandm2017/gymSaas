@@ -10,7 +10,8 @@
         "test:dao": "jest -i tests/dao/*",
         "test:c": "jest -i tests/controller/*",
         "test:s": "jest -i tests/service/*",
-        "test:d": "jest -i tests/dao/*"
+        "test:d": "jest -i tests/dao/*",
+        "test:v": "jest -i tests/validationSchemas/*"
     },
     "repository": {
         "type": "git",

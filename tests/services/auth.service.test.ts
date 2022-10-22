@@ -35,6 +35,8 @@ let emailService: EmailService;
 let accountUtil: AccountUtil;
 
 beforeAll(async () => {
+    await app.connectDB();
+    // lots of setup
     acctDAO = new AccountDAO();
     // acctDAO.getAccountByEmail = jest.fn().mockReturnValue(expectedAccount);
     acctDAO.createAccount = jest.fn();

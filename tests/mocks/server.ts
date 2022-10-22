@@ -18,6 +18,10 @@ import errorHandler from "../../src/middleware/error.middleware";
 
 import { TEST_DB_HOST, TEST_DB_NAME, TEST_DB_PASSWORD, TEST_DB_PORT, TEST_DB_USER } from "../config";
 import AuthService from "../../src/service/auth.service";
+import EmailService from "../../src/service/email.service";
+import AccountUtil from "../../src/util/accountUtil";
+import AccountDAO from "../../src/database/dao/account.dao";
+import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 
 class App {
     public app: Application;
@@ -104,7 +108,11 @@ class App {
 const port = parseInt(process.env.PORT!, 10);
 console.log("hello world!", port);
 
-const a = new AuthService();
+const acctDAO = new AccountDAO();
+const emailService = new EmailService(acctDAO, "testing");
+const accountUtil = new AccountUtil();
+const resetTokenDAO = new ResetTokenDAO();
+const a = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 
 export const app = new App({
     port: port || 8000,
