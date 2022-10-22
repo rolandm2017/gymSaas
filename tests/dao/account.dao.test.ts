@@ -9,7 +9,7 @@ let activeAcctDAO: AccountDAO = new AccountDAO();
 beforeAll(async () => {
     await app.connectDB();
     await app.dropAllTables();
-    await app.dropTable("account");
+    // await app.dropTable("account");
 });
 
 afterAll(async () => {
@@ -19,6 +19,7 @@ afterAll(async () => {
 describe("account DAO tests", () => {
     test("I can create an account and then find it in the db", async () => {
         const created: Account = await activeAcctDAO.createAccount(FAKE_ACCOUNT);
+
         expect(created).toBeDefined();
         expect(created.email).toBe(FAKE_ACCOUNT.email);
         expect(created.id).toBe(FAKE_ACCOUNT.id);
