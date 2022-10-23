@@ -25,20 +25,14 @@ class AuthService {
         this.accountDAO = accountDAO;
     }
 
-    public async authenticate(
-        email: string,
-        password: string,
-        ipAddress: string,
-    ): Promise<IBasicDetails | ISmallError> {
+    public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
         let acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
         // console.log(acctArr, "29rm");
         if (acctArr.length === 0) return { error: "No account found for this email" };
         if (acctArr.length >= 2) return { error: "More than one account found for this email" };
 
         const acct = acctArr[0];
-        const pwHash = await this.accountUtil.generatePasswordHash(password);
-        const test = bcrypt.compareSync(password, pwHash);
-        console.log(acct, test, "41rm");
+
         if (!acct || !acct.isVerified || !bcrypt.compareSync(password, acct.passwordHash)) {
             throw new Error("Email or password is incorrect, or account is not verified");
         }
@@ -60,8 +54,6 @@ class AuthService {
     }
 
     public async register(params: IRegistrationDetails, origin: string): Promise<IBasicDetails | ISmallError> {
-        // "what's in params?" => consult registerUserSchema
-        // console.log(params, "48rm");
         const acctsWithThisEmail: Account[] = await this.accountDAO.getAccountByEmail(params.email);
         const emailAlreadyExists: boolean = acctsWithThisEmail.length !== 0;
         if (emailAlreadyExists) {
@@ -69,15 +61,11 @@ class AuthService {
             await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
             return { error: "Account with this email already exists" };
         }
-        // console.log(params, this.accountUtil, "65rm");
         // create account object
         const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params);
         const acct: Account = await this.accountDAO.createAccount(acctWithPopulatedFields);
-        // console.log(acct, "68rm");
         // first registered account is an admin
         const allAccountsInSystem = await this.accountDAO.getMultipleAccounts(5);
-        // console.log(allAccountsInSystem, "71rm");
-        // was isFirst = allAccountsInSystem.count === 0
         const isFirstAccount = allAccountsInSystem.count === 0;
         acct.role = isFirstAccount ? Role.Admin : Role.User;
         acct.verificationToken = this.accountUtil.randomTokenString();
@@ -150,11 +138,16 @@ class AuthService {
         // todo: add reset token to reset token table linked to user
         const token = this.accountUtil.randomTokenString();
         const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        // console.log(this.resetTokenDAO.createResetToken, "147rm");
-        this.resetTokenDAO.createResetToken(acct[0].id, token, expires);
+
+        // we don't need to return anything here; rather it's added to the db so the user can submit the token in the next step
+        await this.resetTokenDAO.createResetToken(acct[0].id, token, expires);
 
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
+        account.resetToken = {
+            token: token,
+            expires: expires,
+        };
         await this.emailService.sendPasswordResetEmail(account, origin);
     }
 

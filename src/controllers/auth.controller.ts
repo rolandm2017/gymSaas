@@ -26,7 +26,7 @@ class AuthController {
     private authService: AuthService;
 
     constructor(a: AuthService) {
-        // console.warn(a, "29rm");
+        console.warn(a, "29rm");
         this.authService = a;
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate);
@@ -60,20 +60,24 @@ class AuthController {
         return response.json({ accountDetails });
     }
 
-    public async register(request: Request, response: Response, next: NextFunction) {
+    public register = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const origin = request.get("origin");
             if (origin === undefined) {
                 return response.status(400).json({ message: "Origin is required and was undefined" });
             }
+            console.log(this, "69rm");
             const accountDetails: IBasicDetails | ISmallError = await this.authService.register(request.body, origin);
             if ("error" in accountDetails) return response.json({ error: accountDetails.error });
-            return response.json({ message: "Registration successful, please check your email for verification instructions", accountDetails });
+            return response.json({
+                message: "Registration successful, please check your email for verification instructions",
+                accountDetails,
+            });
         } catch (err) {
             console.log(err, "71rm");
             next(err);
         }
-    }
+    };
 
     public async refreshToken(request: Request, response: Response) {
         const token = request.cookies.refreshToken;
@@ -125,7 +129,9 @@ class AuthController {
     public async resetPassword(request: Request, response: Response) {
         const token = request.body.token;
         const password = request.body.password;
-        this.authService.resetPassword(token, password).then(() => response.json({ message: "Password reset successful, you can now login" }));
+        this.authService
+            .resetPassword(token, password)
+            .then(() => response.json({ message: "Password reset successful, you can now login" }));
     }
 
     // **

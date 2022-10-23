@@ -77,7 +77,7 @@ class App {
         await App.Database.sync({ force: true });
     }
 
-    public async dropTable(tableName: string): Promise<void> {
+    public async dropTable(tableName: "account"): Promise<void> {
         // await table.sync({ force: true })
         if (tableName === "account") {
             await Account.destroy({ where: {} });
@@ -123,7 +123,12 @@ const a = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 export const app = new App({
     port: port || 8000,
 
-    controllers: [new AuthController(a), new GooglePlacesController(), new ApartmentsController(), new HealthCheckController()],
+    controllers: [
+        new AuthController(a),
+        new GooglePlacesController(),
+        new ApartmentsController(),
+        new HealthCheckController(),
+    ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });
 
