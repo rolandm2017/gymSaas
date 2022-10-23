@@ -4,9 +4,10 @@ import bcrypt from "bcrypt";
 import { IAccount } from "../interface/Account.interface";
 import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import { IRefreshToken } from "../interface/RefreshToken.interface";
-import { Account } from "../database/models/Account";
+import { Account, AccountCreationAttributes } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
 import { RefreshToken } from "../database/models/RefreshToken";
+import { IRegistrationDetails } from "../interface/RegistrationDetails.interface";
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
 if (secret === "YOLO") {
@@ -46,6 +47,24 @@ class AccountUtil {
         const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const createdByIp = ipAddress;
         return await this.refreshTokenDAO.createRefreshToken(accountId, token, expires, createdByIp);
+    }
+
+    public async generatePasswordHash(password: string): Promise<string> {
+        const hash = await bcrypt.hash(password, 10);
+        return hash;
+    }
+
+    public async attachMissingDetails(params: IRegistrationDetails): Promise<AccountCreationAttributes> {
+        const start: any = { ...params };
+        const pwHash: string = await this.generatePasswordHash(start.password);
+        // start.id = 0; // fixme: shouldnt this be an autoincrement value?
+        start.passwordHash = pwHash;
+        start.verificationToken = "";
+        start.verified = 0;
+        start.updated = 0;
+        start.role = Role.User;
+        const populated = { ...start } as AccountCreationAttributes;
+        return populated;
     }
 
     public convertAccountModelToInterface(startAccount: Account): IAccount {

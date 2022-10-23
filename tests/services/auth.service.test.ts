@@ -2,8 +2,11 @@ import { cookie } from "express-validator";
 import request from "supertest";
 import AccountDAO from "../../src/database/dao/account.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
+import { Account } from "../../src/database/models/Account";
+import { Role } from "../../src/enum/role.enum";
 import { IAccount } from "../../src/interface/Account.interface";
 import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
+import { IRegistrationDetails } from "../../src/interface/RegistrationDetails.interface";
 import { ISmallError } from "../../src/interface/SmallError.interface";
 import AuthService from "../../src/service/auth.service";
 import EmailService from "../../src/service/email.service";
@@ -36,23 +39,30 @@ let accountUtil: AccountUtil;
 beforeAll(async () => {
     await app.connectDB();
     // lots of setup
+    accountUtil = new AccountUtil();
+    const populatedAcct = await accountUtil.attachMissingDetails(validCredentials);
     acctDAO = new AccountDAO();
     // acctDAO.getAccountByEmail = jest.fn().mockReturnValue(expectedAccount);
     acctDAO.createAccount = jest.fn();
-    acctDAO.getMultipleAccounts = jest.fn();
+    acctDAO.getMultipleAccounts = jest.fn().mockReturnValueOnce({ rows: [], count: 0 });
     acctDAO.getAccountByRefreshToken = jest.fn();
     acctDAO.getAccountByVerificationToken = jest.fn();
     acctDAO.getAccountById = jest.fn();
+    //
     resetTokenDAO = new ResetTokenDAO();
     resetTokenDAO.createResetToken = jest.fn();
+    //
     emailService = new EmailService(acctDAO);
     emailService.sendAlreadyRegisteredEmail = jest.fn();
     emailService.sendPasswordResetEmail = jest.fn();
     emailService.sendVerificationEmail = jest.fn();
-    accountUtil = new AccountUtil();
+    //
+    accountUtil.attachMissingDetails = jest.fn().mockReturnValueOnce(populatedAcct);
+    // make an acct in db
     authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
     console.log("Creating account with credentials:", validCredentials);
-    await authService.register(validCredentials, someOrigin); // so there's always an acct to check up on in the db
+    const c: IRegistrationDetails = validCredentials;
+    await authService.register(c, someOrigin); // so there's always an acct to check up on in the db
 });
 
 beforeEach(() => {
@@ -62,7 +72,7 @@ beforeEach(() => {
 describe("test auth service on its own", () => {
     describe("sign up, log in", () => {
         //
-        test("you can log in with an account", async () => {
+        test("[authenticate] you can log in with an account", async () => {
             // todo: beforeAll an account into the db so this test ISNT dependent on another test creating an account to auth as.
             const account: IBasicDetails | ISmallError = await authService.authenticate(
                 validCredentials.email,
@@ -79,7 +89,7 @@ describe("test auth service on its own", () => {
                 throw new Error("failed test");
             }
         });
-        test("you can register an account", async () => {
+        test("[register] you can register an account", async () => {
             //fixme: use 2nd valid credentails
             const registered: IBasicDetails | ISmallError = await authService.register(validCredentials, someOrigin);
             console.log(registered);

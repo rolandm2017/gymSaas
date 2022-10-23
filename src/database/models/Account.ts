@@ -5,7 +5,7 @@ import sequelizeConnection from "../Database";
 import { RefreshToken, RefreshTokenId } from "./RefreshToken";
 
 interface AccountAttributes {
-    id: number;
+    id?: number;
     email: string;
     passwordHash: string;
     isVerified: boolean;

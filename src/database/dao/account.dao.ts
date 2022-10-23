@@ -10,8 +10,12 @@ class AccountDAO {
         return Account.findAll();
     };
 
-    public getMultipleAccounts = (limit: number, offset?: number) => {
-        return Account.findAndCountAll({ offset, limit });
+    public getMultipleAccounts = async (limit: number, offset?: number) => {
+        const accts: {
+            rows: Account[];
+            count: number;
+        } = await Account.findAndCountAll({ offset, limit });
+        return accts;
     };
 
     public getAccountById = (id: number) => {

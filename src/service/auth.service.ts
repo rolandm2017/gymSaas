@@ -8,6 +8,7 @@ import { ResetToken } from "../database/models/ResetToken";
 import { Role } from "../enum/role.enum";
 import { IAccount } from "../interface/Account.interface";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
+import { IRegistrationDetails } from "../interface/RegistrationDetails.interface";
 import { ISmallError } from "../interface/SmallError.interface";
 import AccountUtil from "../util/accountUtil";
 import EmailService from "./email.service";
@@ -24,7 +25,11 @@ class AuthService {
         this.accountDAO = accountDAO;
     }
 
-    public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
+    public async authenticate(
+        email: string,
+        password: string,
+        ipAddress: string,
+    ): Promise<IBasicDetails | ISmallError> {
         let acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
         // console.log(acctArr, "29rm");
         if (acctArr.length === 0) return { error: "No account found for this email" };
@@ -52,7 +57,7 @@ class AuthService {
         };
     }
 
-    public async register(params: any, origin: string): Promise<IBasicDetails | ISmallError> {
+    public async register(params: IRegistrationDetails, origin: string): Promise<IBasicDetails | ISmallError> {
         // "what's in params?" => consult registerUserSchema
         // console.log(params, "48rm");
         const acctsWithThisEmail: Account[] = await this.accountDAO.getAccountByEmail(params.email);
@@ -62,12 +67,15 @@ class AuthService {
             await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
             return { error: "Account with this email already exists" };
         }
-
+        console.log(params, this.accountUtil, "65rm");
         // create account object
-        const acct: Account = await this.accountDAO.createAccount(params);
-
+        const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params);
+        const acct: Account = await this.accountDAO.createAccount(acctWithPopulatedFields);
+        console.log(acct, "68rm");
         // first registered account is an admin
         const allAccountsInSystem = await this.accountDAO.getMultipleAccounts(5);
+        console.log(allAccountsInSystem, "71rm");
+        // was isFirst = allAccountsInSystem.count === 0
         const isFirstAccount = allAccountsInSystem.count === 0;
         acct.role = isFirstAccount ? Role.Admin : Role.User;
         acct.verificationToken = this.accountUtil.randomTokenString();

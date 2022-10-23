@@ -8,7 +8,7 @@ export const badPasswords: string[] = ["hatshats", "HATSHATS", "243509432", "hat
 export const tooShortPassword: string = "short";
 
 export const FAKE_ACCOUNT = {
-    id: 9999,
+    // id: 9999,
     email: "foobarbazman@gmail.com",
     passwordHash: "9n3p9maefadf",
     isVerified: true,
