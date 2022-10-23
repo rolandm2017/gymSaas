@@ -9,5 +9,5 @@ export const testDatabase = new Sequelize({
     database: TEST_DB_NAME,
     username: TEST_DB_USER,
     password: TEST_DB_PASSWORD,
-    logging: console.log,
+    logging: false,
 });

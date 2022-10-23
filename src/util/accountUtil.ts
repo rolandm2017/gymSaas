@@ -50,6 +50,7 @@ class AccountUtil {
     }
 
     public async generatePasswordHash(password: string): Promise<string> {
+        // console.log(password, "password 53rm");
         const hash = await bcrypt.hash(password, 10);
         return hash;
     }

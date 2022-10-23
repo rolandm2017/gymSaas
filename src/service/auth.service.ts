@@ -36,9 +36,11 @@ class AuthService {
         if (acctArr.length >= 2) return { error: "More than one account found for this email" };
 
         const acct = acctArr[0];
-        console.log(acct, "34rm");
+        const pwHash = await this.accountUtil.generatePasswordHash(password);
+        const test = bcrypt.compareSync(password, pwHash);
+        console.log(acct, test, "41rm");
         if (!acct || !acct.isVerified || !bcrypt.compareSync(password, acct.passwordHash)) {
-            throw "Email or password is incorrect";
+            throw new Error("Email or password is incorrect, or account is not verified");
         }
         const account = this.accountUtil.convertAccountModelToInterface(acct);
 
@@ -67,14 +69,14 @@ class AuthService {
             await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
             return { error: "Account with this email already exists" };
         }
-        console.log(params, this.accountUtil, "65rm");
+        // console.log(params, this.accountUtil, "65rm");
         // create account object
         const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params);
         const acct: Account = await this.accountDAO.createAccount(acctWithPopulatedFields);
-        console.log(acct, "68rm");
+        // console.log(acct, "68rm");
         // first registered account is an admin
         const allAccountsInSystem = await this.accountDAO.getMultipleAccounts(5);
-        console.log(allAccountsInSystem, "71rm");
+        // console.log(allAccountsInSystem, "71rm");
         // was isFirst = allAccountsInSystem.count === 0
         const isFirstAccount = allAccountsInSystem.count === 0;
         acct.role = isFirstAccount ? Role.Admin : Role.User;
@@ -140,8 +142,6 @@ class AuthService {
 
     public async forgotPassword(email: string, origin: string) {
         const acct: Account[] = await this.accountDAO.getAccountByEmail(email);
-        console.log(acct, "139rm");
-        console.log(acct.length, "139rm");
 
         // always return ok response to prevent email enumeration
         if (acct.length === 0) return;
@@ -150,7 +150,7 @@ class AuthService {
         // todo: add reset token to reset token table linked to user
         const token = this.accountUtil.randomTokenString();
         const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        console.log(this.resetTokenDAO.createResetToken, "147rm");
+        // console.log(this.resetTokenDAO.createResetToken, "147rm");
         this.resetTokenDAO.createResetToken(acct[0].id, token, expires);
 
         // send email
