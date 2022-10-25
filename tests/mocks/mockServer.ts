@@ -62,7 +62,6 @@ class App {
         await App.Database.authenticate();
         console.log("Database Connection Established");
         await initModels(App.Database);
-        // this.models = models;
         await App.Database.sync({ force: true });
         // await App.Database.drop();
         console.log("Database Sync");
@@ -123,12 +122,7 @@ const a = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 export const app = new App({
     port: port || 8000,
 
-    controllers: [
-        new AuthController(a),
-        new GooglePlacesController(),
-        new ApartmentsController(),
-        new HealthCheckController(),
-    ],
+    controllers: [new AuthController(a), new GooglePlacesController(), new ApartmentsController(), new HealthCheckController()],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });
 

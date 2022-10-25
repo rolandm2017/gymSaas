@@ -26,23 +26,28 @@ class AuthService {
     }
 
     public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
+        console.log(email, "29rm");
         let acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
-        // console.log(acctArr, "29rm");
         if (acctArr.length === 0) return { error: "No account found for this email" };
         if (acctArr.length >= 2) return { error: "More than one account found for this email" };
 
         const acct = acctArr[0];
-
-        if (!acct || !acct.isVerified || !bcrypt.compareSync(password, acct.passwordHash)) {
+        console.log(acct, "34rm");
+        const passwordIsCorrect = bcrypt.compareSync(password, acct.passwordHash);
+        console.log(passwordIsCorrect, "37rm");
+        if (!acct || !acct.isVerified || !passwordIsCorrect) {
+            console.log("in the throw, 39rm");
             throw new Error("Email or password is incorrect, or account is not verified");
         }
-        const account = this.accountUtil.convertAccountModelToInterface(acct);
-
+        console.log("39rm");
+        const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct);
+        console.log(account, "40rm");
         // authentication successful so generate jwt and refresh tokens
-        const jwtToken = await this.accountUtil.generateJwtToken(account);
+        const jwtToken: string = this.accountUtil.generateJwtToken(account);
+        console.log(jwtToken, "47rm");
         const refreshToken: RefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
-
-        // save refresh token
+        console.log(refreshToken, "49rm");
+        // save refresh tokenm
         await refreshToken.save();
 
         // return basic details and tokens
@@ -119,13 +124,36 @@ class AuthService {
     }
 
     public async verifyEmail(token: string) {
-        const account = await this.accountDAO.getAccountByVerificationToken(token);
+        const account: Account | null = await this.accountDAO.getAccountByVerificationToken(token);
+        console.log(token, account, "122rm");
+        if (account === null) throw new Error("Verification failed");
 
-        if (!account) throw new Error("Verification failed");
-
-        account.verified = Date.now();
+        // const now = new Date().toISOString();
+        // console.log(now, "126rm");
+        // account.verified = now;
+        // account.verified = 1000; // temp -- test
         account.verificationToken = ""; // string value that is closest to 'undefined'
+        account.isVerified = true;
+        console.log(account, "126rm");
         await account.save();
+        console.log("129rm");
+    }
+
+    public async updatePassword(email: string, oldPw: string, newPw: string) {
+        const accountArr: Account[] = await this.accountDAO.getAccountByEmail(email);
+
+        // always return ok response to prevent email enumeration
+        if (accountArr.length === 0) return false;
+        const account = accountArr[0];
+
+        // check the starting passwords are the same
+        const correctInputPw = bcrypt.compareSync(oldPw, account.passwordHash);
+        if (!correctInputPw) return false;
+
+        const hashed = this.accountUtil.hash(newPw);
+        account.passwordHash = hashed;
+        await account.save();
+        return true;
     }
 
     public async forgotPassword(email: string, origin: string) {
@@ -197,7 +225,7 @@ class AuthService {
         }
 
         const account: Account = await this.accountDAO.createAccount(params);
-        account.verified = Date.now();
+        // account.verified = "";
 
         // hash password
         account.passwordHash = this.accountUtil.hash(params.password);

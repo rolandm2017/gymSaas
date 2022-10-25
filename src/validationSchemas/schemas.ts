@@ -29,6 +29,16 @@ function registerUserSchema(req: Request, res: Response, next: NextFunction) {
     validateRequest(req, next, schema);
 }
 
+function updatePasswordSchema(req: Request, res: Response, next: NextFunction) {
+    const schema: ObjectSchema<any> = Joi.object({
+        email: Joi.string().email().required(),
+        oldPw: Joi.string().min(6).required(),
+        newPw: Joi.string().min(6).required(),
+        confirmNewPw: Joi.string().min(6).required(),
+    });
+    validateRequest(req, next, schema);
+}
+
 function createAccountSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema<any> = Joi.object({
         // title: Joi.string().required(),
@@ -115,6 +125,7 @@ export {
     registerUserSchema,
     createAccountSchema,
     verifyEmailSchema,
+    updatePasswordSchema,
     forgotPasswordSchema,
     resetPasswordSchema,
     validateResetTokenSchema,

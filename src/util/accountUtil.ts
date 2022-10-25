@@ -35,7 +35,7 @@ class AccountUtil {
         return refreshToken;
     }
 
-    public async generateJwtToken(account: IAccount) {
+    public generateJwtToken(account: IAccount) {
         // create a jwt token containing the account id that expires in 15 minutes
         return jwt.sign({ sub: account.id, id: account.id }, secret, { expiresIn: "15m" });
     }
@@ -46,6 +46,7 @@ class AccountUtil {
         const token = this.randomTokenString();
         const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const createdByIp = ipAddress;
+        console.log("GenerateRefreshToken 49rm");
         return await this.refreshTokenDAO.createRefreshToken(accountId, token, expires, createdByIp);
     }
 
@@ -61,7 +62,7 @@ class AccountUtil {
         // start.id = 0; // fixme: shouldnt this be an autoincrement value?
         start.passwordHash = pwHash;
         start.verificationToken = "";
-        start.verified = 0;
+        // start.verified = 0;
         start.updated = 0;
         start.role = Role.User;
         const populated = { ...start } as AccountCreationAttributes;

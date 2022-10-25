@@ -10,7 +10,6 @@ interface AccountAttributes {
     passwordHash: string;
     isVerified: boolean;
     verificationToken: string;
-    verified: number;
     updated: number;
     role: string;
     passwordReset: number; // Date.now()
@@ -31,7 +30,6 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public passwordHash!: string;
     public isVerified!: boolean;
     public verificationToken!: string;
-    public verified!: number; // this is a timestamp
     public updated!: number;
     public role!: string;
     public passwordReset!: number;
@@ -75,10 +73,6 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 },
                 verificationToken: {
                     type: DataTypes.STRING,
-                    allowNull: true,
-                },
-                verified: {
-                    type: DataTypes.INTEGER,
                     allowNull: true,
                 },
                 updated: {

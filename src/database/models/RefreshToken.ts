@@ -38,9 +38,9 @@ export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCrea
     public readonly deletedAt!: Date;
 
     // RefreshToken belongsTo Account via refresh_token_owner_id <= lying comment probably
-    getAccount!: Sequelize.BelongsToGetAssociationMixin<Account>;
-    setAccount!: Sequelize.BelongsToSetAssociationMixin<Account, AccountId>;
-    createAccount!: Sequelize.BelongsToCreateAssociationMixin<Account>;
+    declare getAccount: Sequelize.BelongsToGetAssociationMixin<Account>;
+    declare setAccount: Sequelize.BelongsToSetAssociationMixin<Account, AccountId>;
+    declare createAccount: Sequelize.BelongsToCreateAssociationMixin<Account>;
 
     static initModel(sequelize: S): typeof RefreshToken {
         return RefreshToken.init(

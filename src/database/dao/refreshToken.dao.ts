@@ -24,11 +24,18 @@ class RefreshTokenDAO {
     };
 
     public createRefreshToken = async (id: number, token: string, expires: Date, createdByIp: string) => {
-        // todo: create rt associated w/ acct id of id
-        const rt: RefreshToken = await RefreshToken.create({ token, expires, createdByIp, isActive: true });
         const associatedAcct: Account | null = await this.accountDAO.getAccountById(id);
         if (associatedAcct === null) throw Error("Account not found");
+        const rt: RefreshToken = await RefreshToken.create({
+            token,
+            expires,
+            createdByIp,
+            isActive: true,
+        });
+        console.log(rt, "38rm");
+        // associatedAcct.addRefreshToken(rt);
         rt.setAccount(associatedAcct);
+        console.log("account set", "40rm");
         return rt;
     };
 }

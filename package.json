@@ -12,7 +12,8 @@
         "test:s": "jest -i tests/service/*",
         "test:d": "jest -i tests/dao/*",
         "test:v": "jest -i tests/validationSchemas/*",
-        "test:r": "jest -i tests/routes/*"
+        "test:r": "jest -i tests/routes/*",
+        "test:m": "jest -i tests/misc/*"
     },
     "repository": {
         "type": "git",
