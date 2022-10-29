@@ -10,6 +10,10 @@ class AccountDAO {
         return Account.findAll();
     };
 
+    public findAllAccountsWithTokens = () => {
+        return Account.findAll({ include: "their_refresh_tokens" });
+    };
+
     public getMultipleAccounts = async (limit: number, offset?: number) => {
         const accts: {
             rows: Account[];
@@ -35,10 +39,7 @@ class AccountDAO {
         // not wroking? read: https://stackoverflow.com/questions/74092426/proper-way-to-find-an-account-via-one-of-its-associated-refreshtokens-in-sequeli
         return Account.findAll({
             where: { "$RefreshTokens.token$": token.token },
-            include: {
-                model: RefreshToken,
-                as: RefreshToken.tableName,
-            },
+            include: "their_refresh_tokens",
         });
     };
 
@@ -54,11 +55,11 @@ class AccountDAO {
     };
 
     public updateAccount = (account: AccountCreationAttributes, id: number) => {
-        return Account.update(account, { where: { id } });
+        return Account.update(account, { where: { acctId: id } });
     };
 
     public deleteAccount = (id: number) => {
-        return Account.destroy({ where: { id } });
+        return Account.destroy({ where: { acctId: id } });
     };
 }
 

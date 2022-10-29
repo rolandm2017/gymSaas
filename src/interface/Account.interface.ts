@@ -1,7 +1,7 @@
 import { Role } from "../enum/role.enum";
 
 export interface IAccount {
-    id: number;
+    acctId: number;
     email: string;
     isVerified: boolean;
     updated: Date | number; // Date or number repping time
@@ -13,6 +13,7 @@ export interface IAccount {
     jwtToken?: string;
     refreshToken?: string;
     resetToken?: {
+        tokenId?: number;
         token: string;
         expires: Date;
     };

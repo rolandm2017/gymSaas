@@ -32,7 +32,7 @@ function authorize(roles: Role[] = []) {
             }
             const account: Account | null = await acctDAO.getAccountById(request.user.id);
             if (!account) return res.status(401).json({ message: "Unauthorized" });
-            const refreshTokens = await rtDAO.getAllRefreshTokensForAccount(account.id);
+            const refreshTokens = await rtDAO.getAllRefreshTokensForAccount(account.acctId);
 
             const validRoles = Object.values(Role);
             const acctRole: Role = account.role as Role;

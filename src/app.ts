@@ -32,7 +32,7 @@ class App {
                 await Database.authenticate();
                 console.log("Database Connection Established");
                 await initModels(Database);
-                await Database.sync();
+                await Database.sync({ alter: true });
                 console.log("Done syncing...");
             } catch (err) {
                 console.log("Database connection failed", err);

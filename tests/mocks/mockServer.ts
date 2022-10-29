@@ -22,7 +22,7 @@ import AccountUtil from "../../src/util/accountUtil";
 import AccountDAO from "../../src/database/dao/account.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import { Account } from "../../src/database/models/Account";
-import { testDatabase } from "../database/Database";
+import testDatabase from "../database/Database";
 
 class App {
     public app: Application;
@@ -58,6 +58,7 @@ class App {
 
     public async connectDB() {
         if (this.dbConnOpen) return;
+
         App.initDB();
         await App.Database.authenticate();
         console.log("Database Connection Established");

@@ -32,7 +32,7 @@ class AuthService {
         if (acctArr.length >= 2) return { error: "More than one account found for this email" };
 
         const acct = acctArr[0];
-        console.log(acct, "34rm");
+        // console.log(acct, "34rm");
         const passwordIsCorrect = bcrypt.compareSync(password, acct.passwordHash);
         console.log(passwordIsCorrect, "37rm");
         if (!acct || !acct.isVerified || !passwordIsCorrect) {
@@ -89,8 +89,8 @@ class AuthService {
         };
     }
 
-    public async refreshToken(token: string, ipAddress: string) {
-        const refreshToken = await this.accountUtil.getRefreshToken(token);
+    public async refreshToken(tokenString: string, ipAddress: string) {
+        const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
         const acct: Account[] = await this.accountDAO.getAccountByRefreshToken(refreshToken);
         // todo: throw err if multiple accts found & report
         const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct[0]);
@@ -114,9 +114,8 @@ class AuthService {
         };
     }
 
-    public async revokeToken(token: string, ipAddress: string) {
-        const refreshToken = await this.accountUtil.getRefreshToken(token);
-
+    public async revokeToken(tokenString: string, ipAddress: string) {
+        const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
         // revoke token and save
         refreshToken.revoked = Date.now();
         refreshToken.revokedByIp = ipAddress;
@@ -168,7 +167,7 @@ class AuthService {
         const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         // we don't need to return anything here; rather it's added to the db so the user can submit the token in the next step
-        await this.resetTokenDAO.createResetToken(acct[0].id, token, expires);
+        await this.resetTokenDAO.createResetToken(acct[0].acctId, token, expires);
 
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
@@ -198,7 +197,7 @@ class AuthService {
         account.passwordHash = this.accountUtil.hash(password);
         account.passwordReset = Date.now();
         // account.resetToken = undefined;
-        const resetTokenForAccount = await this.resetTokenDAO.getAllResetTokensForAccount(account.id);
+        const resetTokenForAccount = await this.resetTokenDAO.getAllResetTokensForAccount(account.acctId);
         for (const token of resetTokenForAccount) {
             this.resetTokenDAO.deleteResetTokenByModel(token);
         }
@@ -262,9 +261,9 @@ class AuthService {
     }
 
     private basicDetails(account: IAccount | Account): IBasicDetails {
-        const { id, email, role, updated, isVerified } = account;
+        const { acctId, email, role, updated, isVerified } = account;
         const definitelyARole = role as Role;
-        return { id, email, role: definitelyARole, updated, isVerified };
+        return { acctId, email, role: definitelyARole, updated, isVerified };
     }
 
     private async getAccount(id: number) {

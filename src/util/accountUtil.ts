@@ -28,8 +28,8 @@ class AccountUtil {
         return bcrypt.hashSync(password, 10);
     }
 
-    public async getRefreshToken(token: string): Promise<RefreshToken> {
-        const refreshToken = await this.refreshTokenDAO.getRefreshTokenByToken(token);
+    public async getRefreshTokenByTokenString(tokenString: string): Promise<RefreshToken> {
+        const refreshToken = await this.refreshTokenDAO.getRefreshTokenByTokenString(tokenString);
         // fixme: .populate("account"); does what? see line 64         const { account } = refreshToken;
         if (!refreshToken || !refreshToken.isActive) throw new Error("Invalid token");
         return refreshToken;
@@ -37,12 +37,12 @@ class AccountUtil {
 
     public generateJwtToken(account: IAccount) {
         // create a jwt token containing the account id that expires in 15 minutes
-        return jwt.sign({ sub: account.id, id: account.id }, secret, { expiresIn: "15m" });
+        return jwt.sign({ sub: account.acctId, id: account.acctId }, secret, { expiresIn: "15m" });
     }
 
     public async generateRefreshToken(account: IAccount, ipAddress: string): Promise<RefreshToken> {
         // create a refresh token that expires in 7 days
-        const accountId = account.id;
+        const accountId = account.acctId;
         const token = this.randomTokenString();
         const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const createdByIp = ipAddress;
@@ -59,7 +59,7 @@ class AccountUtil {
     public async attachMissingDetails(params: IRegistrationDetails): Promise<AccountCreationAttributes> {
         const start: any = { ...params };
         const pwHash: string = await this.generatePasswordHash(start.password);
-        // start.id = 0; // fixme: shouldnt this be an autoincrement value?
+        // start.acctId = 0; // fixme: shouldnt this be an autoincrement value?
         start.passwordHash = pwHash;
         start.verificationToken = "";
         // start.verified = 0;
@@ -74,7 +74,7 @@ class AccountUtil {
             throw Error("No valid role found for user. Value was: " + startAccount.role);
         }
         const account: IAccount = {
-            id: startAccount.id,
+            acctId: startAccount.acctId,
             email: startAccount.email,
             isVerified: startAccount.isVerified,
             updated: new Date(startAccount.updated),
