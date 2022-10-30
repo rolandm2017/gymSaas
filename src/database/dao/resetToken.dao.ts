@@ -27,8 +27,8 @@ class ResetTokenDAO {
         });
     };
 
-    public createResetToken = async (id: number, token: string, expires: Date) => {
-        return await ResetToken.create({ acctId: id, token, expires });
+    public createResetToken = async (acctId: number, token: string, expires: Date) => {
+        return await ResetToken.create({ acctId: acctId, token: token, expires: expires });
     };
 
     public deleteResetTokenById = (tokenId: number) => {
