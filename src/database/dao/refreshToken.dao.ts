@@ -25,7 +25,7 @@ class RefreshTokenDAO {
 
     public getAllRefreshTokensForAccount = (accountId: number) => {
         return RefreshToken.findAll({
-            where: { "$Account.id$": accountId },
+            where: { acctId: accountId },
             include: "their_refresh_tokens",
         });
     };

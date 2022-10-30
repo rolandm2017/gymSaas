@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { NextFunction, Request, response, Response } from "express";
 
 import {
     authenticateUserSchema,
@@ -28,6 +28,7 @@ class AuthController {
 
     constructor(a: AuthService) {
         this.authService = a;
+        this.router.get("/health", this.healthCheck);
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate);
         this.router.post("/register", registerUserSchema, this.register);
@@ -59,7 +60,10 @@ class AuthController {
 
         const accountDetails: IBasicDetails | ISmallError = await this.authService.authenticate(email, password, ipAddress);
         if ("error" in accountDetails) return response.json({ error: accountDetails.error });
-        return response.json({ accountDetails });
+        if (accountDetails.jwtToken === undefined) throw new Error("jwt missing");
+        if (accountDetails.refreshToken === undefined) throw new Error("refresh token missing");
+        this.setTokenCookie(response, accountDetails.refreshToken);
+        return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
     };
 
     public register = async (request: Request, response: Response, next: NextFunction) => {
@@ -90,11 +94,11 @@ class AuthController {
     };
 
     public revokeToken = async (request: RequestWithUser, response: Response, next: NextFunction) => {
-        //
+        // accept token from request body or cookie
         const token = request.body.token || request.cookies.refreshToken;
         const ipAddress = request.ip;
         if (request.user === undefined) return response.status(400).json({ message: "User is required" });
-        if (!token) return response.status(400).json({ message: "Token is required" });
+        if (!token || request.user.ownsToken === undefined) return response.status(400).json({ message: "Token is required" });
         // users can revoke their own tokens and admins can revoke any tokens
         if (!request.user.ownsToken(token) && request.user.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
@@ -108,7 +112,7 @@ class AuthController {
         const token = request.body.token;
         console.log("109rm");
         await this.authService.verifyEmail(token);
-        console.log("111rm")
+        console.log("111rm");
         return response.json({ message: "Verification successful, you can now login" });
     };
 
@@ -119,6 +123,7 @@ class AuthController {
         const oldPw = request.body.oldPw;
         const newPw = request.body.newPw;
         const confirmNewPw = request.body.confirmnNewPw;
+        console.log("126rm");
         if (newPw !== confirmNewPw) return response.json({ error: "Passwords did not match" });
         const success: boolean = await this.authService.updatePassword(email, oldPw, newPw);
         if (success) return response.json({ message: "Password updated!" });
@@ -145,9 +150,7 @@ class AuthController {
     public resetPassword = async (request: Request, response: Response) => {
         const token = request.body.token;
         const password = request.body.password;
-        await this.authService
-            .resetPassword(token, password)
-            .then(() => response.json({ message: "Password reset successful, you can now login" }));
+        await this.authService.resetPassword(token, password).then(() => response.json({ message: "Password reset successful, you can now login" }));
     };
 
     // **
@@ -159,7 +162,8 @@ class AuthController {
     };
 
     public getAccountById = async (request: RequestWithUser, response: Response) => {
-        if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
+        const requestedAcctId = request.body.acctId;
+        if (requestedAcctId !== request.user?.acctId && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
         const idAsNumber = parseInt(request.params.id, 10);
@@ -175,7 +179,8 @@ class AuthController {
 
     public updateAccount = async (request: RequestWithUser, response: Response) => {
         // users can update their own account and admins can update any account
-        if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
+        const idOfAcctToUpdate = request.body.acctId;
+        if (idOfAcctToUpdate !== request.user?.acctId && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
         const idAsNumber = parseInt(request.params.id, 10);
@@ -186,13 +191,18 @@ class AuthController {
 
     public _deleteAccount = async (request: RequestWithUser, response: Response) => {
         // users can delete their own account and admins can delete any account
+        const idOfAcctToDelete = request.body.acctId;
         if (request.user === undefined) return response.status(400).json({ message: "User missing" });
-        if (request.params.id !== request.user?.id && request.user?.role !== Role.Admin) {
+        if (idOfAcctToDelete !== request.user?.acctId && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }
 
         await this.authService.deleteAccount(request.params.id);
         return response.json({ message: "Account deleted successfully" });
+    };
+
+    public healthCheck = async () => {
+        return response.json({ message: "ok" });
     };
 
     private setTokenCookie(response: Response, token: string) {

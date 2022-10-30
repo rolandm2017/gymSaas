@@ -37,7 +37,7 @@ class AccountUtil {
 
     public generateJwtToken(account: IAccount) {
         // create a jwt token containing the account id that expires in 15 minutes
-        return jwt.sign({ sub: account.acctId, id: account.acctId }, secret, { expiresIn: "15m" });
+        return jwt.sign({ sub: account.acctId, acctId: account.acctId }, secret, { expiresIn: "15m" });
     }
 
     public async generateRefreshToken(account: IAccount, ipAddress: string): Promise<RefreshToken> {

@@ -65,6 +65,13 @@ function logTime(a: number) {
 }
 
 describe("Test auth controller", () => {
+    // describe("health check", () => {
+    //     test("is active", async () => {
+    //         const p = `${path}/health`;
+    //         const res = await request(server).get(p);
+    //         expect(res.body.message).toBe("ok");
+    //     });
+    // });
     describe("POST /register", () => {
         test("responds with success msg if body is populated properly", async () => {
             const res = await request(server).post(`${path}/register`).set("origin", "testSuite").send(validCredentials);
@@ -90,7 +97,7 @@ describe("Test auth controller", () => {
     });
     describe("Complete user registration flow & password reset", () => {
         jest.setTimeout(1000 * 240);
-        test("works - this is integration", async () => {
+        test("works - integration", async () => {
             logTime(1);
             const credentials = { ...validCredentials };
             credentials.email = "foobarbazgirl@gmail.com";
@@ -113,19 +120,40 @@ describe("Test auth controller", () => {
             // now we expect logging in with this new account to "just work"
             const loginPayload = { email: credentials.email, password: pw };
             const authenticationRes = await request(server).post(`${path}/authenticate`).send(loginPayload);
+            console.log(authenticationRes.body, "123rm");
             expect(authenticationRes.body.email).toBe(credentials.email);
-            expect(authenticationRes.body.id).toBeDefined();
+            expect(authenticationRes.body.acctId).toBeDefined();
             expect(authenticationRes.body.isVerified).toBe(true); // the goods! verification successful.
+            // check header for jwt and refresh token
+            const jwtToken = authenticationRes.body.jwtToken;
+            expect(jwtToken.length).toBe(153);
+            const refreshToken = authenticationRes.headers["set-cookie"][0];
+            const refreshTokenString = refreshToken.split(";")[0].split("=")[1];
+            console.log(refreshTokenString, refreshTokenString.length, "130rm");
+            expect(refreshTokenString).toBeDefined();
+            expect(refreshTokenString.length).toBe(80);
             logTime(4);
             // now try changing the password
             const newPw = pw + "str";
+            const authorizationCredentials = {
+                acctId: authenticationRes.body.acctId,
+                // ownsToken: authCookie,
+            };
             const emailChangerPayload = {
                 email: credentials.email,
                 oldPw: pw,
                 newPw: newPw,
                 confirmNewPw: newPw,
             };
-            const changedPwRes = await request(server).post(`${path}/update_password`).send(emailChangerPayload);
+            // const changedPwRes = await request(server).post(`${path}/update_password`).auth(jwtToken, { type: "bearer" }).send(emailChangerPayload);
+            // const changedPwRes = await request(server)
+            //     .post(`${path}/update_password`)
+            //     .set("Authorization", "Bearer " + jwtToken)
+            //     .send(emailChangerPayload);
+            const changedPwRes = await request(server)
+                .post(`${path}/update_password`)
+                .set("Authorization", "bearer " + jwtToken)
+                .send(emailChangerPayload);
             expect(changedPwRes.body.message).toBe("Password updated!");
             logTime(5);
         });

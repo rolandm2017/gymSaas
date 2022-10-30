@@ -139,12 +139,14 @@ class AuthService {
     }
 
     public async updatePassword(email: string, oldPw: string, newPw: string) {
+        console.log(email, "142rm");
         const accountArr: Account[] = await this.accountDAO.getAccountByEmail(email);
 
         // always return ok response to prevent email enumeration
         if (accountArr.length === 0) return false;
         const account = accountArr[0];
 
+        console.log("149rm");
         // check the starting passwords are the same
         const correctInputPw = bcrypt.compareSync(oldPw, account.passwordHash);
         if (!correctInputPw) return false;
@@ -152,6 +154,7 @@ class AuthService {
         const hashed = this.accountUtil.hash(newPw);
         account.passwordHash = hashed;
         await account.save();
+        console.log("157rm");
         return true;
     }
 
