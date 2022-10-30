@@ -18,13 +18,13 @@ function initModels(sequelize: Sequelize) {
         foreignKey: "acctId",
         as: "their_refresh_tokens",
     });
-    RefreshToken.belongsTo(Account, { as: "belongs_to", foreignKey: "acctId" });
+    RefreshToken.belongsTo(Account, { as: "belongs_to_user", foreignKey: "acctId" });
 
     Account.hasMany(ResetToken, {
         foreignKey: "acctId",
         as: "their_reset_tokens",
     });
-    ResetToken.belongsTo(Account, { as: "belongs_to", foreignKey: "acctId" });
+    ResetToken.belongsTo(Account, { as: "belongs_to_user", foreignKey: "acctId" });
 
     Account.hasMany(Report);
     Report.hasOne(Account);

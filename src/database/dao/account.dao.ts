@@ -36,9 +36,8 @@ class AccountDAO {
     };
 
     public getAccountByRefreshToken = (token: RefreshToken) => {
-        // not wroking? read: https://stackoverflow.com/questions/74092426/proper-way-to-find-an-account-via-one-of-its-associated-refreshtokens-in-sequeli
         return Account.findAll({
-            where: { "$RefreshTokens.token$": token.token },
+            where: { acctId: token.token },
             include: "their_refresh_tokens",
         });
     };

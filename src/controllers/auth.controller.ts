@@ -122,10 +122,13 @@ class AuthController {
         const email = request.body.email;
         const oldPw = request.body.oldPw;
         const newPw = request.body.newPw;
-        const confirmNewPw = request.body.confirmnNewPw;
-        console.log("126rm");
+        const confirmNewPw = request.body.confirmNewPw;
+        console.log(newPw, confirmNewPw, "126rm");
+        if (newPw === undefined || confirmNewPw === undefined) return response.json({ error: "A password was missing" });
         if (newPw !== confirmNewPw) return response.json({ error: "Passwords did not match" });
+        console.log("128rm");
         const success: boolean = await this.authService.updatePassword(email, oldPw, newPw);
+        console.log(success, "129rm");
         if (success) return response.json({ message: "Password updated!" });
         else return response.json({ error: "You entered the wrong starting password" });
     };
