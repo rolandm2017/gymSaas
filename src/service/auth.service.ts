@@ -159,29 +159,33 @@ class AuthService {
     }
 
     public async forgotPassword(email: string, origin: string) {
-        const acct: Account[] = await this.accountDAO.getAccountByEmail(email);
+        try {
+            const acct: Account[] = await this.accountDAO.getAccountByEmail(email);
 
-        // always return ok response to prevent email enumeration
-        if (acct.length === 0) return;
+            // always return ok response to prevent email enumeration
+            if (acct.length === 0) return;
 
-        // create reset token that expires after 24 hours
-        // todo: add reset token to reset token table linked to user
-        const token = this.accountUtil.randomTokenString();
-        const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+            // create reset token that expires after 24 hours
+            // todo: add reset token to reset token table linked to user
+            const token = this.accountUtil.randomTokenString();
+            const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-        // we don't need to return anything here; rather it's added to the db so the user can submit the token in the next step
-        console.log("173rm");
-        console.log(acct[0].acctId, token, expires, "174rm");
-        await this.resetTokenDAO.createResetToken(acct[0].acctId, token, expires);
-        console.log("==\n==\n176rm\n==\n--");
-        // send email
-        const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
-        account.resetToken = {
-            token: token,
-            expires: expires,
-        };
-        console.log("182rm");
-        await this.emailService.sendPasswordResetEmail(account, origin);
+            // we don't need to return anything here; rather it's added to the db so the user can submit the token in the next step
+            console.log("173rm");
+            console.log(acct[0].acctId, token, expires, "174rm");
+            await this.resetTokenDAO.createResetToken(acct[0].acctId, token, expires);
+            console.log("==\n==\n176rm\n==\n--");
+            // send email
+            const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
+            account.resetToken = {
+                token: token,
+                expires: expires,
+            };
+            console.log("182rm");
+            await this.emailService.sendPasswordResetEmail(account, origin);
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     public async validateResetToken(token: string) {
@@ -196,21 +200,32 @@ class AuthService {
     }
 
     public async resetPassword(token: string, password: string) {
-        const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
-        if (!resetToken) throw new Error("Invalid token");
-        const account = await this.accountDAO.getAccountById(resetToken.acctId);
+        try {
+            console.log(1);
+            const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
+            if (!resetToken) throw new Error("Invalid token");
+            console.log(2);
+            const account = await this.accountDAO.getAccountById(resetToken.acctId);
 
-        if (!account) throw new Error("Invalid token");
-
-        // update password and remove reset token
-        account.passwordHash = this.accountUtil.hash(password);
-        account.passwordReset = Date.now();
-        const resetTokenForAccount = await this.resetTokenDAO.getAllResetTokensForAccount(account.acctId);
-        for (const token of resetTokenForAccount) {
-            this.resetTokenDAO.deleteResetTokenByModel(token);
+            if (!account) throw new Error("Invalid token");
+            console.log(3);
+            // update password and remove reset token
+            account.passwordHash = this.accountUtil.hash(password);
+            account.passwordReset = Date.now();
+            const resetTokenForAccount = await this.resetTokenDAO.getAllResetTokensForAccount(account.acctId);
+            console.log(4);
+            for await (const token of resetTokenForAccount) {
+                await this.resetTokenDAO.deleteResetTokenByModel(token);
+                console.log(5);
+            }
+            console.log(6);
+            await account.save();
+            console.log(7);
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
         }
-        await account.save();
-        return true;
     }
 
     // authorized

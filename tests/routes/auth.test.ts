@@ -46,7 +46,7 @@ beforeAll(async () => {
     console.log("\n====\n====\nstarting app...\n===\n===");
     await app.connectDB();
     await app.dropTable("account");
-    await app.dropTable("resetToken");
+    // await app.dropTable("resetToken");
 });
 
 afterAll(async () => {
@@ -192,9 +192,9 @@ describe("Test auth controller", () => {
             console.log("191rm");
             const validateTokenRes = await request(server).post(`${path}/validate_reset_token`).send(t);
             expect(validateTokenRes.body.message).toBe("Token is valid");
-            const newPwPayload = { ...t, password: "someNewPw99##" };
+            const newPwPayload = { ...t, password: "someNewPw99##", confirmPassword: "someNewPw99##" };
             const resetPwRes = await request(server).post(`${path}/reset_password`).send(newPwPayload);
             expect(resetPwRes.body.message).toBe("Password reset successful, you can now login");
-        });
+        }, 100000);
     });
 });

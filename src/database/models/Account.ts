@@ -65,7 +65,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                     allowNull: false,
                 },
                 passwordReset: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.BIGINT,
                     allowNull: true,
                 },
             },
