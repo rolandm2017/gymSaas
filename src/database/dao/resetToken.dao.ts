@@ -1,7 +1,16 @@
 import { ResetToken, ResetTokenCreationAttributes } from "../models/ResetToken";
+import AccountDAO from "./account.dao";
 
 class ResetTokenDAO {
-    constructor() {}
+    private acctDAO: AccountDAO;
+    constructor(acctDAO: AccountDAO) {
+        this.acctDAO = acctDAO;
+    }
+
+    public getResetTokenByEmail = async (email: string) => {
+        const acct = await this.acctDAO.getAccountByEmail(email);
+        return await ResetToken.findOne({ where: { acctId: acct[0].acctId } });
+    };
     public getResetTokenByToken = (token: string) => {
         return ResetToken.findOne({
             where: {
@@ -13,17 +22,17 @@ class ResetTokenDAO {
     public getAllResetTokensForAccount = (accountId: number) => {
         return ResetToken.findAll({
             where: {
-                accountId: accountId,
+                acctId: accountId,
             },
         });
     };
 
-    public createResetToken = (id: number, token: string, expires: Date) => {
-        return ResetToken.create({ accountId: id, token, expires });
+    public createResetToken = async (id: number, token: string, expires: Date) => {
+        return await ResetToken.create({ acctId: id, token, expires });
     };
 
-    public deleteResetTokenById = (accountId: number) => {
-        return ResetToken.destroy({ where: { accountId: accountId } });
+    public deleteResetTokenById = (tokenId: number) => {
+        return ResetToken.destroy({ where: { tokenId: tokenId } });
     };
 
     public deleteResetTokenByModel = (resetToken: ResetToken) => {

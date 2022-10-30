@@ -1,6 +1,7 @@
 import { cookie } from "express-validator";
 import request from "supertest";
 import AccountDAO from "../../src/database/dao/account.dao";
+import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 
 import { app, server } from "../mocks/mockServer";
 import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
@@ -39,6 +40,7 @@ const invalidCredentials3 = {
 };
 
 let acctDAO: AccountDAO = new AccountDAO();
+let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 
 beforeAll(async () => {
     console.log("\n====\n====\nstarting app...\n===\n===");
@@ -96,9 +98,7 @@ describe("Test auth controller", () => {
         });
     });
     describe("Complete user registration flow & password reset", () => {
-        jest.setTimeout(1000 * 240);
-        test("works - integration", async () => {
-            logTime(1);
+        test("works - integration - register => verify email => authenticate => change pw => login again", async () => {
             const credentials = { ...validCredentials };
             credentials.email = "foobarbazgirl@gmail.com";
             const pw = "catsDOGS444%%";
@@ -108,54 +108,92 @@ describe("Test auth controller", () => {
             expect(res.body.message).toBe("Registration successful, please check your email for verification instructions");
             expect(res.body.accountDetails.email).toBe(credentials.email);
             expect(res.body.accountDetails.isVerified).toBe(null);
-            logTime(2);
             // get token via cheater method b/c we don't have email set up => verify ownership of account
             const madeAcct = await acctDAO.getAccountByEmail(credentials.email);
             const token = madeAcct[0].verificationToken;
             const payload = { token: token };
             const acctVerificationRes = await request(server).post(`${path}/verify_email`).send(payload);
-            logTime(2.5);
             expect(acctVerificationRes.body.message).toBe("Verification successful, you can now login");
-            logTime(3);
             // now we expect logging in with this new account to "just work"
             const loginPayload = { email: credentials.email, password: pw };
             const authenticationRes = await request(server).post(`${path}/authenticate`).send(loginPayload);
-            console.log(authenticationRes.body, "123rm");
             expect(authenticationRes.body.email).toBe(credentials.email);
             expect(authenticationRes.body.acctId).toBeDefined();
             expect(authenticationRes.body.isVerified).toBe(true); // the goods! verification successful.
             // check header for jwt and refresh token
             const jwtToken = authenticationRes.body.jwtToken;
+            expect(jwtToken).toBeDefined();
             expect(jwtToken.length).toBe(153);
             const refreshToken = authenticationRes.headers["set-cookie"][0];
             const refreshTokenString = refreshToken.split(";")[0].split("=")[1];
-            console.log(refreshTokenString, refreshTokenString.length, "130rm");
             expect(refreshTokenString).toBeDefined();
             expect(refreshTokenString.length).toBe(80);
-            logTime(4);
             // now try changing the password
             const newPw = pw + "str";
-            const authorizationCredentials = {
-                acctId: authenticationRes.body.acctId,
-                // ownsToken: authCookie,
-            };
             const emailChangerPayload = {
                 email: credentials.email,
                 oldPw: pw,
                 newPw: newPw,
                 confirmNewPw: newPw,
             };
-            // const changedPwRes = await request(server).post(`${path}/update_password`).auth(jwtToken, { type: "bearer" }).send(emailChangerPayload);
-            // const changedPwRes = await request(server)
-            //     .post(`${path}/update_password`)
-            //     .set("Authorization", "Bearer " + jwtToken)
-            //     .send(emailChangerPayload);
             const changedPwRes = await request(server)
                 .post(`${path}/update_password`)
                 .set("Authorization", "bearer " + jwtToken)
                 .send(emailChangerPayload);
             expect(changedPwRes.body.message).toBe("Password updated!");
-            logTime(5);
+            // can now log in with new credentials
+            const loginPayload2 = { email: emailChangerPayload.email, password: emailChangerPayload.newPw };
+            const authenticationRes2 = await request(server).post(`${path}/authenticate`).send(loginPayload2);
+            // redo check authentication response
+            expect(authenticationRes2.body.email).toBe(loginPayload2.email);
+            expect(authenticationRes2.body.acctId).toBeDefined();
+            expect(authenticationRes2.body.isVerified).toBe(true); // the goods! verification successful.
+            // check header for jwt and refresh token
+            const jwtToken2 = authenticationRes2.body.jwtToken;
+            expect(jwtToken2.length).toBe(153);
+            const refreshToken2 = authenticationRes2.headers["set-cookie"][0];
+            const refreshTokenString2 = refreshToken2.split(";")[0].split("=")[1];
+            expect(refreshTokenString2).toBeDefined();
+            expect(refreshTokenString2.length).toBe(80);
+            // ** amazing! **
+        });
+        test("works - integration - create account => verify => forget pw => validate reset token => reset pw => login", async () => {
+            // Setup
+            const credentials3 = {
+                email: "foobarbazman@gmail.com",
+                pw: "catsDOGS444%%",
+                password: "jlg900#A",
+                confirmPassword: "jlg900#A",
+                acceptTerms: true,
+            };
+            const res = await request(server).post(`${path}/register`).set("origin", "testSuite").send(credentials3);
+            console.log("170rm");
+            expect(res.body.message).toBe("Registration successful, please check your email for verification instructions");
+            expect(res.body.accountDetails.email).toBe(credentials3.email);
+            expect(res.body.accountDetails.isVerified).toBe(null);
+            // get token via cheater method b/c we don't have email set up => verify ownership of account
+            const madeAcct = await acctDAO.getAccountByEmail(credentials3.email);
+            const token = madeAcct[0].verificationToken;
+            const payload = { token: token };
+            console.log("177rm");
+            const acctVerificationRes = await request(server).post(`${path}/verify_email`).send(payload);
+            expect(acctVerificationRes.body.message).toBe("Verification successful, you can now login");
+            // The real reason the test is here
+            const forgotPwPayload = {
+                email: credentials3.email,
+            };
+            console.log("183rm");
+            const forgotPwRes = await request(server).post(`${path}/forgot_password`).set("origin", "testSuite").send(forgotPwPayload);
+            expect(forgotPwRes.body.message).toBe("Please check your email for password reset instructions");
+            // bypass email, get token directly
+            const forgotPwToken = await resetTokenDAO.getResetTokenByEmail(forgotPwPayload.email);
+            const t = { token: forgotPwToken?.token };
+            console.log("191rm");
+            const validateTokenRes = await request(server).post(`${path}/validate_reset_token`).send(t);
+            expect(validateTokenRes.body.message).toBe("Token is valid");
+            const newPwPayload = { ...t, password: "someNewPw99##" };
+            const resetPwRes = await request(server).post(`${path}/reset_password`).send(newPwPayload);
+            expect(resetPwRes.body.message).toBe("Password reset successful, you can now login");
         });
     });
 });

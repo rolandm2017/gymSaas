@@ -1,11 +1,13 @@
-import { DataTypes, Sequelize, Model, Optional } from "sequelize";
+import { DataTypes, Sequelize, Model, Optional, ForeignKey } from "sequelize";
 
 import sequelizeConnection from "../Database";
+import { Account } from "./Account";
 
 interface ResetTokenAttributes {
-    accountId: number; // todo: link to User model
+    tokenId?: number; // todo: link to User model
     token: string;
     expires: Date;
+    acctId?: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -15,9 +17,10 @@ export type ResetTokenOptionalAttributes = "createdAt" | "updatedAt" | "deletedA
 export type ResetTokenCreationAttributes = Optional<ResetTokenAttributes, ResetTokenOptionalAttributes>;
 
 export class ResetToken extends Model<ResetTokenAttributes, ResetTokenCreationAttributes> implements ResetTokenAttributes {
-    public accountId!: number;
+    public tokenId!: number;
     public token!: string;
     public expires!: Date;
+    public acctId!: ForeignKey<Account["acctId"]>;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -26,7 +29,7 @@ export class ResetToken extends Model<ResetTokenAttributes, ResetTokenCreationAt
     static initModel(sequelize: Sequelize): typeof ResetToken {
         return ResetToken.init(
             {
-                accountId: {
+                tokenId: {
                     type: DataTypes.INTEGER, // todo: link to user model.
                     autoIncrement: true,
                     primaryKey: true,

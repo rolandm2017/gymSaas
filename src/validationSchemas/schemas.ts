@@ -16,6 +16,7 @@ function authenticateUserSchema(req: Request, res: Response, next: NextFunction)
         email: Joi.string().email().required(),
         password: Joi.string().required(),
     });
+    console.log(req, "19rm");
     validateRequest(req, next, schema);
 }
 

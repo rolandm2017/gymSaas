@@ -57,8 +57,10 @@ class AuthController {
         const email: string = request.body.email;
         const password: string = request.body.password;
         const ipAddress: string = request.ip;
+        console.log(email, password, "60rm");
 
         const accountDetails: IBasicDetails | ISmallError = await this.authService.authenticate(email, password, ipAddress);
+        console.log(accountDetails, "63rm");
         if ("error" in accountDetails) return response.json({ error: accountDetails.error });
         if (accountDetails.jwtToken === undefined) throw new Error("jwt missing");
         if (accountDetails.refreshToken === undefined) throw new Error("refresh token missing");
@@ -146,14 +148,17 @@ class AuthController {
 
     public validateResetToken = async (request: Request, response: Response) => {
         const token = request.body.token;
-        await this.authService.validateResetToken(token);
-        return response.json({ message: "Token is valid" });
+        const success = await this.authService.validateResetToken(token);
+        if (success) return response.json({ message: "Token is valid" });
+        else return response.json({ message: "Invalid token" });
     };
 
     public resetPassword = async (request: Request, response: Response) => {
         const token = request.body.token;
         const password = request.body.password;
-        await this.authService.resetPassword(token, password).then(() => response.json({ message: "Password reset successful, you can now login" }));
+        const success = await this.authService.resetPassword(token, password);
+        if (success) return response.json({ message: "Password reset successful, you can now login" });
+        else return response.json({ message: "Reset password failed" });
     };
 
     // **

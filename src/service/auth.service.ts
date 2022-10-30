@@ -170,41 +170,47 @@ class AuthService {
         const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         // we don't need to return anything here; rather it's added to the db so the user can submit the token in the next step
+        console.log("173rm");
+        console.log(acct[0].acctId, token, expires, "174rm");
         await this.resetTokenDAO.createResetToken(acct[0].acctId, token, expires);
-
+        console.log("==\n==\n176rm\n==\n--");
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
         account.resetToken = {
             token: token,
             expires: expires,
         };
+        console.log("182rm");
         await this.emailService.sendPasswordResetEmail(account, origin);
     }
 
     public async validateResetToken(token: string) {
         const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
-        if (!resetToken) throw new Error("Invalid token");
-        const account = await this.accountDAO.getAccountById(resetToken.accountId);
+        if (!resetToken) return false;
+        // throw new Error("Invalid token");
+        const account = await this.accountDAO.getAccountById(resetToken.acctId);
 
-        if (!account) throw new Error("Invalid token");
+        if (!account) return false;
+        // throw new Error("Invalid token");
+        return true;
     }
 
     public async resetPassword(token: string, password: string) {
         const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
         if (!resetToken) throw new Error("Invalid token");
-        const account = await this.accountDAO.getAccountById(resetToken.accountId);
+        const account = await this.accountDAO.getAccountById(resetToken.acctId);
 
         if (!account) throw new Error("Invalid token");
 
         // update password and remove reset token
         account.passwordHash = this.accountUtil.hash(password);
         account.passwordReset = Date.now();
-        // account.resetToken = undefined;
         const resetTokenForAccount = await this.resetTokenDAO.getAllResetTokensForAccount(account.acctId);
         for (const token of resetTokenForAccount) {
             this.resetTokenDAO.deleteResetTokenByModel(token);
         }
         await account.save();
+        return true;
     }
 
     // authorized

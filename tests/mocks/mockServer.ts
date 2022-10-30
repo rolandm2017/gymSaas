@@ -117,7 +117,7 @@ console.log("hello world!", port);
 const acctDAO = new AccountDAO();
 const emailService = new EmailService(acctDAO, "testing");
 const accountUtil = new AccountUtil();
-const resetTokenDAO = new ResetTokenDAO();
+const resetTokenDAO = new ResetTokenDAO(acctDAO);
 const a = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 
 export const app = new App({
