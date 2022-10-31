@@ -44,16 +44,12 @@ function authorize(roles: Role[] = []) {
                 acctId: acctInfo.acctId,
                 role: "", // temp to satisfy ts
             };
-            console.log("50rm");
             const account: Account | null = await acctDAO.getAccountById(acctInfo.acctId);
             if (!account) return res.status(401).json({ message: "Unauthorized - 034" });
-            console.log("53rm");
             const refreshTokens = await rtDAO.getAllRefreshTokensForAccount(account.acctId);
-            console.log("58rm");
 
             const validRoles = Object.values(Role);
             const acctRole: Role = account.role as Role;
-            console.log(acctRole, "040rm");
             const rolesFoundOnRequest = roles.length;
             if (rolesFoundOnRequest && !validRoles.includes(acctRole)) {
                 // account no longer exists or role not authorized

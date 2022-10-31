@@ -27,7 +27,6 @@ class AuthService {
 
     public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
         try {
-            console.log(email, password, ipAddress, "30rm");
             let acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
             if (acctArr.length === 0) return { error: "No account found for this email" };
             if (acctArr.length >= 2) return { error: "More than one account found for this email" };
@@ -43,7 +42,6 @@ class AuthService {
             const refreshToken: RefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
             // save refresh tokenm
             await refreshToken.save();
-            console.log(jwtToken, "45rm");
             // return basic details and tokens
             return {
                 ...this.basicDetails(account),

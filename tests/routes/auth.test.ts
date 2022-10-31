@@ -111,7 +111,6 @@ describe("Test auth controller", () => {
             expect(res.body.accountDetails.isVerified).toBe(null);
             // get token via cheater method b/c we don't have email set up => verify ownership of account
             const madeAcct = await acctDAO.getAccountByEmail(credentials.email);
-            console.log(madeAcct, "114rm");
             const token = madeAcct[0].verificationToken;
             const payload = { token: token };
             const acctVerificationRes = await request(server).post(`${path}/verify_email`).send(payload);
@@ -174,7 +173,6 @@ describe("Test auth controller", () => {
             expect(res.body.accountDetails.isVerified).toBe(null);
             // get token via cheater method b/c we don't have email set up => verify ownership of account
             const madeAcct = await acctDAO.getAccountByEmail(credentials3.email);
-            console.log(madeAcct, madeAcct[0].acctId, "177rm");
             const token = madeAcct[0].verificationToken;
             const payload = { token: token };
             const acctVerificationRes = await request(server).post(`${path}/verify_email`).send(payload);
