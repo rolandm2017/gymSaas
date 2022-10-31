@@ -16,15 +16,17 @@ let controller: AuthController;
 let aDAO: AccountDAO = new AccountDAO();
 let e: EmailService = new EmailService(aDAO, "testing");
 let a: AccountUtil = new AccountUtil();
-let rDAO: ResetTokenDAO = new ResetTokenDAO();
+let rDAO: ResetTokenDAO = new ResetTokenDAO(aDAO);
 
 const validEmail = "someValidEmail@gmail.com";
 const fakeButValidAccount: IBasicDetails = {
-    id: 999999,
+    acctId: 999999,
     email: validEmail,
     isVerified: true,
     updated: 0,
     role: Role.User,
+    jwtToken: "testToken",
+    refreshToken: "fakeTestToken",
 };
 
 beforeAll(() => {
@@ -48,34 +50,39 @@ const mockResponse = () => {
 
 describe("Test auth controller", () => {
     test("authenticate route succeeds for valid inputs", async () => {
-        s.authenticate = jest.fn().mockReturnValue(fakeButValidAccount);
+        const credentialsWithJwtAndRefreshToken = { ...fakeButValidAccount };
+        s.authenticate = jest.fn().mockReturnValue(credentialsWithJwtAndRefreshToken);
+        controller = new AuthController(s);
         const req: Request = { body: {} } as Request;
         req.body.email = "someValidEmail@gmail.com";
         req.body.password = "validPassword999*";
-        req.ip = "195.1.1.3";
+        req.ip = "195.1.1.35";
         const res: Response = mockResponse();
         res.json = jest.fn();
+        res.cookie = jest.fn();
         const n: NextFunction = {} as NextFunction;
         const response: Response = await controller.authenticate(req, res, n);
         // expect(response.email).toEqual(validEmail);
         expect(res.json).toHaveBeenCalledWith({
-            accountDetails: fakeButValidAccount,
+            ...fakeButValidAccount,
         });
         expect(res.json).toHaveBeenCalled();
+        expect(res.cookie).toHaveBeenCalled();
     });
     test("authenticate route errors for invalid inputs", async () => {
-        s.authenticate = jest.fn().mockReturnValue({ error: "hats" });
+        s.authenticate = jest.fn().mockReturnValue({ error: "someTestValue22" });
         const req: Request = {} as Request;
         const res: Response = mockResponse();
         res.json = jest.fn();
         // const n: NextFunction = {} as NextFunction;
         req.body = {
             email: "hats@gmail.com",
+            password: "aValidPw99##",
         };
         const n: NextFunction = {} as NextFunction;
         // ready
         const response = await controller.authenticate(req, res, n);
-        expect(res.json).toHaveBeenCalledWith({ error: "hats" });
+        expect(res.json).toHaveBeenCalledWith({ error: "someTestValue22" });
         expect(res.json).toHaveBeenCalled();
     });
 
@@ -83,7 +90,7 @@ describe("Test auth controller", () => {
         s.register = jest.fn().mockReturnValue(fakeButValidAccount);
         const req: any = {};
         req.get = function () {
-            return "hats";
+            return "fictionalOriginForTest";
         };
         const res: Response = mockResponse();
         res.json = jest.fn();
@@ -97,10 +104,10 @@ describe("Test auth controller", () => {
         expect(res.json).toHaveBeenCalled();
     });
     test("register route errors for invalid inputs", async () => {
-        s.register = jest.fn().mockReturnValue({ error: "hats" });
+        s.register = jest.fn().mockReturnValue({ error: "the_error_msg_is_passed_properly" });
         const req: any = {};
         req.get = function () {
-            return "hats";
+            return "fictionalOriginForTest2";
         };
         const res: Response = mockResponse();
         res.json = jest.fn();
@@ -108,7 +115,7 @@ describe("Test auth controller", () => {
         // ready
         const response = await controller.register(req, res, n);
         expect(res.json).toHaveBeenCalledWith({
-            error: "hats",
+            error: "the_error_msg_is_passed_properly",
         });
         expect(res.json).toHaveBeenCalled();
     });
@@ -120,12 +127,11 @@ describe("Test auth controller", () => {
             const req: RequestWithUser = { body: {} } as Request;
             req.body.token = "aaaaaaaaa";
             req.ip = "195.1.1.3";
-            req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), id: "hats" };
+            req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), acctId: 300 };
             const res: Response = mockResponse();
             const n: NextFunction = {} as NextFunction;
             // ready
             const response = await controller.revokeToken(req, res, n);
-            console.log(response);
             expect(req.user.ownsToken).toBeCalled();
             expect(s.revokeToken).toHaveBeenCalled();
             expect(res.json).toHaveBeenCalledWith({ message: "Token revoked" });
@@ -136,12 +142,11 @@ describe("Test auth controller", () => {
             const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
             req.cookies.refreshToken = "bbbbbb";
             req.ip = "195.1.1.3";
-            req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), id: "hats" };
+            req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), acctId: 303 };
             const res: Response = mockResponse();
             const n: NextFunction = {} as NextFunction;
             // ready
             const response = await controller.revokeToken(req, res, n);
-            console.log(response);
             expect(req.user.ownsToken).toBeCalled();
             expect(s.revokeToken).toHaveBeenCalled();
             expect(response.json).toHaveBeenCalledWith({ message: "Token revoked" });
@@ -165,7 +170,7 @@ describe("Test auth controller", () => {
             // setup
             s.revokeToken = jest.fn();
             const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
-            req.user = { role: "User", ownsToken: jest.fn(), id: "hats" };
+            req.user = { role: "User", ownsToken: jest.fn(), acctId: 305 };
             const res: Response = mockResponse();
             const n: NextFunction = {} as NextFunction;
             // ready

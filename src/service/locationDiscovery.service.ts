@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { ILatLong } from "../interface/LatLong.interface";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const APIKEY = process.env.GOOGLE_GEOCODING_API_KEY;
 
@@ -18,12 +20,10 @@ class LocationDiscoveryService {
         const url = `https://maps.googleapis.com/maps/api/geocode/json?key=${APIKEY}&address=${city} ${state} ${country}`;
 
         const results: AxiosResponse<any, any> = await axios.get(url);
-        // console.log(results, "20rm");
         let coords = results.data.results[0].geometry.location;
         // const coords = results.data.results.geometry.location;
         coords = { lat: coords.lat, long: coords.lng };
         // const coords = { lat: results.data.results.geometry.location.lat, long: results.data.results.geometry.location.long };
-        console.log(coords, "19rm");
         return coords;
     }
 }

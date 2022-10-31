@@ -12,7 +12,6 @@ class GooglePlacesController {
     }
 
     async getGyms(request: Request, response: Response) {
-        console.log("In get gyms", 13);
         const city = request.body.city;
         const stateOrProvince = request.body.state;
         const country = request.body.country;
@@ -29,7 +28,6 @@ class GooglePlacesController {
     }
 
     async getSavedGymsFromDB(request: Request, response: Response) {
-        console.log("32rm");
         const city = request.query.city;
         if (typeof city !== "string") {
             return response.status(500).json({ err: "bad input" }).end();

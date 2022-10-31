@@ -26,136 +26,149 @@ class AuthService {
     }
 
     public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails | ISmallError> {
-        console.log(email, "29rm");
-        let acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
-        if (acctArr.length === 0) return { error: "No account found for this email" };
-        if (acctArr.length >= 2) return { error: "More than one account found for this email" };
+        try {
+            console.log(email, password, ipAddress, "30rm");
+            let acctArr: Account[] = await this.accountDAO.getAccountByEmail(email);
+            if (acctArr.length === 0) return { error: "No account found for this email" };
+            if (acctArr.length >= 2) return { error: "More than one account found for this email" };
 
-        const acct = acctArr[0];
-        // console.log(acct, "34rm");
-        const passwordIsCorrect = bcrypt.compareSync(password, acct.passwordHash);
-        console.log(passwordIsCorrect, "37rm");
-        if (!acct || !acct.isVerified || !passwordIsCorrect) {
-            console.log("in the throw, 39rm");
-            throw new Error("Email or password is incorrect, or account is not verified");
+            const acct = acctArr[0];
+            const passwordIsCorrect = bcrypt.compareSync(password, acct.passwordHash);
+            if (!acct || !acct.isVerified || !passwordIsCorrect) {
+                throw new Error("Email or password is incorrect, or account is not verified");
+            }
+            const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct);
+            // authentication successful so generate jwt and refresh tokens
+            const jwtToken: string = this.accountUtil.generateJwtToken(account);
+            const refreshToken: RefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
+            // save refresh tokenm
+            await refreshToken.save();
+            console.log(jwtToken, "45rm");
+            // return basic details and tokens
+            return {
+                ...this.basicDetails(account),
+                jwtToken: jwtToken,
+                refreshToken: refreshToken.token,
+            };
+        } catch (err) {
+            console.log(err);
+            if (err instanceof Error) return { error: err.message };
+            else return { error: "Unexpected error" };
         }
-        console.log("39rm");
-        const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct);
-        console.log(account, "40rm");
-        // authentication successful so generate jwt and refresh tokens
-        const jwtToken: string = this.accountUtil.generateJwtToken(account);
-        console.log(jwtToken, "47rm");
-        const refreshToken: RefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
-        console.log(refreshToken, "49rm");
-        // save refresh tokenm
-        await refreshToken.save();
-
-        // return basic details and tokens
-        return {
-            ...this.basicDetails(account),
-            jwtToken,
-            refreshToken: refreshToken.token,
-        };
     }
 
     public async register(params: IRegistrationDetails, origin: string): Promise<IBasicDetails | ISmallError> {
-        const acctsWithThisEmail: Account[] = await this.accountDAO.getAccountByEmail(params.email);
-        const emailAlreadyExists: boolean = acctsWithThisEmail.length !== 0;
-        if (emailAlreadyExists) {
-            // send already registered error in email to prevent account enumeration
-            await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
-            return { error: "Account with this email already exists" };
+        try {
+            const acctsWithThisEmail: Account[] = await this.accountDAO.getAccountByEmail(params.email);
+            const emailAlreadyExists: boolean = acctsWithThisEmail.length !== 0;
+            if (emailAlreadyExists) {
+                // send already registered error in email to prevent account enumeration
+                await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
+                return { error: "Account with this email already exists" };
+            }
+            // create account object
+            const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params);
+            const acct: Account = await this.accountDAO.createAccount(acctWithPopulatedFields);
+            // first registered account is an admin
+            const allAccountsInSystem = await this.accountDAO.getMultipleAccounts(5);
+            const isFirstAccount = allAccountsInSystem.count === 0;
+            acct.role = isFirstAccount ? Role.Admin : Role.User;
+            acct.verificationToken = this.accountUtil.randomTokenString();
+
+            // hash password
+            acct.passwordHash = this.accountUtil.hash(params.password);
+
+            // save account
+            await acct.save();
+
+            // send email
+            const account = this.accountUtil.convertAccountModelToInterface(acct);
+            await this.emailService.sendVerificationEmail(account, origin);
+            return {
+                ...this.basicDetails(account),
+            };
+        } catch (err) {
+            console.log(err);
+            if (err instanceof Error) return { error: err.message };
+            else return { error: "Unexpected error" };
         }
-        // create account object
-        const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params);
-        const acct: Account = await this.accountDAO.createAccount(acctWithPopulatedFields);
-        // first registered account is an admin
-        const allAccountsInSystem = await this.accountDAO.getMultipleAccounts(5);
-        const isFirstAccount = allAccountsInSystem.count === 0;
-        acct.role = isFirstAccount ? Role.Admin : Role.User;
-        acct.verificationToken = this.accountUtil.randomTokenString();
-
-        // hash password
-        acct.passwordHash = this.accountUtil.hash(params.password);
-
-        // save account
-        await acct.save();
-
-        // send email
-        const account = this.accountUtil.convertAccountModelToInterface(acct);
-        await this.emailService.sendVerificationEmail(account, origin);
-        return {
-            ...this.basicDetails(account),
-        };
     }
 
     public async refreshToken(tokenString: string, ipAddress: string) {
-        const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
-        const acct: Account[] = await this.accountDAO.getAccountByRefreshToken(refreshToken);
-        // todo: throw err if multiple accts found & report
-        const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct[0]);
+        try {
+            const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
+            const acct: Account[] = await this.accountDAO.getAccountByRefreshToken(refreshToken);
+            // todo: throw err if multiple accts found & report
+            const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct[0]);
 
-        // replace old refresh token with a new one and save
-        const newRefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
-        refreshToken.revoked = Date.now();
-        refreshToken.revokedByIp = ipAddress;
-        refreshToken.replacedByToken = newRefreshToken.token;
-        await refreshToken.save();
-        await newRefreshToken.save();
+            // replace old refresh token with a new one and save
+            const newRefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
+            refreshToken.revoked = Date.now();
+            refreshToken.revokedByIp = ipAddress;
+            refreshToken.replacedByToken = newRefreshToken.token;
+            await refreshToken.save();
+            await newRefreshToken.save();
 
-        // generate new jwt
-        const jwtToken = this.accountUtil.generateJwtToken(account);
+            // generate new jwt
+            const jwtToken = this.accountUtil.generateJwtToken(account);
 
-        // return basic details and tokens
-        return {
-            ...this.basicDetails(account),
-            jwtToken,
-            refreshToken: newRefreshToken.token,
-        };
+            // return basic details and tokens
+            return {
+                ...this.basicDetails(account),
+                jwtToken,
+                refreshToken: newRefreshToken.token,
+            };
+        } catch (err) {
+            console.log(err);
+            return { refreshToken: "" };
+        }
     }
 
     public async revokeToken(tokenString: string, ipAddress: string) {
-        const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
-        // revoke token and save
-        refreshToken.revoked = Date.now();
-        refreshToken.revokedByIp = ipAddress;
-        await refreshToken.save();
+        try {
+            const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
+            // revoke token and save
+            refreshToken.revoked = Date.now();
+            refreshToken.revokedByIp = ipAddress;
+            await refreshToken.save();
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     public async verifyEmail(token: string) {
-        const account: Account | null = await this.accountDAO.getAccountByVerificationToken(token);
-        console.log(token, account, "122rm");
-        if (account === null) throw new Error("Verification failed");
+        try {
+            const account: Account | null = await this.accountDAO.getAccountByVerificationToken(token);
+            if (account === null) throw new Error("Verification failed");
 
-        // const now = new Date().toISOString();
-        // console.log(now, "126rm");
-        // account.verified = now;
-        // account.verified = 1000; // temp -- test
-        account.verificationToken = ""; // string value that is closest to 'undefined'
-        account.isVerified = true;
-        console.log(account, "126rm");
-        await account.save();
-        console.log("129rm");
+            account.verificationToken = ""; // string value that is closest to 'undefined'
+            account.isVerified = true;
+            await account.save();
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     public async updatePassword(email: string, oldPw: string, newPw: string) {
-        console.log(email, "142rm");
-        const accountArr: Account[] = await this.accountDAO.getAccountByEmail(email);
+        try {
+            const accountArr: Account[] = await this.accountDAO.getAccountByEmail(email);
 
-        // always return ok response to prevent email enumeration
-        if (accountArr.length === 0) return false;
-        const account = accountArr[0];
+            // always return ok response to prevent email enumeration
+            if (accountArr.length === 0) return false;
+            const account = accountArr[0];
 
-        console.log("149rm");
-        // check the starting passwords are the same
-        const correctInputPw = bcrypt.compareSync(oldPw, account.passwordHash);
-        if (!correctInputPw) return false;
+            // check the starting passwords are the same
+            const correctInputPw = bcrypt.compareSync(oldPw, account.passwordHash);
+            if (!correctInputPw) return false;
 
-        const hashed = this.accountUtil.hash(newPw);
-        account.passwordHash = hashed;
-        await account.save();
-        console.log("157rm");
-        return true;
+            const hashed = this.accountUtil.hash(newPw);
+            account.passwordHash = hashed;
+            await account.save();
+            return true;
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
     }
 
     public async forgotPassword(email: string, origin: string) {
@@ -171,17 +184,13 @@ class AuthService {
             const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
             // we don't need to return anything here; rather it's added to the db so the user can submit the token in the next step
-            console.log("173rm");
-            console.log(acct[0].acctId, token, expires, "174rm");
             await this.resetTokenDAO.createResetToken(acct[0].acctId, token, expires);
-            console.log("==\n==\n176rm\n==\n--");
             // send email
             const account = this.accountUtil.convertAccountModelToInterface(acct[0]);
             account.resetToken = {
                 token: token,
                 expires: expires,
             };
-            console.log("182rm");
             await this.emailService.sendPasswordResetEmail(account, origin);
         } catch (err) {
             console.log(err);
@@ -189,38 +198,34 @@ class AuthService {
     }
 
     public async validateResetToken(token: string) {
-        const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
-        if (!resetToken) return false;
-        // throw new Error("Invalid token");
-        const account = await this.accountDAO.getAccountById(resetToken.acctId);
+        try {
+            const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
+            if (!resetToken) return false;
+            // throw new Error("Invalid token");
+            const account = await this.accountDAO.getAccountById(resetToken.acctId);
 
-        if (!account) return false;
-        // throw new Error("Invalid token");
-        return true;
+            if (!account) return false;
+            // throw new Error("Invalid token");
+            return true;
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     public async resetPassword(token: string, password: string) {
         try {
-            console.log(1);
             const resetToken: ResetToken | null = await this.resetTokenDAO.getResetTokenByToken(token);
             if (!resetToken) throw new Error("Invalid token");
-            console.log(2);
             const account = await this.accountDAO.getAccountById(resetToken.acctId);
-
             if (!account) throw new Error("Invalid token");
-            console.log(3);
             // update password and remove reset token
             account.passwordHash = this.accountUtil.hash(password);
             account.passwordReset = Date.now();
             const resetTokenForAccount = await this.resetTokenDAO.getAllResetTokensForAccount(account.acctId);
-            console.log(4);
             for await (const token of resetTokenForAccount) {
                 await this.resetTokenDAO.deleteResetTokenByModel(token);
-                console.log(5);
             }
-            console.log(6);
             await account.save();
-            console.log(7);
             return true;
         } catch (error) {
             console.log(error);
@@ -229,10 +234,13 @@ class AuthService {
     }
 
     // authorized
-
     public async getAllAccounts() {
-        const accounts: Account[] = await this.accountDAO.findAllAccounts();
-        return accounts.map((a: Account) => this.basicDetails(a));
+        try {
+            const accounts: Account[] = await this.accountDAO.findAllAccounts();
+            return accounts.map((a: Account) => this.basicDetails(a));
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     public async getAccountById(id: number) {
@@ -242,42 +250,50 @@ class AuthService {
 
     public async createAccount(params: any) {
         // "what's in params?" => consult registerUserSchema
-        // validate
-        if (await this.accountDAO.getAccountByEmail(params.email)) {
-            throw 'Email "' + params.email + '" is already registered';
+        // validate email
+        try {
+            if (await this.accountDAO.getAccountByEmail(params.email)) {
+                throw 'Email "' + params.email + '" is already registered';
+            }
+
+            const account: Account = await this.accountDAO.createAccount(params);
+            // account.verified = "";
+
+            // hash password
+            account.passwordHash = this.accountUtil.hash(params.password);
+
+            // save account
+            await account.save();
+
+            return this.basicDetails(account);
+        } catch (err) {
+            console.log(err);
         }
-
-        const account: Account = await this.accountDAO.createAccount(params);
-        // account.verified = "";
-
-        // hash password
-        account.passwordHash = this.accountUtil.hash(params.password);
-
-        // save account
-        await account.save();
-
-        return this.basicDetails(account);
     }
 
     public async updateAccount(id: number, params: any) {
-        const account = await this.getAccount(id);
+        try {
+            const account = await this.getAccount(id);
 
-        // validate (if email was changed)
-        if (params.email && account.email !== params.email && (await this.accountDAO.getAccountByEmail(params.email))) {
-            throw 'Email "' + params.email + '" is already taken';
+            // validate (if email was changed)
+            if (params.email && account.email !== params.email && (await this.accountDAO.getAccountByEmail(params.email))) {
+                throw 'Email "' + params.email + '" is already taken';
+            }
+
+            // hash password if it was entered
+            if (params.password) {
+                params.passwordHash = this.accountUtil.hash(params.password);
+            }
+
+            // copy params to account and save
+            Object.assign(account, params);
+            account.updated = Date.now();
+            await account.save();
+
+            return this.basicDetails(account);
+        } catch (err) {
+            console.log(err);
         }
-
-        // hash password if it was entered
-        if (params.password) {
-            params.passwordHash = this.accountUtil.hash(params.password);
-        }
-
-        // copy params to account and save
-        Object.assign(account, params);
-        account.updated = Date.now();
-        await account.save();
-
-        return this.basicDetails(account);
     }
 
     public async deleteAccount(id: string) {

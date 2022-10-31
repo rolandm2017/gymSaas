@@ -47,7 +47,6 @@ class GymFinderService {
             // // "There is a delay until the  next_page_token is issued and validated. So you need to put a small sleep time
             // // like 2 seconds between each request. Otherwise, you will get an  INVALID_REQUEST status."
             // await new Promise(r => setTimeout(r, 2000)); // async delay 2 seconds
-            // console.log(nextPageToken ? nextPageToken.slice(0, 20) : null, counter, "30rm");
         }
 
         return gyms.flat();
@@ -64,7 +63,6 @@ class GymFinderService {
     }
 
     private convertJSONToGyms(gyms: object[]): IGym[] {
-        console.log(gyms, "63rm");
         const output: IGym[] = [];
         for (let i = 0; i < gyms.length; i++) {
             const gym: IGym = gyms[i] as IGym;

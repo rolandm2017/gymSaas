@@ -35,13 +35,13 @@ describe("account DAO tests", () => {
 
         expect(created).toBeDefined();
         expect(created.email).toBe(FAKE_ACCOUNT.email);
-        expect(created.id).toBeDefined();
+        expect(created.acctId).toBeDefined();
         // now get the account
         const retrieved: Account[] = await activeAcctDAO.getAccountByEmail(FAKE_ACCOUNT.email);
         expect(retrieved).toBeDefined();
         expect(retrieved.length).toEqual(1);
         // expect(retrieved[0].id).toEqual(FAKE_ACCOUNT.id);
-        expect(retrieved[0].id).toBeDefined();
+        expect(retrieved[0].acctId).toBeDefined();
         expect(retrieved[0].email).toEqual(FAKE_ACCOUNT.email);
     });
 

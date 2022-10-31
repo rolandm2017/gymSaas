@@ -46,12 +46,10 @@ class AccountUtil {
         const token = this.randomTokenString();
         const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const createdByIp = ipAddress;
-        console.log("GenerateRefreshToken 49rm");
         return await this.refreshTokenDAO.createRefreshToken(accountId, token, expires, createdByIp);
     }
 
     public async generatePasswordHash(password: string): Promise<string> {
-        // console.log(password, "password 53rm");
         const hash = await bcrypt.hash(password, 10);
         return hash;
     }

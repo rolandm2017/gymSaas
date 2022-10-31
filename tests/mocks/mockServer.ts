@@ -63,8 +63,8 @@ class App {
         App.initDB();
         await App.Database.authenticate();
         console.log("Database Connection Established");
-        await initModels(App.Database);
         await App.Database.sync({ force: true });
+        await initModels(App.Database);
         // await App.Database.drop();
         console.log("Database Sync");
         this.dbConnOpen = true;

@@ -6,6 +6,9 @@ import { Account } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
+
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
 if (secret === "YOLO") {
     throw new Error("secret not found in env file");
@@ -30,7 +33,6 @@ function authorize(roles: Role[] = []) {
 
         // authorize based on user role
         async (request: RequestWithUser, res: Response, next: NextFunction) => {
-            console.log(request, "030rm");
             // Note for Jason Watmore: If you're reading this, it looks like, at some point, express-jwt's devs changed things.
             // see https://stackoverflow.com/questions/34775687/express-jwt-setting-user-object-to-req-user-doc-instead-of-just-req-user
             // I discovered this while googling "jwt secret express jwt req.user"

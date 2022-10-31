@@ -16,7 +16,6 @@ function authenticateUserSchema(req: Request, res: Response, next: NextFunction)
         email: Joi.string().email().required(),
         password: Joi.string().required(),
     });
-    console.log(req, "19rm");
     validateRequest(req, next, schema);
 }
 
@@ -37,7 +36,6 @@ function updatePasswordSchema(req: Request, res: Response, next: NextFunction) {
         newPw: Joi.string().min(6).required(),
         confirmNewPw: Joi.string().min(6).required(),
     });
-    console.log(req, "39rm");
     validateRequest(req, next, schema);
 }
 

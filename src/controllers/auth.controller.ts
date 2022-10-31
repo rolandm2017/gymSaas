@@ -57,10 +57,7 @@ class AuthController {
         const email: string = request.body.email;
         const password: string = request.body.password;
         const ipAddress: string = request.ip;
-        console.log(email, password, "60rm");
-
         const accountDetails: IBasicDetails | ISmallError = await this.authService.authenticate(email, password, ipAddress);
-        console.log(accountDetails, "63rm");
         if ("error" in accountDetails) return response.json({ error: accountDetails.error });
         if (accountDetails.jwtToken === undefined) throw new Error("jwt missing");
         if (accountDetails.refreshToken === undefined) throw new Error("refresh token missing");
@@ -81,7 +78,6 @@ class AuthController {
                 accountDetails,
             });
         } catch (err) {
-            console.log(err, "71rm");
             next(err);
         }
     };
@@ -112,9 +108,7 @@ class AuthController {
 
     public verifyEmail = async (request: Request, response: Response) => {
         const token = request.body.token;
-        console.log("109rm");
         await this.authService.verifyEmail(token);
-        console.log("111rm");
         return response.json({ message: "Verification successful, you can now login" });
     };
 
@@ -125,12 +119,9 @@ class AuthController {
         const oldPw = request.body.oldPw;
         const newPw = request.body.newPw;
         const confirmNewPw = request.body.confirmNewPw;
-        console.log(newPw, confirmNewPw, "126rm");
         if (newPw === undefined || confirmNewPw === undefined) return response.json({ error: "A password was missing" });
         if (newPw !== confirmNewPw) return response.json({ error: "Passwords did not match" });
-        console.log("128rm");
         const success: boolean = await this.authService.updatePassword(email, oldPw, newPw);
-        console.log(success, "129rm");
         if (success) return response.json({ message: "Password updated!" });
         else return response.json({ error: "You entered the wrong starting password" });
     };
