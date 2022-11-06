@@ -58,7 +58,9 @@ class ApartmentsController {
         const radius: number = request.body.radius;
         // not doing input validation here.
         const scraper = new ApartmentScraperService();
+        console.log(startCoords, bounds, radius, "61rm");
         const gridCoords = scraper.planGrid(startCoords, bounds, radius);
+        console.log(gridCoords, "63rm");
         return response.status(200).json(gridCoords);
     }
 
@@ -86,13 +88,9 @@ class ApartmentsController {
     //     return response.status(200).send("You made it");
     // }
 
-    async getHardcodeApartments(request: Request, response: Response) {
-     
-    }
+    async getHardcodeApartments(request: Request, response: Response) {}
 
-    async getQualifiedHardcodeApartments(request: Request, response: Response) {
-        
-    }
+    async getQualifiedHardcodeApartments(request: Request, response: Response) {}
 }
 
 export default ApartmentsController;
