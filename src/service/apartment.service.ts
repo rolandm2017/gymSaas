@@ -10,7 +10,7 @@ import axios from "axios";
 
 import { IHousing } from "../interface/Housing.interface";
 import Parser from "../util/parser";
-import { Provider } from "../enum/provider.enum";
+import { ProviderEnum } from "../enum/provider.enum";
 import Scraper from "../scrapers/scraper";
 import ScraperFactory from "../scrapers/factory";
 import { detectViewportSize } from "../util/viewportSizeDetector";
@@ -23,17 +23,16 @@ import { generateGrid } from "../util/gridMaker";
 dotenv.config();
 
 class ApartmentScraperService {
-    // todo: declare service dependencies using 'private' kwd
     constructor() {}
 
-    public async scrapeApartments(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IHousing[]> {
+    public async scrapeApartments(provider: ProviderEnum, city: string, stateOrProvince: string, country: string): Promise<IHousing[]> {
         // fwd request to Flask scraper services.
         // Note: Expect scraping to take 5-10 minutes in the future, when we have 4 scrapers handling 1 to 100 screens worth of data.
 
         return [];
     }
 
-    public async detectProviderViewportWidth(provider: Provider, city: string, stateOrProvince: string, country: string): Promise<IBounds> {
+    public async detectProviderViewportWidth(provider: ProviderEnum, city: string, stateOrProvince: string, country: string): Promise<IBounds> {
         // step 1: discover the viewport width. To be used in the grid maker as "jump" size.
         try {
             const scraper = new ScraperFactory().createScraperOfType(provider);
@@ -51,10 +50,11 @@ class ApartmentScraperService {
             // return something to appease the return type
             return { north: 0, south: 0, east: 0, west: 0, latitudeChange: 0, longitudeChange: 0, kmEastWest: 0, kmNorthSouth: 0 };
         }
+     
     }
 
     public async planGrid(startCoords: ILatLong, bounds: IBounds, radius: number): Promise<ILatLong[]> {
-        // step 2: plan the grid pattern the apis will scan in.
+        // step 2 of 3: plan the grid pattern the apis will scan in.
         const theSmallerOfTheTwo = bounds.kmEastWest > bounds.kmNorthSouth ? bounds.kmNorthSouth : bounds.kmEastWest;
         // choose the smaller of the two distances because we prefer some overlap instead of some space between snapshots
         const subdivisionLocations = generateGrid(startCoords, theSmallerOfTheTwo, radius);
@@ -62,7 +62,7 @@ class ApartmentScraperService {
         return subdivisionLocations;
     }
 
-    public async scanGrid(provider: Provider, coords: ILatLong[], zoomWidth: number): Promise<boolean> {
+    public async scanGrid(provider: ProviderEnum, coords: ILatLong[], zoomWidth: number): Promise<boolean> {
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
         const scraper: Scraper = new ScraperFactory().createScraperOfType(provider);
@@ -74,20 +74,8 @@ class ApartmentScraperService {
         return successfullyQueued;
     }
 
-    // public async getDummyData(provider: Provider): Promise<IHousing[]> {
-    //     // open data based on input string
-    //     const parser = new Parser(provider);
-    //     console.log(__dirname, "31rm");
-    //     if (provider === Provider.rentCanada) {
-    //         return parser.parse(rc);
-    //     } else if (provider === Provider.rentFaster) {
-    //         return parser.parse(rf);
-    //     } else if (provider === Provider.rentSeeker) {
-    //         return parser.parse(rs);
-    //     } else {
-    //         throw new Error("Provider not included or invalid");
-    //     }
-    // }
+
+
 }
 
 export default ApartmentScraperService;

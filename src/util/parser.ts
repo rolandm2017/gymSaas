@@ -1,19 +1,19 @@
-import { Provider } from "../enum/provider.enum";
+import { ProviderEnum } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
 
 class Parser {
-    provider: Provider;
+    provider: ProviderEnum;
 
-    constructor(source: Provider) {
+    constructor(source: ProviderEnum) {
         this.provider = source;
     }
 
     parse(unprocessed: string) {
-        if (this.provider === Provider.rentCanada) {
+        if (this.provider === ProviderEnum.rentCanada) {
             return this.parseRentCanada(unprocessed);
-        } else if (this.provider === Provider.rentFaster) {
+        } else if (this.provider === ProviderEnum.rentFaster) {
             return this.parseRentFaster(unprocessed);
-        } else if (this.provider === Provider.rentSeeker) {
+        } else if (this.provider === ProviderEnum.rentSeeker) {
             return this.parseRentSeeker(unprocessed);
         } else {
             throw new Error("Provider not selected");
@@ -22,6 +22,7 @@ class Parser {
 
     parseRentCanada(unprocessed: any): IHousing[] {
         // list of objects
+        console.log("25rm");
         const mainList = unprocessed.listings;
         // properties of interest: address (for geolocating), city, province, url, description, externalUrl
         const apList: IHousing[] = [];
@@ -41,6 +42,7 @@ class Parser {
             apList.push(ap);
         }
         // TODO: convert address => lat/long for these
+        console.log(apList.length, "44rm");
         return apList;
     }
 

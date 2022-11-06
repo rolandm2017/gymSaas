@@ -1,9 +1,9 @@
-import { Provider } from "../enum/provider.enum";
+import { ProviderEnum } from "../enum/provider.enum";
 import Scraper from "./scraper";
 
 const scraperAccess = {
     rentCanada: {
-        site: "rentcanada,com",
+        site: "rentcanada.com",
         scraper_ip: "http://127.0.0.1",
         scraper_port: 5000,
         type: "lat,long",
@@ -25,7 +25,7 @@ const scraperAccess = {
 class ScraperFactory {
     constructor() {}
 
-    createScraperOfType(source: Provider) {
+    createScraperOfType(source: ProviderEnum) {
         console.log("here!");
         // if (source === Provider.rentCanada) {
         const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);

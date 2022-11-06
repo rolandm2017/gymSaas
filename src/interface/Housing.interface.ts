@@ -1,4 +1,4 @@
-import { Provider } from "../enum/provider.enum";
+import { ProviderEnum } from "../enum/provider.enum";
 import { IAssociation } from "./Association.interface";
 
 export interface IHousing {
@@ -12,7 +12,7 @@ export interface IHousing {
     url?: string;
     lat: number;
     long: number;
-    source: Provider;
+    source: ProviderEnum;
     nearbyGyms?: IAssociation[];
     // TODO: consider adding "availability"
 }

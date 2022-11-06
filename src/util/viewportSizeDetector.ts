@@ -35,9 +35,9 @@ export function detectViewportSize(places: IHousing[]): IBounds {
         east: eastMax,
         south: southMax,
         west: westMax,
-        kmNorthSouth: kmChangeNorthSouth,
-        kmEastWest: kmChangeEastWest,
         latitudeChange,
         longitudeChange,
+        kmNorthSouth: kmChangeNorthSouth,
+        kmEastWest: kmChangeEastWest,
     };
 }

@@ -11,21 +11,22 @@ import errorHandler from "./middleware/error.middleware";
 import AccountDAO from "./database/dao/account.dao";
 import ResetTokenDAO from "./database/dao/resetToken.dao";
 import AccountUtil from "./util/accountUtil";
+import TaskQueueController from "./controllers/taskQueue.controller";
 
 const port = parseInt(process.env.PORT!, 10);
-console.log("hello world!", port);
 
 // is there a better place to initialize these?
 const acctDAO: AccountDAO = new AccountDAO();
 const e: EmailService = new EmailService(acctDAO);
-const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO();
+const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 const accountUtil: AccountUtil = new AccountUtil();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
 
 const app = new App({
     port: port || 8000,
 
-    controllers: [new AuthController(authService), new GooglePlacesController(), new ApartmentsController(), new HealthCheckController()],
+    controllers: [new AuthController(authService), new GooglePlacesController(), new ApartmentsController(), new TaskQueueController(),new HealthCheckController()],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });
+
 app.listen();

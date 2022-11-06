@@ -4,8 +4,11 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import initModels from "./database/models/init-models";
 import Database from "./database/Database";
+<<<<<<< HEAD
 // import ErrorMiddleware from "./middleware/error.middleware";
 import errorHandler from "./middleware/error.middleware";
+=======
+>>>>>>> queueScrapeTasks
 
 class App {
     public app: Application;

@@ -1,3 +1,4 @@
+import { ProviderEnum } from "../../enum/provider.enum";
 import { Provider, ProviderCreationAttributes } from "../models/Provider";
 
 export const getMultipleProviders = (limit: number, offset?: number) => {
@@ -8,6 +9,9 @@ export const getProviderById = (id: number) => {
     return Provider.findByPk(id);
 };
 
+export const getProviderByName = (name: ProviderEnum) => {
+    return Provider.findOne({ where: { name: name } });
+};
 // todo: create "get provider by name" i.e. rentCanada, rentSeeker, rentFaster
 
 export const createProvider = (provider: ProviderCreationAttributes) => {

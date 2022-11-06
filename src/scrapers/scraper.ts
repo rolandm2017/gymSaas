@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { createTask } from "../database/dao/task.dao";
-import { Provider } from "../enum/provider.enum";
+import { TaskCreationAttributes } from "../database/models/Task";
+import { ProviderEnum } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
 import { ILatLong } from "../interface/LatLong.interface";
 import Parser from "../util/parser";
@@ -17,9 +18,11 @@ class Scraper {
         this.port = port;
     }
 
-    async scrape(lat: number, long: number, provider: Provider): Promise<IHousing[]> {
-        const url: string = this.ip + ":" + this.port;
-        const json: string = JSON.stringify({ lat, long });
+    async scrape(lat: number, long: number, provider: ProviderEnum): Promise<IHousing[]> {
+        const url: string = this.ip + ":" + this.port + "/";
+        const json: string = JSON.stringify({ lat, long, provider });
+        console.log(url, json, "24rm");
+        // fixme2: url goes to nowhere in the scraper service
         const results: AxiosResponse<any, any> = await axios.post(url, json, {
             headers: {
                 "Content-Type": "application/json",
@@ -27,16 +30,24 @@ class Scraper {
         });
         // note for reviewers: I argue that organizing (parsing) the data is part of the action, "to scrape"
         const parser = new Parser(provider);
+        console.log(parser, "32rm");
         const housingData: IHousing[] = parser.parse(results.data);
-        return results.data;
+        console.log(housingData.length, "33rm");
+        return housingData;
     }
 
     async queueGridScrape(tasks: ILatLong[], zoomWidth: number): Promise<boolean> {
         try {
             // todo: go into shared db and queue tasks.
             for (const task of tasks) {
-                const t = { ...task, zoomWidth: zoomWidth, lastScan: undefined };
-                await createTask(t, zoomWidth);
+                const newTask: TaskCreationAttributes = {
+                    ...task,
+                    zoomWidth: zoomWidth,
+                    lastScan: undefined,
+                    batch: 1,
+                    providerName: ProviderEnum.rentCanada, // TODO: distribute tasks to all 3 providers when ready
+                };
+                await createTask(newTask);
             }
             return true;
         } catch (err) {

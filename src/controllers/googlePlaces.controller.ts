@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import GymFinderService from "../service/gym.service";
 
 class GooglePlacesController {
-    public test = "9000";
     public path = "/google";
     public router = express.Router();
 

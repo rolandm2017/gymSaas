@@ -35,6 +35,8 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
 
+    
+
     static initModel(sequelize: Sequelize): typeof City {
         return City.init(
             {
