@@ -20,7 +20,7 @@ class Scraper {
 
     async scrape(lat: number, long: number, provider: ProviderEnum): Promise<IHousing[]> {
         const url: string = this.ip + ":" + this.port + "/";
-        const json: string = JSON.stringify({ lat, long, provider });
+        const json: string = JSON.stringify({ id: 0, lat, long, provider });
         console.log(url, json, "24rm");
         // fixme2: url goes to nowhere in the scraper service
         const results: AxiosResponse<any, any> = await axios.post(url, json, {
