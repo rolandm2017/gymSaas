@@ -1,21 +1,35 @@
 import { City, CityCreationAttributes } from "../models/City";
 
-export const getMultipleCities = (limit: number, offset?: number) => {
-    return City.findAndCountAll({ offset, limit });
-};
+class CityDAO {
+    constructor() {}
 
-export const getCityById = (id: number) => {
-    return City.findByPk(id);
-};
+    public getMultipleCities = (limit: number, offset?: number) => {
+        return City.findAndCountAll({ offset, limit });
+    };
 
-export const createCity = (city: CityCreationAttributes) => {
-    return City.create(city);
-};
+    public getCityById = (id: number) => {
+        return City.findByPk(id);
+    };
 
-export const updateCity = (city: CityCreationAttributes, id: number) => {
-    return City.update(city, { where: { id } });
-};
+    public getCityByName = (name: string) => {
+        return City.findOne({
+            where: {
+                city: name,
+            },
+        });
+    };
 
-export const deleteCity = (id: number) => {
-    return City.destroy({ where: { id } });
-};
+    public createCity = (city: CityCreationAttributes) => {
+        return City.create(city);
+    };
+
+    public updateCity = (city: CityCreationAttributes, id: number) => {
+        return City.update(city, { where: { cityId: id } });
+    };
+
+    public deleteCity = (id: number) => {
+        return City.destroy({ where: { cityId: id } });
+    };
+}
+
+export default CityDAO;

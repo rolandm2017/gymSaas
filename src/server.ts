@@ -12,8 +12,17 @@ import AccountDAO from "./database/dao/account.dao";
 import ResetTokenDAO from "./database/dao/resetToken.dao";
 import AccountUtil from "./util/accountUtil";
 import TaskQueueController from "./controllers/taskQueue.controller";
+import TaskQueueService from "./service/taskQueue.service";
+import TaskDAO from "./database/dao/task.dao";
+import CityDAO from "./database/dao/city.dao";
 
 const port = parseInt(process.env.PORT!, 10);
+
+const cityDAO = new CityDAO();
+const taskDAO = new TaskDAO();
+
+// services
+const taskQueueService = new TaskQueueService(cityDAO, taskDAO);
 
 // is there a better place to initialize these?
 const acctDAO: AccountDAO = new AccountDAO();
@@ -25,7 +34,13 @@ const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetT
 const app = new App({
     port: port || 8000,
 
-    controllers: [new AuthController(authService), new GooglePlacesController(), new ApartmentsController(), new TaskQueueController(),new HealthCheckController()],
+    controllers: [
+        new AuthController(authService),
+        new GooglePlacesController(),
+        new ApartmentsController(),
+        new TaskQueueController(taskQueueService),
+        new HealthCheckController(),
+    ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });
 

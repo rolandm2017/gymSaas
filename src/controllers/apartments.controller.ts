@@ -13,12 +13,12 @@ class ApartmentsController {
 
     constructor() {
         this.router.get("/scrape", this.scrapeApartments);
+        // step 1 of 3 in queuing a scrape
         this.router.get("/viewport_width", this.detectProviderViewportWidth);
+        // step 2 of 3 in queuing a scrape
         this.router.get("/grid_scan_plan", this.getGridForScan);
         this.router.get("/saved", this.getSavedApartments);
         // this.router.post("/task", this.queueScrape);
-        this.router.get("/hardcode", this.getHardcodeApartments); // old test route
-        this.router.get("/qualified", this.getQualifiedHardcodeApartments); // old test route
     }
 
     async scrapeApartments(request: Request, response: Response) {
@@ -58,9 +58,7 @@ class ApartmentsController {
         const radius: number = request.body.radius;
         // not doing input validation here.
         const scraper = new ApartmentScraperService();
-        console.log(startCoords, bounds, radius, "61rm");
-        const gridCoords = scraper.planGrid(startCoords, bounds, radius);
-        console.log(gridCoords, "63rm");
+        const gridCoords = await scraper.planGrid(startCoords, bounds, radius);
         return response.status(200).json(gridCoords);
     }
 

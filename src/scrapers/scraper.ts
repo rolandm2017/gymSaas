@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { createTask } from "../database/dao/task.dao";
+import TaskDAO from "../database/dao/task.dao";
 import { TaskCreationAttributes } from "../database/models/Task";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
@@ -11,18 +11,19 @@ class Scraper {
     site: string;
     ip: string;
     port: number;
+    private taskDAO: TaskDAO;
 
-    constructor(site: string, ip: string, port: number) {
+    constructor(site: string, ip: string, port: number, taskDAO: TaskDAO) {
         this.site = site;
         this.ip = ip;
         this.port = port;
+        this.taskDAO = taskDAO;
     }
 
     async scrape(lat: number, long: number, provider: ProviderEnum): Promise<IHousing[]> {
         const url: string = this.ip + ":" + this.port + "/";
         const json: string = JSON.stringify({ id: 0, lat, long, provider });
         console.log(url, json, "24rm");
-        // fixme2: url goes to nowhere in the scraper service
         const results: AxiosResponse<any, any> = await axios.post(url, json, {
             headers: {
                 "Content-Type": "application/json",
@@ -47,7 +48,7 @@ class Scraper {
                     batch: 1,
                     providerName: ProviderEnum.rentCanada, // TODO: distribute tasks to all 3 providers when ready
                 };
-                await createTask(newTask);
+                await this.taskDAO.createTask(newTask);
             }
             return true;
         } catch (err) {

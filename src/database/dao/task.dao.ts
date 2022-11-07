@@ -3,78 +3,96 @@ import moment from "moment";
 import { ProviderEnum } from "../../enum/provider.enum";
 import { Task, TaskCreationAttributes } from "../models/Task";
 
-export const getMultipleTasks = (limit: number, offset?: number) => {
-    return Task.findAndCountAll({ offset, limit });
-};
+class TaskDAO {
+    constructor() {}
 
-export const getTaskById = (id: number) => {
-    return Task.findByPk(id);
-};
+    public getMultipleTasks = (limit: number, offset?: number) => {
+        return Task.findAndCountAll({ offset, limit });
+    };
 
-export const getMostRecentTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
-    let conditions;
-    if (batchNum) {
-        conditions = { providerName: provider, batch: batchNum };
-    } else {
-        conditions = { providerName: provider };
-    }
-    return Task.findAll({
-        limit: 1,
-        where: conditions,
-        order: [["createdAt", "DESC"]],
-    });
-};
+    public getTaskById = (id: number) => {
+        return Task.findByPk(id);
+    };
 
-export const createTask = (task: TaskCreationAttributes) => {
-    return Task.create(task);
-};
+    public getHighestBatchNum = () => {
+        return Task.findOne({ order: [["batch", "DESC"]] });
+    };
 
-// Can't work because it doesn't allow create with associations.
-// export const bulkCreateTask = (tasks: TaskCreationAttributes[]) => {
-//     return Task.bulkCreate(tasks);
-// };
+    public getMostRecentTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
+        let conditions;
+        if (batchNum) {
+            conditions = { providerName: provider, batch: batchNum };
+        } else {
+            conditions = { providerName: provider };
+        }
+        return Task.findAll({
+            limit: 1,
+            where: conditions,
+            order: [["createdAt", "DESC"]],
+        });
+    };
 
-export const getNextUnfinishedTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
-    let conditions;
-    if (batchNum) {
-        conditions = { providerName: provider, batch: batchNum };
-    } else {
-        conditions = { providerName: provider };
-    }
-    console.log("conditions", conditions, "44rm");
-    return Task.findAll({
-        limit: 1,
-        where: conditions,
-        order: [["createdAt", "DESC"]],
-    });
-};
+    public createTask = (task: TaskCreationAttributes) => {
+        return Task.create(task);
+    };
 
-export const getAllUnfinishedBatchesForProvider = (provider: ProviderEnum) => {
-    // note: used to be "getNextUnfinishedBatch" but was impossible to figure out implementation
-    return Task.findAll({
-        where: { providerName: provider },
-        order: [["createdAt", "DESC"]],
-    });
-};
+    // Can't work because it doesn't allow create with associations.
+    // public  bulkCreateTask = (tasks: TaskCreationAttributes[]) => {
+    //     return Task.bulkCreate(tasks);
+    // };
 
-export const getAllTasksForProvider = (provider: ProviderEnum) => {
-    return Task.findAll({
-        where: { providerName: provider },
-    });
-};
+    public getNextUnfinishedTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
+        let conditions;
+        if (batchNum) {
+            conditions = { providerName: provider, batch: batchNum };
+        } else {
+            conditions = { providerName: provider };
+        }
+        console.log("conditions", conditions, "44rm");
+        return Task.findAll({
+            limit: 1,
+            where: conditions,
+            order: [["createdAt", "DESC"]],
+        });
+    };
 
-export const updateTask = (task: TaskCreationAttributes, id: number) => {
-    return Task.update(task, { where: { id } });
-};
+    public getAllUnfinishedBatchesForProvider = (provider: ProviderEnum) => {
+        // note: used to be "getNextUnfinishedBatch" but was impossible to figure out implementation
+        return Task.findAll({
+            where: { providerName: provider },
+            order: [["createdAt", "DESC"]],
+        });
+    };
 
-export const deleteTask = (id: number) => {
-    return Task.destroy({ where: { id } });
-};
+    public getAllTasksForProvider = (provider: ProviderEnum) => {
+        return Task.findAll({
+            where: { providerName: provider },
+        });
+    };
 
-export const deleteTasksOlderThanTwoMonths = () => {
-    return Task.destroy({
-        where: {
-            createdAt: { [Op.lte]: moment().subtract(2, "months").toDate() },
-        },
-    });
-};
+    public getAllTasks = (choice?: ProviderEnum) => {
+        if (choice) {
+            return Task.findAll({ where: { providerName: choice } });
+        } else {
+            return Task.findAll({ where: {} });
+        }
+    };
+
+    public updateTask = (task: TaskCreationAttributes, id: number) => {
+        return Task.update(task, { where: { taskId: id } });
+    };
+
+    public deleteTask = (id: number) => {
+        return Task.destroy({ where: { taskId: id } });
+    };
+
+    public deleteTasksOlderThanTwoMonths = () => {
+        return Task.destroy({
+            where: {
+                createdAt: { [Op.lte]: moment().subtract(2, "months").toDate() },
+            },
+        });
+    };
+}
+
+export default TaskDAO;

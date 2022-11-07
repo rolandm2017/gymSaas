@@ -6,6 +6,8 @@ import initModels from "./database/models/init-models";
 import Database from "./database/Database";
 // import ErrorMiddleware from "./middleware/error.middleware";
 import errorHandler from "./middleware/error.middleware";
+import { SEED_CITIES } from "./seed/seedCities";
+import { City } from "./database/models/City";
 
 class App {
     public app: Application;
@@ -33,6 +35,7 @@ class App {
                 console.log("Database Connection Established");
                 await initModels(Database);
                 await Database.sync({ alter: true });
+                await this.seedDb();
                 console.log("Done syncing...");
             } catch (err) {
                 console.log("Database connection failed", err);
@@ -56,6 +59,12 @@ class App {
             // console.log(controller.path, "... is running");
             this.app.use(controller.path, controller.router);
         });
+    }
+
+    private async seedDb() {
+        for (const city of SEED_CITIES) {
+            City.create(city);
+        }
     }
 }
 

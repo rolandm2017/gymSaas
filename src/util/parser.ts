@@ -8,7 +8,7 @@ class Parser {
         this.provider = source;
     }
 
-    parse(unprocessed: string) {
+    parse(unprocessed: any) {
         if (this.provider === ProviderEnum.rentCanada) {
             return this.parseRentCanada(unprocessed);
         } else if (this.provider === ProviderEnum.rentFaster) {

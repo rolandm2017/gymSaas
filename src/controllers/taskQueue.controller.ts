@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { Task } from "../database/models/Task";
 import { ProviderEnum } from "../enum/provider.enum";
 import { ITask } from "../interface/Task.interface";
 import TaskQueueService from "../service/taskQueue.service";
@@ -6,13 +7,20 @@ import TaskQueueService from "../service/taskQueue.service";
 class TaskQueueController {
     public path = "/task_queue";
     public router = express.Router();
+    private taskQueueService: TaskQueueService;
 
-    constructor() {
-        this.router.post("/queue_grid_scan", this.addGridScanToQueue);
-        this.router.get("/next_task_for_scraper", this.getNextTaskForScraper);
-        this.router.post("/report_findings", this.reportFindingsToDb);
-        this.router.post("/mark_task_complete", this.markTaskComplete);
-        this.router.delete("/cleanup", this.cleanOldTasks);
+    // todo in production: mark several routes "admin only" like authorize([Role.Admin])
+
+    constructor(taskQueueService: TaskQueueService) {
+        this.taskQueueService = taskQueueService;
+        // step 3 of 3 in queuing a scrape
+        this.router.post("/queue_grid_scan", this.addGridScanToQueue.bind(this)); // admin only
+        this.router.get("/next_tasks_for_scraper", this.getNextTasksForScraper.bind(this));
+        this.router.post("/report_findings_and_mark_complete", this.reportFindingsToDbAndMarkComplete.bind(this));
+        // this.router.post("/mark_task_complete", this.markTaskComplete.bind(this));
+        // check tasks make sense
+        this.router.get("/all", this.getAllTasks.bind(this));
+        this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
         // this.router.get("/db_contents", )
         this.router.get("/health_check", this.healthCheck);
     }
@@ -21,6 +29,8 @@ class TaskQueueController {
         const provider = request.body.provider;
         const coords = request.body.coords;
         const zoomWidth = request.body.zoomWidth;
+        // const batchNum // todo: implement and pass down into task creation
+        const city = request.body.city;
         // todo: validation
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return response.status(400).send("Invalid provider input");
@@ -32,15 +42,15 @@ class TaskQueueController {
             return response.status(400).send("Invalid zoomWidth input");
         }
 
-        const taskQueue = new TaskQueueService();
-        const queued = await taskQueue.queueGridScan(provider, coords, zoomWidth);
+        const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, city);
 
         return response.status(200).json(queued);
     }
 
-    async getNextTaskForScraper(request: Request, response: Response) {
+    async getNextTasksForScraper(request: Request, response: Response) {
         const provider = request.body.provider;
         const batchNum = request.body.batchNum;
+        console.log(provider, batchNum, "52rm");
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return response.status(400).send("Invalid provider input");
         }
@@ -49,31 +59,34 @@ class TaskQueueController {
             return response.status(400).send("Invalid batchNum input");
         }
 
-        const taskQueue = new TaskQueueService();
-        const task: ITask = await taskQueue.getNextTaskForScraper(provider, batchNum);
+        const tasks: Task[] = await this.taskQueueService.getNextTasksForScraper(provider, batchNum);
 
-        return response.status(200).json(task);
+        return response.status(200).json(tasks);
     }
 
-    async reportFindingsToDb(request: Request, response: Response) {
+    async reportFindingsToDbAndMarkComplete(request: Request, response: Response) {
         // todo: fill me in
-    }
+        const forProvider: ProviderEnum = request.body.provider;
+        const taskId: number = request.body.taskId;
+        const apartments: any[] = request.body.apartments;
 
-    async markTaskComplete(request: Request, response: Response) {
-        const taskId = request.body.taskId;
         if (typeof taskId !== "number" || taskId < 0) {
             return response.status(400).send("Bad task ID input");
         }
-        const taskQueue = new TaskQueueService();
-        const complete = await taskQueue.markTaskComplete(taskId);
 
-        return response.status(200).json({ complete });
+        const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments);
+        const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
+    }
+
+    async getAllTasks(request: Request, response: Response) {
+        const choice = request.body.provider;
+        console.log(choice, "83rm");
+        const all = await this.taskQueueService.getAllTasks(choice);
+        return response.status(200).json({ all: all });
     }
 
     async cleanOldTasks(request: Request, response: Response) {
-        const taskQueue = new TaskQueueService();
-        const deleted = await taskQueue.cleanOldTasks();
-
+        const deleted = await this.taskQueueService.cleanOldTasks();
         return response.status(200).json({ deleted });
     }
 

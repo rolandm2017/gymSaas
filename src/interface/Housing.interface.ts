@@ -14,5 +14,6 @@ export interface IHousing {
     long: number;
     source: ProviderEnum;
     nearbyGyms?: IAssociation[];
+    idAtSource?: number; // for the id as detected at the provider. used in RentCanada to scrape apartment URL
     // TODO: consider adding "availability"
 }

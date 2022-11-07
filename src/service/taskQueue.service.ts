@@ -1,37 +1,59 @@
 import express from "express";
 
-import {
-    createTask,
-    deleteTasksOlderThanTwoMonths,
-    getAllTasksForProvider,
-    getMostRecentTaskForProvider,
-    getNextUnfinishedTaskForProvider,
-    getTaskById,
-    updateTask,
-} from "../database/dao/task.dao";
-import { getProviderByName } from "../database/dao/provider.dao";
+import TaskDAO from "../database/dao/task.dao";
 import { ProviderEnum } from "../enum/provider.enum";
 import { ILatLong } from "../interface/LatLong.interface";
 import { Task } from "../database/models/Task";
 import { ITask } from "../interface/Task.interface";
+import CityDAO from "../database/dao/city.dao";
+import Parser from "../util/parser";
+import { HousingCreationAttributes } from "../database/models/Housing";
+import HousingDAO from "../database/dao/housing.dao";
 
 class TaskQueueService {
-    constructor() {}
+    private cityDAO: CityDAO;
+    private taskDAO: TaskDAO;
+    private housingDAO: HousingDAO;
 
-    public async queueGridScan(provider: ProviderEnum, coords: ILatLong[], zoomWidth: number): Promise<{ pass: number; fail: number }> {
+    constructor(cityDAO: CityDAO, housingDAO: HousingDAO, taskDAO: TaskDAO) {
+        this.cityDAO = cityDAO;
+        this.housingDAO = housingDAO;
+        this.taskDAO = taskDAO;
+    }
+
+    public async queueGridScan(
+        provider: ProviderEnum,
+        coords: ILatLong[],
+        zoomWidth: number,
+        cityName: string,
+    ): Promise<{ pass: number; fail: number }> {
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
-        const successes: Task[] = [];
-        //todo: associate task with provider by foreign key
+        const city = await this.cityDAO.getCityByName(cityName);
+        if (city === null) throw new Error("City not found");
 
-        const mostRecentTask: Task[] = await getMostRecentTaskForProvider(provider);
-        const mostRecentBatchNum: number = mostRecentTask[0].batch;
+        const successes: {}[] = [];
+
+        const mostRecentTask: Task[] = await this.taskDAO.getMostRecentTaskForProvider(provider);
+        let mostRecentBatchNum: number | undefined;
+        if (mostRecentTask.length === 0) {
+            mostRecentBatchNum = 0;
+        } else {
+            mostRecentBatchNum = mostRecentTask[0].batch;
+        }
 
         for (let i = 0; i < coords.length; i++) {
-            // FIXME: probably 'id' is missing somehow in the db *unless* autoassignment worked
             try {
-                const s = await createTask({ providerName: provider, ...coords[i], zoomWidth, lastScan: undefined, batch: mostRecentBatchNum + 1 });
-                successes.push(s);
+                const s = await this.taskDAO.createTask({
+                    providerName: provider,
+                    lat: coords[i].lat,
+                    long: coords[i].long,
+                    zoomWidth,
+                    lastScan: undefined,
+                    batch: mostRecentBatchNum + 1,
+                    cityId: city.cityId,
+                });
+                successes.push({});
             } catch (err) {
                 console.log(err);
             }
@@ -45,26 +67,57 @@ class TaskQueueService {
     }
 
     public async getNextTaskForScraper(provider: ProviderEnum, batchNum?: number): Promise<ITask> {
-        return await getNextUnfinishedTaskForProvider(provider, batchNum);
+        return await this.taskDAO.getNextUnfinishedTaskForProvider(provider, batchNum);
+    }
+
+    public async getNextTasksForScraper(provider: ProviderEnum, batchNum?: number): Promise<Task[]> {
+        const tasks = await this.taskDAO.getAllTasksForProvider(provider);
+        return tasks;
+    }
+
+    public async reportFindingsToDb(provider: ProviderEnum, taskId: number, apartments: any): Promise<{ pass: number; fail: number }> {
+        const parser = new Parser(provider);
+        const parsedApartmentData = parser.parse(apartments);
+        const successes: {}[] = [];
+        for (const apartment of apartments) {
+            try {
+                const apartmentCreationPayload: HousingCreationAttributes;
+                this.housingDAO.createHousing(apartmentCreationPayload);
+                successes.push({});
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        const results = {
+            pass: successes.length,
+            fail: parsedApartmentData.length - successes.length,
+        };
+        // todo: log success of the reporting
+        return results;
     }
 
     public async markTaskComplete(taskId: number): Promise<boolean> {
-        const s = await getTaskById(taskId);
+        const s = await this.taskDAO.getTaskById(taskId);
         if (s === null) {
             return false;
         }
         s.lastScan = new Date();
-        await updateTask(s, taskId);
+        await this.taskDAO.updateTask(s, taskId);
         return true;
     }
 
+    public async getAllTasks(choice?: ProviderEnum): Promise<Task[]> {
+        const all = await this.taskDAO.getAllTasks(choice);
+        return all;
+    }
+
     public async cleanOldTasks(): Promise<number> {
-        return await deleteTasksOlderThanTwoMonths();
+        return await this.taskDAO.deleteTasksOlderThanTwoMonths();
     }
 
     public async examineDbContents(provider: ProviderEnum): Promise<ITask[]> {
         // used for testing and admin
-        return await getAllTasksForProvider(provider);
+        return await this.taskDAO.getAllTasksForProvider(provider);
     }
 }
 

@@ -5,7 +5,7 @@ import sequelizeConnection from "../Database";
 // import { LocationAttributes } from "./Location";
 
 export interface CityAttributes {
-    id: number;
+    cityId?: number;
     city: string;
     state: string;
     country: string;
@@ -22,7 +22,7 @@ export type CityOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type CityCreationAttributes = Optional<CityAttributes, CityOptionalAttributes>;
 
 export class City extends Model<CityAttributes, CityCreationAttributes> implements CityAttributes {
-    public id!: number;
+    public cityId!: number;
     public city!: string;
     public state!: string;
     public country!: string;
@@ -35,12 +35,10 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
 
-    
-
     static initModel(sequelize: Sequelize): typeof City {
         return City.init(
             {
-                id: {
+                cityId: {
                     type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true,
@@ -58,15 +56,15 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
                     allowNull: false,
                 },
                 centerLat: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.FLOAT,
                     allowNull: false,
                 },
                 centerLong: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.FLOAT,
                     allowNull: false,
                 },
                 scanRadius: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.FLOAT,
                     allowNull: false,
                 },
                 lastScan: {

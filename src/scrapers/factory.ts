@@ -1,5 +1,8 @@
+import TaskDAO from "../database/dao/task.dao";
 import { ProviderEnum } from "../enum/provider.enum";
 import Scraper from "./scraper";
+
+const taskDAO = new TaskDAO();
 
 const scraperAccess = {
     rentCanada: {
@@ -28,7 +31,7 @@ class ScraperFactory {
     createScraperOfType(source: ProviderEnum) {
         console.log("here!");
         // if (source === Provider.rentCanada) {
-        const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);
+        const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port, taskDAO);
         return s;
         // } else if (source === Provider.rentFaster) {
         //     const s = new Scraper(scraperAccess[source].site, scraperAccess[source].scraper_ip, scraperAccess[source].scraper_port);

@@ -24,6 +24,8 @@ import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import { Account } from "../../src/database/models/Account";
 import testDatabase from "../database/Database";
 import { ResetToken } from "../../src/database/models/ResetToken";
+import { Task } from "../../src/database/models/Task";
+import { City } from "../../src/database/models/City";
 
 class App {
     public app: Application;
@@ -78,13 +80,19 @@ class App {
         await App.Database.sync({ force: true });
     }
 
-    public async dropTable(tableName: "account" | "resetToken"): Promise<void> {
+    public async dropTable(tableName: "account" | "resetToken" | "task" | "city"): Promise<void> {
         // await table.sync({ force: true })
         if (tableName === "account") {
             await Account.destroy({ where: {} });
         }
         if (tableName === "resetToken") {
             await ResetToken.destroy({ where: {} });
+        }
+        if (tableName === "task") {
+            await Task.destroy({ where: {} });
+        }
+        if (tableName === "city") {
+            await City.destroy({ where: {} });
         }
     }
 

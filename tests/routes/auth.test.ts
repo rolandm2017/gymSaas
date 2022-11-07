@@ -43,14 +43,11 @@ let acctDAO: AccountDAO = new AccountDAO();
 let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 
 beforeAll(async () => {
-    console.log("\n====\n====\nstarting app...\n===\n===");
     await app.connectDB();
     await app.dropTable("account");
-    // await app.dropTable("resetToken");
 });
 
 afterAll(async () => {
-    console.log("***\n***\n***\nclosing app...");
     await app.closeDB();
 });
 
