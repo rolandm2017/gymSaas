@@ -15,14 +15,17 @@ import TaskQueueController from "./controllers/taskQueue.controller";
 import TaskQueueService from "./service/taskQueue.service";
 import TaskDAO from "./database/dao/task.dao";
 import CityDAO from "./database/dao/city.dao";
+// import TestController from "./controllers/test.controller";
+import HousingDAO from "./database/dao/housing.dao";
 
 const port = parseInt(process.env.PORT!, 10);
 
 const cityDAO = new CityDAO();
+const housingDAO = new HousingDAO();
 const taskDAO = new TaskDAO();
 
 // services
-const taskQueueService = new TaskQueueService(cityDAO, taskDAO);
+const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO);
 
 // is there a better place to initialize these?
 const acctDAO: AccountDAO = new AccountDAO();

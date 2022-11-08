@@ -1,9 +1,11 @@
+import { off } from "process";
 import { Housing, HousingCreationAttributes } from "../models/Housing";
 
 class HousingDAO {
     constructor() {}
-    public getMultipleHousings = (limit: number, offset?: number) => {
-        return Housing.findAndCountAll({ offset, limit });
+    public getMultipleHousings = async (limit?: number, offset?: number) => {
+        if (limit === undefined && offset === undefined) return await Housing.findAndCountAll({ where: {} });
+        return await Housing.findAndCountAll({ offset, limit });
     };
 
     public getHousingById = (id: number) => {
@@ -14,12 +16,12 @@ class HousingDAO {
         return Housing.create(housing);
     };
 
-    public updateHousing = (housing: HousingCreationAttributes, id: number) => {
-        return Housing.update(housing, { where: { id } });
+    public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {
+        return Housing.update(housing, { where: { housingId } });
     };
 
-    public deleteHousing = (id: number) => {
-        return Housing.destroy({ where: { id } });
+    public deleteHousing = (housingId: number) => {
+        return Housing.destroy({ where: { housingId } });
     };
 }
 

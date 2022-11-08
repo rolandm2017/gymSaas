@@ -7,8 +7,7 @@ import sequelizeConnection from "../Database";
 export interface GymAttributes {
     id?: number;
     city: string;
-    street: string; // street address, e.g. 123 Fake St, 596 Unreal Boulevard
-    // FIXME: street => streetAddr
+    address: string; // street address, e.g. 123 Fake St, 596 Unreal Boulevard
     country: string;
     url: string; // link to the biz's website
     lat: number;
@@ -20,8 +19,6 @@ export interface GymAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
-// export interface GymInput extends Required<GymAttributes> {}
-// export interface GymOutput extends Required<GymAttributes> {}
 
 export type GymOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type GymCreationAttributes = Optional<GymAttributes, GymOptionalAttributes>;
@@ -29,7 +26,7 @@ export type GymCreationAttributes = Optional<GymAttributes, GymOptionalAttribute
 export class Gym extends Model<GymAttributes, GymCreationAttributes> implements GymAttributes {
     public id!: number;
     public city!: string;
-    public street!: string;
+    public address!: string;
     public country!: string;
     public url!: string;
     public lat!: number;
@@ -54,7 +51,7 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-                street: {
+                address: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },

@@ -1,17 +1,18 @@
-import { DataTypes, Model, Sequelize, Optional } from "sequelize";
+import { DataTypes, Model, Sequelize, Optional, ForeignKey } from "sequelize";
 
 import sequelizeConnection from "../Database";
+import { City } from "./City";
 
 interface HousingAttributes {
-    id: number;
-    building: "apartment" | "house";
-    transaction: "rent" | "buy";
+    housingId?: number;
+    buildingType: "apartment" | "house";
+    agreementType: "rent" | "buy";
     price: number;
-    city: string;
-    street: string;
+    address: string;
     url: string;
     lat: number;
     long: number;
+    cityId?: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -23,15 +24,15 @@ export type HousingOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type HousingCreationAttributes = Optional<HousingAttributes, HousingOptionalAttributes>;
 
 export class Housing extends Model<HousingAttributes, HousingCreationAttributes> implements HousingAttributes {
-    public id!: number;
-    public building!: "apartment" | "house";
-    public transaction!: "rent" | "buy";
+    public housingId!: number;
+    public buildingType!: "apartment" | "house";
+    public agreementType!: "rent" | "buy";
     public price!: number;
-    public city!: string;
-    public street!: string;
+    public address!: string;
     public url!: string;
     public lat!: number;
     public long!: number;
+    public cityId!: ForeignKey<City["cityId"]>;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -40,16 +41,16 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     static initModel(sequelize: Sequelize): typeof Housing {
         return Housing.init(
             {
-                id: {
+                housingId: {
                     type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true,
                 },
-                building: {
+                buildingType: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-                transaction: {
+                agreementType: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
@@ -57,11 +58,8 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                     type: DataTypes.INTEGER,
                     allowNull: false,
                 },
-                city: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
-                },
-                street: {
+
+                address: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },

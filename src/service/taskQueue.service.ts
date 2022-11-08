@@ -9,6 +9,8 @@ import CityDAO from "../database/dao/city.dao";
 import Parser from "../util/parser";
 import { HousingCreationAttributes } from "../database/models/Housing";
 import HousingDAO from "../database/dao/housing.dao";
+import { IHousing } from "../interface/Housing.interface";
+import { convertIHousingToCreationAttr } from "../util/housingConverter";
 
 class TaskQueueService {
     private cityDAO: CityDAO;
@@ -77,11 +79,11 @@ class TaskQueueService {
 
     public async reportFindingsToDb(provider: ProviderEnum, taskId: number, apartments: any): Promise<{ pass: number; fail: number }> {
         const parser = new Parser(provider);
-        const parsedApartmentData = parser.parse(apartments);
+        const parsedApartmentData: IHousing[] = parser.parse(apartments);
         const successes: {}[] = [];
-        for (const apartment of apartments) {
+        for (const apartment of parsedApartmentData) {
             try {
-                const apartmentCreationPayload: HousingCreationAttributes;
+                const apartmentCreationPayload: HousingCreationAttributes = convertIHousingToCreationAttr(apartment, provider);
                 this.housingDAO.createHousing(apartmentCreationPayload);
                 successes.push({});
             } catch (err) {

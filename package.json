@@ -13,7 +13,8 @@
         "test:v": "jest -i tests/validationSchemas/*",
         "test:r": "jest -i tests/routes/*",
         "test:m": "jest -i tests/misc/*",
-        "test:p": "jest -i tests/process/*"
+        "test:p": "jest -i tests/process/*",
+        "test:u": "jest -i tests/util/*"
     },
     "repository": {
         "type": "git",

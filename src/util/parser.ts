@@ -23,39 +23,38 @@ class Parser {
     parseRentCanada(unprocessed: any): IHousing[] {
         // list of objects
         console.log("25rm");
-        const mainList = unprocessed.listings;
-        // properties of interest: address (for geolocating), city, province, url, description, externalUrl
+        const mainList = unprocessed.results.listings;
+        // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {
             const unit = mainList[i];
             const ap: IHousing = {
-                type: "apartment",
-                agreement: "rent",
+                buildingType: "apartment",
+                agreementType: "rent",
                 address: unit.address,
                 state: unit.state,
                 price: undefined,
                 source: this.provider,
-                // TODO: if coords MIA, query geoCoding API with address IF not present in noSQL db. also store in DB for next time.
                 lat: unit.latitude,
                 long: unit.longitude,
+                idAtSource: unit.id,
             };
             apList.push(ap);
         }
-        // TODO: convert address => lat/long for these
         console.log(apList.length, "44rm");
         return apList;
     }
 
     parseRentFaster(unprocessed: any): IHousing[] {
         // list of objects
-        const mainList = unprocessed.listings;
+        const mainList = unprocessed.results.listings;
         // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {
             const unit = mainList[i];
             const ap: IHousing = {
-                type: "apartment",
-                agreement: "rent",
+                buildingType: "apartment",
+                agreementType: "rent",
                 address: unit.address,
                 state: undefined,
                 price: unit.price,
@@ -70,14 +69,14 @@ class Parser {
 
     parseRentSeeker(unprocessed: any): IHousing[] {
         // list of objects
-        const mainList = unprocessed.hits;
+        const mainList = unprocessed.results.hits;
         // properties of interest: "name" here is the address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {
             const unit = mainList[i];
             const ap: IHousing = {
-                type: "apartment",
-                agreement: "rent",
+                buildingType: "apartment",
+                agreementType: "rent",
                 address: unit.name,
                 state: undefined,
                 price: undefined,

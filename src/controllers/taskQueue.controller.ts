@@ -76,6 +76,7 @@ class TaskQueueController {
 
         const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments);
         const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
+        return response.status(200).json({ successfullyLogged, markedComplete });
     }
 
     async getAllTasks(request: Request, response: Response) {

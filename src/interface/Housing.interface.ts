@@ -2,8 +2,9 @@ import { ProviderEnum } from "../enum/provider.enum";
 import { IAssociation } from "./Association.interface";
 
 export interface IHousing {
-    type: "apartment" | "house";
-    agreement: "rent" | "buy";
+    housingId?: number; // same property name as in db
+    buildingType: "apartment" | "house";
+    agreementType: "rent" | "buy";
     address?: string;
     city?: string;
     state?: string;
