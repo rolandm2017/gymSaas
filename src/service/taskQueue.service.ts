@@ -28,21 +28,22 @@ class TaskQueueService {
         coords: ILatLong[],
         zoomWidth: number,
         cityName: string,
+        batchNum: number,
     ): Promise<{ pass: number; fail: number; batchNum: number }> {
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
-        const city = await this.cityDAO.getCityByName(cityName);
-        if (city === null) throw new Error("City not found");
+        const cityForId = await this.cityDAO.getCityByName(cityName);
+        if (cityForId === null) throw new Error("City not found");
 
         const successes: {}[] = [];
 
-        const mostRecentTask: Task[] = await this.taskDAO.getMostRecentTaskForProvider(provider);
-        let mostRecentBatchNum: number | undefined;
-        if (mostRecentTask.length === 0) {
-            mostRecentBatchNum = 0;
-        } else {
-            mostRecentBatchNum = mostRecentTask[0].batch;
-        }
+        // const mostRecentTask: Task[] = await this.taskDAO.getMostRecentTaskForProvider(provider);
+        // let mostRecentBatchNum: number | undefined;
+        // if (mostRecentTask.length === 0) {
+        //     mostRecentBatchNum = 0;
+        // } else {
+        //     mostRecentBatchNum = mostRecentTask[0].batch;
+        // }
 
         for (let i = 0; i < coords.length; i++) {
             try {
@@ -52,8 +53,8 @@ class TaskQueueService {
                     long: coords[i].long,
                     zoomWidth,
                     lastScan: undefined,
-                    batch: mostRecentBatchNum + 1,
-                    cityId: city.cityId,
+                    batch: batchNum,
+                    cityId: cityForId.cityId,
                 });
                 successes.push({});
             } catch (err) {
@@ -64,17 +65,19 @@ class TaskQueueService {
         const results = {
             pass: successes.length,
             fail: coords.length - successes.length,
-            batchNum: mostRecentBatchNum,
+            batchNum,
         };
         return results;
     }
 
+    // SINGLE
     public async getNextTaskForScraper(provider: ProviderEnum, batchNum?: number): Promise<ITask> {
         return await this.taskDAO.getNextUnfinishedTaskForProvider(provider, batchNum);
     }
 
+    // PLURAL, note the plural!!
     public async getNextTasksForScraper(provider: ProviderEnum, batchNum?: number): Promise<Task[]> {
-        const tasks = await this.taskDAO.getAllTasksForProvider(provider);
+        const tasks = await this.taskDAO.getAllUnfinishedTasksForProvider(provider, batchNum);
         return tasks;
     }
 
@@ -82,9 +85,14 @@ class TaskQueueService {
         const parser = new Parser(provider);
         const parsedApartmentData: IHousing[] = parser.parse(apartments);
         const successes: {}[] = [];
+        // get city id for this task because its needed in the housing model for foreign key
+        const currentTask = await this.taskDAO.getTaskById(taskId);
+        if (currentTask === null) throw new Error("Orphaned task discovered");
+        const cityId = currentTask.cityId;
+        //
         for (const apartment of parsedApartmentData) {
             try {
-                const apartmentCreationPayload: HousingCreationAttributes = convertIHousingToCreationAttr(apartment, provider);
+                const apartmentCreationPayload: HousingCreationAttributes = convertIHousingToCreationAttr(apartment, provider, taskId, cityId);
                 this.housingDAO.createHousing(apartmentCreationPayload);
                 successes.push({});
             } catch (err) {
@@ -116,11 +124,6 @@ class TaskQueueService {
 
     public async cleanOldTasks(): Promise<number> {
         return await this.taskDAO.deleteTasksOlderThanTwoMonths();
-    }
-
-    public async examineDbContents(provider: ProviderEnum): Promise<ITask[]> {
-        // used for testing and admin
-        return await this.taskDAO.getAllTasksForProvider(provider);
     }
 }
 

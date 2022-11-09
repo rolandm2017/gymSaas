@@ -56,17 +56,32 @@ class TaskDAO {
         });
     };
 
-    public getAllUnfinishedBatchesForProvider = (provider: ProviderEnum) => {
-        // note: used to be "getNextUnfinishedBatch" but was impossible to figure out implementation
-        return Task.findAll({
-            where: { providerName: provider },
-            order: [["createdAt", "DESC"]],
-        });
-    };
+    // public getAllUnfinishedBatchesForProvider = async (provider: ProviderEnum) => {
+    //     // note: used to be "getNextUnfinishedBatch" but was impossible to figure out implementation
+    //     // note nov 8: this will be difficult to implement, costly to execute. what is the fastest way to do it?
+    //     const tasks = await Task.findAll({
+    //         where: { providerName: provider },
+    //         order: [["createdAt", "DESC"]],
+    //     });
+    //     const currentBatch = [];
+    //     const unfinishedBatches = [];
+    //     let endOfCurrentBatch = 0;
+    //     for (let i = 0; i < tasks.length; i++) {
+    //         const currentTask = tasks[i]
+    //         if (tasks[i + 1])
+    //     }
+    // };
 
-    public getAllTasksForProvider = (provider: ProviderEnum) => {
+    public getAllUnfinishedTasksForProvider = (provider: ProviderEnum, batchNum?: number) => {
+        let conditions;
+        if (batchNum) {
+            conditions = { providerName: provider, lastScan: undefined, batch: batchNum };
+        } else {
+            conditions = { providerName: provider, lastScan: undefined };
+        }
         return Task.findAll({
-            where: { providerName: provider },
+            where: conditions,
+            order: [["createdAt", "DESC"]],
         });
     };
 

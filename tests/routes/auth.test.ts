@@ -65,13 +65,13 @@ function logTime(a: number) {
 }
 
 describe("Test auth controller", () => {
-    // describe("health check", () => {
-    //     test("is active", async () => {
-    //         const p = `${path}/health`;
-    //         const res = await request(server).get(p);
-    //         expect(res.body.message).toBe("ok");
-    //     });
-    // });
+    describe("health check", () => {
+        test("is active", async () => {
+            const p = `${path}/health`;
+            const res = await request(server).get(p);
+            expect(res.body.message).toBe("ok");
+        });
+    });
     describe("POST /register", () => {
         test("responds with success msg if body is populated properly", async () => {
             const res = await request(server).post(`${path}/register`).set("origin", "testSuite").send(validCredentials);

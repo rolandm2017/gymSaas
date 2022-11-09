@@ -200,7 +200,7 @@ class AuthController {
         return response.json({ message: "Account deleted successfully" });
     };
 
-    public healthCheck = async () => {
+    public healthCheck = async (request: Request, response: Response) => {
         return response.json({ message: "ok" });
     };
 

@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { currentBatchNum } from "../database/batchNumCache";
 import { Task } from "../database/models/Task";
 import { ProviderEnum } from "../enum/provider.enum";
 import { ITask } from "../interface/Task.interface";
@@ -13,6 +14,7 @@ class TaskQueueController {
 
     constructor(taskQueueService: TaskQueueService) {
         this.taskQueueService = taskQueueService;
+        this.router.get("/next_batch_number", this.getNextBatchNumber.bind(this));
         // step 3 of 3 in queuing a scrape
         this.router.post("/queue_grid_scan", this.addGridScanToQueue.bind(this)); // admin only
         this.router.get("/next_tasks_for_scraper", this.getNextTasksForScraper.bind(this));
@@ -24,13 +26,17 @@ class TaskQueueController {
         this.router.get("/health_check", this.healthCheck);
     }
 
+    async getNextBatchNumber(request: Request, response: Response) {
+        if (currentBatchNum) return response.status(200).json({ nextBatchNum: currentBatchNum + 1 });
+        else return response.status(200).json({ nextBatchNum: 0 });
+    }
+
     async addGridScanToQueue(request: Request, response: Response) {
         const provider = request.body.provider;
         const coords = request.body.coords;
         const zoomWidth = request.body.zoomWidth;
-        // const batchNum // todo: implement and pass down into task creation
         const city = request.body.city;
-        // todo: validation
+        const batchNum = request.body.batchNum;
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return response.status(400).send("Invalid provider input");
         }
@@ -40,22 +46,24 @@ class TaskQueueController {
         if (typeof zoomWidth !== "number" || zoomWidth < 0) {
             return response.status(400).send("Invalid zoomWidth input");
         }
+        if (batchNum === undefined || batchNum === null) return response.status(400).send("batchNum must be defined");
+        // "if batchNum is supplied, check if its a number"
+        if (batchNum && typeof batchNum !== "number") return response.status(400).send("Invalid batchNum input");
 
-        const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, city);
-
+        const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, city, batchNum);
+        console.log(queued, "54rm");
         return response.status(200).json(queued);
     }
 
     async getNextTasksForScraper(request: Request, response: Response) {
         const provider = request.body.provider;
-        const batchNum = request.body.batchNum;
+        // Currently batchNum is an OPTIONAL parameter!
+        // If specified: Get that batch's unfinished tasks for provider.
+        // If not specified: Get ALL unfinished tasks for provider.
+        const batchNum = request.body.batchNum; // MIGHT need batch number, but also might not!
         console.log(provider, batchNum, "52rm");
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return response.status(400).send("Invalid provider input");
-        }
-        if (batchNum && typeof batchNum !== "number") {
-            // "if batchNum is supplied, check if its a number"
-            return response.status(400).send("Invalid batchNum input");
         }
 
         const tasks: Task[] = await this.taskQueueService.getNextTasksForScraper(provider, batchNum);
@@ -74,13 +82,14 @@ class TaskQueueController {
 
         const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments);
         const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
-        return response.status(200).json({ successfullyLogged, markedComplete });
+        return response.status(200).json({ successfullyLogged, markedComplete, taskId });
     }
 
     async getAllTasks(request: Request, response: Response) {
         const choice = request.body.provider;
         console.log(choice, "83rm");
-        const all = await this.taskQueueService.getAllTasks(choice);
+        const all: Task[] = await this.taskQueueService.getAllTasks(choice);
+        console.log(all, "92rm");
         return response.status(200).json({ all: all });
     }
 
