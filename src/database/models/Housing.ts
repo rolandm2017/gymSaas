@@ -1,12 +1,14 @@
 import { DataTypes, Model, Sequelize, Optional, ForeignKey } from "sequelize";
+import { AgreementTypeEnum } from "../../enum/agreementType.enum";
+import { BuildingTypeEnum } from "../../enum/buildingType.enum";
 
 import sequelizeConnection from "../Database";
 import { City } from "./City";
 
 interface HousingAttributes {
     housingId?: number;
-    buildingType: "apartment" | "house";
-    agreementType: "rent" | "buy";
+    buildingType: string; // "apartment" | "house"
+    agreementType: string; //"rent" | "buy"
     price: number;
     address: string;
     url: string;
@@ -17,16 +19,14 @@ interface HousingAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
-// export interface HousingInput extends Required<HousingAttributes> {}
-// export interface HousingOutput extends Required<HousingAttributes> {}
 
-export type HousingOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
+export type HousingOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt" | "cityId";
 export type HousingCreationAttributes = Optional<HousingAttributes, HousingOptionalAttributes>;
 
 export class Housing extends Model<HousingAttributes, HousingCreationAttributes> implements HousingAttributes {
     public housingId!: number;
-    public buildingType!: "apartment" | "house";
-    public agreementType!: "rent" | "buy";
+    public buildingType!: string;
+    public agreementType!: string;
     public price!: number;
     public address!: string;
     public url!: string;
@@ -58,7 +58,6 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                     type: DataTypes.INTEGER,
                     allowNull: false,
                 },
-
                 address: {
                     type: DataTypes.STRING,
                     allowNull: false,
@@ -68,17 +67,17 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                     allowNull: false,
                 },
                 lat: {
-                    type: DataTypes.FLOAT,
+                    type: DataTypes.DOUBLE,
                     allowNull: false,
                 },
                 long: {
-                    type: DataTypes.FLOAT,
+                    type: DataTypes.DOUBLE,
                     allowNull: false,
                 },
             },
             {
                 timestamps: true,
-                sequelize: sequelizeConnection,
+                sequelize: sequelize,
                 paranoid: true,
             },
         );

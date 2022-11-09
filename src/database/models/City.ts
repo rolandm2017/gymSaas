@@ -56,11 +56,11 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
                     allowNull: false,
                 },
                 centerLat: {
-                    type: DataTypes.FLOAT,
+                    type: DataTypes.DOUBLE,
                     allowNull: false,
                 },
                 centerLong: {
-                    type: DataTypes.FLOAT,
+                    type: DataTypes.DOUBLE,
                     allowNull: false,
                 },
                 scanRadius: {

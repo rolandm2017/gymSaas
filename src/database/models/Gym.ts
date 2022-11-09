@@ -61,11 +61,11 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
                     allowNull: false,
                 },
                 lat: {
-                    type: DataTypes.FLOAT,
+                    type: DataTypes.DOUBLE,
                     allowNull: false,
                 },
                 long: {
-                    type: DataTypes.FLOAT,
+                    type: DataTypes.DOUBLE,
                     allowNull: false,
                 },
                 icon: { type: DataTypes.STRING, allowNull: true },

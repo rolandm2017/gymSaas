@@ -14,7 +14,8 @@
         "test:r": "jest -i tests/routes/*",
         "test:m": "jest -i tests/misc/*",
         "test:p": "jest -i tests/process/*",
-        "test:u": "jest -i tests/util/*"
+        "test:u": "jest -i tests/util/*",
+        "test:t": "jest -i tests/temp/*"
     },
     "repository": {
         "type": "git",

@@ -86,7 +86,7 @@ class GymFinderService {
         for (let i = 0; i < gyms.length; i++) {
             const gymCreationAttr: GymCreationAttributes = {
                 city: city,
-                street: gyms[i].formatted_address,
+                address: gyms[i].formatted_address,
                 country: country,
                 url: gyms[i].icon,
                 lat: gyms[i].geometry.location.lat,

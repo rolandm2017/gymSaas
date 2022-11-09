@@ -59,11 +59,11 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
                     allowNull: false,
                 },
                 lat: {
-                    type: DataTypes.FLOAT,
+                    type: DataTypes.DOUBLE,
                     allowNull: false,
                 },
                 long: {
-                    type: DataTypes.FLOAT,
+                    type: DataTypes.DOUBLE,
                     allowNull: false,
                 },
                 zoomWidth: {

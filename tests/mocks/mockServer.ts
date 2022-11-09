@@ -26,6 +26,7 @@ import testDatabase from "../database/Database";
 import { ResetToken } from "../../src/database/models/ResetToken";
 import { Task } from "../../src/database/models/Task";
 import { City } from "../../src/database/models/City";
+import { Housing } from "../../src/database/models/Housing";
 
 class App {
     public app: Application;
@@ -64,23 +65,23 @@ class App {
 
         App.initDB();
         await App.Database.authenticate();
-        console.log("Database Connection Established");
+        // console.log("Database Connection Established");
         await App.Database.sync({ force: true });
         await initModels(App.Database);
         // await App.Database.drop();
-        console.log("Database Sync");
+        // console.log("Database Sync");
         this.dbConnOpen = true;
     }
 
     public async dropAllTables() {
         if (!this.dbConnOpen) return;
-        console.log("Dropping all tables...");
+        // console.log("Dropping all tables...");
         await App.Database.drop();
         // fixme: Never managed to make this work
         await App.Database.sync({ force: true });
     }
 
-    public async dropTable(tableName: "account" | "resetToken" | "task" | "city"): Promise<void> {
+    public async dropTable(tableName: "account" | "resetToken" | "task" | "city" | "housing"): Promise<void> {
         // await table.sync({ force: true })
         if (tableName === "account") {
             await Account.destroy({ where: {} });
@@ -89,10 +90,14 @@ class App {
             await ResetToken.destroy({ where: {} });
         }
         if (tableName === "task") {
+            console.log(tableName, "92rm");
             await Task.destroy({ where: {} });
         }
         if (tableName === "city") {
             await City.destroy({ where: {} });
+        }
+        if (tableName === "housing") {
+            await Housing.destroy({ where: {} });
         }
     }
 
@@ -100,7 +105,7 @@ class App {
         if (this.dbConnOpen) {
             await App.Database.close();
             this.dbConnOpen = false;
-            console.log("db connection closed!");
+            // console.log("db connection closed!");
         }
     }
 
@@ -124,7 +129,6 @@ class App {
 }
 
 const port = parseInt(process.env.PORT!, 10);
-console.log("hello world!", port);
 
 const acctDAO = new AccountDAO();
 const emailService = new EmailService(acctDAO, "testing");

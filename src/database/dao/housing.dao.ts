@@ -13,7 +13,7 @@ class HousingDAO {
     };
 
     public createHousing = (housing: HousingCreationAttributes) => {
-        return Housing.create(housing);
+        return Housing.create({ ...housing });
     };
 
     public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {

@@ -17,7 +17,6 @@ class TaskQueueController {
         this.router.post("/queue_grid_scan", this.addGridScanToQueue.bind(this)); // admin only
         this.router.get("/next_tasks_for_scraper", this.getNextTasksForScraper.bind(this));
         this.router.post("/report_findings_and_mark_complete", this.reportFindingsToDbAndMarkComplete.bind(this));
-        // this.router.post("/mark_task_complete", this.markTaskComplete.bind(this));
         // check tasks make sense
         this.router.get("/all", this.getAllTasks.bind(this));
         this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
@@ -65,7 +64,6 @@ class TaskQueueController {
     }
 
     async reportFindingsToDbAndMarkComplete(request: Request, response: Response) {
-        // todo: fill me in
         const forProvider: ProviderEnum = request.body.provider;
         const taskId: number = request.body.taskId;
         const apartments: any[] = request.body.apartments;

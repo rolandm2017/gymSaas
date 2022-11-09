@@ -28,7 +28,7 @@ class TaskQueueService {
         coords: ILatLong[],
         zoomWidth: number,
         cityName: string,
-    ): Promise<{ pass: number; fail: number }> {
+    ): Promise<{ pass: number; fail: number; batchNum: number }> {
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
         const city = await this.cityDAO.getCityByName(cityName);
@@ -64,6 +64,7 @@ class TaskQueueService {
         const results = {
             pass: successes.length,
             fail: coords.length - successes.length,
+            batchNum: mostRecentBatchNum,
         };
         return results;
     }
