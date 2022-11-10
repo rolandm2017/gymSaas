@@ -44,7 +44,7 @@ class Scraper {
                 const newTask: TaskCreationAttributes = {
                     ...task,
                     zoomWidth: zoomWidth,
-                    lastScan: undefined,
+                    lastScan: null,
                     batch: 1,
                     providerName: ProviderEnum.rentCanada, // TODO: distribute tasks to all 3 providers when ready
                 };

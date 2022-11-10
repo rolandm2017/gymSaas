@@ -1,18 +1,21 @@
+import BatchDAO from "./dao/batch.dao";
 import TaskDAO from "./dao/task.dao";
 
-export let currentBatchNum: number | undefined = undefined;
+export let _currentBatchNumForNewBatches: number | undefined = undefined;
 
-const taskDAO = new TaskDAO();
-
-export async function getCurrentBatchNum(): Promise<number> {
-    if (currentBatchNum) return currentBatchNum;
-    const taskWithHighestNumberedBatchInDb = await taskDAO.getHighestBatchNum();
-    if (taskWithHighestNumberedBatchInDb === null) throw new Error("No task found in db");
-    currentBatchNum = taskWithHighestNumberedBatchInDb.batch;
-    return currentBatchNum;
+export async function getBatchNumForNewBatches(batchDAO: BatchDAO): Promise<number> {
+    if (_currentBatchNumForNewBatches) return _currentBatchNumForNewBatches;
+    console.log("10rm");
+    const batchWithHighestNum = await batchDAO.getHighestBatchNum();
+    if (batchWithHighestNum === null) {
+        _currentBatchNumForNewBatches = 0;
+        await batchDAO.addBatchNum(0);
+    }
+    _currentBatchNumForNewBatches = batchWithHighestNum ? batchWithHighestNum : 0;
+    return _currentBatchNumForNewBatches;
 }
 
 export async function updateBatchNum(newNum: number) {
-    if (currentBatchNum && newNum < currentBatchNum) throw new Error("Can't decrease batch num");
-    currentBatchNum = newNum;
+    if (_currentBatchNumForNewBatches && newNum < _currentBatchNumForNewBatches) throw new Error("Can't decrease batch num");
+    _currentBatchNumForNewBatches = newNum;
 }

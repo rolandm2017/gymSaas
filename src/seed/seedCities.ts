@@ -9,7 +9,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         centerLat: 49.2827,
         centerLong: -123.1207,
         scanRadius: 25,
-        lastScan: undefined,
+        lastScan: null,
     },
     {
         city: CityEnum.calgary,
@@ -18,7 +18,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         centerLat: 51.0447,
         centerLong: -114.0719,
         scanRadius: 25,
-        lastScan: undefined,
+        lastScan: null,
     },
     {
         city: CityEnum.edmonton,
@@ -27,7 +27,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         centerLat: 53.5461,
         centerLong: -113.4937,
         scanRadius: 25,
-        lastScan: undefined,
+        lastScan: null,
     },
     {
         city: CityEnum.winnipeg,
@@ -36,7 +36,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         centerLat: 49.8954,
         centerLong: -97.1385,
         scanRadius: 25,
-        lastScan: undefined,
+        lastScan: null,
     },
     {
         city: CityEnum.toronto,
@@ -45,7 +45,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         centerLat: 43.6532,
         centerLong: -79.3832,
         scanRadius: 25,
-        lastScan: undefined,
+        lastScan: null,
     },
     {
         city: CityEnum.montreal,
@@ -54,6 +54,6 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         centerLat: 45.5019,
         centerLong: -73.5674,
         scanRadius: 25,
-        lastScan: undefined,
+        lastScan: null,
     },
 ];

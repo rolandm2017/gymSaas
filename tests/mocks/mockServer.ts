@@ -11,6 +11,7 @@ import GooglePlacesController from "../../src/controllers/googlePlaces.controlle
 import ApartmentsController from "../../src/controllers/apartments.controller";
 import HealthCheckController from "../../src/controllers/healthCheck.controller";
 import AuthController from "../../src/controllers/auth.controller";
+import TaskQueueController from "../../src/controllers/taskQueue.controller";
 
 import initModels from "../../src/database/models/init-models";
 import errorHandler from "../../src/middleware/error.middleware";
@@ -27,6 +28,11 @@ import { ResetToken } from "../../src/database/models/ResetToken";
 import { Task } from "../../src/database/models/Task";
 import { City } from "../../src/database/models/City";
 import { Housing } from "../../src/database/models/Housing";
+import TaskQueueService from "../../src/service/taskQueue.service";
+import CityDAO from "../../src/database/dao/city.dao";
+import HousingDAO from "../../src/database/dao/housing.dao";
+import TaskDAO from "../../src/database/dao/task.dao";
+import { Batch } from "../../src/database/models/Batch";
 
 class App {
     public app: Application;
@@ -81,7 +87,7 @@ class App {
         await App.Database.sync({ force: true });
     }
 
-    public async dropTable(tableName: "account" | "resetToken" | "task" | "city" | "housing"): Promise<void> {
+    public async dropTable(tableName: "account" | "resetToken" | "task" | "city" | "housing" | "batch"): Promise<void> {
         // await table.sync({ force: true })
         if (tableName === "account") {
             await Account.destroy({ where: {} });
@@ -90,7 +96,7 @@ class App {
             await ResetToken.destroy({ where: {} });
         }
         if (tableName === "task") {
-            console.log(tableName, "92rm");
+            console.log("deleting all tasks ... supposedly 99rm");
             await Task.destroy({ where: {} });
         }
         if (tableName === "city") {
@@ -98,6 +104,9 @@ class App {
         }
         if (tableName === "housing") {
             await Housing.destroy({ where: {} });
+        }
+        if (tableName === "batch") {
+            await Batch.destroy({ where: {} });
         }
     }
 
@@ -130,16 +139,28 @@ class App {
 
 const port = parseInt(process.env.PORT!, 10);
 
+// initialize dao
+const cityDAO = new CityDAO();
+const housingDAO = new HousingDAO();
+const taskDAO = new TaskDAO();
 const acctDAO = new AccountDAO();
-const emailService = new EmailService(acctDAO, "testing");
 const accountUtil = new AccountUtil();
 const resetTokenDAO = new ResetTokenDAO(acctDAO);
+// services
+const emailService = new EmailService(acctDAO, "testing");
 const a = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
+const t = new TaskQueueService(cityDAO, housingDAO, taskDAO);
 
 export const app = new App({
     port: port || 8000,
 
-    controllers: [new AuthController(a), new GooglePlacesController(), new ApartmentsController(), new HealthCheckController()],
+    controllers: [
+        new AuthController(a),
+        new GooglePlacesController(),
+        new ApartmentsController(),
+        new HealthCheckController(),
+        new TaskQueueController(t),
+    ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });
 

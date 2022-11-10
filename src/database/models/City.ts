@@ -12,7 +12,7 @@ export interface CityAttributes {
     centerLat: number;
     centerLong: number;
     scanRadius: number; // the GTA has a radius of around 25 km.
-    lastScan: Date | undefined;
+    lastScan: Date | null;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -29,7 +29,7 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
     public centerLat!: number;
     public centerLong!: number;
     public scanRadius!: number;
-    public lastScan: Date | undefined; // used to distinguish between up to date results and out of date results.
+    public lastScan!: Date | null; // used to distinguish between up to date results and out of date results.
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;

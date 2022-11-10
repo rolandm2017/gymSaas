@@ -75,9 +75,9 @@ class TaskDAO {
     public getAllUnfinishedTasksForProvider = (provider: ProviderEnum, batchNum?: number) => {
         let conditions;
         if (batchNum) {
-            conditions = { providerName: provider, lastScan: undefined, batch: batchNum };
+            conditions = { providerName: provider, lastScan: null, batch: batchNum };
         } else {
-            conditions = { providerName: provider, lastScan: undefined };
+            conditions = { providerName: provider, lastScan: null };
         }
         return Task.findAll({
             where: conditions,
@@ -95,6 +95,11 @@ class TaskDAO {
 
     public updateTask = (task: TaskCreationAttributes, id: number) => {
         return Task.update(task, { where: { taskId: id } });
+    };
+
+    public updateLastScanDate = (t: Task, scanDate: Date) => {
+        t.lastScan = scanDate;
+        t.save();
     };
 
     public deleteTask = (id: number) => {

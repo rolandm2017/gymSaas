@@ -10,6 +10,7 @@ import {
     Sequelize,
 } from "sequelize";
 import { ProviderEnum } from "../../enum/provider.enum";
+import { Batch } from "./Batch";
 import { City } from "./City";
 
 // import { Provider, ProviderId } from "./Provider";
@@ -21,8 +22,9 @@ export interface TaskAttributes {
     long: number;
     zoomWidth: number; // 0 = default
     batch: number;
-    lastScan: Date | undefined;
+    lastScan: Date | null;
     cityId?: number;
+    batchId?: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -39,8 +41,9 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
     public long!: number;
     public zoomWidth!: number;
     public batch!: number;
-    public lastScan: Date | undefined;
+    public lastScan!: Date | null;
     public cityId!: ForeignKey<City["cityId"]>;
+    public batchId!: ForeignKey<Batch["batchId"]>;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;

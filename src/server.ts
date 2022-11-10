@@ -23,16 +23,15 @@ const port = parseInt(process.env.PORT!, 10);
 const cityDAO = new CityDAO();
 const housingDAO = new HousingDAO();
 const taskDAO = new TaskDAO();
+const acctDAO: AccountDAO = new AccountDAO();
+const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 
 // services
-const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO);
-
 // is there a better place to initialize these?
-const acctDAO: AccountDAO = new AccountDAO();
 const e: EmailService = new EmailService(acctDAO);
-const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 const accountUtil: AccountUtil = new AccountUtil();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
+const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO);
 
 const app = new App({
     port: port || 8000,

@@ -30,7 +30,7 @@ describe("confirm task DAO works as expected", () => {
             centerLat: 50,
             centerLong: 50,
             scanRadius: 25,
-            lastScan: undefined,
+            lastScan: null,
         };
         const initCity = await cityDAO.createCity(cityPayload);
         expect(initCity.cityId).toBeDefined();
@@ -41,7 +41,7 @@ describe("confirm task DAO works as expected", () => {
             long: 50,
             zoomWidth: 0,
             batch: 1,
-            lastScan: undefined,
+            lastScan: null,
             cityId: initCity.cityId,
         };
         let t = await taskDAO.createTask(payload);

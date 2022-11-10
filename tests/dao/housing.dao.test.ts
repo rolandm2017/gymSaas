@@ -30,7 +30,7 @@ describe("housingDAO tests", () => {
             centerLat: 50,
             centerLong: 50,
             scanRadius: 25,
-            lastScan: undefined,
+            lastScan: null,
         };
         const initCity = await cityDAO.createCity(cityPayload);
         const ap1: HousingCreationAttributes = {

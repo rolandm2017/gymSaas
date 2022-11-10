@@ -52,7 +52,7 @@ class TaskQueueService {
                     lat: coords[i].lat,
                     long: coords[i].long,
                     zoomWidth,
-                    lastScan: undefined,
+                    lastScan: null,
                     batch: batchNum,
                     cityId: cityForId.cityId,
                 });
@@ -89,7 +89,9 @@ class TaskQueueService {
         const currentTask = await this.taskDAO.getTaskById(taskId);
         if (currentTask === null) throw new Error("Orphaned task discovered");
         const cityId = currentTask.cityId;
-        //
+        // update task's lastScan date
+        await this.taskDAO.updateLastScanDate(currentTask, new Date());
+        // add apartments
         for (const apartment of parsedApartmentData) {
             try {
                 const apartmentCreationPayload: HousingCreationAttributes = convertIHousingToCreationAttr(apartment, provider, taskId, cityId);
@@ -103,7 +105,6 @@ class TaskQueueService {
             pass: successes.length,
             fail: parsedApartmentData.length - successes.length,
         };
-        // todo: log success of the reporting
         return results;
     }
 

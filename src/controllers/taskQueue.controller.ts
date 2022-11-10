@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
-import { currentBatchNum } from "../database/batchNumCache";
+import { getBatchNumForNewBatches } from "../database/batchNumCache";
+import BatchDAO from "../database/dao/batch.dao";
 import { Task } from "../database/models/Task";
 import { ProviderEnum } from "../enum/provider.enum";
 import { ITask } from "../interface/Task.interface";
@@ -10,7 +11,7 @@ class TaskQueueController {
     public router = express.Router();
     private taskQueueService: TaskQueueService;
 
-    // todo in production: mark several routes "admin only" like authorize([Role.Admin])
+    // todo in production: mark several routes "admin only" like this: authorize([Role.Admin])
 
     constructor(taskQueueService: TaskQueueService) {
         this.taskQueueService = taskQueueService;
@@ -23,11 +24,15 @@ class TaskQueueController {
         this.router.get("/all", this.getAllTasks.bind(this));
         this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
         // this.router.get("/db_contents", )
-        this.router.get("/health_check", this.healthCheck);
+        this.router.get("/health_check", this.healthCheck.bind(this));
     }
 
     async getNextBatchNumber(request: Request, response: Response) {
-        if (currentBatchNum) return response.status(200).json({ nextBatchNum: currentBatchNum + 1 });
+        console.log("30rm");
+        const batchDAO = new BatchDAO();
+        const highest = await getBatchNumForNewBatches(batchDAO);
+        console.log(highest, "31rm");
+        if (highest) return response.status(200).json({ nextBatchNum: highest });
         else return response.status(200).json({ nextBatchNum: 0 });
     }
 
@@ -36,7 +41,8 @@ class TaskQueueController {
         const coords = request.body.coords;
         const zoomWidth = request.body.zoomWidth;
         const city = request.body.city;
-        const batchNum = request.body.batchNum;
+        const batchNum = request.body.batchNum; // admin should have gotten this from the previous endpoint
+        // console.log(request.body, "40rm");
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return response.status(400).send("Invalid provider input");
         }
@@ -51,8 +57,8 @@ class TaskQueueController {
         if (batchNum && typeof batchNum !== "number") return response.status(400).send("Invalid batchNum input");
 
         const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, city, batchNum);
-        console.log(queued, "54rm");
-        return response.status(200).json(queued);
+        // console.log(queued, "54rm");
+        return response.status(200).json({ queued });
     }
 
     async getNextTasksForScraper(request: Request, response: Response) {
@@ -68,7 +74,7 @@ class TaskQueueController {
 
         const tasks: Task[] = await this.taskQueueService.getNextTasksForScraper(provider, batchNum);
 
-        return response.status(200).json(tasks);
+        return response.status(200).json({ tasks });
     }
 
     async reportFindingsToDbAndMarkComplete(request: Request, response: Response) {
@@ -81,7 +87,9 @@ class TaskQueueController {
         }
 
         const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments);
+        console.log(successfullyLogged, taskId, "91rm");
         const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
+        console.log(markedComplete, taskId, "91rm");
         return response.status(200).json({ successfullyLogged, markedComplete, taskId });
     }
 

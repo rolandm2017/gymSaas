@@ -28,7 +28,7 @@ describe("confirm city DAO works as expected", () => {
             centerLat: 50,
             centerLong: 50,
             scanRadius: 25,
-            lastScan: undefined,
+            lastScan: null,
         };
         const initCity = await cityDAO.createCity(cityPayload);
         expect(initCity.cityId).toBeDefined();

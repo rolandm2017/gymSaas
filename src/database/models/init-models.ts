@@ -5,6 +5,7 @@ import { Housing as _Housing } from "./Housing";
 import { Report as _Report } from "./Report";
 import { RefreshToken as _RefreshToken } from "./RefreshToken";
 import { ResetToken as _ResetToken } from "./ResetToken";
+import { Batch as _Batch } from "./Batch";
 
 import { City as _City } from "./City";
 // import { Provider as _Provider } from "./Provider";
@@ -19,6 +20,7 @@ function initModels(sequelize: Sequelize) {
     const City = _City.initModel(sequelize);
     // const Provider = _Provider.initModel(sequelize);
     const Task = _Task.initModel(sequelize);
+    const Batch = _Batch.initModel(sequelize);
 
     Account.hasMany(RefreshToken, {
         foreignKey: "acctId",
@@ -60,7 +62,25 @@ function initModels(sequelize: Sequelize) {
         as: "gym_is_in_city",
     });
 
-    return { Account, RefreshToken, ResetToken, Housing, Gym, City, Task };
+    // Batch relationships
+    Batch.hasMany(Task, {
+        foreignKey: "batchId",
+        as: "tasks_for_this_batch",
+    });
+    Task.hasOne(Batch, {
+        foreignKey: "batchId",
+        as: "task_from_batch",
+    });
+    Batch.hasMany(Housing, {
+        foreignKey: "batchId",
+        as: "housings_from_this_batch",
+    });
+    Housing.hasOne(Batch, {
+        foreignKey: "batchId",
+        as: "housing_from_batch",
+    });
+
+    return { Account, RefreshToken, ResetToken, Housing, Gym, City, Batch, Task };
 }
 
 export default initModels;
