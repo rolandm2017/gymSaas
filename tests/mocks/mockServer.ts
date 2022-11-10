@@ -143,7 +143,6 @@ class App {
         for (const city of SEED_CITIES) {
             // check if city is seeded into db before trying to add a dupe
             const found = await City.findOne({ where: city });
-            console.log("Found city with name: ", found?.city);
             if (found) continue;
             City.create(city);
         }

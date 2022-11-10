@@ -17,11 +17,9 @@ class BatchDAO {
     public addBatchNum = async (newBatchNum?: number) => {
         try {
             if (newBatchNum) {
-                const x = await Batch.create({ batchId: newBatchNum });
-                return x;
+                return await Batch.create({ batchId: newBatchNum });
             }
             const highestCurrent = await this.getHighestBatchNum();
-            console.log(highestCurrent, "31rm");
             if (highestCurrent) return await Batch.create({ batchId: highestCurrent + 1 });
             else return await Batch.create({ batchId: 1 });
         } catch (err) {

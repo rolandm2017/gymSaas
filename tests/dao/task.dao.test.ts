@@ -10,6 +10,7 @@ let taskDAO: TaskDAO = new TaskDAO();
 
 beforeAll(async () => {
     await app.connectDB();
+    await app.dropTable("city");
 });
 
 beforeEach(async () => {
@@ -24,7 +25,7 @@ describe("confirm task DAO works as expected", () => {
     test("we can insert 3 different batches of tasks and then get the batch num", async () => {
         // setup so that city with cityId exists
         const cityPayload: CityCreationAttributes = {
-            city: "montreal2",
+            city: "montreal2222",
             state: "quebec",
             country: "canada",
             centerLat: 50,
@@ -33,6 +34,7 @@ describe("confirm task DAO works as expected", () => {
             lastScan: null,
         };
         const initCity = await cityDAO.createCity(cityPayload);
+        if (initCity === undefined) fail("must be defined");
         expect(initCity.cityId).toBeDefined();
         1;
         const payload: TaskCreationAttributes = {
@@ -47,7 +49,6 @@ describe("confirm task DAO works as expected", () => {
         let t = await taskDAO.createTask(payload);
         expect(t.batch).toBe(1);
         let highestBatch = await taskDAO.getHighestBatchNum();
-        console.log(highestBatch, "49rm");
         if (highestBatch === null) throw new Error("expected batch does not exist");
         // 2
         payload.batch = highestBatch.batch + 1;

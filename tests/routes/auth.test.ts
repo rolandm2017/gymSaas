@@ -19,14 +19,14 @@ const validCredentials = {
 };
 
 const invalidCredentials1 = {
-    email: emails[0],
+    email: emails[1],
     password: passwords[0],
     confirmPassword: passwords[0],
     acceptTerms: false, // false is a problem
 };
 
 const invalidCredentials2 = {
-    email: emails[0],
+    email: emails[2],
     password: passwords[0],
     confirmPassword: passwords[1], // if pw no match, problem!
     acceptTerms: true,
@@ -89,10 +89,10 @@ describe("Test auth controller", () => {
     describe("POST /authenticate", () => {
         // authentic
         test("responds with success msg if body is populated properly", () => {
-            //
+            // todo
         });
         test("malformed and edge cases are rejected", () => {
-            //
+            // todo
         });
     });
     describe("Complete user registration flow & password reset", () => {
@@ -164,12 +164,13 @@ describe("Test auth controller", () => {
                 confirmPassword: "jlg900#A",
                 acceptTerms: true,
             };
-            const res = await request(server).post(`${path}/register`).set("origin", "testSuite").send(credentials3);
-            expect(res.body.message).toBe("Registration successful, please check your email for verification instructions");
-            expect(res.body.accountDetails.email).toBe(credentials3.email);
-            expect(res.body.accountDetails.isVerified).toBe(null);
+            const registrationRes = await request(server).post(`${path}/register`).set("origin", "testSuite").send(credentials3);
+            expect(registrationRes.body.message).toBe("Registration successful, please check your email for verification instructions");
+            expect(registrationRes.body.accountDetails.email).toBe(credentials3.email);
+            expect(registrationRes.body.accountDetails.isVerified).toBe(null);
             // get token via cheater method b/c we don't have email set up => verify ownership of account
             const madeAcct = await acctDAO.getAccountByEmail(credentials3.email);
+            if (madeAcct.length === 0) fail("No account found when there should've been one");
             const token = madeAcct[0].verificationToken;
             const payload = { token: token };
             const acctVerificationRes = await request(server).post(`${path}/verify_email`).send(payload);

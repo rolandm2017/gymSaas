@@ -9,6 +9,7 @@ let taskDAO: TaskDAO = new TaskDAO();
 
 beforeAll(async () => {
     await app.connectDB();
+    await app.dropTable("city");
 });
 
 beforeEach(async () => {
@@ -31,7 +32,7 @@ describe("confirm city DAO works as expected", () => {
             lastScan: null,
         };
         const initCity = await cityDAO.createCity(cityPayload);
-        console.log(initCity, "34rm");
+        if (initCity === undefined) fail("must be defined");
         expect(initCity.cityId).toBeDefined();
     });
 });

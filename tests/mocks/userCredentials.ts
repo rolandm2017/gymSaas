@@ -1,4 +1,13 @@
-export const emails: string[] = ["a@gmail.com", "b@gmail.com", "c@gmail.com", "d@gmail.com", "e@gmail.com"];
+export const emails: string[] = [
+    "a@gmail.com",
+    "b@gmail.com",
+    "c@gmail.com",
+    "d@gmail.com",
+    "e@gmail.com",
+    "kim@gmail.com",
+    "foo@gmail.com",
+    "hats@gmail.com",
+];
 
 export const passwords: string[] = ["hats888*I", "hats777&U", "hats666^Y", "hats555%T", "hats444$R"];
 
