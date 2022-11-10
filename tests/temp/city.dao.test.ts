@@ -31,6 +31,7 @@ describe("confirm city DAO works as expected", () => {
             lastScan: null,
         };
         const initCity = await cityDAO.createCity(cityPayload);
+        console.log(initCity, "34rm");
         expect(initCity.cityId).toBeDefined();
     });
 });

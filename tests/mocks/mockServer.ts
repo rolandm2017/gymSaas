@@ -59,7 +59,7 @@ class App {
         this.middlewares(appInit.middlewares);
         // this.app.use(ErrorMiddleware.handleRouteErrors); // this will catch any error thrown routes
         this.routes(appInit.controllers);
-        this.seedDb();
+        // this.seedDb();
         this.app.use(errorHandler);
     }
 
@@ -77,7 +77,7 @@ class App {
         // console.log("Database Connection Established");
         await App.Database.sync({ force: true });
         await initModels(App.Database);
-        // await this.seedDb();
+        await this.seedDb();
         // await App.Database.drop();
         // console.log("Database Sync");
         this.dbConnOpen = true;
@@ -141,7 +141,11 @@ class App {
 
     public async seedDb() {
         for (const city of SEED_CITIES) {
-            await City.create(city);
+            // check if city is seeded into db before trying to add a dupe
+            const found = await City.findOne({ where: city });
+            console.log("Found city with name: ", found?.city);
+            if (found) continue;
+            City.create(city);
         }
     }
 }

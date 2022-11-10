@@ -1,9 +1,5 @@
 import { Association, DataTypes, Model, Optional, Sequelize } from "sequelize";
 
-import sequelizeConnection from "../Database";
-
-// import { LocationAttributes } from "./Location";
-
 export interface CityAttributes {
     cityId?: number;
     city: string;

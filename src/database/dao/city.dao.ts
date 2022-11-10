@@ -20,6 +20,7 @@ class CityDAO {
     };
 
     public createCity = (city: CityCreationAttributes) => {
+        console.log(city, "23rm");
         return City.create(city);
     };
 
