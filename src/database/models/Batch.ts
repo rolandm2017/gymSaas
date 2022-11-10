@@ -28,7 +28,6 @@ export class Batch extends Model<BatchAttributes, BatchCreationAttributes> imple
             {
                 timestamps: true,
                 sequelize: sequelize,
-                paranoid: false,
             },
         );
     }

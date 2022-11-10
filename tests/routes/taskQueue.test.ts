@@ -10,8 +10,10 @@ import { smlCanada } from "../mocks/smallRealResults/smlCanada";
 import { smlFaster } from "../mocks/smallRealResults/smlFaster";
 import { smlSeeker } from "../mocks/smallRealResults/smlSeeker";
 import BatchDAO from "../../src/database/dao/batch.dao";
+import CityDAO from "../../src/database/dao/city.dao";
 
 const taskDAO = new TaskDAO();
+const cityDAO = new CityDAO();
 
 const testTasks = [
     {
@@ -191,14 +193,12 @@ describe("test taskQueue controller", () => {
             for (let i = 0; i < findingsPayloads.length; i++) {
                 const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
                 // now all the ones for rentCanada should be marked complete
-                console.log(completedTasksResponse.body, "195rm");
                 expect(completedTasksResponse.body.markedComplete).toBe(true);
                 expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.results.listings.length);
                 expect(completedTasksResponse.body.taskId).toBe(findingsPayloads[i].taskId);
             }
             // now verify that all tasks for this provider are completed.
             const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
-            console.log(allTasksForThisProvider.body, "201rm");
             const allTasksAreCompleted = allTasksForThisProvider.body.all.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!
@@ -227,14 +227,12 @@ describe("test taskQueue controller", () => {
             for (let i = 0; i < findingsPayloads.length; i++) {
                 const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
                 // now all the ones for rentFaster should be marked complete
-                console.log(completedTasksResponse.body, "195rm");
                 expect(completedTasksResponse.body.markedComplete).toBe(true);
                 expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.results.listings.length);
                 expect(completedTasksResponse.body.taskId).toBe(findingsPayloads[i].taskId);
             }
             // now verify that all tasks for this provider are completed.
             const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
-            console.log(allTasksForThisProvider.body, "201rm");
             const allTasksAreCompleted = allTasksForThisProvider.body.all.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!
@@ -263,14 +261,12 @@ describe("test taskQueue controller", () => {
             for (let i = 0; i < findingsPayloads.length; i++) {
                 const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
                 // now all the ones for rentSeeker should be marked complete
-                console.log(completedTasksResponse.body, "195rm");
                 expect(completedTasksResponse.body.markedComplete).toBe(true); // note that "results.hits" is for rentSeeker
                 expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.results.hits.length);
                 expect(completedTasksResponse.body.taskId).toBe(findingsPayloads[i].taskId);
             }
             // now verify that all tasks for this provider are completed.
             const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
-            console.log(allTasksForThisProvider.body, "201rm");
             const allTasksAreCompleted = allTasksForThisProvider.body.all.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!

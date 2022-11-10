@@ -46,6 +46,7 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
                 city: {
                     type: DataTypes.STRING,
                     allowNull: false,
+                    unique: true,
                 },
                 state: {
                     type: DataTypes.STRING,
@@ -74,8 +75,7 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
             },
             {
                 timestamps: true,
-                sequelize: sequelizeConnection,
-                paranoid: true,
+                sequelize: sequelize,
             },
         );
     }

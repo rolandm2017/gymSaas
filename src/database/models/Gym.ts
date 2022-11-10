@@ -74,8 +74,7 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
             },
             {
                 timestamps: true,
-                sequelize: sequelizeConnection,
-                paranoid: true,
+                sequelize: sequelize,
             },
         );
     }

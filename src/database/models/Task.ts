@@ -85,7 +85,6 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
             {
                 timestamps: true,
                 sequelize: sequelize,
-                paranoid: true,
             },
         );
     }

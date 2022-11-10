@@ -34,6 +34,8 @@ import HousingDAO from "../../src/database/dao/housing.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { Batch } from "../../src/database/models/Batch";
 
+import { SEED_CITIES } from "../../src/seed/seedCities";
+
 class App {
     public app: Application;
     public port: number;
@@ -57,6 +59,7 @@ class App {
         this.middlewares(appInit.middlewares);
         // this.app.use(ErrorMiddleware.handleRouteErrors); // this will catch any error thrown routes
         this.routes(appInit.controllers);
+        this.seedDb();
         this.app.use(errorHandler);
     }
 
@@ -74,6 +77,7 @@ class App {
         // console.log("Database Connection Established");
         await App.Database.sync({ force: true });
         await initModels(App.Database);
+        // await this.seedDb();
         // await App.Database.drop();
         // console.log("Database Sync");
         this.dbConnOpen = true;
@@ -96,7 +100,6 @@ class App {
             await ResetToken.destroy({ where: {} });
         }
         if (tableName === "task") {
-            console.log("deleting all tasks ... supposedly 99rm");
             await Task.destroy({ where: {} });
         }
         if (tableName === "city") {
@@ -134,6 +137,12 @@ class App {
             // console.log(controller.path, "... is running");
             this.app.use(controller.path, controller.router);
         });
+    }
+
+    public async seedDb() {
+        for (const city of SEED_CITIES) {
+            await City.create(city);
+        }
     }
 }
 

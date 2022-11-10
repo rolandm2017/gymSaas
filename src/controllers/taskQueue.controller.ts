@@ -31,7 +31,6 @@ class TaskQueueController {
         console.log("30rm");
         const batchDAO = new BatchDAO();
         const highest = await getBatchNumForNewBatches(batchDAO);
-        console.log(highest, "31rm");
         if (highest) return response.status(200).json({ nextBatchNum: highest });
         else return response.status(200).json({ nextBatchNum: 0 });
     }
@@ -67,7 +66,6 @@ class TaskQueueController {
         // If specified: Get that batch's unfinished tasks for provider.
         // If not specified: Get ALL unfinished tasks for provider.
         const batchNum = request.body.batchNum; // MIGHT need batch number, but also might not!
-        console.log(provider, batchNum, "52rm");
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return response.status(400).send("Invalid provider input");
         }
@@ -87,17 +85,13 @@ class TaskQueueController {
         }
 
         const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments);
-        console.log(successfullyLogged, taskId, "91rm");
         const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
-        console.log(markedComplete, taskId, "91rm");
         return response.status(200).json({ successfullyLogged, markedComplete, taskId });
     }
 
     async getAllTasks(request: Request, response: Response) {
         const choice = request.body.provider;
-        console.log(choice, "83rm");
         const all: Task[] = await this.taskQueueService.getAllTasks(choice);
-        console.log(all, "92rm");
         return response.status(200).json({ all: all });
     }
 

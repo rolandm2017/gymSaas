@@ -43,6 +43,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 email: {
                     type: DataTypes.STRING,
                     allowNull: false,
+                    unique: true,
                 },
                 passwordHash: {
                     type: DataTypes.STRING,

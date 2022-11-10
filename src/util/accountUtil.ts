@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+
 import { IAccount } from "../interface/Account.interface";
 import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import { IRefreshToken } from "../interface/RefreshToken.interface";
@@ -8,6 +10,8 @@ import { Account, AccountCreationAttributes } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
 import { RefreshToken } from "../database/models/RefreshToken";
 import { IRegistrationDetails } from "../interface/RegistrationDetails.interface";
+
+dotenv.config({ path: "./.env" });
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
 if (secret === "YOLO") {

@@ -84,7 +84,6 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
             {
                 timestamps: true,
                 sequelize: sequelize,
-                paranoid: true,
             },
         );
     }

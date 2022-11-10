@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { expressjwt as jwt } from "express-jwt";
+import dotenv from "dotenv";
+
 import AccountDAO from "../database/dao/account.dao";
 import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import { Account } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
-import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
 const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";

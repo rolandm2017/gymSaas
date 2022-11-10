@@ -1,7 +1,7 @@
 import { Account } from "../../src/database/models/Account";
 
 const expectedAccount: Account = {
-    id: 999999,
+    acctId: 999999,
     email: "someEmail@gmail.com",
     passwordHash: "catsjfpdsjafdsaofdsfa",
     isVerified: true,
@@ -10,6 +10,6 @@ const expectedAccount: Account = {
     updated: 24332,
     role: "User",
     // many fields missing (intentionally)
-} as Account;
+} as unknown as Account;
 
 export default expectedAccount;

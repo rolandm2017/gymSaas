@@ -1,10 +1,6 @@
-import { cookie } from "express-validator";
-import request from "supertest";
 import AccountDAO from "../../src/database/dao/account.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
-import { Account } from "../../src/database/models/Account";
 import { Role } from "../../src/enum/role.enum";
-import { IAccount } from "../../src/interface/Account.interface";
 import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
 import { IRegistrationDetails } from "../../src/interface/RegistrationDetails.interface";
 import { ISmallError } from "../../src/interface/SmallError.interface";
@@ -24,10 +20,6 @@ const validCredentials = {
     acceptTerms: true,
 };
 
-const validIPAddress = "143.14.14.143";
-
-const JWT_TOKEN_LENGTH = 40; // todo: add real length of jwt
-const REFRESH_TOKEN_LENGTH = 40; // todo: get real length
 const someOrigin = "whatever";
 
 let authService: AuthService;
@@ -47,7 +39,6 @@ beforeAll(async () => {
     emailService = new EmailService(acctDAO);
     // // make an acct in db
     authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
-    // console.log("Creating account with credentials:", validCredentials);
 });
 
 beforeEach(async () => {
@@ -69,7 +60,6 @@ describe("test auth service on its own", () => {
             const testAcct = { ...validCredentials };
             testAcct.email = "someOtherEmail2@gmail.com";
             const registered: IBasicDetails | ISmallError = await authService.register(testAcct, someOrigin);
-            // console.log(registered);
             if ("email" in registered) {
                 expect(registered.email).toEqual(testAcct.email);
             } else {

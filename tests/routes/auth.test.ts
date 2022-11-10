@@ -188,6 +188,6 @@ describe("Test auth controller", () => {
             const newPwPayload = { ...t, password: "someNewPw99##", confirmPassword: "someNewPw99##" };
             const resetPwRes = await request(server).post(`${path}/reset_password`).send(newPwPayload);
             expect(resetPwRes.body.message).toBe("Password reset successful, you can now login");
-        }, 100000);
+        });
     });
 });

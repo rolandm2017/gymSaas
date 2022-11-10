@@ -12,7 +12,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-    await app.dropTable("city");
+    // await app.dropTable("city");
 });
 
 afterAll(async () => {

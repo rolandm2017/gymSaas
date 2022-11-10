@@ -45,8 +45,7 @@ export class ResetToken extends Model<ResetTokenAttributes, ResetTokenCreationAt
             },
             {
                 timestamps: true,
-                sequelize: sequelizeConnection,
-                paranoid: true,
+                sequelize: sequelize,
             },
         );
     }

@@ -52,8 +52,7 @@ export class Report extends Model<ReportAttributes, ReportCreationAttributes> im
             },
             {
                 timestamps: true,
-                sequelize: sequelizeConnection,
-                paranoid: true,
+                sequelize: sequelize,
             },
         );
     }
