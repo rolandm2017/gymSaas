@@ -20,7 +20,11 @@ class CityDAO {
     };
 
     public createCity = (city: CityCreationAttributes) => {
-        return City.create(city);
+        try {
+            return City.create(city);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public updateCity = (city: CityCreationAttributes, id: number) => {

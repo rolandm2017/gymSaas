@@ -75,18 +75,18 @@ class App {
         App.initDB();
         await App.Database.authenticate();
         // console.log("Database Connection Established");
+        await App.Database.drop();
         await App.Database.sync({ force: true });
         await initModels(App.Database);
         await this.seedDb();
-        // await App.Database.drop();
         // console.log("Database Sync");
         this.dbConnOpen = true;
     }
 
     public async dropAllTables() {
         if (!this.dbConnOpen) return;
-        // console.log("Dropping all tables...");
-        await App.Database.drop();
+        console.log("Dropping all tables...");
+        // await App.Database.drop();
         // fixme: Never managed to make this work
         await App.Database.sync({ force: true });
     }

@@ -30,6 +30,7 @@ let accountUtil: AccountUtil;
 
 beforeAll(async () => {
     await app.connectDB();
+    await app.dropAllTables();
     // lots of setup
     accountUtil = new AccountUtil();
 
@@ -56,7 +57,6 @@ afterAll(async () => {
 describe("test auth service on its own", () => {
     describe("sign up, log in", () => {
         test("[register] you can register an account", async () => {
-            //fixme: use 2nd valid credentails
             const testAcct = { ...validCredentials };
             testAcct.email = "someOtherEmail2@gmail.com";
             const registered: IBasicDetails | ISmallError = await authService.register(testAcct, someOrigin);

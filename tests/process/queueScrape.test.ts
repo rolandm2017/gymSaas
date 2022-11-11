@@ -15,6 +15,12 @@
 //     await app.closeDB();
 // });
 
+describe("placeholder", () => {
+    test("placeholder", () => {
+        expect(true).toBe(true);
+    });
+});
+
 // describe("Queue a scrape for the engine", () => {
 //     // **
 //     // ** commented out b/c it takes way too long to run

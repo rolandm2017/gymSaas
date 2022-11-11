@@ -5,6 +5,7 @@ const batchDAO: BatchDAO = new BatchDAO();
 
 beforeAll(async () => {
     await app.connectDB();
+    await app.dropAllTables();
 });
 
 beforeEach(async () => {

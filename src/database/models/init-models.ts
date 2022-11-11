@@ -15,9 +15,10 @@ function initModels(sequelize: Sequelize) {
     const Account = _Account.initModel(sequelize);
     const RefreshToken = _RefreshToken.initModel(sequelize);
     const ResetToken = _ResetToken.initModel(sequelize);
+    // city must be added before housing, gym, task, because they depend on it
+    const City = _City.initModel(sequelize);
     const Housing = _Housing.initModel(sequelize);
     const Gym = _Gym.initModel(sequelize);
-    const City = _City.initModel(sequelize);
     // const Provider = _Provider.initModel(sequelize);
     const Task = _Task.initModel(sequelize);
     const Batch = _Batch.initModel(sequelize);

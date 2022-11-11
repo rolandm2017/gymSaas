@@ -33,7 +33,11 @@ class TaskDAO {
     };
 
     public createTask = (task: TaskCreationAttributes) => {
-        return Task.create(task);
+        try {
+            return Task.create(task);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     // Can't work because it doesn't allow create with associations.

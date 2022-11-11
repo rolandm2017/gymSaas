@@ -8,7 +8,7 @@ let activeAcctDAO: AccountDAO = new AccountDAO();
 
 beforeAll(async () => {
     await app.connectDB();
-    // await app.dropAllTables();
+    await app.dropAllTables();
 });
 
 beforeEach(async () => {

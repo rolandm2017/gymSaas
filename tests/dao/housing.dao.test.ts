@@ -11,10 +11,11 @@ const housingDAO = new HousingDAO();
 
 beforeAll(async () => {
     await app.connectDB();
-    await app.dropTable("city");
+    await app.dropAllTables();
 });
 
 beforeEach(async () => {
+    await app.dropTable("city");
     await app.dropTable("housing");
 });
 

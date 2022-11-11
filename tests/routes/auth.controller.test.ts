@@ -1,4 +1,3 @@
-import { cookie } from "express-validator";
 import request from "supertest";
 import AccountDAO from "../../src/database/dao/account.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
@@ -44,7 +43,8 @@ let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 
 beforeAll(async () => {
     await app.connectDB();
-    await app.dropTable("account");
+    // await app.dropTable("account");
+    await app.dropAllTables();
 });
 
 afterAll(async () => {

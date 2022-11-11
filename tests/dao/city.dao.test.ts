@@ -9,7 +9,8 @@ let taskDAO: TaskDAO = new TaskDAO();
 
 beforeAll(async () => {
     await app.connectDB();
-    await app.dropTable("city");
+    // await app.dropTable("city");
+    await app.dropAllTables();
 });
 
 beforeEach(async () => {

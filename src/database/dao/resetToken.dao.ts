@@ -7,6 +7,10 @@ class ResetTokenDAO {
         this.acctDAO = acctDAO;
     }
 
+    public createResetToken = async (acctId: number, token: string, expires: Date) => {
+        return await ResetToken.create({ acctId: acctId, token: token, expires: expires });
+    };
+
     public getResetTokenByEmail = async (email: string) => {
         const acct = await this.acctDAO.getAccountByEmail(email);
         return await ResetToken.findOne({ where: { acctId: acct[0].acctId } });
@@ -27,8 +31,8 @@ class ResetTokenDAO {
         });
     };
 
-    public createResetToken = async (acctId: number, token: string, expires: Date) => {
-        return await ResetToken.create({ acctId: acctId, token: token, expires: expires });
+    public getAllResetTokens = async () => {
+        return await ResetToken.findAll({ where: {} });
     };
 
     public deleteResetTokenById = (tokenId: number) => {

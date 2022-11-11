@@ -12,6 +12,8 @@ let newAcct;
 
 beforeAll(async () => {
     await app.connectDB();
+    // await app.dropTable("resetToken");
+    await app.dropAllTables();
     const newAcctDetails = {
         email: "kim@gmail.com",
         passwordHash: "afsdoifsaofj",
@@ -26,16 +28,19 @@ beforeAll(async () => {
     await resetTokenDAO.createResetToken(newAcct.acctId, "someTokenString", now);
 });
 
-beforeEach(async () => {
-    await app.dropTable("resetToken");
-});
+beforeEach(async () => {});
 
 afterAll(async () => {
     await app.closeDB();
 });
 
 describe("reset token DAO tests", () => {
+    test("reset token dao returns null if there is no batches", async () => {
+        const definitelyNull = await resetTokenDAO.getAllResetTokens();
+        expect(definitelyNull.length).toBe(1); // 1 because something is added in beforeAll()
+    });
     test("create one", async () => {
+        // todo
         const freshAcctDetails = {
             email: "sally@gmail.com",
             passwordHash: "afsdoifsaofj3adsfads",
@@ -45,8 +50,9 @@ describe("reset token DAO tests", () => {
             role: "User",
             passwordReset: 110,
         };
-    });
-    test("i see 0 accounts in the db when it is freshly started", async () => {
-        //
+        const newAcct = await acctDAO.createAccount(freshAcctDetails);
+        const newResetToken = await resetTokenDAO.createResetToken(newAcct.acctId, "someOtherTokenString", new Date());
+        expect(newResetToken.token).toBeDefined();
+        expect(newResetToken.acctId).toBe(newAcct.acctId);
     });
 });
