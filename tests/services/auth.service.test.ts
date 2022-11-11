@@ -30,7 +30,8 @@ let accountUtil: AccountUtil;
 
 beforeAll(async () => {
     await app.connectDB();
-    await app.dropAllTables();
+    // await app.dropAllTables(); // takes too long
+    await app.dropTable("account");
     // lots of setup
     accountUtil = new AccountUtil();
 

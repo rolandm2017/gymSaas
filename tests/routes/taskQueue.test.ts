@@ -92,9 +92,9 @@ const miniPayloadRentSeeker = {
 
 beforeAll(async () => {
     await app.connectDB();
-    await app.dropAllTables();
+    await app.dropAllTables(); // takes too long
     await app.seedDb();
-}, 15000);
+});
 
 beforeEach(async () => {
     await app.dropTable("task");

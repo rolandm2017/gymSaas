@@ -6,13 +6,17 @@ import { ProviderEnum } from "../../src/enum/provider.enum";
 
 import { app } from "../mocks/mockServer";
 
+process.on("unhandledRejection", reason => {
+    console.log(reason); // log the reason including the stack trace
+});
+
 let cityDAO: CityDAO = new CityDAO();
 let taskDAO: TaskDAO = new TaskDAO();
 
 beforeAll(async () => {
     await app.connectDB();
-    // await app.dropTable("city");
-    await app.dropAllTables();
+    await app.dropTable("city");
+    // await app.dropAllTables(); // takes too long
 });
 
 afterAll(async () => {
@@ -46,8 +50,7 @@ describe("we see if drop all tables really drops all tables", () => {
             console.log(initCity, "40rm");
             cityId = initCity.cityId;
         } catch (err) {
-            console.log(err);
-            expect(true).toBe(false); // fail
+            fail(err + "49rm");
         }
     });
     test("spam tasks", async () => {
@@ -71,7 +74,8 @@ describe("we see if drop all tables really drops all tables", () => {
             expect(t.batch).toBe(1);
         } catch (err) {
             console.log(err);
-            expect(true).toBe(false); // fail
+            fail(err + "73rm");
+            // expect(true).toBe(false); // fail
             // fail("some error2");
         }
     });
