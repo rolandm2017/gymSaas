@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "jest",
+        "test": "jest --verbose",
         "dev": "nodemon ./src/server.ts",
         "start": "node ./dist/server.js",
         "test:c": "jest -i tests/controller/*",
