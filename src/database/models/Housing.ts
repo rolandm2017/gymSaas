@@ -5,6 +5,7 @@ import { BuildingTypeEnum } from "../../enum/buildingType.enum";
 import sequelizeConnection from "../Database";
 import { Batch } from "./Batch";
 import { City } from "./City";
+import { State } from "./State";
 import { Task } from "./Task";
 
 interface HousingAttributes {
@@ -18,6 +19,7 @@ interface HousingAttributes {
     long: number;
     taskId?: number;
     cityId?: number;
+    stateId?: number;
     batchId?: number;
     createdAt?: Date;
     updatedAt?: Date;
@@ -38,6 +40,7 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public long!: number;
     public taskId!: ForeignKey<Task["taskId"]>;
     public cityId!: ForeignKey<City["cityId"]>;
+    public stateId!: ForeignKey<State["stateId"]>;
     public batchId!: ForeignKey<Batch["batchId"]>;
 
     public readonly createdAt!: Date;

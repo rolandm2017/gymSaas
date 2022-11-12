@@ -41,6 +41,7 @@ import { SEED_CITIES } from "../../src/seed/seedCities";
 import ScraperService from "../../src/service/scraper.service";
 import CacheService from "../../src/service/cache.service";
 import BatchDAO from "../../src/database/dao/batch.dao";
+import StateDAO from "../../src/database/dao/state.dao";
 
 class App {
     public app: Application;
@@ -158,9 +159,10 @@ class App {
 const port = parseInt(process.env.PORT!, 10);
 
 // initialize dao
+const stateDAO = new StateDAO();
 const batchDAO = new BatchDAO();
 const cityDAO = new CityDAO();
-const housingDAO = new HousingDAO();
+const housingDAO = new HousingDAO(stateDAO);
 const taskDAO = new TaskDAO();
 const acctDAO = new AccountDAO();
 const accountUtil = new AccountUtil();

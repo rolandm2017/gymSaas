@@ -1,5 +1,6 @@
 import CityDAO from "../../src/database/dao/city.dao";
 import HousingDAO from "../../src/database/dao/housing.dao";
+import StateDAO from "../../src/database/dao/state.dao";
 import { CityCreationAttributes } from "../../src/database/models/City";
 import { HousingCreationAttributes } from "../../src/database/models/Housing";
 import { AgreementTypeEnum } from "../../src/enum/agreementType.enum";
@@ -7,7 +8,8 @@ import { BuildingTypeEnum } from "../../src/enum/buildingType.enum";
 import { app } from "../mocks/mockServer";
 
 let cityDAO: CityDAO = new CityDAO();
-const housingDAO = new HousingDAO();
+const stateDAO: StateDAO = new StateDAO();
+const housingDAO = new HousingDAO(stateDAO);
 
 beforeAll(async () => {
     await app.connectDB();

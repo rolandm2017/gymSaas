@@ -1,4 +1,5 @@
-import { Association, DataTypes, Model, Optional, Sequelize } from "sequelize";
+import { Association, DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
+import { State } from "./State";
 
 export interface CityAttributes {
     cityId?: number;
@@ -8,6 +9,7 @@ export interface CityAttributes {
     centerLat: number;
     centerLong: number;
     scanRadius: number; // the GTA has a radius of around 25 km.
+    stateId?: number;
     lastScan: Date | null;
     createdAt?: Date;
     updatedAt?: Date;
@@ -26,6 +28,7 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
     public centerLong!: number;
     public scanRadius!: number;
     public lastScan!: Date | null; // used to distinguish between up to date results and out of date results.
+    public stateId?: ForeignKey<State["stateId"]>;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;

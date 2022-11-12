@@ -1,8 +1,10 @@
 import { CityCreationAttributes } from "../database/models/City";
+import { ProvinceIdEnum } from "../enum/canadaProvince.enum";
 import { CityEnum } from "../enum/city.enum";
 
 export const SEED_CITIES: CityCreationAttributes[] = [
     {
+        stateId: ProvinceIdEnum.britishColumbia,
         city: CityEnum.vancouver,
         state: "British Columbia",
         country: "Canada",
@@ -12,6 +14,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         lastScan: null,
     },
     {
+        stateId: ProvinceIdEnum.alberta,
         city: CityEnum.calgary,
         state: "Alberta",
         country: "Canada",
@@ -21,6 +24,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         lastScan: null,
     },
     {
+        stateId: ProvinceIdEnum.alberta,
         city: CityEnum.edmonton,
         state: "Alberta",
         country: "Canada",
@@ -30,6 +34,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         lastScan: null,
     },
     {
+        stateId: ProvinceIdEnum.manitoba,
         city: CityEnum.winnipeg,
         state: "Manitoba",
         country: "Canada",
@@ -39,6 +44,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         lastScan: null,
     },
     {
+        stateId: ProvinceIdEnum.ontario,
         city: CityEnum.toronto,
         state: "Ontario",
         country: "Canada",
@@ -48,6 +54,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         lastScan: null,
     },
     {
+        stateId: ProvinceIdEnum.quebec,
         city: CityEnum.montreal,
         state: "Quebec",
         country: "Canada",

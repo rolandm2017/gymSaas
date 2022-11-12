@@ -1,8 +1,6 @@
 import { City, CityCreationAttributes } from "../models/City";
 
 class CityDAO {
-    constructor() {}
-
     public getMultipleCities = (limit: number, offset?: number) => {
         return City.findAndCountAll({ offset, limit });
     };

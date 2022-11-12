@@ -1,0 +1,15 @@
+export enum ProvinceIdEnum {
+    britishColumbia = 1,
+    alberta = 2,
+    saskatchewan = 3,
+    manitoba = 4,
+    ontario = 5,
+    quebec = 6,
+    PEI = 7,
+    newBrunswick = 8,
+    novaScotia = 9,
+    newfoundland = 10,
+    yukon = 11,
+    nunavut = 12,
+    northwestTerritories = 13,
+}

@@ -1,6 +1,7 @@
 // todo
 
 import HousingDAO from "../database/dao/housing.dao";
+import { Housing } from "../database/models/Housing";
 
 class ApartmentService {
     private housingDAO: HousingDAO;
@@ -9,8 +10,8 @@ class ApartmentService {
     }
 
     //
-    public async getAll() {
-        return this.housingDAO.getAllHousing();
+    public async getAllHousing(cityId: number, stateOrProvince: string, country?: string): Promise<Housing[]> {
+        return await this.housingDAO.getAllHousing(cityId, stateOrProvince, country);
     }
 }
 

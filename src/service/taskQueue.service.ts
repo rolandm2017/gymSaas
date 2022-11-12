@@ -124,15 +124,13 @@ class TaskQueueService {
     }
 
     public async cleanSpecific(byArray: number[] | undefined, byRange: number[] | undefined): Promise<number[]> {
-        console.log(byArray, byRange, "is this thing even on? 127rm");
         const deletedTaskIds = [];
         let toDelete: number[] = [];
+        // this is mostly to prevent ts from yelling about "maybe undefined!"
         const probablyUsingByRange = Array.isArray(byArray) && byArray.length === 0;
-        const definitelyUsingByRange = Array.isArray(byRange);
+        const definitelyUsingByRange = Array.isArray(byRange); // this is mostly to satisfy TS
         if (probablyUsingByRange && definitelyUsingByRange) {
-            console.log(byRange, "131rm");
             for (let i = byRange[0]; i < byRange[1]; i++) {
-                console.log(i, "133rm");
                 toDelete.push(i);
             }
         } else if (Array.isArray(byArray)) {
@@ -141,9 +139,7 @@ class TaskQueueService {
             throw new Error("input validation failed");
         }
         // loop over them and delete
-        console.log(toDelete, "140rm");
         for (const taskId of toDelete) {
-            console.log(taskId, "142rm");
             try {
                 await this.taskDAO.deleteTask(taskId);
                 deletedTaskIds.push(taskId);
@@ -152,7 +148,6 @@ class TaskQueueService {
                 console.log(taskId + " failed to delete; perhaps it doesn't exist?");
             }
         }
-        console.log(deletedTaskIds, "yes it is 149rm");
         return deletedTaskIds;
     }
 

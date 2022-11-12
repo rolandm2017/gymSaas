@@ -17,11 +17,22 @@ import TaskDAO from "./database/dao/task.dao";
 import CityDAO from "./database/dao/city.dao";
 // import TestController from "./controllers/test.controller";
 import HousingDAO from "./database/dao/housing.dao";
+import StateDAO from "./database/dao/state.dao";
+import ApartmentService from "./service/apartment.service";
+import ScraperService from "./service/scraper.service";
+import CacheService from "./service/cache.service";
+import BatchDAO from "./database/dao/batch.dao";
 
 const port = parseInt(process.env.PORT!, 10);
 
+// misc
+const accountUtil: AccountUtil = new AccountUtil();
+
+// dao
+const batchDAO = new BatchDAO();
 const cityDAO = new CityDAO();
-const housingDAO = new HousingDAO();
+const stateDAO = new StateDAO();
+const housingDAO = new HousingDAO(stateDAO);
 const taskDAO = new TaskDAO();
 const acctDAO: AccountDAO = new AccountDAO();
 const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
@@ -29,9 +40,11 @@ const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 // services
 // is there a better place to initialize these?
 const e: EmailService = new EmailService(acctDAO);
-const accountUtil: AccountUtil = new AccountUtil();
+const apartmentService = new ApartmentService(housingDAO);
+const scraperService = new ScraperService();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
 const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO);
+const cacheService = new CacheService(cityDAO, batchDAO);
 
 const app = new App({
     port: port || 8000,
@@ -39,8 +52,8 @@ const app = new App({
     controllers: [
         new AuthController(authService),
         new GooglePlacesController(),
-        new ApartmentsController(),
-        new TaskQueueController(taskQueueService),
+        new ApartmentsController(apartmentService, scraperService),
+        new TaskQueueController(taskQueueService, scraperService, cacheService),
         new HealthCheckController(),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],

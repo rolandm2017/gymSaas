@@ -8,6 +8,8 @@ import Database from "./database/Database";
 import errorHandler from "./middleware/error.middleware";
 import { SEED_CITIES } from "./seed/seedCities";
 import { City } from "./database/models/City";
+import { SEED_STATES } from "./seed/seedStates";
+import { State } from "./database/models/State";
 
 class App {
     public app: Application;
@@ -62,6 +64,11 @@ class App {
     }
 
     private async seedDb() {
+        for (const state of SEED_STATES) {
+            const found = await State.findOne({ where: state });
+            if (found) continue;
+            State.create(state);
+        }
         for (const city of SEED_CITIES) {
             // check if city is seeded into db before trying to add a dupe
             const found = await City.findOne({ where: city });

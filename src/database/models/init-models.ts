@@ -8,6 +8,7 @@ import { ResetToken as _ResetToken } from "./ResetToken";
 import { Batch as _Batch } from "./Batch";
 
 import { City as _City } from "./City";
+import { State as _State } from "./State";
 // import { Provider as _Provider } from "./Provider";
 import { Task as _Task } from "./Task";
 
@@ -16,6 +17,7 @@ function initModels(sequelize: Sequelize) {
     const RefreshToken = _RefreshToken.initModel(sequelize);
     const ResetToken = _ResetToken.initModel(sequelize);
     // city must be added before housing, gym, task, because they depend on it
+    const State = _State.initModel(sequelize);
     const City = _City.initModel(sequelize);
     const Housing = _Housing.initModel(sequelize);
     const Gym = _Gym.initModel(sequelize);
@@ -46,6 +48,15 @@ function initModels(sequelize: Sequelize) {
     });
 
     // Places
+    State.hasMany(City, {
+        foreignKey: "stateId",
+        as: "state_cities",
+    });
+    City.belongsTo(State, {
+        foreignKey: "stateId",
+        as: "city_is_in",
+    });
+
     City.hasMany(Housing, {
         foreignKey: "cityId",
         as: "scraped_apartments",
