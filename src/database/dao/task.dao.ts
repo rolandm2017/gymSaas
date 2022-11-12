@@ -89,9 +89,13 @@ class TaskDAO {
         });
     };
 
-    public getAllTasks = (choice?: ProviderEnum) => {
+    public getAllTasks = (choice?: ProviderEnum, batchId?: number) => {
         if (choice) {
             return Task.findAll({ where: { providerName: choice } });
+        } else if (batchId) {
+            return Task.findAll({ where: { batchId } });
+        } else if (choice && batchId) {
+            return Task.findAll({ where: { providerName: choice, batchId } });
         } else {
             return Task.findAll({ where: {} });
         }

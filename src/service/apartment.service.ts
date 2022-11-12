@@ -10,8 +10,12 @@ class ApartmentService {
     }
 
     //
-    public async getAllHousing(cityId: number, stateOrProvince: string, country?: string): Promise<Housing[]> {
-        return await this.housingDAO.getAllHousing(cityId, stateOrProvince, country);
+    public async getAllHousing(cityId: number, cityName?: string, stateOrProvince?: string): Promise<Housing[]> {
+        return await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
+    }
+
+    public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number): Promise<Housing[]> {
+        return await this.housingDAO.getHousingByCityIdAndBatchNum(cityId, batchNum);
     }
 }
 
