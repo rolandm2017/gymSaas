@@ -39,6 +39,7 @@ class TaskQueueController {
         // check tasks make sense
         this.router.get("/all", this.getAllTasks.bind(this));
         this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
+        this.router.delete("/by_id", this.cleanSpecific.bind(this));
         // this.router.get("/db_contents", )
         this.router.get("/health_check", this.healthCheck.bind(this));
     }
@@ -138,11 +139,11 @@ class TaskQueueController {
         const byArray = request.body.toDelete;
         const byRange = [request.body.start, request.body.end];
         // validation
-        const usingByArray = Array.isArray(byRange) && byArray.every((i: any) => typeof i === "number" && i >= 0);
-        const usingByRange = typeof request.body.start === "number" && typeof request.body.end === "number";
+        const usingByArray = Array.isArray(byRange) && byRange.length > 0 && byArray.every((i: any) => typeof i === "number" && i >= 0);
+        const usingByRange = typeof request.body.start === "number" && typeof request.body.end === "number" && byRange[0] < byRange[1];
         if (!usingByArray && !usingByRange) return response.status(400).json({ error: "bad inputs" });
         // service
-        const deletedTaskIds = await this.taskQueueService.cleanSpecific(byArray, byRange);
+        const deletedTaskIds: number[] = await this.taskQueueService.cleanSpecific(byArray, byRange);
         return response.status(200).json({ deletedTaskIds });
     }
 

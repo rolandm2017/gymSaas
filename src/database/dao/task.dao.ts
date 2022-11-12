@@ -106,8 +106,8 @@ class TaskDAO {
         t.save();
     };
 
-    public deleteTask = (id: number) => {
-        return Task.destroy({ where: { taskId: id } });
+    public deleteTask = (taskId: number) => {
+        return Task.destroy({ where: { taskId } });
     };
 
     public deleteTasksOlderThanTwoMonths = () => {

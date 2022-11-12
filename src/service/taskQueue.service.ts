@@ -123,9 +123,36 @@ class TaskQueueService {
         return all;
     }
 
-    public async cleanSpecific(byArray: number[] | undefined, byRange: number[] | undefined) {
+    public async cleanSpecific(byArray: number[] | undefined, byRange: number[] | undefined): Promise<number[]> {
+        console.log(byArray, byRange, "is this thing even on? 127rm");
         const deletedTaskIds = [];
-        // its going to be by array or by range, and if "both" then by array will take precedence.
+        let toDelete: number[] = [];
+        const probablyUsingByRange = Array.isArray(byArray) && byArray.length === 0;
+        const definitelyUsingByRange = Array.isArray(byRange);
+        if (probablyUsingByRange && definitelyUsingByRange) {
+            console.log(byRange, "131rm");
+            for (let i = byRange[0]; i < byRange[1]; i++) {
+                console.log(i, "133rm");
+                toDelete.push(i);
+            }
+        } else if (Array.isArray(byArray)) {
+            toDelete = byArray;
+        } else {
+            throw new Error("input validation failed");
+        }
+        // loop over them and delete
+        console.log(toDelete, "140rm");
+        for (const taskId of toDelete) {
+            console.log(taskId, "142rm");
+            try {
+                await this.taskDAO.deleteTask(taskId);
+                deletedTaskIds.push(taskId);
+            } catch (err) {
+                console.log(err);
+                console.log(taskId + " failed to delete; perhaps it doesn't exist?");
+            }
+        }
+        console.log(deletedTaskIds, "yes it is 149rm");
         return deletedTaskIds;
     }
 
