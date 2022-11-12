@@ -17,7 +17,9 @@ class ApartmentsController {
 
         // step 1 of 3 in queuing a scrape
         this.router.get("/viewport_width", this.detectProviderViewportWidth.bind(this));
-        // other
+        // user queries
+        this.router.get("/location", this.getApartmentsByLocation.bind(this));
+        // admin ish stuff
         this.router.get("/saved", this.getSavedApartments.bind(this));
         this.router.get("/all", this.getSavedApartments.bind(this));
         // this.router.post("/task", this.queueScrape);
@@ -55,6 +57,10 @@ class ApartmentsController {
         } catch {
             return response.status(500).send();
         }
+    }
+
+    async getApartmentsByLocation(request: Request, response: Response) {
+        //
     }
 
     async getSavedApartments(request: Request, response: Response) {

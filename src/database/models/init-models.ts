@@ -11,6 +11,8 @@ import { City as _City } from "./City";
 import { State as _State } from "./State";
 // import { Provider as _Provider } from "./Provider";
 import { Task as _Task } from "./Task";
+// logging
+import { Wish as _Wish } from "./Wish";
 
 function initModels(sequelize: Sequelize) {
     const Account = _Account.initModel(sequelize);
@@ -24,6 +26,8 @@ function initModels(sequelize: Sequelize) {
     // const Provider = _Provider.initModel(sequelize);
     const Task = _Task.initModel(sequelize);
     const Batch = _Batch.initModel(sequelize);
+    // logging
+    const Wish = _Wish.initModel(sequelize);
 
     Account.hasMany(RefreshToken, {
         foreignKey: "acctId",
@@ -92,7 +96,7 @@ function initModels(sequelize: Sequelize) {
         as: "housing_from_batch",
     });
 
-    return { Account, RefreshToken, ResetToken, Housing, Gym, City, Batch, Task };
+    return { Account, RefreshToken, ResetToken, Housing, Gym, City, Batch, Task, Wish };
 }
 
 export default initModels;
