@@ -123,6 +123,12 @@ class TaskQueueService {
         return all;
     }
 
+    public async cleanSpecific(byArray: number[] | undefined, byRange: number[] | undefined) {
+        const deletedTaskIds = [];
+        // its going to be by array or by range, and if "both" then by array will take precedence.
+        return deletedTaskIds;
+    }
+
     public async cleanOldTasks(): Promise<number> {
         return await this.taskDAO.deleteTasksOlderThanTwoMonths();
     }

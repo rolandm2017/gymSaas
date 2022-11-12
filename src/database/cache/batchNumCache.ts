@@ -1,5 +1,4 @@
-import BatchDAO from "./dao/batch.dao";
-import TaskDAO from "./dao/task.dao";
+import BatchDAO from "../dao/batch.dao";
 
 export let _currentBatchNumForNewBatches: number | undefined = undefined;
 
@@ -15,7 +14,7 @@ export async function getBatchNumForNewBatches(batchDAO: BatchDAO): Promise<numb
     return _currentBatchNumForNewBatches;
 }
 
-export async function updateBatchNum(newNum: number) {
+export async function setBatchNum(newNum: number) {
     if (_currentBatchNumForNewBatches && newNum < _currentBatchNumForNewBatches) throw new Error("Can't decrease batch num");
     _currentBatchNumForNewBatches = newNum;
 }

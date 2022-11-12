@@ -3,6 +3,11 @@ import { Housing, HousingCreationAttributes } from "../models/Housing";
 
 class HousingDAO {
     constructor() {}
+
+    public createHousing = (housing: HousingCreationAttributes) => {
+        return Housing.create({ ...housing });
+    };
+
     public getMultipleHousings = async (limit?: number, offset?: number) => {
         if (limit === undefined && offset === undefined) return await Housing.findAndCountAll({ where: {} });
         return await Housing.findAndCountAll({ offset, limit });
@@ -12,8 +17,8 @@ class HousingDAO {
         return Housing.findByPk(id);
     };
 
-    public createHousing = (housing: HousingCreationAttributes) => {
-        return Housing.create({ ...housing });
+    public getAllHousing = async () => {
+        return await Housing.findAll({});
     };
 
     public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {

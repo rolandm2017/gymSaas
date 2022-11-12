@@ -1,4 +1,4 @@
-import { getCityIdFromCacheElseDb, setCityId, _cityIdCache } from "../../src/database/cityIdCache";
+import { getCityIdFromCacheElseDb, setCityId, _cityIdCache } from "../../src/database/cache/cityIdCache";
 
 describe("test the city id cache", () => {
     test("we can set the city id into the cache", () => {

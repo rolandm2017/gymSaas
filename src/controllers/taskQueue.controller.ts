@@ -1,23 +1,39 @@
 import express, { Request, Response } from "express";
-import { getBatchNumForNewBatches } from "../database/batchNumCache";
+import { cache } from "joi";
+
+import { getBatchNumForNewBatches } from "../database/cache/batchNumCache";
 import BatchDAO from "../database/dao/batch.dao";
 import { Task } from "../database/models/Task";
+import { IHousing } from "../interface/Housing.interface";
 import { ProviderEnum } from "../enum/provider.enum";
 import { ITask } from "../interface/Task.interface";
+import CacheService from "../service/cache.service";
 import TaskQueueService from "../service/taskQueue.service";
+import { ILatLong } from "../interface/LatLong.interface";
+import { IBounds } from "../interface/Bounds.interface";
+import ScraperService from "../service/scraper.service";
 
+// do I need a "scraper controller" and a separate "task queue controller"?
 class TaskQueueController {
     public path = "/task_queue";
     public router = express.Router();
     private taskQueueService: TaskQueueService;
+    private scraperService: ScraperService;
+    private cacheService: CacheService;
 
     // todo in production: mark several routes "admin only" like this: authorize([Role.Admin])
 
-    constructor(taskQueueService: TaskQueueService) {
+    constructor(taskQueueService: TaskQueueService, scraperService: ScraperService, cacheService: CacheService) {
         this.taskQueueService = taskQueueService;
-        this.router.get("/next_batch_number", this.getNextBatchNumber.bind(this));
+        this.scraperService = scraperService;
+        this.cacheService = cacheService;
+        // step 2 of 3 in queuing a scrape
+        this.router.get("/grid_scan_plan", this.getGridForScan.bind(this));
         // step 3 of 3 in queuing a scrape
         this.router.post("/queue_grid_scan", this.addGridScanToQueue.bind(this)); // admin only
+        // stuff (separate from the 3 step queuing)
+        this.router.get("/scrape", this.scrapeApartments.bind(this));
+        this.router.get("/next_batch_number", this.getNextBatchNumber.bind(this));
         this.router.get("/next_tasks_for_scraper", this.getNextTasksForScraper.bind(this));
         this.router.post("/report_findings_and_mark_complete", this.reportFindingsToDbAndMarkComplete.bind(this));
         // check tasks make sense
@@ -27,12 +43,35 @@ class TaskQueueController {
         this.router.get("/health_check", this.healthCheck.bind(this));
     }
 
+    async scrapeApartments(request: Request, response: Response) {
+        const city = request.body.city;
+        const stateOrProvince = request.body.state;
+        const country = request.body.country;
+        if (!city || !stateOrProvince || !country) {
+            return response.status(500).send({ err: "Parameter missing" }).end();
+        }
+        console.log(city, stateOrProvince, country, "31rm");
+        const aps: IHousing[] = await this.scraperService.scrapeApartments(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
+        // TODO: forward request to flask servers
+        return response.status(200).send("You made it");
+    }
+
     async getNextBatchNumber(request: Request, response: Response) {
         console.log("30rm");
-        const batchDAO = new BatchDAO();
-        const highest = await getBatchNumForNewBatches(batchDAO);
+        const highest = await this.cacheService.getBatchNumForNewBatches();
         if (highest) return response.status(200).json({ nextBatchNum: highest });
-        else return response.status(200).json({ nextBatchNum: 0 });
+        // so this only happens once
+        this.cacheService.setBatchNum(0);
+        return response.status(200).json({ nextBatchNum: 0 });
+    }
+
+    async getGridForScan(request: Request, response: Response) {
+        const startCoords: ILatLong = request.body.startCoords;
+        const bounds: IBounds = request.body.bounds;
+        const radius: number = request.body.radius;
+        // not doing input validation here.
+        const gridCoords = await this.scraperService.planGrid(startCoords, bounds, radius);
+        return response.status(200).json(gridCoords);
     }
 
     async addGridScanToQueue(request: Request, response: Response) {
@@ -79,7 +118,7 @@ class TaskQueueController {
         const forProvider: ProviderEnum = request.body.provider;
         const taskId: number = request.body.taskId;
         const apartments: any[] = request.body.apartments;
-
+        console.log(apartments, "121rm");
         if (typeof taskId !== "number" || taskId < 0) {
             return response.status(400).send("Bad task ID input");
         }
@@ -93,6 +132,18 @@ class TaskQueueController {
         const choice = request.body.provider;
         const all: Task[] = await this.taskQueueService.getAllTasks(choice);
         return response.status(200).json({ all: all });
+    }
+
+    async cleanSpecific(request: Request, response: Response) {
+        const byArray = request.body.toDelete;
+        const byRange = [request.body.start, request.body.end];
+        // validation
+        const usingByArray = Array.isArray(byRange) && byArray.every((i: any) => typeof i === "number" && i >= 0);
+        const usingByRange = typeof request.body.start === "number" && typeof request.body.end === "number";
+        if (!usingByArray && !usingByRange) return response.status(400).json({ error: "bad inputs" });
+        // service
+        const deletedTaskIds = await this.taskQueueService.cleanSpecific(byArray, byRange);
+        return response.status(200).json({ deletedTaskIds });
     }
 
     async cleanOldTasks(request: Request, response: Response) {

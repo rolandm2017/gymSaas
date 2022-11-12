@@ -26,8 +26,8 @@ class AuthController {
     public router = express.Router();
     private authService: AuthService;
 
-    constructor(a: AuthService) {
-        this.authService = a;
+    constructor(authService: AuthService) {
+        this.authService = authService;
         this.router.get("/health", this.healthCheck);
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate);

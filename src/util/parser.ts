@@ -22,7 +22,9 @@ class Parser {
 
     parseRentCanada(unprocessed: any): IHousing[] {
         // list of objects
-        const mainList = unprocessed.results.listings;
+        console.log(this.provider, unprocessed, "25rm");
+        const mainList = unprocessed.listings;
+        // fixme: what to do if .listings = []? answer: dont let it get into this method
         // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {
@@ -45,7 +47,8 @@ class Parser {
 
     parseRentFaster(unprocessed: any): IHousing[] {
         // list of objects
-        const mainList = unprocessed.results.listings;
+        console.log(this.provider, unprocessed, "49rm");
+        const mainList = unprocessed.listings;
         // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {
@@ -66,8 +69,9 @@ class Parser {
     }
 
     parseRentSeeker(unprocessed: any): IHousing[] {
+        console.log(this.provider, unprocessed, "71rm");
         // list of objects
-        const mainList = unprocessed.results.hits;
+        const mainList = unprocessed.hits;
         // properties of interest: "name" here is the address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {

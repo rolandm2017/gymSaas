@@ -17,8 +17,11 @@ import initModels from "../../src/database/models/init-models";
 import errorHandler from "../../src/middleware/error.middleware";
 
 import { TEST_DB_HOST, TEST_DB_NAME, TEST_DB_PASSWORD, TEST_DB_PORT, TEST_DB_USER } from "../config";
+// service
 import AuthService from "../../src/service/auth.service";
 import EmailService from "../../src/service/email.service";
+import ApartmentService from "../../src/service/apartment.service";
+
 import AccountUtil from "../../src/util/accountUtil";
 import AccountDAO from "../../src/database/dao/account.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
@@ -35,6 +38,9 @@ import TaskDAO from "../../src/database/dao/task.dao";
 import { Batch } from "../../src/database/models/Batch";
 
 import { SEED_CITIES } from "../../src/seed/seedCities";
+import ScraperService from "../../src/service/scraper.service";
+import CacheService from "../../src/service/cache.service";
+import BatchDAO from "../../src/database/dao/batch.dao";
 
 class App {
     public app: Application;
@@ -152,6 +158,7 @@ class App {
 const port = parseInt(process.env.PORT!, 10);
 
 // initialize dao
+const batchDAO = new BatchDAO();
 const cityDAO = new CityDAO();
 const housingDAO = new HousingDAO();
 const taskDAO = new TaskDAO();
@@ -159,9 +166,12 @@ const acctDAO = new AccountDAO();
 const accountUtil = new AccountUtil();
 const resetTokenDAO = new ResetTokenDAO(acctDAO);
 // services
+const apartmentService = new ApartmentService(housingDAO);
+const scraperService = new ScraperService();
 const emailService = new EmailService(acctDAO, "testing");
 const a = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
-const t = new TaskQueueService(cityDAO, housingDAO, taskDAO);
+const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO);
+const cacheService = new CacheService(cityDAO, batchDAO);
 
 export const app = new App({
     port: port || 8000,
@@ -169,9 +179,9 @@ export const app = new App({
     controllers: [
         new AuthController(a),
         new GooglePlacesController(),
-        new ApartmentsController(),
+        new ApartmentsController(apartmentService, scraperService),
         new HealthCheckController(),
-        new TaskQueueController(t),
+        new TaskQueueController(taskQueueService, scraperService, cacheService),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });

@@ -1,5 +1,5 @@
 import { string } from "joi";
-import CityDAO from "./dao/city.dao";
+import CityDAO from "../dao/city.dao";
 
 export const _cityIdCache = new Map<string, number>();
 
