@@ -22,6 +22,8 @@ import ApartmentService from "./service/apartment.service";
 import ScraperService from "./service/scraper.service";
 import CacheService from "./service/cache.service";
 import BatchDAO from "./database/dao/batch.dao";
+import AdminController from "./controllers/admin.controller";
+import AdminService from "./service/admin.service";
 
 const port = parseInt(process.env.PORT!, 10);
 
@@ -32,18 +34,19 @@ const accountUtil: AccountUtil = new AccountUtil();
 const batchDAO = new BatchDAO();
 const cityDAO = new CityDAO();
 const stateDAO = new StateDAO();
-const housingDAO = new HousingDAO(stateDAO);
+const housingDAO = new HousingDAO(stateDAO, cityDAO);
 const taskDAO = new TaskDAO();
 const acctDAO: AccountDAO = new AccountDAO();
 const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 
 // services
 // is there a better place to initialize these?
+const adminService = new AdminService(acctDAO);
 const e: EmailService = new EmailService(acctDAO);
 const apartmentService = new ApartmentService(housingDAO);
 const scraperService = new ScraperService();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
-const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO);
+const taskQueueService = new TaskQueueService(cityDAO, batchDAO, housingDAO, taskDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
 
 const app = new App({
@@ -54,6 +57,7 @@ const app = new App({
         new GooglePlacesController(),
         new ApartmentsController(apartmentService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
+        new AdminController(adminService, taskQueueService, apartmentService),
         new HealthCheckController(),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],

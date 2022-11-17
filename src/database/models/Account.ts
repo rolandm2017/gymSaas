@@ -10,6 +10,7 @@ interface AccountAttributes {
     updated: number;
     role: string;
     passwordReset: number; // Date.now()
+    isBanned?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -27,6 +28,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public updated!: number;
     public role!: string;
     public passwordReset!: number;
+    public isBanned!: boolean;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -67,6 +69,10 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 },
                 passwordReset: {
                     type: DataTypes.BIGINT,
+                    allowNull: true,
+                },
+                isBanned: {
+                    type: DataTypes.BOOLEAN,
                     allowNull: true,
                 },
             },

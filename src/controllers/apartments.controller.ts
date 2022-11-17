@@ -22,7 +22,8 @@ class ApartmentsController {
         // admin ish stuff
         this.router.get("/by_city_id_and_batch_id", this.getHousingByCityIdAndBatchNum.bind(this));
         this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
-        this.router.get("/all", this.getSavedApartmentsByLocation.bind(this));
+        this.router.get("/by_location", this.getSavedApartmentsByLocation.bind(this));
+        this.router.get("/all", this.getAllApartments.bind(this));
         // this.router.post("/task", this.queueScrape);
     }
 
@@ -58,15 +59,28 @@ class ApartmentsController {
     }
 
     public async getSavedApartmentsByLocation(request: Request, response: Response) {
-        const cityId = request.body.cityId;
-        const cityName = request.body.cityName;
-        const stateOrProvince = request.body.state;
-        if (!cityId && !stateOrProvince && !cityName) {
-            return response.status(500).send({ err: "Parameter missing" }).end();
+        const cityIdString = request.query.cityId;
+        const cityName = request.query.cityName;
+        const stateOrProvince = request.query.state;
+        console.log(cityIdString, cityName, stateOrProvince, "72rm");
+        if (!cityIdString && !stateOrProvince && !cityName) {
+            return response.status(400).json({ err: "Parameter missing" }).end();
         }
-        console.log(cityId, stateOrProvince, this.apartmentService, "72rm");
+        if (cityIdString && typeof cityIdString !== "string" && typeof cityIdString !== "number")
+            return response.status(400).json({ error: "cityId must be number or string" });
+        if (cityName && typeof cityName !== "string") return response.status(400).json({ error: "cityName must be string" });
+        if (stateOrProvince && typeof stateOrProvince !== "string") return response.status(400).json({ error: "state must be string" });
+        if (cityIdString === undefined) return response.status(400).json({ error: "cityId undefined" });
+        const cityId: number | undefined = cityIdString ? parseInt(cityIdString, 10) : undefined;
+        // if (cityId === NaN) return response.status(400).json({ error: "cityId must be int" });
         const apartments: Housing[] = await this.apartmentService.getAllHousing(cityId, cityName, stateOrProvince);
-        return response.status(200).send({ apartments });
+        return response.status(200).json({ apartments });
+    }
+
+    public async getAllApartments(request: Request, response: Response) {
+        // keep this one SIMPLE. Really: "Get ALL."
+        const apartments: Housing[] = await this.apartmentService.getAllHousing();
+        return response.status(200).json({ apartments });
     }
 }
 

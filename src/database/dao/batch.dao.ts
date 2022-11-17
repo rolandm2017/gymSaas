@@ -1,3 +1,4 @@
+import { IBatch } from "../../interface/Batch.interface";
 import { Batch } from "../models/Batch";
 // tentative
 
@@ -11,6 +12,21 @@ class BatchDAO {
             return b[0].batchId;
         } catch (err) {
             console.log(err);
+        }
+    };
+
+    public getAllBatchNums = async () => {
+        try {
+            const batches = await Batch.findAll({});
+            const justNums: IBatch[] = batches.map(b => {
+                return {
+                    batchId: b.batchId,
+                };
+            });
+            return justNums;
+        } catch (err) {
+            console.log(err);
+            return []; // silence errors about returning undefined
         }
     };
 

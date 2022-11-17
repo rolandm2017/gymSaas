@@ -3,6 +3,12 @@ import moment from "moment";
 import { ProviderEnum } from "../../enum/provider.enum";
 import { Task, TaskCreationAttributes } from "../models/Task";
 
+interface Filters {
+    providerName?: ProviderEnum;
+    batchId?: number;
+    cityId?: number;
+}
+
 class TaskDAO {
     constructor() {}
 
@@ -30,6 +36,10 @@ class TaskDAO {
             where: conditions,
             order: [["createdAt", "DESC"]],
         });
+    };
+
+    public getTasksByBatchNum = (batchNum: number) => {
+        return Task.findAll({ where: { batch: batchNum } });
     };
 
     public createTask = (task: TaskCreationAttributes) => {
@@ -60,22 +70,6 @@ class TaskDAO {
         });
     };
 
-    // public getAllUnfinishedBatchesForProvider = async (provider: ProviderEnum) => {
-    //     // note: used to be "getNextUnfinishedBatch" but was impossible to figure out implementation
-    //     // note nov 8: this will be difficult to implement, costly to execute. what is the fastest way to do it?
-    //     const tasks = await Task.findAll({
-    //         where: { providerName: provider },
-    //         order: [["createdAt", "DESC"]],
-    //     });
-    //     const currentBatch = [];
-    //     const unfinishedBatches = [];
-    //     let endOfCurrentBatch = 0;
-    //     for (let i = 0; i < tasks.length; i++) {
-    //         const currentTask = tasks[i]
-    //         if (tasks[i + 1])
-    //     }
-    // };
-
     public getAllUnfinishedTasksForProvider = (provider: ProviderEnum, batchNum?: number) => {
         let conditions;
         if (batchNum) {
@@ -89,16 +83,8 @@ class TaskDAO {
         });
     };
 
-    public getAllTasks = (choice?: ProviderEnum, batchId?: number) => {
-        if (choice) {
-            return Task.findAll({ where: { providerName: choice } });
-        } else if (batchId) {
-            return Task.findAll({ where: { batchId } });
-        } else if (choice && batchId) {
-            return Task.findAll({ where: { providerName: choice, batchId } });
-        } else {
-            return Task.findAll({ where: {} });
-        }
+    public getAllTasks = (filters: Filters) => {
+        return Task.findAll({ where: { ...filters } });
     };
 
     public updateTask = (task: TaskCreationAttributes, id: number) => {

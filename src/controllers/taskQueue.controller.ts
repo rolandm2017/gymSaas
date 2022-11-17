@@ -39,6 +39,7 @@ class TaskQueueController {
 
         // check tasks make sense
         this.router.get("/all", this.getAllTasks.bind(this));
+        // this.router.get("/batch", this.getTasksByBatch.bind(this));
         this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
         this.router.delete("/by_id", this.cleanSpecific.bind(this));
         // this.router.get("/db_contents", )
@@ -131,14 +132,21 @@ class TaskQueueController {
     }
 
     async getAllTasks(request: Request, response: Response) {
-        const byProvider = request.body.provider;
-        const byBatchNum = request.body.batchNum;
+        const byProvider = request.body.provider; // provider only should work.
+        const byBatchNum = request.body.batchNum; // batchNum only should work.
+        // todo: neither should work; "get all, I really mean ALL"
         if (byProvider && typeof byProvider !== "string") return response.status(400).json({ error: "provider must be int" });
         if (byBatchNum && typeof byBatchNum !== "number") return response.status(400).json({ error: "batchNum must be int" });
-        if (!byBatchNum && !byProvider) return response.status(400).json({ error: "Missing parameter" });
-        const tasks: Task[] = await this.taskQueueService.getAllTasks(byProvider, byBatchNum);
+        // if (!byBatchNum && !byProvider) return response.status(400).json({ error: "Missing parameter" });
+        const tasks: Task[] = await this.taskQueueService.getAllTasks(byProvider, byBatchNum, undefined);
         return response.status(200).json({ tasks });
     }
+
+    // async getTasksByBatch(request: Request, response: Response) {
+    //     const batchNum = request.params.batchNum;
+    //     if (batchNum && typeof batchNum !== "number") return response.status(400).json({error:"batchNum missing"})
+    //     const tasks:Task[] = await this.taskQueueService..getAllT
+    // }
 
     async cleanSpecific(request: Request, response: Response) {
         const byArray = request.body.toDelete;

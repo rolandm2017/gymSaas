@@ -26,6 +26,7 @@ class HousingDAO {
     };
 
     public getAllHousing = async (cityId?: number, cityName?: string, stateOrProvince?: string) => {
+        if ([cityId, cityName, stateOrProvince].every(arg => arg === undefined)) return await Housing.findAll({});
         let conditions;
         let state;
         if (stateOrProvince) {

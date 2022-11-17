@@ -11,14 +11,18 @@ import { HousingCreationAttributes } from "../database/models/Housing";
 import HousingDAO from "../database/dao/housing.dao";
 import { IHousing } from "../interface/Housing.interface";
 import { convertIHousingToCreationAttr } from "../util/housingConverter";
+import BatchDAO from "../database/dao/batch.dao";
+import { IBatch } from "../interface/Batch.interface";
 
 class TaskQueueService {
     private cityDAO: CityDAO;
+    private batchDAO: BatchDAO;
     private taskDAO: TaskDAO;
     private housingDAO: HousingDAO;
 
-    constructor(cityDAO: CityDAO, housingDAO: HousingDAO, taskDAO: TaskDAO) {
+    constructor(cityDAO: CityDAO, batchDAO: BatchDAO, housingDAO: HousingDAO, taskDAO: TaskDAO) {
         this.cityDAO = cityDAO;
+        this.batchDAO = batchDAO;
         this.housingDAO = housingDAO;
         this.taskDAO = taskDAO;
     }
@@ -81,6 +85,11 @@ class TaskQueueService {
         return tasks;
     }
 
+    public async getTasksByBatchNum(batchNum: number): Promise<Task[]> {
+        const tasks: Task[] = await this.taskDAO.getTasksByBatchNum(batchNum);
+        return tasks;
+    }
+
     public async reportFindingsToDb(provider: ProviderEnum, taskId: number, apartments: any): Promise<{ pass: number; fail: number }> {
         const parser = new Parser(provider);
         const parsedApartmentData: IHousing[] = parser.parse(apartments);
@@ -118,9 +127,14 @@ class TaskQueueService {
         return true;
     }
 
-    public async getAllTasks(choice?: ProviderEnum): Promise<Task[]> {
-        const all = await this.taskDAO.getAllTasks(choice);
+    public async getAllTasks(choice: ProviderEnum | undefined, batchId: number | undefined, cityId: number | undefined): Promise<Task[]> {
+        const all = await this.taskDAO.getAllTasks({ providerName: choice, batchId, cityId });
         return all;
+    }
+
+    public async getAllBatchNumbers(): Promise<IBatch[]> {
+        const batches = await this.batchDAO.getAllBatchNums();
+        return batches;
     }
 
     public async cleanSpecific(byArray: number[] | undefined, byRange: number[] | undefined): Promise<number[]> {

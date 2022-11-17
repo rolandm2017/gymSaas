@@ -10,7 +10,7 @@ class ApartmentService {
     }
 
     //
-    public async getAllHousing(cityId: number, cityName?: string, stateOrProvince?: string): Promise<Housing[]> {
+    public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<Housing[]> {
         return await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
     }
 

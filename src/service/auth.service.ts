@@ -67,10 +67,8 @@ class AuthService {
             // create account object
             const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params);
             const acct: Account = await this.accountDAO.createAccount(acctWithPopulatedFields);
-            // first registered account is an admin
-            const allAccountsInSystem = await this.accountDAO.getMultipleAccounts(5);
-            const isFirstAccount = allAccountsInSystem.count === 0;
-            acct.role = isFirstAccount ? Role.Admin : Role.User;
+            // acct has user role unless one is made by the 'make admin' endpoint in admin controller
+            acct.role = Role.User;
             acct.verificationToken = this.accountUtil.randomTokenString();
 
             // hash password
@@ -308,6 +306,11 @@ class AuthService {
         const account = await this.accountDAO.getAccountById(id);
         if (!account) throw new Error("Account not found");
         return account;
+    }
+
+    public async logVerificationToken(email: string) {
+        const account = await this.accountDAO.getAccountByEmail(email);
+        console.log("token for email" + email + " is " + account[0].verificationToken);
     }
 }
 

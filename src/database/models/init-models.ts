@@ -60,6 +60,8 @@ function initModels(sequelize: Sequelize) {
         foreignKey: "stateId",
         as: "city_is_in",
     });
+    State.hasMany(Housing, { foreignKey: "stateId" });
+    Housing.hasOne(State, { foreignKey: "stateId" });
 
     City.hasMany(Housing, {
         foreignKey: "cityId",

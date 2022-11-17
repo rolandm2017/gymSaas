@@ -1,9 +1,15 @@
+import { Role } from "../../enum/role.enum";
 import { isEmail } from "../../validationSchemas/schemas";
 import { Account, AccountCreationAttributes } from "../models/Account";
 import { RefreshToken } from "../models/RefreshToken";
 
 class AccountDAO {
     constructor() {}
+
+    public countAdmins = async () => {
+        const accounts = await Account.findAll({ where: { role: Role.Admin } });
+        return accounts.length;
+    };
 
     public findAllAccounts = () => {
         // 'find' instead of 'get' because 'getAllAccounts' is taken
@@ -51,6 +57,14 @@ class AccountDAO {
         if (!isReallyEmail) throw new Error("Email field wasn't an email");
         const created: Account = await Account.create(account);
         return created;
+    };
+
+    public createAdmin = async (email: string) => {
+        return await Account.update({ role: Role.Admin }, { where: { email } });
+    };
+
+    public banUser = async (userId: number) => {
+        return await Account.update({ isBanned: true }, { where: { acctId: userId } });
     };
 
     public updateAccount = (account: AccountCreationAttributes, id: number) => {

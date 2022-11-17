@@ -32,12 +32,13 @@ class AuthController {
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate);
         this.router.post("/register", registerUserSchema, this.register);
+        // verify email
+        this.router.post("/verify_email", verifyEmailSchema, this.verifyEmail);
+        this.router.get("/bypass_authentication_token", this.bypassEmail);
         // tokens
         this.router.post("/refresh_token", this.refreshToken);
         // note: /revoke_token === /log_out
         this.router.post("/revoke_token", authorize(), revokeTokenSchema, this.revokeToken);
-        // verify email
-        this.router.post("/verify_email", verifyEmailSchema, this.verifyEmail);
         // update pw
         this.router.post("/update_password", authorize(), updatePasswordSchema, this.updatePassword);
         // pw reset
@@ -110,6 +111,12 @@ class AuthController {
         const token = request.body.token;
         await this.authService.verifyEmail(token);
         return response.json({ message: "Verification successful, you can now login" });
+    };
+
+    public bypassEmail = async (request: Request, response: Response) => {
+        const email = request.body.email;
+        await this.authService.logVerificationToken(email);
+        return response.status(200).json({ message: "success" });
     };
 
     public updatePassword = async (request: RequestWithUser, response: Response) => {
