@@ -5,6 +5,19 @@ import { Batch } from "../models/Batch";
 class BatchDAO {
     constructor() {}
 
+    public addBatchNum = async (newBatchNum?: number) => {
+        try {
+            if (newBatchNum) {
+                return await Batch.create({ batchId: newBatchNum });
+            }
+            const highestCurrent = await this.getHighestBatchNum();
+            if (highestCurrent) return await Batch.create({ batchId: highestCurrent + 1 });
+            else return await Batch.create({ batchId: 1 });
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     public getHighestBatchNum = async () => {
         try {
             const b = await Batch.findAll({ where: {}, order: [["batchId", "DESC"]], limit: 1 });
@@ -27,19 +40,6 @@ class BatchDAO {
         } catch (err) {
             console.log(err);
             return []; // silence errors about returning undefined
-        }
-    };
-
-    public addBatchNum = async (newBatchNum?: number) => {
-        try {
-            if (newBatchNum) {
-                return await Batch.create({ batchId: newBatchNum });
-            }
-            const highestCurrent = await this.getHighestBatchNum();
-            if (highestCurrent) return await Batch.create({ batchId: highestCurrent + 1 });
-            else return await Batch.create({ batchId: 1 });
-        } catch (err) {
-            console.log(err);
         }
     };
 }

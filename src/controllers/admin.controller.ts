@@ -59,10 +59,12 @@ class AdminController {
 
     public async getApartmentsByLocation(request: Request, response: Response) {
         const cityName = request.query.cityName;
-        const state = request.query.state;
+        const stateName = request.query.stateName;
         // do we need by country? YAGNI?
-        if (!cityName && !state) return response.status(400).json({ message: "at least one of cityName or state must be provided" });
-        const aps: Housing[] = await this.apartmentService.getApartmentsByLocation(cityName, state);
+        if (!cityName && !stateName) return response.status(400).json({ error: "at least one of cityName or state must be provided" });
+        if (cityName && typeof cityName !== "string") return response.status(400).json({ error: "cityName must be string" });
+        if (stateName && typeof stateName !== "string") return response.status(400).json({ error: "stateName must be string" });
+        const aps: Housing[] = await this.apartmentService.getApartmentsByLocation(cityName, stateName);
         return response.status(200).json({ apartments: aps });
     }
 
@@ -71,7 +73,7 @@ class AdminController {
         const batchNum = request.query.batchNum;
         if (typeof cityId !== "number" || typeof batchNum !== "number")
             return response.status(400).json({ error: "cityId and batchNum must be int" });
-        if (!cityId || !!batchNum) return response.status(400).json({ error: "must provide both cityId and batchNum" });
+        if (!cityId || !batchNum) return response.status(400).json({ error: "must provide both cityId and batchNum" });
         const aps: Housing[] = await this.apartmentService.getHousingByCityIdAndBatchNum(cityId, batchNum);
         return response.status(200).json({ apartments: aps });
     }
@@ -88,10 +90,10 @@ class AdminController {
 
     public async banUser(request: Request, response: Response) {
         const acctIdInput = request.query.acctId;
-        if (acctIdInput === undefined || typeof acctIdInput !== "string") return response.status(400).json({ error: "must supply userId" });
-        const userId = parseInt(acctIdInput, 10);
-        if (userId === NaN) return response.status(400).json({ error: "userId must be an integer" });
-        const success = await this.adminService.banUser(userId);
+        if (acctIdInput === undefined || typeof acctIdInput !== "string") return response.status(400).json({ error: "must supply acctId" });
+        const acctId = parseInt(acctIdInput, 10);
+        if (acctId === NaN) return response.status(400).json({ error: "acctId must be an integer" });
+        const success = await this.adminService.banUser(acctId);
         return response.status(200).json({ success });
     }
 

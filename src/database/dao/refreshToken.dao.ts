@@ -7,6 +7,18 @@ class RefreshTokenDAO {
     constructor() {
         this.accountDAO = new AccountDAO();
     }
+
+    public createRefreshToken = async (acctId: number, token: string, expires: Date, createdByIp: string) => {
+        const rt: RefreshToken = await RefreshToken.create({
+            token,
+            expires,
+            createdByIp,
+            isActive: true,
+            acctId: acctId,
+        });
+        return rt;
+    };
+
     public getRefreshTokenById = (tokenId: number) => {
         return RefreshToken.findOne({
             where: {
@@ -28,17 +40,6 @@ class RefreshTokenDAO {
             where: { acctId: accountId },
             include: "belongs_to_user",
         });
-    };
-
-    public createRefreshToken = async (acctId: number, token: string, expires: Date, createdByIp: string) => {
-        const rt: RefreshToken = await RefreshToken.create({
-            token,
-            expires,
-            createdByIp,
-            isActive: true,
-            acctId: acctId,
-        });
-        return rt;
     };
 }
 

@@ -1,7 +1,7 @@
 import { State, StateCreationAttributes } from "../models/State";
 
 class StateDAO {
-    // hopefully thsi isnt used much
+    // hopefully this isnt used much
     constructor() {
         //
     }

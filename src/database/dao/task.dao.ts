@@ -3,7 +3,7 @@ import moment from "moment";
 import { ProviderEnum } from "../../enum/provider.enum";
 import { Task, TaskCreationAttributes } from "../models/Task";
 
-interface Filters {
+interface GetAllTasksFilters {
     providerName?: ProviderEnum;
     batchId?: number;
     cityId?: number;
@@ -11,6 +11,14 @@ interface Filters {
 
 class TaskDAO {
     constructor() {}
+
+    public createTask = (task: TaskCreationAttributes) => {
+        try {
+            return Task.create(task);
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     public getMultipleTasks = (limit: number, offset?: number) => {
         return Task.findAndCountAll({ offset, limit });
@@ -40,14 +48,6 @@ class TaskDAO {
 
     public getTasksByBatchNum = (batchNum: number) => {
         return Task.findAll({ where: { batch: batchNum } });
-    };
-
-    public createTask = (task: TaskCreationAttributes) => {
-        try {
-            return Task.create(task);
-        } catch (err) {
-            console.log(err);
-        }
     };
 
     // Can't work because it doesn't allow create with associations.
@@ -83,7 +83,7 @@ class TaskDAO {
         });
     };
 
-    public getAllTasks = (filters: Filters) => {
+    public getAllTasks = (filters: GetAllTasksFilters) => {
         return Task.findAll({ where: { ...filters } });
     };
 

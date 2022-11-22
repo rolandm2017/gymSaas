@@ -17,6 +17,10 @@ class ApartmentService {
     public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number): Promise<Housing[]> {
         return await this.housingDAO.getHousingByCityIdAndBatchNum(cityId, batchNum);
     }
+
+    public async getApartmentsByLocation(cityName: string | undefined, stateName: string | undefined): Promise<Housing[]> {
+        return await this.housingDAO.getApartmentsByLocation(cityName, stateName);
+    }
 }
 
 export default ApartmentService;

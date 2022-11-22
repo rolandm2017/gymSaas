@@ -6,6 +6,17 @@ import { RefreshToken } from "../models/RefreshToken";
 class AccountDAO {
     constructor() {}
 
+    public createAccount = async (account: AccountCreationAttributes) => {
+        const isReallyEmail = isEmail(account.email);
+        if (!isReallyEmail) throw new Error("Email field wasn't an email");
+        const created: Account = await Account.create(account);
+        return created;
+    };
+
+    public createAdmin = async (email: string) => {
+        return await Account.update({ role: Role.Admin }, { where: { email } });
+    };
+
     public countAdmins = async () => {
         const accounts = await Account.findAll({ where: { role: Role.Admin } });
         return accounts.length;
@@ -50,17 +61,6 @@ class AccountDAO {
 
     public getAccountByVerificationToken = (token: string) => {
         return Account.findOne({ where: { verificationToken: token } });
-    };
-
-    public createAccount = async (account: AccountCreationAttributes) => {
-        const isReallyEmail = isEmail(account.email);
-        if (!isReallyEmail) throw new Error("Email field wasn't an email");
-        const created: Account = await Account.create(account);
-        return created;
-    };
-
-    public createAdmin = async (email: string) => {
-        return await Account.update({ role: Role.Admin }, { where: { email } });
     };
 
     public banUser = async (userId: number) => {

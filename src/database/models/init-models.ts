@@ -2,7 +2,6 @@ import { Sequelize } from "sequelize";
 import { Account as _Account } from "./Account";
 import { Gym as _Gym } from "./Gym";
 import { Housing as _Housing } from "./Housing";
-import { Report as _Report } from "./Report";
 import { RefreshToken as _RefreshToken } from "./RefreshToken";
 import { ResetToken as _ResetToken } from "./ResetToken";
 import { Batch as _Batch } from "./Batch";

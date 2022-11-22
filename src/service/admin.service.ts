@@ -1,5 +1,3 @@
-//
-
 import AccountDAO from "../database/dao/account.dao";
 import { Account } from "../database/models/Account";
 
@@ -18,6 +16,13 @@ class AdminService {
         } else {
             return [];
         }
+    }
+
+    public async banUser(acctId: number): Promise<boolean> {
+        const success = await this.accountDAO.banUser(acctId);
+        if (success.length > 1) throw new Error("banned multiple users via one account id");
+        if (success.length == 1) return true;
+        return false;
     }
 }
 

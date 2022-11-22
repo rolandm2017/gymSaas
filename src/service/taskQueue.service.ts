@@ -20,10 +20,10 @@ class TaskQueueService {
     private taskDAO: TaskDAO;
     private housingDAO: HousingDAO;
 
-    constructor(cityDAO: CityDAO, batchDAO: BatchDAO, housingDAO: HousingDAO, taskDAO: TaskDAO) {
+    constructor(cityDAO: CityDAO, housingDAO: HousingDAO, batchDAO: BatchDAO, taskDAO: TaskDAO) {
         this.cityDAO = cityDAO;
-        this.batchDAO = batchDAO;
         this.housingDAO = housingDAO;
+        this.batchDAO = batchDAO;
         this.taskDAO = taskDAO;
     }
 

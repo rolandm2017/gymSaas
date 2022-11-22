@@ -60,8 +60,8 @@ describe("Test auth controller", () => {
         const res: Response = mockResponse();
         res.json = jest.fn();
         res.cookie = jest.fn();
-        const n: NextFunction = {} as NextFunction;
-        const response: Response = await controller.authenticate(req, res, n);
+        const next: NextFunction = {} as NextFunction;
+        const response: Response = await controller.authenticate(req, res, next);
         // expect(response.email).toEqual(validEmail);
         expect(res.json).toHaveBeenCalledWith({
             ...fakeButValidAccount,

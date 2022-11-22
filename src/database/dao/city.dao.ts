@@ -1,6 +1,15 @@
 import { City, CityCreationAttributes } from "../models/City";
 
 class CityDAO {
+    constructor() {}
+
+    public createCity = (city: CityCreationAttributes) => {
+        try {
+            return City.create(city);
+        } catch (err) {
+            console.log(err);
+        }
+    };
     public getMultipleCities = (limit: number, offset?: number) => {
         return City.findAndCountAll({ offset, limit });
     };
@@ -15,14 +24,6 @@ class CityDAO {
                 city: name,
             },
         });
-    };
-
-    public createCity = (city: CityCreationAttributes) => {
-        try {
-            return City.create(city);
-        } catch (err) {
-            console.log(err);
-        }
     };
 
     public updateCity = (city: CityCreationAttributes, id: number) => {
