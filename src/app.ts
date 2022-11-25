@@ -82,7 +82,7 @@ class App {
             City.create(city);
         }
         for (const user of SEED_USERS) {
-            const found = await Account.findOne({ where: user });
+            const found = await Account.findOne({ where: { email: user.email } });
             if (found) continue;
             Account.create(user);
         }

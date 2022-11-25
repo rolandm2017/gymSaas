@@ -22,7 +22,7 @@ class AdminController {
         this.apartmentService = apartmentService;
         // batches, apartments
         this.router.get("/batches/all", authorize([Role.Admin]), this.getAllBatchNumbers.bind(this));
-        this.router.get("/task_queue/all", this.getAllTasks.bind(this));
+        this.router.get("/task_queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
         this.router.get("/housing/by_location", authorize([Role.Admin]), this.getApartmentsByLocation.bind(this));
         this.router.get("/housing/by_city_id_and_batch_num", authorize([Role.Admin]), this.getApartmentsByCityIdAndBatchNum.bind(this));
         // user stuff
@@ -83,7 +83,7 @@ class AdminController {
         if (batchNumInput === undefined || typeof batchNumInput !== "string") return response.status(400).json({ error: "must supply batchNum" });
         // todo: validation
         const batchNum = parseInt(batchNumInput, 10);
-        if (batchNum === NaN) return response.status(400).json({ error: "batchNum must be an integer" });
+        if (isNaN(batchNum)) return response.status(400).json({ error: "batchNum must be an integer" });
         const tasks: Task[] = await this.taskQueueService.getTasksByBatchNum(batchNum);
         return response.status(200).json({ tasks });
     }
@@ -92,7 +92,7 @@ class AdminController {
         const acctIdInput = request.query.acctId;
         if (acctIdInput === undefined || typeof acctIdInput !== "string") return response.status(400).json({ error: "must supply acctId" });
         const acctId = parseInt(acctIdInput, 10);
-        if (acctId === NaN) return response.status(400).json({ error: "acctId must be an integer" });
+        if (isNaN(acctId)) return response.status(400).json({ error: "acctId must be an integer" });
         const success = await this.adminService.banUser(acctId);
         return response.status(200).json({ success });
     }

@@ -47,6 +47,7 @@ class TaskDAO {
     };
 
     public getTasksByBatchNum = (batchNum: number) => {
+        console.log(batchNum, "50rm");
         return Task.findAll({ where: { batch: batchNum } });
     };
 

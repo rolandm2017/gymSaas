@@ -81,20 +81,21 @@ describe("invalid inputs yield an error about the input being invalid", () => {
     test("getApartmentsByCityIdAndBatchNum", async () => {
         // requires cityId and batchNum to both be integers
         // case: neither is supplied
+        const req: Request = { query: {}, body: {} } as Request;
         const res1: Response = mockResponse();
         res1.json = jest.fn();
+        await controller.getApartmentsByCityIdAndBatchNum(req, res1);
         expect(res1.json).toHaveBeenCalled();
-        expect(res1.json).toHaveBeenCalledWith({ error: "placeholder" });
+        expect(res1.json).toHaveBeenCalledWith({ error: "cityId and batchNum must be int" }); // this error is fine
 
         // case: batchNum is not int
-        const req: Request = { query: {}, body: {} } as Request;
         req.query.cityId = "5";
         req.query.batchNum = "hats"; // fails
         const res2: Response = mockResponse();
         res2.json = jest.fn();
         await controller.getApartmentsByCityIdAndBatchNum(req, res2);
         expect(res2.json).toHaveBeenCalled();
-        expect(res2.json).toHaveBeenCalledWith({ error: "placeholder" });
+        expect(res2.json).toHaveBeenCalledWith({ error: "cityId and batchNum must be int" });
 
         // case: cityId is not int
         const req2: Request = { query: {}, body: {} } as Request;
@@ -104,7 +105,7 @@ describe("invalid inputs yield an error about the input being invalid", () => {
         res3.json = jest.fn();
         await controller.getApartmentsByCityIdAndBatchNum(req2, res3);
         expect(res3.json).toHaveBeenCalled();
-        expect(res3.json).toHaveBeenCalledWith({ error: "placeholder" });
+        expect(res3.json).toHaveBeenCalledWith({ error: "cityId and batchNum must be int" });
     });
     test("getTasksByBatchNum", async () => {
         // requires batchNum field to be an integer
@@ -114,7 +115,7 @@ describe("invalid inputs yield an error about the input being invalid", () => {
         res.json = jest.fn();
         await controller.getTasksByBatchNum(req, res);
         expect(res.json).toHaveBeenCalled();
-        expect(res.json).toHaveBeenCalledWith({ error: "must supply acctId" });
+        expect(res.json).toHaveBeenCalledWith({ error: "must supply batchNum" });
 
         // test version 2
         jest.clearAllMocks();
@@ -122,8 +123,8 @@ describe("invalid inputs yield an error about the input being invalid", () => {
         res2.json = jest.fn();
         req.query.batchNum = "hats";
         await controller.getTasksByBatchNum(req, res2);
-        expect(res.json).toHaveBeenCalled();
-        expect(res.json).toHaveBeenCalledWith({ error: "acctId must be an integer" });
+        expect(res2.json).toHaveBeenCalled();
+        expect(res2.json).toHaveBeenCalledWith({ error: "batchNum must be an integer" });
     });
     test("banUser", async () => {
         // requires acctId field to be an integer
