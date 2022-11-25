@@ -25,7 +25,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public passwordHash!: string;
     public isVerified!: boolean;
     public verificationToken!: string;
-    public updated!: number;
+    public updated!: number; // todo: remove this. 'updatedAt' handles it
     public role!: string;
     public passwordReset!: number;
     public isBanned!: boolean;

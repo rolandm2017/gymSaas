@@ -2,14 +2,19 @@ import express, { Application } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+//
 import initModels from "./database/models/init-models";
 import Database from "./database/Database";
-// import ErrorMiddleware from "./middleware/error.middleware";
 import errorHandler from "./middleware/error.middleware";
-import { SEED_CITIES } from "./seed/seedCities";
+
 import { City } from "./database/models/City";
-import { SEED_STATES } from "./seed/seedStates";
 import { State } from "./database/models/State";
+import { Account } from "./database/models/Account";
+
+import { SEED_CITIES } from "./seed/seedCities";
+import { SEED_STATES } from "./seed/seedStates";
+import { SEED_USERS } from "./seed/seedUsers";
+import AccountUtil from "./util/accountUtil";
 
 class App {
     public app: Application;
@@ -75,6 +80,11 @@ class App {
             console.log("Found city with name: ", found?.city);
             if (found) continue;
             City.create(city);
+        }
+        for (const user of SEED_USERS) {
+            const found = await Account.findOne({ where: user });
+            if (found) continue;
+            Account.create(user);
         }
     }
 }

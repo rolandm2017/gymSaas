@@ -7,7 +7,6 @@ import HealthCheckController from "./controllers/healthCheck.controller";
 import AuthController from "./controllers/auth.controller";
 import AuthService from "./service/auth.service";
 import EmailService from "./service/email.service";
-import errorHandler from "./middleware/error.middleware";
 import AccountDAO from "./database/dao/account.dao";
 import ResetTokenDAO from "./database/dao/resetToken.dao";
 import AccountUtil from "./util/accountUtil";
@@ -15,7 +14,6 @@ import TaskQueueController from "./controllers/taskQueue.controller";
 import TaskQueueService from "./service/taskQueue.service";
 import TaskDAO from "./database/dao/task.dao";
 import CityDAO from "./database/dao/city.dao";
-// import TestController from "./controllers/test.controller";
 import HousingDAO from "./database/dao/housing.dao";
 import StateDAO from "./database/dao/state.dao";
 import ApartmentService from "./service/apartment.service";
@@ -46,7 +44,7 @@ const e: EmailService = new EmailService(acctDAO);
 const apartmentService = new ApartmentService(housingDAO);
 const scraperService = new ScraperService();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
-const taskQueueService = new TaskQueueService(cityDAO, batchDAO, housingDAO, taskDAO);
+const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
 
 const app = new App({
