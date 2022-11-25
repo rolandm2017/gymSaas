@@ -48,7 +48,7 @@ const mockResponse = () => {
     return res;
 };
 
-describe("Test auth controller", () => {
+describe("Test auth controller without services", () => {
     test("authenticate route succeeds for valid inputs", async () => {
         const credentialsWithJwtAndRefreshToken = { ...fakeButValidAccount };
         s.authenticate = jest.fn().mockReturnValue(credentialsWithJwtAndRefreshToken);

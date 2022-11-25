@@ -64,7 +64,7 @@ function logTime(a: number) {
     ); // => 51
 }
 
-describe("Test auth controller", () => {
+describe("Test auth controller with supertest", () => {
     describe("health check", () => {
         test("is active", async () => {
             const p = `${path}/health`;

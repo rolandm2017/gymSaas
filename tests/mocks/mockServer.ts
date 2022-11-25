@@ -42,6 +42,8 @@ import ScraperService from "../../src/service/scraper.service";
 import CacheService from "../../src/service/cache.service";
 import BatchDAO from "../../src/database/dao/batch.dao";
 import StateDAO from "../../src/database/dao/state.dao";
+import GymService from "../../src/service/gym.service";
+import GymDAO from "../../src/database/dao/gym.dao";
 
 class App {
     public app: Application;
@@ -158,29 +160,32 @@ class App {
 
 const port = parseInt(process.env.PORT!, 10);
 
+// misc
+const accountUtil = new AccountUtil();
 // initialize dao
 const stateDAO = new StateDAO();
 const batchDAO = new BatchDAO();
 const cityDAO = new CityDAO();
-const housingDAO = new HousingDAO(stateDAO);
+const housingDAO = new HousingDAO(stateDAO, cityDAO);
 const taskDAO = new TaskDAO();
 const acctDAO = new AccountDAO();
-const accountUtil = new AccountUtil();
 const resetTokenDAO = new ResetTokenDAO(acctDAO);
+const gymDAO = new GymDAO();
 // services
 const apartmentService = new ApartmentService(housingDAO);
 const scraperService = new ScraperService();
 const emailService = new EmailService(acctDAO, "testing");
-const a = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
-const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO);
+const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
+const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
+const gymService = new GymService(gymDAO);
 
 export const app = new App({
     port: port || 8000,
 
     controllers: [
-        new AuthController(a),
-        new GooglePlacesController(),
+        new AuthController(authService),
+        new GooglePlacesController(gymService),
         new ApartmentsController(apartmentService, scraperService),
         new HealthCheckController(),
         new TaskQueueController(taskQueueService, scraperService, cacheService),

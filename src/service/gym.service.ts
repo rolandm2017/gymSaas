@@ -4,19 +4,22 @@ import express from "express";
 import dotenv from "dotenv";
 import axios, { AxiosResponse } from "axios";
 
-import { createGym, getMultipleGyms } from "../database/dao/gym.dao";
 import { IGym } from "../interface/Gym.interface";
 import { Gym, GymCreationAttributes } from "../database/models/Gym";
 import { gymDbEntryToIGym } from "../util/gymDbEntryToIGym";
+import GymDAO from "../database/dao/gym.dao";
 
 // const dotenvConfig = dotenv.config();
 dotenv.config();
 
-class GymFinderService {
+class GymService {
     // private bareRequest;
     private key = process.env.GOOGLE_PLACES_API_KEY;
+    private gymDAO: GymDAO;
 
-    constructor() {}
+    constructor(gymDAO: GymDAO) {
+        this.gymDAO = gymDAO;
+    }
 
     public async findGymsInLocation(country: string, state: string, city: string): Promise<IGym[]> {
         // TODO: refuse query if query was done within the past 24 hours (before making it to this method)
@@ -95,12 +98,12 @@ class GymFinderService {
                 name: gyms[i].name,
                 rating: gyms[i].rating,
             };
-            await createGym(gymCreationAttr);
+            await this.gymDAO.createGym(gymCreationAttr);
         }
     }
 
     public async getSavedGymsFromDB(city: string): Promise<IGym[]> {
-        const gymsFromDb = await getMultipleGyms(city);
+        const gymsFromDb = await this.gymDAO.getMultipleGyms(city);
         const rowsOfGyms: Gym[] = gymsFromDb.rows;
         const gyms: IGym[] = [];
         for (const row of rowsOfGyms) {
@@ -111,9 +114,8 @@ class GymFinderService {
     }
 }
 
-// const key = process.env.GOOGLE_PLACES_API_KEY;
-
+// example queries
 // const request = `https://maps.googleapis.com/maps/api/place/textsearch/json?`
 // const query = `query=burgers+chelsea+manhattan+new+york+city&type=restaurant&key=${key}`
 
-export default GymFinderService;
+export default GymService;

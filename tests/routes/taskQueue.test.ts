@@ -107,7 +107,7 @@ afterAll(async () => {
     await app.closeDB();
 });
 
-describe("test taskQueue controller", () => {
+describe("Test taskQueue controller with supertest", () => {
     let batchNum = 0;
     test("health check!", async () => {
         const healthCheckRes = await request(server).get("/task_queue/health_check");
