@@ -1,12 +1,8 @@
 import express, { Request, Response } from "express";
-import { cache } from "joi";
 
-import { getBatchNumForNewBatches } from "../database/cache/batchNumCache";
-import BatchDAO from "../database/dao/batch.dao";
 import { Task } from "../database/models/Task";
 import { IHousing } from "../interface/Housing.interface";
 import { ProviderEnum } from "../enum/provider.enum";
-import { ITask } from "../interface/Task.interface";
 import CacheService from "../service/cache.service";
 import TaskQueueService from "../service/taskQueue.service";
 import { ILatLong } from "../interface/LatLong.interface";

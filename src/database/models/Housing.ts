@@ -1,8 +1,4 @@
 import { DataTypes, Model, Sequelize, Optional, ForeignKey } from "sequelize";
-import { AgreementTypeEnum } from "../../enum/agreementType.enum";
-import { BuildingTypeEnum } from "../../enum/buildingType.enum";
-
-import sequelizeConnection from "../Database";
 import { Batch } from "./Batch";
 import { City } from "./City";
 import { State } from "./State";

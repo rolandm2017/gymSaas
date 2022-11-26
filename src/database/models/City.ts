@@ -1,4 +1,4 @@
-import { Association, DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
+import { DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
 import { State } from "./State";
 
 export interface CityAttributes {

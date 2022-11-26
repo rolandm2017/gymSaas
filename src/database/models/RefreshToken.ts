@@ -1,6 +1,5 @@
-import Sequelize, { DataTypes, Sequelize as S, Model, Optional, ForeignKey } from "sequelize";
+import { DataTypes, Sequelize as S, Model, Optional, ForeignKey } from "sequelize";
 
-import sequelizeConnection from "../Database";
 import { Account } from "./Account";
 
 interface RefreshTokenAttributes {

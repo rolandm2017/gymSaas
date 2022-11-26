@@ -1,14 +1,4 @@
-import {
-    Association,
-    BelongsToCreateAssociationMixin,
-    BelongsToGetAssociationMixin,
-    BelongsToSetAssociationMixin,
-    DataTypes,
-    ForeignKey,
-    Model,
-    Optional,
-    Sequelize,
-} from "sequelize";
+import { DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
 import { ProviderEnum } from "../../enum/provider.enum";
 import { Batch } from "./Batch";
 import { City } from "./City";

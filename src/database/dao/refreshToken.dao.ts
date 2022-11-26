@@ -1,13 +1,6 @@
-import { Account } from "../models/Account";
 import { RefreshToken, RefreshTokenCreationAttributes } from "../models/RefreshToken";
-import AccountDAO from "./account.dao";
 
 class RefreshTokenDAO {
-    private accountDAO: AccountDAO;
-    constructor() {
-        this.accountDAO = new AccountDAO();
-    }
-
     public createRefreshToken = async (acctId: number, token: string, expires: Date, createdByIp: string) => {
         const rt: RefreshToken = await RefreshToken.create({
             token,

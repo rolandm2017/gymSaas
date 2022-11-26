@@ -12,11 +12,12 @@
         "test:d": "jest -i tests/dao/*",
         "test:db": "jest -i tests/dbUtil/*",
         "test:v": "jest -i tests/validationSchemas/*",
-        "test:r": "jest -i tests/routes/*",
+        "test:r": "jest -i --verbose tests/routes/*",
         "test:m": "jest -i tests/misc/*",
         "test:p": "jest -i tests/process/*",
         "test:u": "jest -i tests/util/*",
-        "test:t": "jest -i tests/temp/*"
+        "test:t": "jest -i tests/temp/*",
+        "test:tt": "jest -i tests/temp2/*"
     },
     "repository": {
         "type": "git",

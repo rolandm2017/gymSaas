@@ -9,7 +9,7 @@ import { app } from "../mocks/mockServer";
 
 let cityDAO: CityDAO = new CityDAO();
 const stateDAO: StateDAO = new StateDAO();
-const housingDAO = new HousingDAO(stateDAO);
+const housingDAO = new HousingDAO(stateDAO, cityDAO);
 
 beforeAll(async () => {
     await app.connectDB();

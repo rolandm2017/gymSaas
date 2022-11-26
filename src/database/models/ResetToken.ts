@@ -1,6 +1,5 @@
 import { DataTypes, Sequelize, Model, Optional, ForeignKey } from "sequelize";
 
-import sequelizeConnection from "../Database";
 import { Account } from "./Account";
 
 interface ResetTokenAttributes {

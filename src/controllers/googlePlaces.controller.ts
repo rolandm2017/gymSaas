@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import GymService from "../service/gym.service";
-import GymFinderService from "../service/gym.service";
 
 class GooglePlacesController {
     public path = "/google";

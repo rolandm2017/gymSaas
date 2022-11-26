@@ -1,5 +1,4 @@
-import Sequelize, { DataTypes, Sequelize as S, Model, Optional } from "sequelize";
-import { Role } from "../../enum/role.enum";
+import { DataTypes, Sequelize as S, Model, Optional } from "sequelize";
 
 interface AccountAttributes {
     acctId?: number;

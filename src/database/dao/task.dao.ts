@@ -1,5 +1,6 @@
-import sequelize, { Op } from "sequelize";
+import { Op } from "sequelize";
 import moment from "moment";
+//
 import { ProviderEnum } from "../../enum/provider.enum";
 import { Task, TaskCreationAttributes } from "../models/Task";
 

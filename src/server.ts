@@ -1,6 +1,6 @@
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-import App from "./app";
+//
 import GooglePlacesController from "./controllers/googlePlaces.controller";
 import ApartmentsController from "./controllers/apartments.controller";
 import HealthCheckController from "./controllers/healthCheck.controller";
@@ -22,6 +22,10 @@ import CacheService from "./service/cache.service";
 import BatchDAO from "./database/dao/batch.dao";
 import AdminController from "./controllers/admin.controller";
 import AdminService from "./service/admin.service";
+//
+import App from "./app";
+import GymService from "./service/gym.service";
+import GymDAO from "./database/dao/gym.dao";
 
 const port = parseInt(process.env.PORT!, 10);
 
@@ -36,6 +40,7 @@ const housingDAO = new HousingDAO(stateDAO, cityDAO);
 const taskDAO = new TaskDAO();
 const acctDAO: AccountDAO = new AccountDAO();
 const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
+const gymDAO = new GymDAO();
 
 // services
 // is there a better place to initialize these?
@@ -46,13 +51,14 @@ const scraperService = new ScraperService();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
 const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
+const gymService = new GymService(gymDAO);
 
 const app = new App({
     port: port || 8000,
 
     controllers: [
         new AuthController(authService),
-        new GooglePlacesController(),
+        new GooglePlacesController(gymService),
         new ApartmentsController(apartmentService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
         new AdminController(adminService, taskQueueService, apartmentService),
