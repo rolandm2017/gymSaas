@@ -51,7 +51,7 @@ class TaskQueueService {
 
         for (let i = 0; i < coords.length; i++) {
             try {
-                const s = await this.taskDAO.createTask({
+                await this.taskDAO.createTask({
                     providerName: provider,
                     lat: coords[i].lat,
                     long: coords[i].long,
@@ -128,7 +128,7 @@ class TaskQueueService {
     }
 
     public async getAllTasks(choice: ProviderEnum | undefined, batchId: number | undefined, cityId: number | undefined): Promise<Task[]> {
-        const all = await this.taskDAO.getAllTasks({ providerName: choice, batchId, cityId });
+        const all = await this.taskDAO.getAllTasks(choice, batchId, cityId);
         return all;
     }
 

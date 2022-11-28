@@ -39,14 +39,14 @@ function authorize(roles: Role[] = []) {
             // I discovered this while googling "jwt secret express jwt req.user"
             const acctInfo = request.auth;
             if (acctInfo?.acctId === undefined) {
-                return res.status(401).json({ message: "Unauthorized - 031" });
+                return res.status(401).json({ message: "Unauthorized" });
             }
             request.user = {
                 acctId: acctInfo.acctId,
                 role: "", // temp to satisfy ts
             };
             const account: Account | null = await acctDAO.getAccountById(acctInfo.acctId);
-            if (!account) return res.status(401).json({ message: "Unauthorized - 034" });
+            if (!account) return res.status(401).json({ message: "Unauthorized" });
             const refreshTokens = await rtDAO.getAllRefreshTokensForAccount(account.acctId);
 
             const validRoles = Object.values(Role);
@@ -54,7 +54,7 @@ function authorize(roles: Role[] = []) {
             const rolesFoundOnRequest = roles.length;
             if (rolesFoundOnRequest && !validRoles.includes(acctRole)) {
                 // account no longer exists or role not authorized
-                return res.status(401).json({ message: "Unauthorized - 041" });
+                return res.status(401).json({ message: "Unauthorized" });
             }
 
             // authentication and authorization successful

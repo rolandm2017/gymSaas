@@ -24,7 +24,7 @@ afterAll(async () => {
 describe("confirm city DAO works as expected", () => {
     test("we can create a city", async () => {
         const cityPayload: CityCreationAttributes = {
-            city: "montreal",
+            cityName: "montreal",
             state: "quebec",
             country: "canada",
             centerLat: 50,

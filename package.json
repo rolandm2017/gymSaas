@@ -6,6 +6,7 @@
     "scripts": {
         "test": "jest --verbose --i",
         "dev": "nodemon ./src/server.ts",
+        "mock": "nodemon ./tests/mocks/mockServer.ts",
         "start": "node ./dist/server.js",
         "test:c": "jest -i tests/controller/*",
         "test:s": "jest -i tests/service/*",

@@ -131,7 +131,7 @@ describe("Test taskQueue controller with supertest", () => {
         expect(queued.body.queued.pass).toBe(miniPayloadRentCanada.coords.length); // not the real point of the test, but, sanity
         expect(queued2.body.queued.pass).toBe(miniPayloadRentFaster.coords.length); // not the real point of the test, but, sanity
         const allTasksViaEndpoint = await request(server).get("/task_queue/all");
-        expect(allTasksViaEndpoint.body.all.length).toEqual(miniPayloadRentCanada.coords.length + miniPayloadRentFaster.coords.length);
+        expect(allTasksViaEndpoint.body.tasks.length).toEqual(miniPayloadRentCanada.coords.length + miniPayloadRentFaster.coords.length);
     });
     test("add tasks to the task queue - works [integration]", async () => {
         // 2nd payload, another provider
@@ -208,12 +208,12 @@ describe("Test taskQueue controller with supertest", () => {
             const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
             // console.log(allTasksForThisProvider.body, "202rm");
             console.log(allTasksForThisProvider.body, "209rm");
-            const allTasksAreCompleted = allTasksForThisProvider.body.all.every((task: Task) => task.lastScan !== null);
+            const allTasksAreCompleted = allTasksForThisProvider.body.tasks.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!
             payload.provider = ProviderEnum.rentSeeker;
             const allTasksForThisProvider2 = await request(server).get("/task_queue/all").send(payload);
-            const allTasksAreIncomplete = allTasksForThisProvider2.body.all.every((task: Task) => task.lastScan === null);
+            const allTasksAreIncomplete = allTasksForThisProvider2.body.tasks.every((task: Task) => task.lastScan === null);
             expect(allTasksAreIncomplete).toBe(true);
         });
 
@@ -246,12 +246,12 @@ describe("Test taskQueue controller with supertest", () => {
             expect(tasksReceived === tasksTriedToComplete).toBe(true); // testing inputs.
             // now verify that all tasks for this provider are completed.
             const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
-            const allTasksAreCompleted = allTasksForThisProvider.body.all.every((task: Task) => task.lastScan !== null);
+            const allTasksAreCompleted = allTasksForThisProvider.body.tasks.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!
             payload.provider = ProviderEnum.rentCanada;
             const allTasksForThisProvider2 = await request(server).get("/task_queue/all").send(payload);
-            const allTasksAreIncomplete = allTasksForThisProvider2.body.all.every((task: Task) => task.lastScan === null);
+            const allTasksAreIncomplete = allTasksForThisProvider2.body.tasks.every((task: Task) => task.lastScan === null);
             expect(allTasksAreIncomplete).toBe(true);
         });
 
@@ -284,12 +284,12 @@ describe("Test taskQueue controller with supertest", () => {
             expect(tasksReceived === tasksTriedToComplete).toBe(true); // testing inputs.
             // now verify that all tasks for this provider are completed.
             const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
-            const allTasksAreCompleted = allTasksForThisProvider.body.all.every((task: Task) => task.lastScan !== null);
+            const allTasksAreCompleted = allTasksForThisProvider.body.tasks.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!
             payload.provider = ProviderEnum.rentFaster;
             const allTasksForThisProvider2 = await request(server).get("/task_queue/all").send(payload);
-            const allTasksAreIncomplete = allTasksForThisProvider2.body.all.every((task: Task) => task.lastScan === null);
+            const allTasksAreIncomplete = allTasksForThisProvider2.body.tasks.every((task: Task) => task.lastScan === null);
             expect(allTasksAreIncomplete).toBe(true);
         });
     });

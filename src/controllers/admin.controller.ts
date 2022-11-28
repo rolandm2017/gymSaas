@@ -3,6 +3,7 @@ import { Housing } from "../database/models/Housing";
 import { Task } from "../database/models/Task";
 import { ProviderEnum } from "../enum/provider.enum";
 import { Role } from "../enum/role.enum";
+import { HealthCheck } from "../enum/routes/healthCheck.enum";
 import { IBatch } from "../interface/Batch.interface";
 import authorize from "../middleware/authorize.middleware";
 import AdminService from "../service/admin.service";
@@ -31,7 +32,7 @@ class AdminController {
         // journey
         this.router.get("/user/journey", authorize([Role.Admin]), this.getUserJourney.bind(this));
         // health check
-        this.router.get("/health_check", this.healthCheck);
+        this.router.get(HealthCheck.healthCheck, this.healthCheck);
     }
 
     public async getAllBatchNumbers(request: Request, response: Response) {
@@ -110,7 +111,7 @@ class AdminController {
         // journey - add much later
     }
 
-    public async healthCheck(request: Request, response: Response) {
+    public healthCheck(request: Request, response: Response) {
         return response.status(200).json({ message: "active" });
     }
 }

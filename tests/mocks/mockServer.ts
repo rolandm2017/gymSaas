@@ -12,6 +12,7 @@ import ApartmentsController from "../../src/controllers/apartments.controller";
 import HealthCheckController from "../../src/controllers/healthCheck.controller";
 import AuthController from "../../src/controllers/auth.controller";
 import TaskQueueController from "../../src/controllers/taskQueue.controller";
+import AdminController from "../../src/controllers/admin.controller";
 
 import initModels from "../../src/database/models/init-models";
 import errorHandler from "../../src/middleware/error.middleware";
@@ -29,7 +30,7 @@ import { Account } from "../../src/database/models/Account";
 import testDatabase from "../database/Database";
 import { ResetToken } from "../../src/database/models/ResetToken";
 import { Task } from "../../src/database/models/Task";
-import { City } from "../../src/database/models/City";
+import { City, CityCreationAttributes } from "../../src/database/models/City";
 import { Housing } from "../../src/database/models/Housing";
 import TaskQueueService from "../../src/service/taskQueue.service";
 import CityDAO from "../../src/database/dao/city.dao";
@@ -37,6 +38,7 @@ import HousingDAO from "../../src/database/dao/housing.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { Batch } from "../../src/database/models/Batch";
 
+import { SEED_STATES } from "../../src/seed/seedStates";
 import { SEED_CITIES } from "../../src/seed/seedCities";
 import ScraperService from "../../src/service/scraper.service";
 import CacheService from "../../src/service/cache.service";
@@ -44,6 +46,8 @@ import BatchDAO from "../../src/database/dao/batch.dao";
 import StateDAO from "../../src/database/dao/state.dao";
 import GymService from "../../src/service/gym.service";
 import GymDAO from "../../src/database/dao/gym.dao";
+import { State } from "../../src/database/models/State";
+import AdminService from "../../src/service/admin.service";
 
 class App {
     public app: Application;
@@ -85,8 +89,8 @@ class App {
         await App.Database.authenticate();
         // console.log("Database Connection Established");
         await App.Database.drop();
-        await App.Database.sync({ force: true });
         await initModels(App.Database);
+        await App.Database.sync({ force: true });
         await this.seedDb();
         // console.log("Database Sync");
         this.dbConnOpen = true;
@@ -149,11 +153,24 @@ class App {
     }
 
     public async seedDb() {
+        let i = 0;
+        for (const state of SEED_STATES) {
+            const found = await State.findOne({ where: state });
+            if (found) continue;
+            State.create(state);
+        }
         for (const city of SEED_CITIES) {
             // check if city is seeded into db before trying to add a dupe
-            const found = await City.findOne({ where: city });
+            // try {
+            // await City.findOrCreate(city);
+            const found = await City.findOne({ where: { cityName: city.cityName } });
+            const all = await City.findAll({});
             if (found) continue;
             City.create(city);
+            // } catch (err) {
+            //     console.log(err);
+            //     console.log(err);
+            // }
         }
     }
 }
@@ -172,6 +189,7 @@ const acctDAO = new AccountDAO();
 const resetTokenDAO = new ResetTokenDAO(acctDAO);
 const gymDAO = new GymDAO();
 // services
+const adminService = new AdminService(acctDAO);
 const apartmentService = new ApartmentService(housingDAO);
 const scraperService = new ScraperService();
 const emailService = new EmailService(acctDAO, "testing");
@@ -184,6 +202,7 @@ export const app = new App({
     port: port || 8000,
 
     controllers: [
+        new AdminController(adminService, taskQueueService, apartmentService),
         new AuthController(authService),
         new GooglePlacesController(gymService),
         new ApartmentsController(apartmentService, scraperService),

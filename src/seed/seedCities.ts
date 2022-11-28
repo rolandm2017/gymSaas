@@ -5,8 +5,7 @@ import { CityEnum } from "../enum/city.enum";
 export const SEED_CITIES: CityCreationAttributes[] = [
     {
         stateId: ProvinceIdEnum.britishColumbia,
-        city: CityEnum.vancouver,
-        state: "British Columbia",
+        cityName: CityEnum.vancouver,
         country: "Canada",
         centerLat: 49.2827,
         centerLong: -123.1207,
@@ -15,8 +14,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.alberta,
-        city: CityEnum.calgary,
-        state: "Alberta",
+        cityName: CityEnum.calgary,
         country: "Canada",
         centerLat: 51.0447,
         centerLong: -114.0719,
@@ -25,8 +23,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.alberta,
-        city: CityEnum.edmonton,
-        state: "Alberta",
+        cityName: CityEnum.edmonton,
         country: "Canada",
         centerLat: 53.5461,
         centerLong: -113.4937,
@@ -35,8 +32,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.manitoba,
-        city: CityEnum.winnipeg,
-        state: "Manitoba",
+        cityName: CityEnum.winnipeg,
         country: "Canada",
         centerLat: 49.8954,
         centerLong: -97.1385,
@@ -45,8 +41,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.ontario,
-        city: CityEnum.toronto,
-        state: "Ontario",
+        cityName: CityEnum.toronto,
         country: "Canada",
         centerLat: 43.6532,
         centerLong: -79.3832,
@@ -55,8 +50,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.quebec,
-        city: CityEnum.montreal,
-        state: "Quebec",
+        cityName: CityEnum.montreal,
         country: "Canada",
         centerLat: 45.5019,
         centerLong: -73.5674,

@@ -85,8 +85,26 @@ class TaskDAO {
         });
     };
 
-    public getAllTasks = (filters: GetAllTasksFilters) => {
-        return Task.findAll({ where: { ...filters } });
+    public getAllTasks = (providerName?: ProviderEnum, batchId?: number, cityId?: number) => {
+        let conditions;
+        if (providerName && batchId && cityId) {
+            conditions = { providerName, batchId, cityId, lastScan: null };
+        } else if (providerName && batchId) {
+            conditions = { providerName, batchId, lastScan: null };
+        } else if (batchId && cityId) {
+            conditions = { batchId, cityId, lastScan: null };
+        } else if (providerName && cityId) {
+            conditions = { providerName, cityId, lastScan: null };
+        } else if (providerName) {
+            conditions = { providerName, lastScan: null };
+        } else if (batchId) {
+            conditions = { batchId, lastScan: null };
+        } else if (cityId) {
+            conditions = { cityId, lastScan: null };
+        } else {
+            conditions = { lastScan: null };
+        }
+        return Task.findAll({ where: conditions });
     };
 
     public updateTask = (task: TaskCreationAttributes, id: number) => {

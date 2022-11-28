@@ -18,10 +18,10 @@ class CityDAO {
         return City.findByPk(id);
     };
 
-    public getCityByName = (name: string) => {
+    public getCityByName = (cityName: string) => {
         return City.findOne({
             where: {
-                city: name,
+                cityName: cityName,
             },
         });
     };

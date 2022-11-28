@@ -20,6 +20,7 @@ function initModels(sequelize: Sequelize) {
     // city must be added before housing, gym, task, because they depend on it
     const State = _State.initModel(sequelize);
     const City = _City.initModel(sequelize);
+    console.log("City is init! 23rm");
     const Housing = _Housing.initModel(sequelize);
     const Gym = _Gym.initModel(sequelize);
     // const Provider = _Provider.initModel(sequelize);

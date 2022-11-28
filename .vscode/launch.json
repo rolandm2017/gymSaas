@@ -23,6 +23,18 @@
         {
             "type": "node-terminal",
             "request": "launch",
+            "name": "Mock typescript-express-starter",
+            "command": "npm run mock"
+        },
+        {
+            "type": "node-terminal",
+            "request": "launch",
+            "name": "testTemp ts-express-starter",
+            "command": "npm run test:t"
+        },
+        {
+            "type": "node-terminal",
+            "request": "launch",
             "name": "Start typescript-express-starter",
             "command": "npm run start"
         },
@@ -31,18 +43,6 @@
             "request": "launch",
             "name": "Test typescript-express-starter",
             "command": "npm run test"
-        },
-        {
-            "type": "node-terminal",
-            "request": "launch",
-            "name": "Lint typescript-express-starter",
-            "command": "npm run lint"
-        },
-        {
-            "type": "node-terminal",
-            "request": "launch",
-            "name": "Lint:Fix typescript-express-starter",
-            "command": "npm run lint:fix"
         }
     ]
 }

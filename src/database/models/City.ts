@@ -3,8 +3,7 @@ import { State } from "./State";
 
 export interface CityAttributes {
     cityId?: number;
-    city: string;
-    state: string;
+    cityName: string;
     country: string;
     centerLat: number;
     centerLong: number;
@@ -21,8 +20,7 @@ export type CityCreationAttributes = Optional<CityAttributes, CityOptionalAttrib
 
 export class City extends Model<CityAttributes, CityCreationAttributes> implements CityAttributes {
     public cityId!: number;
-    public city!: string;
-    public state!: string;
+    public cityName!: string;
     public country!: string;
     public centerLat!: number;
     public centerLong!: number;
@@ -42,14 +40,10 @@ export class City extends Model<CityAttributes, CityCreationAttributes> implemen
                     autoIncrement: true,
                     primaryKey: true,
                 },
-                city: {
+                cityName: {
                     type: DataTypes.STRING,
                     allowNull: false,
                     unique: true,
-                },
-                state: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
                 },
                 country: {
                     type: DataTypes.STRING,
