@@ -38,6 +38,7 @@ import HousingDAO from "../../src/database/dao/housing.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { Batch } from "../../src/database/models/Batch";
 
+import { SEED_USERS } from "../../src/seed/seedUsers";
 import { SEED_STATES } from "../../src/seed/seedStates";
 import { SEED_CITIES } from "../../src/seed/seedCities";
 import ScraperService from "../../src/service/scraper.service";
@@ -52,7 +53,6 @@ import AdminService from "../../src/service/admin.service";
 class App {
     public app: Application;
     public port: number;
-    private models: any;
 
     public static Database: Sequelize;
     public dbConnOpen: boolean = false;
@@ -92,6 +92,12 @@ class App {
         await initModels(App.Database);
         await App.Database.sync({ force: true });
         await this.seedDb();
+        // restore cache of batch ids from db
+        const batchDAO = new BatchDAO();
+        const cityDAO = new CityDAO();
+        const cacheService = new CacheService(cityDAO, batchDAO);
+        cacheService.initBatchCache();
+
         // console.log("Database Sync");
         this.dbConnOpen = true;
     }
@@ -153,7 +159,11 @@ class App {
     }
 
     public async seedDb() {
-        let i = 0;
+        for (const user of SEED_USERS) {
+            const found = await Account.findOne({ where: { email: user.email } });
+            if (found) continue;
+            Account.create(user);
+        }
         for (const state of SEED_STATES) {
             const found = await State.findOne({ where: state });
             if (found) continue;
@@ -194,8 +204,8 @@ const apartmentService = new ApartmentService(housingDAO);
 const scraperService = new ScraperService();
 const emailService = new EmailService(acctDAO, "testing");
 const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
-const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
+const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
 const gymService = new GymService(gymDAO);
 
 export const app = new App({

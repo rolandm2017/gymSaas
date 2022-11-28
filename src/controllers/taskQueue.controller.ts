@@ -60,7 +60,7 @@ class TaskQueueController {
         const highest = await this.cacheService.getBatchNumForNewBatches();
         if (highest) return response.status(200).json({ nextBatchNum: highest });
         // so this only happens once
-        this.cacheService.setBatchNum(0);
+        this.cacheService.setBatchNumForNewBatches(0);
         return response.status(200).json({ nextBatchNum: 0 });
     }
 
@@ -117,7 +117,6 @@ class TaskQueueController {
         const forProvider: ProviderEnum = request.body.provider;
         const taskId: number = request.body.taskId;
         const apartments: any[] = request.body.apartments;
-        console.log(apartments, "121rm");
         if (typeof taskId !== "number" || taskId < 0) {
             return response.status(400).send("Bad task ID input");
         }

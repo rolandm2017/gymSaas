@@ -27,8 +27,7 @@ afterAll(async () => {
 describe("housingDAO tests", () => {
     test("we add 3 apartments to the db and then discover there are 3 in it", async () => {
         const cityPayload: CityCreationAttributes = {
-            city: "montreal",
-            state: "quebec",
+            cityName: "montreal",
             country: "canada",
             centerLat: 50,
             centerLong: 50,

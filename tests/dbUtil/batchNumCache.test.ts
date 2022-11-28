@@ -10,7 +10,9 @@ describe("test the batch num cache", () => {
     });
     test("we can extract the batch num when it is set without touching the db", async () => {
         // Note: this test depends on the one before it ...
-        const fakeBatchDao = { getHighestBatchNum: jest.fn(), addBatchNum: jest.fn() };
+        const fakeBatchDao = new BatchDAO();
+        fakeBatchDao.getHighestBatchNum = jest.fn();
+        fakeBatchDao.addBatchNum = jest.fn();
         const current = await getBatchNumForNewBatches(fakeBatchDao);
         expect(fakeBatchDao.getHighestBatchNum).not.toHaveBeenCalled();
         expect(current).toBe(3);

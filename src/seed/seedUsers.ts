@@ -1,7 +1,9 @@
 import { Role } from "../enum/role.enum";
 import AccountUtil from "../util/accountUtil";
 
-const pwHash = new AccountUtil().hash("testTEST11!!");
+export const ADMIN_ACCT_PASSWORD = "testTEST11!!";
+
+const pwHash = new AccountUtil().hash(ADMIN_ACCT_PASSWORD);
 
 export const SEED_USERS = [
     {

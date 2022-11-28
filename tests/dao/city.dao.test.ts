@@ -25,7 +25,6 @@ describe("confirm city DAO works as expected", () => {
     test("we can create a city", async () => {
         const cityPayload: CityCreationAttributes = {
             cityName: "montreal",
-            state: "quebec",
             country: "canada",
             centerLat: 50,
             centerLong: 50,

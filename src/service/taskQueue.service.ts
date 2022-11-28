@@ -13,18 +13,21 @@ import { IHousing } from "../interface/Housing.interface";
 import { convertIHousingToCreationAttr } from "../util/housingConverter";
 import BatchDAO from "../database/dao/batch.dao";
 import { IBatch } from "../interface/Batch.interface";
+import CacheService from "./cache.service";
 
 class TaskQueueService {
     private cityDAO: CityDAO;
     private batchDAO: BatchDAO;
     private taskDAO: TaskDAO;
     private housingDAO: HousingDAO;
+    private cacheService: CacheService;
 
-    constructor(cityDAO: CityDAO, housingDAO: HousingDAO, batchDAO: BatchDAO, taskDAO: TaskDAO) {
+    constructor(cityDAO: CityDAO, housingDAO: HousingDAO, batchDAO: BatchDAO, taskDAO: TaskDAO, cacheService: CacheService) {
         this.cityDAO = cityDAO;
         this.housingDAO = housingDAO;
         this.batchDAO = batchDAO;
         this.taskDAO = taskDAO;
+        this.cacheService = cacheService;
     }
 
     public async queueGridScan(
@@ -34,20 +37,13 @@ class TaskQueueService {
         cityName: string,
         batchNum: number,
     ): Promise<{ pass: number; fail: number; batchNum: number }> {
+        this.cacheService.addBatchNumIfNotExists(batchNum);
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
         const cityForId = await this.cityDAO.getCityByName(cityName);
         if (cityForId === null) throw new Error("City not found");
 
         const successes: {}[] = [];
-
-        // const mostRecentTask: Task[] = await this.taskDAO.getMostRecentTaskForProvider(provider);
-        // let mostRecentBatchNum: number | undefined;
-        // if (mostRecentTask.length === 0) {
-        //     mostRecentBatchNum = 0;
-        // } else {
-        //     mostRecentBatchNum = mostRecentTask[0].batch;
-        // }
 
         for (let i = 0; i < coords.length; i++) {
             try {

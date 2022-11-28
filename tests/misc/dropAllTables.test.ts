@@ -26,57 +26,44 @@ afterAll(async () => {
 describe("we see if drop all tables really drops all tables", () => {
     let cityId = 0;
     test("spam cities", async () => {
-        try {
-            const cityPayload: CityCreationAttributes = {
-                city: "montrealAAAA2",
-                state: "quebec",
-                country: "canada",
-                centerLat: 50,
-                centerLong: 50,
-                scanRadius: 25,
-                lastScan: null,
-            };
-            const initCity = await cityDAO.createCity(cityPayload);
-            cityPayload.city = "t2123";
-            let initCity2 = await cityDAO.createCity(cityPayload);
-            cityPayload.city = "t3123";
-            initCity2 = await cityDAO.createCity(cityPayload);
-            cityPayload.city = "t4123";
-            initCity2 = await cityDAO.createCity(cityPayload);
-            cityPayload.city = "t5123";
-            initCity2 = await cityDAO.createCity(cityPayload);
-            if (initCity === undefined) fail("must be defined");
-            expect(initCity.cityId).toBeDefined();
-            console.log(initCity, "40rm");
-            cityId = initCity.cityId;
-        } catch (err) {
-            fail(err + "49rm");
-        }
+        const cityPayload: CityCreationAttributes = {
+            cityName: "montrealAAAA2",
+            country: "canada",
+            centerLat: 50,
+            centerLong: 50,
+            scanRadius: 25,
+            lastScan: null,
+        };
+        const initCity = await cityDAO.createCity(cityPayload);
+        cityPayload.cityName = "t2123";
+        let initCity2 = await cityDAO.createCity(cityPayload);
+        cityPayload.cityName = "t3123";
+        initCity2 = await cityDAO.createCity(cityPayload);
+        cityPayload.cityName = "t4123";
+        initCity2 = await cityDAO.createCity(cityPayload);
+        cityPayload.cityName = "t5123";
+        initCity2 = await cityDAO.createCity(cityPayload);
+        if (initCity === undefined) fail("must be defined");
+        expect(initCity.cityId).toBeDefined();
+        console.log(initCity, "40rm");
+        cityId = initCity.cityId;
     });
     test("spam tasks", async () => {
-        try {
-            const payload: TaskCreationAttributes = {
-                providerName: ProviderEnum.rentFaster,
-                lat: 50,
-                long: 50,
-                zoomWidth: 0,
-                batch: 1,
-                lastScan: null,
-                cityId: cityId,
-            };
-            let t = await taskDAO.createTask(payload);
-            t = await taskDAO.createTask(payload);
-            t = await taskDAO.createTask(payload);
-            t = await taskDAO.createTask(payload);
-            t = await taskDAO.createTask(payload);
-            if (t == undefined) fail("undefined task");
-            console.log(t, "55rm");
-            expect(t.batch).toBe(1);
-        } catch (err) {
-            console.log(err);
-            fail(err + "73rm");
-            // expect(true).toBe(false); // fail
-            // fail("some error2");
-        }
+        const payload: TaskCreationAttributes = {
+            providerName: ProviderEnum.rentFaster,
+            lat: 50,
+            long: 50,
+            zoomWidth: 0,
+            batch: 1,
+            lastScan: null,
+            cityId: cityId,
+        };
+        let t = await taskDAO.createTask(payload);
+        t = await taskDAO.createTask(payload);
+        t = await taskDAO.createTask(payload);
+        t = await taskDAO.createTask(payload);
+        t = await taskDAO.createTask(payload);
+        if (t == undefined) fail("undefined task");
+        expect(t.batch).toBe(1);
     });
 });

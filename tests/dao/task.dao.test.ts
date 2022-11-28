@@ -26,8 +26,7 @@ describe("confirm task DAO works as expected", () => {
     test("we can insert 3 different batches of tasks and then get the batch num", async () => {
         // setup so that city with cityId exists
         const cityPayload: CityCreationAttributes = {
-            city: "montreal2222",
-            state: "quebec",
+            cityName: "montreal2222",
             country: "canada",
             centerLat: 50,
             centerLong: 50,

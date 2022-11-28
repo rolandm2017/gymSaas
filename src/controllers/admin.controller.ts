@@ -44,8 +44,6 @@ class AdminController {
         const providerInput = request.query.provider; // optional
         const batchNumInput = request.query.batchNum; // optional
         const cityIdInput = request.query.cityId; // optional
-        console.log(providerInput, typeof providerInput, "44rm");
-        console.log(batchNumInput, typeof batchNumInput, "45rm");
         // validation
         if (providerInput && typeof providerInput !== "string") return response.status(400).json({ error: "invalid provider" });
         const provider = providerInput && providerInput in ProviderEnum ? (providerInput as ProviderEnum) : undefined;

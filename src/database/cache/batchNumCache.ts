@@ -1,20 +1,32 @@
 import BatchDAO from "../dao/batch.dao";
 
-export let _currentBatchNumForNewBatches: number | undefined = undefined;
+export let _usedBatchNumbers: number[] = [];
 
 export async function getBatchNumForNewBatches(batchDAO: BatchDAO): Promise<number> {
-    if (_currentBatchNumForNewBatches) return _currentBatchNumForNewBatches;
+    if (_usedBatchNumbers.length != 0) return _usedBatchNumbers[_usedBatchNumbers.length - 1];
     console.log("10rm");
     const batchWithHighestNum = await batchDAO.getHighestBatchNum();
     if (batchWithHighestNum === null) {
-        _currentBatchNumForNewBatches = 0;
+        _usedBatchNumbers = [0];
         await batchDAO.addBatchNum(0);
     }
-    _currentBatchNumForNewBatches = batchWithHighestNum ? batchWithHighestNum : 0;
-    return _currentBatchNumForNewBatches;
+    const batchNumForNewBatches = _usedBatchNumbers.length !== 0 ? _usedBatchNumbers[_usedBatchNumbers.length - 1] : 0;
+    return batchNumForNewBatches;
 }
 
-export async function setBatchNum(newNum: number) {
-    if (_currentBatchNumForNewBatches && newNum < _currentBatchNumForNewBatches) throw new Error("Can't decrease batch num");
-    _currentBatchNumForNewBatches = newNum;
+export async function setBatchNumForNewBatches(newNum: number, batchDAO: BatchDAO) {
+    const newNumIsLowerThanHighest = _usedBatchNumbers[_usedBatchNumbers.length - 1] > newNum;
+    if (newNumIsLowerThanHighest) throw new Error("Can't decrease batch num");
+    _usedBatchNumbers.push(newNum);
+    await batchDAO.addBatchNum(newNum);
+}
+
+export async function addBatchNumIfNotExists(newNum: number, batchDAO: BatchDAO) {
+    const exists = _usedBatchNumbers.includes(newNum);
+    if (exists) return;
+    else setBatchNumForNewBatches(newNum, batchDAO);
+}
+
+export function initBatchCacheFromDb(numsFromDb: number[]) {
+    _usedBatchNumbers = numsFromDb;
 }

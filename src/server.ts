@@ -26,6 +26,7 @@ import AdminService from "./service/admin.service";
 import App from "./app";
 import GymService from "./service/gym.service";
 import GymDAO from "./database/dao/gym.dao";
+import { cache } from "joi";
 
 const port = parseInt(process.env.PORT!, 10);
 
@@ -49,8 +50,8 @@ const e: EmailService = new EmailService(acctDAO);
 const apartmentService = new ApartmentService(housingDAO);
 const scraperService = new ScraperService();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
-const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
+const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
 const gymService = new GymService(gymDAO);
 
 const app = new App({

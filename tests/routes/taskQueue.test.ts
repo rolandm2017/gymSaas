@@ -1,4 +1,6 @@
 import request from "supertest";
+//
+import { testTasks } from "../mocks/testTasks";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { ProviderEnum } from "../../src/enum/provider.enum";
 import { CityEnum } from "../../src/enum/city.enum";
@@ -12,80 +14,24 @@ import { smlSeeker } from "../mocks/smallRealResults/smlSeeker";
 import BatchDAO from "../../src/database/dao/batch.dao";
 import CityDAO from "../../src/database/dao/city.dao";
 
-const taskDAO = new TaskDAO();
-const cityDAO = new CityDAO();
-
-const testTasks = [
-    {
-        lat: 45.5019,
-        long: -73.5674,
-        index: 0,
-    },
-    {
-        long: -73.66279309451045,
-        lat: 45.54920096660751,
-        index: 1,
-    },
-];
-const testTasks2 = [
-    {
-        lat: 45.5019,
-        long: -73.5674,
-        index: 0,
-    },
-    {
-        long: -73.66279309451045,
-        lat: 45.54920096660751,
-        index: 1,
-    },
-    {
-        long: -73.56703009451044,
-        lat: 45.54920096660751,
-        index: 1,
-    },
-];
-
-const testTasks3 = [
-    {
-        lat: 45.5019,
-        long: -73.5674,
-        index: 0,
-    },
-    {
-        long: -73.66279309451045,
-        lat: 45.54920096660751,
-        index: 1,
-    },
-    {
-        long: -73.7581861890209,
-        lat: 45.596501933215016,
-        index: 2,
-    },
-    {
-        long: -73.7581861890309,
-        lat: 45.596501933215316,
-        index: 2,
-    },
-];
-
 const miniPayloadRentCanada = {
     provider: ProviderEnum.rentCanada,
     city: CityEnum.montreal,
-    coords: testTasks,
+    coords: testTasks[0],
     zoomWidth: 10,
     batchNum: 0,
 };
 const miniPayloadRentFaster = {
     provider: ProviderEnum.rentFaster,
     city: CityEnum.montreal,
-    coords: testTasks2,
+    coords: testTasks[1],
     zoomWidth: 10,
     batchNum: 0,
 };
 const miniPayloadRentSeeker = {
     provider: ProviderEnum.rentSeeker,
     city: CityEnum.montreal,
-    coords: testTasks3,
+    coords: testTasks[2],
     zoomWidth: 10,
     batchNum: 0,
 };
