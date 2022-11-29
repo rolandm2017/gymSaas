@@ -36,7 +36,7 @@ class AdminController {
     }
 
     public async getAllBatchNumbers(request: Request, response: Response) {
-        const batchNums: IBatch[] = await this.taskQueueService.getAllBatchNumbers();
+        const batchNums: number[] = await this.taskQueueService.getAllBatchNumbers();
         return response.status(200).json({ batchNums });
     }
 
@@ -58,12 +58,12 @@ class AdminController {
 
     public async getApartmentsByLocation(request: Request, response: Response) {
         const cityName = request.query.cityName;
-        const stateName = request.query.stateName;
-        // do we need by country? YAGNI?
-        if (!cityName && !stateName) return response.status(400).json({ error: "at least one of cityName or state must be provided" });
-        if (cityName && typeof cityName !== "string") return response.status(400).json({ error: "cityName must be string" });
-        if (stateName && typeof stateName !== "string") return response.status(400).json({ error: "stateName must be string" });
-        const aps: Housing[] = await this.apartmentService.getApartmentsByLocation(cityName, stateName);
+        // const stateName = request.query.stateName;
+        // do we need by country or state? YAGNI?
+        // if (!cityName && !stateName) return response.status(400).json({ error: "at least one of cityName or state must be provided" });
+        if (typeof cityName !== "string") return response.status(400).json({ error: "cityName must be string" });
+        // if (stateName && typeof stateName !== "string") return response.status(400).json({ error: "stateName must be string" });
+        const aps: Housing[] = await this.apartmentService.getApartmentsByLocation(cityName);
         return response.status(200).json({ apartments: aps });
     }
 

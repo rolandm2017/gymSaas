@@ -5,11 +5,11 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 import { Model, Sequelize } from "sequelize";
+// everything else
 
 // import App from "../../src/app"; // this tests server is *different* from the dev server, but close to it.
 import GooglePlacesController from "../../src/controllers/googlePlaces.controller";
 import ApartmentsController from "../../src/controllers/apartments.controller";
-import HealthCheckController from "../../src/controllers/healthCheck.controller";
 import AuthController from "../../src/controllers/auth.controller";
 import TaskQueueController from "../../src/controllers/taskQueue.controller";
 import AdminController from "../../src/controllers/admin.controller";
@@ -22,6 +22,7 @@ import { TEST_DB_HOST, TEST_DB_NAME, TEST_DB_PASSWORD, TEST_DB_PORT, TEST_DB_USE
 import AuthService from "../../src/service/auth.service";
 import EmailService from "../../src/service/email.service";
 import ApartmentService from "../../src/service/apartment.service";
+import AdminService from "../../src/service/admin.service";
 
 import AccountUtil from "../../src/util/accountUtil";
 import AccountDAO from "../../src/database/dao/account.dao";
@@ -48,7 +49,6 @@ import StateDAO from "../../src/database/dao/state.dao";
 import GymService from "../../src/service/gym.service";
 import GymDAO from "../../src/database/dao/gym.dao";
 import { State } from "../../src/database/models/State";
-import AdminService from "../../src/service/admin.service";
 
 class App {
     public app: Application;
@@ -216,7 +216,6 @@ export const app = new App({
         new AuthController(authService),
         new GooglePlacesController(gymService),
         new ApartmentsController(apartmentService, scraperService),
-        new HealthCheckController(),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],

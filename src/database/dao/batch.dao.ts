@@ -6,16 +6,12 @@ class BatchDAO {
     constructor() {}
 
     public addBatchNum = async (newBatchNum?: number) => {
-        try {
-            if (newBatchNum) {
-                return await Batch.create({ batchId: newBatchNum });
-            }
-            const highestCurrent = await this.getHighestBatchNum();
-            if (highestCurrent) return await Batch.create({ batchId: highestCurrent + 1 });
-            else return await Batch.create({ batchId: 1 });
-        } catch (err) {
-            console.log(err);
+        if (newBatchNum !== undefined) {
+            return await Batch.create({ batchId: newBatchNum });
         }
+        const highestCurrent = await this.getHighestBatchNum();
+        if (highestCurrent) return await Batch.create({ batchId: highestCurrent + 1 });
+        else return await Batch.create({ batchId: 1 });
     };
 
     public getHighestBatchNum = async () => {

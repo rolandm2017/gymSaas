@@ -117,11 +117,12 @@ class TaskQueueController {
         const forProvider: ProviderEnum = request.body.provider;
         const taskId: number = request.body.taskId;
         const apartments: any[] = request.body.apartments;
+        const cityId = request.body.cityId;
+        const batchNum = request.body.batchNum;
         if (typeof taskId !== "number" || taskId < 0) {
             return response.status(400).send("Bad task ID input");
         }
-
-        const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments);
+        const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments, cityId, batchNum);
         const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
         return response.status(200).json({ successfullyLogged, markedComplete, taskId });
     }

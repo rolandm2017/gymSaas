@@ -2,7 +2,13 @@ import { HousingCreationAttributes } from "../database/models/Housing";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
 
-export function convertIHousingToCreationAttr(house: IHousing, provider: ProviderEnum, taskId: number, cityId: number): HousingCreationAttributes {
+export function convertIHousingToCreationAttr(
+    house: IHousing,
+    provider: ProviderEnum,
+    taskId: number,
+    cityId: number,
+    batchNum: number,
+): HousingCreationAttributes {
     const creationPayload = {
         buildingType: house.buildingType,
         agreementType: house.agreementType,
@@ -16,6 +22,7 @@ export function convertIHousingToCreationAttr(house: IHousing, provider: Provide
         idAtSource: house.idAtSource,
         taskId,
         cityId,
+        batchId: batchNum,
     };
     return creationPayload;
 }

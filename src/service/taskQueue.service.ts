@@ -17,7 +17,6 @@ import CacheService from "./cache.service";
 
 class TaskQueueService {
     private cityDAO: CityDAO;
-    private batchDAO: BatchDAO;
     private taskDAO: TaskDAO;
     private housingDAO: HousingDAO;
     private cacheService: CacheService;
@@ -25,7 +24,6 @@ class TaskQueueService {
     constructor(cityDAO: CityDAO, housingDAO: HousingDAO, batchDAO: BatchDAO, taskDAO: TaskDAO, cacheService: CacheService) {
         this.cityDAO = cityDAO;
         this.housingDAO = housingDAO;
-        this.batchDAO = batchDAO;
         this.taskDAO = taskDAO;
         this.cacheService = cacheService;
     }
@@ -86,20 +84,27 @@ class TaskQueueService {
         return tasks;
     }
 
-    public async reportFindingsToDb(provider: ProviderEnum, taskId: number, apartments: any): Promise<{ pass: number; fail: number }> {
+    public async reportFindingsToDb(
+        provider: ProviderEnum,
+        taskId: number,
+        apartments: any,
+        reportedCityId?: number, // optional param enables tests to bypass getting the cityId from the Task, which might not exist in testing
+        batchNum?: number, // same story as above: optional so we can bypass a step during tests.
+    ): Promise<{ pass: number; fail: number }> {
         const parser = new Parser(provider);
         const parsedApartmentData: IHousing[] = parser.parse(apartments);
         const successes: {}[] = [];
         // get city id for this task because its needed in the housing model for foreign key
         const currentTask = await this.taskDAO.getTaskById(taskId);
         if (currentTask === null) throw new Error("Orphaned task discovered");
-        const cityId = currentTask.cityId;
+        const cityId = reportedCityId ? reportedCityId : currentTask.cityId;
+        const batchId = batchNum ? batchNum : currentTask.batchId;
         // update task's lastScan date
         await this.taskDAO.updateLastScanDate(currentTask, new Date());
         // add apartments
         for (const apartment of parsedApartmentData) {
             try {
-                const apartmentCreationPayload: HousingCreationAttributes = convertIHousingToCreationAttr(apartment, provider, taskId, cityId);
+                const apartmentCreationPayload = convertIHousingToCreationAttr(apartment, provider, taskId, cityId, batchId);
                 this.housingDAO.createHousing(apartmentCreationPayload);
                 successes.push({});
             } catch (err) {
@@ -128,8 +133,8 @@ class TaskQueueService {
         return all;
     }
 
-    public async getAllBatchNumbers(): Promise<IBatch[]> {
-        const batches = await this.batchDAO.getAllBatchNums();
+    public async getAllBatchNumbers(): Promise<number[]> {
+        const batches = await this.cacheService.getAllBatchNums();
         return batches;
     }
 

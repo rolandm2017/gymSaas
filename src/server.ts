@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 //
 import GooglePlacesController from "./controllers/googlePlaces.controller";
 import ApartmentsController from "./controllers/apartments.controller";
-import HealthCheckController from "./controllers/healthCheck.controller";
 import AuthController from "./controllers/auth.controller";
 import AuthService from "./service/auth.service";
 import EmailService from "./service/email.service";
@@ -63,7 +62,6 @@ const app = new App({
         new ApartmentsController(apartmentService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
         new AdminController(adminService, taskQueueService, apartmentService),
-        new HealthCheckController(),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });

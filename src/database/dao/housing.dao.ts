@@ -61,14 +61,16 @@ class HousingDAO {
         return await Housing.findAll({ where: { cityId, batchId: batchNum } });
     };
 
-    public getApartmentsByLocation = async (cityName: string | undefined, stateName: string | undefined) => {
+    public getApartmentsByLocation = async (cityName: string | undefined) => {
         const city: City | null = cityName ? await this.cityDAO.getCityByName(cityName) : null;
-        const state: State | null = stateName ? await this.stateDAO.getStateByName(stateName) : null;
-        if (state === null && city === null) return [];
-        if (city && state === null) return await Housing.findAll({ where: { cityId: city.cityId } });
-        if (city === null && state) return await Housing.findAll({ where: { stateId: state.stateId } });
-        if (city === null || state === null) return []; // appeasing typescript
-        return await Housing.findAll({ where: { cityId: city.cityId, stateId: state.stateId } });
+        // const state: State | null = stateName ? await this.stateDAO.getStateByName(stateName) : null; // yagni
+        console.log(city?.cityId, "67rm");
+        if (city === null) return [];
+        // if (state === null && city === null) return [];
+        // if (city && state === null) return await Housing.findAll({ where: { cityId: city.cityId } });
+        // if (city === null && state) return await Housing.findAll({ where: { stateId: state.stateId } });
+        // if (city === null || state === null) return []; // appeasing typescript, neither is null at this point
+        return await Housing.findAll({ where: { cityId: city.cityId } });
     };
 
     public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {

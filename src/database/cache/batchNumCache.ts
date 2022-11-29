@@ -30,3 +30,7 @@ export async function addBatchNumIfNotExists(newNum: number, batchDAO: BatchDAO)
 export function initBatchCacheFromDb(numsFromDb: number[]) {
     _usedBatchNumbers = numsFromDb;
 }
+
+export function getAllBatchNums() {
+    return _usedBatchNumbers;
+}

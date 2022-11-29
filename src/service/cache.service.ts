@@ -1,8 +1,13 @@
 import { getCityIdFromCacheElseDb, setCityId } from "../database/cache/cityIdCache";
-import { getBatchNumForNewBatches, setBatchNumForNewBatches, addBatchNumIfNotExists, initBatchCacheFromDb } from "../database/cache/batchNumCache";
+import {
+    getBatchNumForNewBatches,
+    setBatchNumForNewBatches,
+    addBatchNumIfNotExists,
+    initBatchCacheFromDb,
+    getAllBatchNums,
+} from "../database/cache/batchNumCache";
 import CityDAO from "../database/dao/city.dao";
 import BatchDAO from "../database/dao/batch.dao";
-import { Batch } from "../database/models/Batch";
 import { IBatch } from "../interface/Batch.interface";
 // todo
 
@@ -34,6 +39,10 @@ class CacheService {
 
     public addBatchNumIfNotExists(newNum: number) {
         addBatchNumIfNotExists(newNum, this.batchDAO);
+    }
+
+    public async getAllBatchNums() {
+        return getAllBatchNums();
     }
 
     public async initBatchCache() {

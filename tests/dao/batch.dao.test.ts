@@ -39,9 +39,8 @@ describe("batch DAO works as expected", () => {
     test("we can increment the batch # by 1 without supplying an argument", async () => {
         await batchDAO.addBatchNum();
         await batchDAO.addBatchNum();
-        await batchDAO.addBatchNum();
         await batchDAO.addBatchNum(); // will automatically become 4
         const highest = await batchDAO.getHighestBatchNum();
-        expect(highest).toBe(4);
+        expect(highest).toBe(3);
     });
 });
