@@ -86,23 +86,24 @@ class TaskDAO {
     };
 
     public getAllTasks = (providerName?: ProviderEnum, batchId?: number, cityId?: number) => {
+        // even finished ones.
         let conditions;
         if (providerName && batchId && cityId) {
-            conditions = { providerName, batchId, cityId, lastScan: null };
+            conditions = { providerName, batchId, cityId };
         } else if (providerName && batchId) {
-            conditions = { providerName, batchId, lastScan: null };
+            conditions = { providerName, batchId };
         } else if (batchId && cityId) {
-            conditions = { batchId, cityId, lastScan: null };
+            conditions = { batchId, cityId };
         } else if (providerName && cityId) {
-            conditions = { providerName, cityId, lastScan: null };
+            conditions = { providerName, cityId };
         } else if (providerName) {
-            conditions = { providerName, lastScan: null };
+            conditions = { providerName };
         } else if (batchId) {
-            conditions = { batchId, lastScan: null };
+            conditions = { batchId };
         } else if (cityId) {
-            conditions = { cityId, lastScan: null };
+            conditions = { cityId };
         } else {
-            conditions = { lastScan: null };
+            conditions = {};
         }
         return Task.findAll({ where: conditions });
     };

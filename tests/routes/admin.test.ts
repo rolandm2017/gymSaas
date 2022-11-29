@@ -13,6 +13,9 @@ import { smlCanada } from "../mocks/smallRealResults/smlCanada";
 import { smlFaster } from "../mocks/smallRealResults/smlFaster";
 import { smlSeeker } from "../mocks/smallRealResults/smlSeeker";
 import CityDAO from "../../src/database/dao/city.dao";
+import TaskDAO from "../../src/database/dao/task.dao";
+import HousingDAO from "../../src/database/dao/housing.dao";
+import StateDAO from "../../src/database/dao/state.dao";
 
 let adminJWT: string = "";
 
@@ -38,7 +41,15 @@ const miniPayloadRentSeeker = {
     batchNum: 2,
 };
 
+const stateDAO = new StateDAO();
 const cityDAO = new CityDAO();
+const taskDAO = new TaskDAO();
+const housingDAO = new HousingDAO(stateDAO, cityDAO);
+
+let targetCityId: number | undefined = undefined;
+let findingsPayload1: any;
+let findingsPayload2: any;
+let findingsPayload3: any;
 
 beforeAll(async () => {
     await app.connectDB();
@@ -56,40 +67,34 @@ beforeAll(async () => {
     // increment batch number
     // create tasks for this batch number
     const tasks3 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+    const allTasks = await taskDAO.getAllTasks();
+    console.log(allTasks.length, testTasks.flat().length, "tasks in db");
     //
     // create some apartments so there are some to find
     // get city id for mtl so we can use it in the cityId so we can find cities by searching for "Montreal" later
     const mtl = await cityDAO.getCityByName(CityEnum.montreal);
-    const findingsPayload1 = [1, 2, 3].map((t: number) => {
-        return {
-            provider: ProviderEnum.rentCanada,
-            taskId: t,
-            apartments: smlCanada,
-            cityId: mtl?.cityId,
-            batchNum: 0,
-        };
-    });
+    findingsPayload1 = {
+        provider: ProviderEnum.rentCanada,
+        taskId: 1,
+        apartments: smlCanada,
+        cityId: mtl?.cityId,
+        batchNum: 0,
+    };
+    targetCityId = mtl?.cityId;
+
     const completedTasksResponse1 = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayload1);
-    const findingsPayload2 = [4, 5, 6].map((t: number) => {
-        return {
-            provider: ProviderEnum.rentFaster,
-            taskId: t,
-            apartments: smlFaster,
-            cityId: mtl?.cityId,
-            batchNum: 1,
-        };
-    });
+    findingsPayload2 = { provider: ProviderEnum.rentFaster, taskId: 2, apartments: smlFaster, cityId: mtl?.cityId, batchNum: 1 };
     const completedTasksResponse2 = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayload2);
-    const findingsPayload3 = [7, 8, 9].map((t: number) => {
-        return {
-            provider: ProviderEnum.rentSeeker,
-            taskId: t,
-            apartments: smlSeeker,
-            cityId: mtl?.cityId,
-            batchNum: 2,
-        };
-    });
+    findingsPayload3 = {
+        provider: ProviderEnum.rentSeeker,
+        taskId: 3,
+        apartments: smlSeeker,
+        cityId: mtl?.cityId,
+        batchNum: 2,
+    };
     const completedTasksResponse3 = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayload3);
+    const allHousing = await housingDAO.getAllHousing();
+    console.log(allHousing.length, [smlCanada.results.listings, smlFaster.results.listings, smlSeeker.results.hits].flat().length, "housings in db");
 });
 
 afterAll(async () => {
@@ -120,19 +125,24 @@ describe("Test admin controller with supertest", () => {
             const response = await request(server)
                 .get(`/admin/housing/by_location?cityName=${cityName}`)
                 .set("Authorization", "Bearer " + adminJWT);
-            console.log(response.body, "117rm");
             expect(response.body.apartments.length).toBe(
                 [smlCanada.results.listings, smlFaster.results.listings, smlSeeker.results.hits].flat().length,
             );
         });
         test("Get housing by city id and batch num", async () => {
-            const cityId = 1;
-            const batchNum = 2;
+            let cityId = findingsPayload2.cityId;
+            let batchNum = findingsPayload2.batchNum;
             const response = await request(server)
                 .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
                 .set("Authorization", "Bearer " + adminJWT);
             console.log(response.body, "128rm");
-            expect(response.body.apartments.length).toBe(smlSeeker.results.hits.length * 3); // used in payload findingsPayload3
+            expect(response.body.apartments.length).toBe(findingsPayload2.apartments.results.listings.length); // used in payload findingsPayload3
+            cityId = findingsPayload3.cityId; // is the same as before
+            batchNum = findingsPayload3.batchNum;
+            const response2 = await request(server)
+                .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
+                .set("Authorization", "Bearer " + adminJWT);
+            expect(response2.body.apartments.length).toBe(findingsPayload3.apartments.results.hits.length); // used in payload findingsPayload3
         });
         test("Ban a user", async () => {
             //

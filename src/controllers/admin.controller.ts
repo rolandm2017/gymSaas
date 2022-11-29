@@ -58,18 +58,19 @@ class AdminController {
 
     public async getApartmentsByLocation(request: Request, response: Response) {
         const cityName = request.query.cityName;
-        // const stateName = request.query.stateName;
-        // do we need by country or state? YAGNI?
-        // if (!cityName && !stateName) return response.status(400).json({ error: "at least one of cityName or state must be provided" });
+        // do I need by country or state? YAGNI?
         if (typeof cityName !== "string") return response.status(400).json({ error: "cityName must be string" });
-        // if (stateName && typeof stateName !== "string") return response.status(400).json({ error: "stateName must be string" });
         const aps: Housing[] = await this.apartmentService.getApartmentsByLocation(cityName);
         return response.status(200).json({ apartments: aps });
     }
 
     public async getApartmentsByCityIdAndBatchNum(request: Request, response: Response) {
-        const cityId = request.query.cityId;
-        const batchNum = request.query.batchNum;
+        const cityIdInput = request.query.cityId;
+        const batchNumInput = request.query.batchNum;
+        if (typeof cityIdInput !== "string") return response.status(400).json({ error: "cityId must be a string integer" });
+        if (typeof batchNumInput !== "string") return response.status(400).json({ error: "batchNum must be a string integer" });
+        const cityId = parseInt(cityIdInput, 10);
+        const batchNum = parseInt(batchNumInput, 10);
         if (typeof cityId !== "number" || typeof batchNum !== "number")
             return response.status(400).json({ error: "cityId and batchNum must be int" });
         if (!cityId || !batchNum) return response.status(400).json({ error: "must provide both cityId and batchNum" });
