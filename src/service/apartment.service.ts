@@ -21,6 +21,11 @@ class ApartmentService {
     public async getApartmentsByLocation(cityName: string | undefined): Promise<Housing[]> {
         return await this.housingDAO.getApartmentsByLocation(cityName);
     }
+
+    public async deleteAllHousing() {
+        const affected = await this.housingDAO.deleteAllHousing();
+        return affected;
+    }
 }
 
 export default ApartmentService;

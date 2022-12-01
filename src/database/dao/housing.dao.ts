@@ -80,6 +80,10 @@ class HousingDAO {
     public deleteHousing = (housingId: number) => {
         return Housing.destroy({ where: { housingId } });
     };
+
+    public deleteAllHousing = () => {
+        return Housing.destroy({ where: {} });
+    };
 }
 
 export default HousingDAO;

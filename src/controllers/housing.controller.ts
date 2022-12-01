@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, response, Response } from "express";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IBounds } from "../interface/Bounds.interface";
 import ScraperService from "../service/scraper.service";
@@ -24,6 +24,7 @@ class HousingController {
         this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by_location", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
+        this.router.delete("/all", this.deleteAllApartments.bind(this)); // todo: authorize admin only
         this.router.get("/health_check", this.healthCheck);
         // this.router.post("/task", this.queueScrape);
     }
@@ -81,7 +82,12 @@ class HousingController {
     public async getAllApartments(request: Request, response: Response) {
         // keep this one SIMPLE. Really: "Get ALL."
         const apartments: Housing[] = await this.apartmentService.getAllHousing();
-        return response.status(200).json({ apartments });
+        return response.status(200).json({ apartments, length: apartments.length });
+    }
+
+    public async deleteAllApartments(request: Request, response: Response) {
+        const affected: number = await this.apartmentService.deleteAllHousing();
+        return response.status(200).json({ message: `Deleted ${affected} rows in the task queue` });
     }
 
     public async healthCheck(request: Request, response: Response) {

@@ -28,6 +28,7 @@ class AdminController {
         // this.router.get("/housing/by_city_id_and_batch_num", authorize([Role.Admin]), this.getApartmentsByCityIdAndBatchNum.bind(this));
         this.router.get("/batches/all", this.getAllBatchNumbers.bind(this));
         this.router.get("/task_queue/all", this.getAllTasks.bind(this));
+        this.router.get("/task_queue/tasks_by_batch_num", this.getTasksByBatchNum.bind(this));
         this.router.get("/housing/by_location", this.getApartmentsByLocation.bind(this));
         this.router.get("/housing/by_city_id_and_batch_num", this.getApartmentsByCityIdAndBatchNum.bind(this));
         // user stuff

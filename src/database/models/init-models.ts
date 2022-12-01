@@ -50,6 +50,14 @@ function initModels(sequelize: Sequelize) {
         foreignKey: "cityId",
         as: "scraped_for_city",
     });
+    Task.hasMany(Housing, {
+        foreignKey: "taskId",
+        as: "scraped_aps",
+    });
+    Housing.belongsTo(Task, {
+        foreignKey: "taskId",
+        as: "from_task",
+    });
 
     // Places
     State.hasMany(City, {
