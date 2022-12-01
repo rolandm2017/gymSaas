@@ -2,7 +2,7 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 //
 import GooglePlacesController from "./controllers/googlePlaces.controller";
-import ApartmentsController from "./controllers/apartments.controller";
+import HousingController from "./controllers/housing.controller";
 import AuthController from "./controllers/auth.controller";
 import AuthService from "./service/auth.service";
 import EmailService from "./service/email.service";
@@ -59,7 +59,7 @@ const app = new App({
     controllers: [
         new AuthController(authService),
         new GooglePlacesController(gymService),
-        new ApartmentsController(apartmentService, scraperService),
+        new HousingController(apartmentService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
         new AdminController(adminService, taskQueueService, apartmentService),
     ],

@@ -18,10 +18,12 @@ export async function setBatchNumForNewBatches(newNum: number, batchDAO: BatchDA
     const newNumIsLowerThanHighest = _usedBatchNumbers[_usedBatchNumbers.length - 1] > newNum;
     if (newNumIsLowerThanHighest) throw new Error("Can't decrease batch num");
     _usedBatchNumbers.push(newNum);
+    console.log(_usedBatchNumbers, "21rm");
     await batchDAO.addBatchNum(newNum);
 }
 
 export async function addBatchNumIfNotExists(newNum: number, batchDAO: BatchDAO) {
+    console.log(_usedBatchNumbers, "26rm");
     const exists = _usedBatchNumbers.includes(newNum);
     if (exists) return;
     else setBatchNumForNewBatches(newNum, batchDAO);

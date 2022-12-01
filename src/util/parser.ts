@@ -22,7 +22,7 @@ class Parser {
 
     parseRentCanada(unprocessed: any): IHousing[] {
         // list of objects
-        const mainList = unprocessed.results.listings;
+        const mainList = unprocessed.listings; // do not change this
         // fixme: what to do if .listings = []? answer: dont let it get into this method
         // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
@@ -46,7 +46,7 @@ class Parser {
 
     parseRentFaster(unprocessed: any): IHousing[] {
         // list of objects
-        const mainList = unprocessed.results.listings;
+        const mainList = unprocessed.listings; // do not change this
         // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {
@@ -68,7 +68,7 @@ class Parser {
 
     parseRentSeeker(unprocessed: any): IHousing[] {
         // list of objects
-        const mainList = unprocessed.results.hits;
+        const mainList = unprocessed.hits; // do not change this
         // properties of interest: "name" here is the address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {

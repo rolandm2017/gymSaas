@@ -145,10 +145,10 @@ describe("Test admin controller with supertest", () => {
             expect(response2.body.apartments.length).toBe(findingsPayload3.apartments.results.hits.length); // used in payload findingsPayload3
         });
         test("Ban a user", async () => {
-            //
+            // todo - yagni?
         });
         test("Make a user admin", async () => {
-            // todo
+            // todo - yagni?
         });
     });
     describe("we can't bypass admin authorization", () => {

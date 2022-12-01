@@ -138,18 +138,18 @@ class TaskQueueService {
         return batches;
     }
 
-    public async cleanSpecific(byArray: number[] | undefined, byRange: number[] | undefined): Promise<number[]> {
+    public async cleanSpecific(bySpecificTaskIds: number[] | undefined, byRange: number[] | undefined): Promise<number[]> {
         const deletedTaskIds = [];
         let toDelete: number[] = [];
         // this is mostly to prevent ts from yelling about "maybe undefined!"
-        const probablyUsingByRange = Array.isArray(byArray) && byArray.length === 0;
+        const probablyUsingByRange = Array.isArray(bySpecificTaskIds) && bySpecificTaskIds.length === 0;
         const definitelyUsingByRange = Array.isArray(byRange); // this is mostly to satisfy TS
         if (probablyUsingByRange && definitelyUsingByRange) {
             for (let i = byRange[0]; i < byRange[1]; i++) {
                 toDelete.push(i);
             }
-        } else if (Array.isArray(byArray)) {
-            toDelete = byArray;
+        } else if (Array.isArray(bySpecificTaskIds)) {
+            toDelete = bySpecificTaskIds;
         } else {
             throw new Error("input validation failed");
         }
@@ -164,6 +164,11 @@ class TaskQueueService {
             }
         }
         return deletedTaskIds;
+    }
+
+    public async cleanAll() {
+        const numberOfDeletedRows = await this.taskDAO.deleteAll();
+        return numberOfDeletedRows;
     }
 
     public async cleanOldTasks(): Promise<number> {

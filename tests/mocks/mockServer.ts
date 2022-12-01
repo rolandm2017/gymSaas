@@ -5,11 +5,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 import { Model, Sequelize } from "sequelize";
-// everything else
-
-// import App from "../../src/app"; // this tests server is *different* from the dev server, but close to it.
+// controller
 import GooglePlacesController from "../../src/controllers/googlePlaces.controller";
-import ApartmentsController from "../../src/controllers/apartments.controller";
+import HousingController from "../../src/controllers/apartments.controller";
 import AuthController from "../../src/controllers/auth.controller";
 import TaskQueueController from "../../src/controllers/taskQueue.controller";
 import AdminController from "../../src/controllers/admin.controller";
@@ -23,32 +21,34 @@ import AuthService from "../../src/service/auth.service";
 import EmailService from "../../src/service/email.service";
 import ApartmentService from "../../src/service/apartment.service";
 import AdminService from "../../src/service/admin.service";
-
-import AccountUtil from "../../src/util/accountUtil";
-import AccountDAO from "../../src/database/dao/account.dao";
-import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
+import TaskQueueService from "../../src/service/taskQueue.service";
+import ScraperService from "../../src/service/scraper.service";
+import CacheService from "../../src/service/cache.service";
+import GymService from "../../src/service/gym.service";
+// model
 import { Account } from "../../src/database/models/Account";
-import testDatabase from "../database/Database";
 import { ResetToken } from "../../src/database/models/ResetToken";
 import { Task } from "../../src/database/models/Task";
 import { City, CityCreationAttributes } from "../../src/database/models/City";
 import { Housing } from "../../src/database/models/Housing";
-import TaskQueueService from "../../src/service/taskQueue.service";
+import { Batch } from "../../src/database/models/Batch";
+import { State } from "../../src/database/models/State";
+// dao
+import AccountDAO from "../../src/database/dao/account.dao";
+import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
+import BatchDAO from "../../src/database/dao/batch.dao";
+import StateDAO from "../../src/database/dao/state.dao";
 import CityDAO from "../../src/database/dao/city.dao";
 import HousingDAO from "../../src/database/dao/housing.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
-import { Batch } from "../../src/database/models/Batch";
+import GymDAO from "../../src/database/dao/gym.dao";
+// misc
+import AccountUtil from "../../src/util/accountUtil";
+import testDatabase from "../database/Database";
 
 import { SEED_USERS } from "../../src/seed/seedUsers";
 import { SEED_STATES } from "../../src/seed/seedStates";
 import { SEED_CITIES } from "../../src/seed/seedCities";
-import ScraperService from "../../src/service/scraper.service";
-import CacheService from "../../src/service/cache.service";
-import BatchDAO from "../../src/database/dao/batch.dao";
-import StateDAO from "../../src/database/dao/state.dao";
-import GymService from "../../src/service/gym.service";
-import GymDAO from "../../src/database/dao/gym.dao";
-import { State } from "../../src/database/models/State";
 
 class App {
     public app: Application;
@@ -171,16 +171,10 @@ class App {
         }
         for (const city of SEED_CITIES) {
             // check if city is seeded into db before trying to add a dupe
-            // try {
-            // await City.findOrCreate(city);
             const found = await City.findOne({ where: { cityName: city.cityName } });
             const all = await City.findAll({});
             if (found) continue;
             City.create(city);
-            // } catch (err) {
-            //     console.log(err);
-            //     console.log(err);
-            // }
         }
     }
 }
@@ -215,7 +209,7 @@ export const app = new App({
         new AdminController(adminService, taskQueueService, apartmentService),
         new AuthController(authService),
         new GooglePlacesController(gymService),
-        new ApartmentsController(apartmentService, scraperService),
+        new HousingController(apartmentService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],

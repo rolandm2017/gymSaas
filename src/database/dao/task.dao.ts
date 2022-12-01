@@ -121,6 +121,10 @@ class TaskDAO {
         return Task.destroy({ where: { taskId } });
     };
 
+    public deleteAll = () => {
+        return Task.destroy({ where: {} });
+    };
+
     public deleteTasksOlderThanTwoMonths = () => {
         return Task.destroy({
             where: {

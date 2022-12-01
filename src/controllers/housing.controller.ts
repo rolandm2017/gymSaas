@@ -5,7 +5,7 @@ import ScraperService from "../service/scraper.service";
 import ApartmentService from "../service/apartment.service";
 import { Housing } from "../database/models/Housing";
 
-class ApartmentsController {
+class HousingController {
     public path = "/housing";
     public router = express.Router();
     private apartmentService: ApartmentService;
@@ -24,6 +24,7 @@ class ApartmentsController {
         this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by_location", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
+        this.router.get("/health_check", this.healthCheck);
         // this.router.post("/task", this.queueScrape);
     }
 
@@ -82,6 +83,10 @@ class ApartmentsController {
         const apartments: Housing[] = await this.apartmentService.getAllHousing();
         return response.status(200).json({ apartments });
     }
+
+    public async healthCheck(request: Request, response: Response) {
+        return response.status(200).json({ message: "Online" });
+    }
 }
 
-export default ApartmentsController;
+export default HousingController;

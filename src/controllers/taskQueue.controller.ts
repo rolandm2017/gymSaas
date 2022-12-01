@@ -38,6 +38,7 @@ class TaskQueueController {
         // this.router.get("/batch", this.getTasksByBatch.bind(this));
         this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
         this.router.delete("/by_id", this.cleanSpecific.bind(this));
+        this.router.delete("/all", this.cleanAll.bind(this));
         // this.router.get("/db_contents", )
         this.router.get("/health_check", this.healthCheck.bind(this));
     }
@@ -145,15 +146,20 @@ class TaskQueueController {
     // }
 
     async cleanSpecific(request: Request, response: Response) {
-        const byArray = request.body.toDelete;
+        const bySpecificTaskIds = request.body.toDelete;
         const byRange = [request.body.start, request.body.end];
         // validation
-        const usingByArray = Array.isArray(byRange) && byRange.length > 0 && byArray.every((i: any) => typeof i === "number" && i >= 0);
+        const usingByArray = Array.isArray(bySpecificTaskIds) && bySpecificTaskIds.every((i: any) => typeof i === "number" && i >= 0);
         const usingByRange = typeof request.body.start === "number" && typeof request.body.end === "number" && byRange[0] < byRange[1];
         if (!usingByArray && !usingByRange) return response.status(400).json({ error: "bad inputs" });
         // service
-        const deletedTaskIds: number[] = await this.taskQueueService.cleanSpecific(byArray, byRange);
+        const deletedTaskIds: number[] = await this.taskQueueService.cleanSpecific(bySpecificTaskIds, byRange);
         return response.status(200).json({ deletedTaskIds });
+    }
+
+    async cleanAll(request: Request, response: Response) {
+        const deletedRows = await this.taskQueueService.cleanAll();
+        return response.status(200).json({ message: `Deleted ${deletedRows} rows in the task queue` });
     }
 
     async cleanOldTasks(request: Request, response: Response) {

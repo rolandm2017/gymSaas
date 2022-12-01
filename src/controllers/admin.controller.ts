@@ -22,10 +22,14 @@ class AdminController {
         this.taskQueueService = taskQueueService;
         this.apartmentService = apartmentService;
         // batches, apartments
-        this.router.get("/batches/all", authorize([Role.Admin]), this.getAllBatchNumbers.bind(this));
-        this.router.get("/task_queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
-        this.router.get("/housing/by_location", authorize([Role.Admin]), this.getApartmentsByLocation.bind(this));
-        this.router.get("/housing/by_city_id_and_batch_num", authorize([Role.Admin]), this.getApartmentsByCityIdAndBatchNum.bind(this));
+        // this.router.get("/batches/all", authorize([Role.Admin]), this.getAllBatchNumbers.bind(this));
+        // this.router.get("/task_queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
+        // this.router.get("/housing/by_location", authorize([Role.Admin]), this.getApartmentsByLocation.bind(this));
+        // this.router.get("/housing/by_city_id_and_batch_num", authorize([Role.Admin]), this.getApartmentsByCityIdAndBatchNum.bind(this));
+        this.router.get("/batches/all", this.getAllBatchNumbers.bind(this));
+        this.router.get("/task_queue/all", this.getAllTasks.bind(this));
+        this.router.get("/housing/by_location", this.getApartmentsByLocation.bind(this));
+        this.router.get("/housing/by_city_id_and_batch_num", this.getApartmentsByCityIdAndBatchNum.bind(this));
         // user stuff
         this.router.post("/user/ban", authorize([Role.Admin]), this.banUser.bind(this));
         this.router.post("/user/make_admin", this.makeAdmin.bind(this));
@@ -99,9 +103,7 @@ class AdminController {
 
     public async makeAdmin(request: Request, response: Response) {
         const newAdminEmail = request.body.email;
-        console.log(newAdminEmail, "81rm");
-        if (newAdminEmail === undefined) return response.status(400).json({ error: "must provide email" });
-        if (typeof newAdminEmail !== "string") return response.status(400).json({ error: "must provide email" });
+        if (newAdminEmail === undefined || typeof newAdminEmail !== "string") return response.status(400).json({ error: "must provide email" });
         const success = this.adminService.makeAdmin(newAdminEmail); // works until there is an admin in the system
         return response.status(200).json({ success });
     }

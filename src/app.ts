@@ -15,6 +15,9 @@ import { SEED_CITIES } from "./seed/seedCities";
 import { SEED_STATES } from "./seed/seedStates";
 import { SEED_USERS } from "./seed/seedUsers";
 import AccountUtil from "./util/accountUtil";
+import CacheService from "./service/cache.service";
+import CityDAO from "./database/dao/city.dao";
+import BatchDAO from "./database/dao/batch.dao";
 
 class App {
     public app: Application;
@@ -43,6 +46,7 @@ class App {
                 await initModels(Database);
                 await Database.sync({ alter: true });
                 await this.seedDb();
+                await this.initializeBatchNumCache();
                 console.log("Done syncing...");
             } catch (err) {
                 console.log("Database connection failed", err);
@@ -86,6 +90,13 @@ class App {
             if (found) continue;
             Account.create(user);
         }
+    }
+
+    public async initializeBatchNumCache() {
+        const cityDAO = new CityDAO();
+        const batchDAO = new BatchDAO();
+        const cacheService = new CacheService(cityDAO, batchDAO);
+        await cacheService.initBatchCache();
     }
 }
 
