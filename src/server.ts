@@ -1,7 +1,7 @@
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 //
-import GooglePlacesController from "./controllers/googlePlaces.controller";
+import GymsController from "./controllers/gyms.controller";
 import HousingController from "./controllers/housing.controller";
 import AuthController from "./controllers/auth.controller";
 import AuthService from "./service/auth.service";
@@ -52,14 +52,14 @@ const scraperService = new ScraperService();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
 const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
-const gymService = new GymService(gymDAO, googlePlacesAPI);
+const gymService = new GymService(gymDAO, cacheService, googlePlacesAPI);
 
 const app = new App({
     port: port || 8000,
 
     controllers: [
         new AuthController(authService),
-        new GooglePlacesController(gymService),
+        new GymsController(gymService),
         new HousingController(apartmentService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
         new AdminController(adminService, taskQueueService, apartmentService),

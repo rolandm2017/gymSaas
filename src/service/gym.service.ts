@@ -9,16 +9,20 @@ import { Gym, GymCreationAttributes } from "../database/models/Gym";
 import { gymDbEntryToIGym } from "../util/gymDbEntryToIGym";
 import GymDAO from "../database/dao/gym.dao";
 import GooglePlacesAPI from "../api/googlePlaces";
+import CacheService from "./cache.service";
+import { ICityIdAndName } from "../interface/CityIdAndName.interface";
 
 // const dotenvConfig = dotenv.config();
 dotenv.config();
 
 class GymService {
     private gymDAO: GymDAO;
+    private cacheService: CacheService;
     private googlePlacesAPI: GooglePlacesAPI;
 
-    constructor(gymDAO: GymDAO, googlePlacesAPI: GooglePlacesAPI) {
+    constructor(gymDAO: GymDAO, cacheService: CacheService, googlePlacesAPI: GooglePlacesAPI) {
         this.gymDAO = gymDAO;
+        this.cacheService = cacheService;
         this.googlePlacesAPI = googlePlacesAPI;
     }
 
@@ -26,6 +30,7 @@ class GymService {
         // TODO: refuse query if query was done within the past 24 hours (before making it to this method)
         let gyms: IGym[] = [];
         // initial request
+        console.log(this.googlePlacesAPI, "32rm");
         const request: string = this.googlePlacesAPI.embedLocation(country, state, city);
         let response: AxiosResponse<any, any> = await this.googlePlacesAPI.requestGyms(request);
         const results: IGym[] = this.convertJSONToGyms(response.data.results);
@@ -71,7 +76,9 @@ class GymService {
     }
 
     public async saveGyms(gyms: IGym[], cityName: string) {
+        // will be used for one city at a time.
         let successes = 0;
+        const cityId = await this.cacheService.getCityId(cityName);
         for (let i = 0; i < gyms.length; i++) {
             try {
                 const gymCreationAttr: GymCreationAttributes = {
@@ -83,6 +90,7 @@ class GymService {
                     icon: gyms[i].icon,
                     name: gyms[i].name,
                     rating: gyms[i].rating,
+                    cityId: cityId,
                 };
                 await this.gymDAO.createGym(gymCreationAttr);
                 successes++;
@@ -105,6 +113,34 @@ class GymService {
             const g: IGym = gymDbEntryToIGym(row);
             gyms.push(g);
         }
+        return gyms;
+    }
+
+    public async correctNullEntries() {
+        const entriesToCorrect: Gym[] = await this.gymDAO.getEntriesWithNullCityId();
+        const namesOfMissingCities = Array.from(new Set(entriesToCorrect.map(gym => gym.cityName)));
+        const correctedGymsTally = [];
+        for (const cityName in namesOfMissingCities) {
+            const correspondingCityId = await this.cacheService.getCityId(cityName);
+            const correspondingEntriesToCorrect = entriesToCorrect.filter(gym => gym.cityName === cityName);
+            const corrected = await this.gymDAO.addCityIdToGyms(correspondingEntriesToCorrect, correspondingCityId);
+            correctedGymsTally.push(corrected);
+        }
+        return correctedGymsTally;
+    }
+
+    public async countGymsByCity() {
+        const allGyms = await this.gymDAO.getAllGyms();
+        const cityNamesOnly = allGyms.map(gym => gym.cityName);
+        const counted = cityNamesOnly.reduce(function (prev: any, cur: string) {
+            prev[cur] = (prev[cur] || 0) + 1;
+            return prev;
+        }, {});
+        return counted;
+    }
+
+    public async getAllGyms() {
+        const gyms = await this.gymDAO.getAllGyms();
         return gyms;
     }
 

@@ -2,7 +2,7 @@ import { Association, DataTypes, ForeignKey, Model, Optional, Sequelize } from "
 import { City } from "./City";
 
 export interface GymAttributes {
-    id?: number;
+    gymId?: number;
     cityName: string;
     address: string; // street address, e.g. 123 Fake St, 596 Unreal Boulevard
     url: string; // link to the biz's website
@@ -11,7 +11,7 @@ export interface GymAttributes {
     icon?: string;
     name: string; // business name
     rating?: number;
-    cityId?: number;
+    cityId?: number | null;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -21,7 +21,7 @@ export type GymOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type GymCreationAttributes = Optional<GymAttributes, GymOptionalAttributes>;
 
 export class Gym extends Model<GymAttributes, GymCreationAttributes> implements GymAttributes {
-    public id!: number;
+    public gymId!: number;
     public cityName!: string;
     public address!: string;
     public url!: string;
@@ -39,7 +39,7 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
     static initModel(sequelize: Sequelize): typeof Gym {
         return Gym.init(
             {
-                id: {
+                gymId: {
                     type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true,

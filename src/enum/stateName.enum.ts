@@ -1,0 +1,15 @@
+export enum StateNames {
+    britishColumbia = "British Columbia",
+    alberta = "Alberta",
+    saskatchewan = "Saskatchewan",
+    manitoba = "Manitoba",
+    ontario = "Ontario",
+    quebec = "Quebec",
+    PEI = "PEI",
+    newBrunswick = "New Brunswick",
+    novaScotia = "Nova Scotia",
+    newfoundland = "Newfoundland",
+    yukon = "Yukon",
+    nunavut = "Nunavut",
+    northwestTerritories = "Northwest Territories",
+}

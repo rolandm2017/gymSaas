@@ -19,6 +19,7 @@ class CacheService {
         this.batchDAO = batchDAO;
     }
 
+    // city id stuff
     public async getCityId(city: string) {
         return await getCityIdFromCacheElseDb(city, this.cityDAO);
     }
@@ -28,6 +29,7 @@ class CacheService {
         return true;
     }
 
+    // batch num stuff
     public async getBatchNumForNewBatches() {
         return await getBatchNumForNewBatches(this.batchDAO);
     }
@@ -45,6 +47,7 @@ class CacheService {
         return getAllBatchNums();
     }
 
+    // init functions for when the server restarts
     public async initBatchCache() {
         const batchNums = await this.batchDAO.getAllBatchNums();
         const justNums = batchNums.map((batch: IBatch) => batch.batchId);

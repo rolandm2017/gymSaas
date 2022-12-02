@@ -1,4 +1,4 @@
-export enum CityEnum {
+export enum CityNameEnum { // top 10 largest cities in Canada
     vancouver = "Vancouver",
     calgary = "Calgary",
     edmonton = "Edmonton",
