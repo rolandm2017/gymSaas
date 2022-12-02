@@ -4,5 +4,9 @@ export enum CityEnum {
     edmonton = "Edmonton",
     winnipeg = "Winnipeg",
     toronto = "Toronto",
+    mississauga = "Mississauga",
+    brampton = "Brampton",
+    hamilton = "Hamilton",
+    ottawa = "Ottawa",
     montreal = "Montreal",
 }

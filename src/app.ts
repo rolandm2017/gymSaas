@@ -46,7 +46,7 @@ class App {
                 await initModels(Database);
                 await Database.sync({ alter: true });
                 await this.seedDb();
-                await this.initializeBatchNumCache();
+                await this.initializeCaches();
                 console.log("Done syncing...");
             } catch (err) {
                 console.log("Database connection failed", err);
@@ -92,11 +92,12 @@ class App {
         }
     }
 
-    public async initializeBatchNumCache() {
+    public async initializeCaches() {
         const cityDAO = new CityDAO();
         const batchDAO = new BatchDAO();
         const cacheService = new CacheService(cityDAO, batchDAO);
         await cacheService.initBatchCache();
+        await cacheService.initCityIdCache();
     }
 }
 

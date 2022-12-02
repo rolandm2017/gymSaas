@@ -23,8 +23,8 @@ class CacheService {
         return await getCityIdFromCacheElseDb(city, this.cityDAO);
     }
 
-    public setCityId(city: string, cityId: number) {
-        setCityId(city, cityId);
+    public setCityId(cityName: string, cityId: number) {
+        setCityId(cityName, cityId);
         return true;
     }
 
@@ -49,6 +49,19 @@ class CacheService {
         const batchNums = await this.batchDAO.getAllBatchNums();
         const justNums = batchNums.map((batch: IBatch) => batch.batchId);
         initBatchCacheFromDb(justNums);
+    }
+
+    public async initCityIdCache(): Promise<void> {
+        const cities = await this.cityDAO.getAllCities();
+        const namesAndIds = cities.map(city => {
+            return {
+                cityName: city.cityName,
+                cityId: city.cityId,
+            };
+        });
+        for (const city of namesAndIds) {
+            setCityId(city.cityName, city.cityId);
+        }
     }
 }
 

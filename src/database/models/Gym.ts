@@ -1,16 +1,17 @@
-import { Association, DataTypes, Model, Optional, Sequelize } from "sequelize";
+import { Association, DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
+import { City } from "./City";
 
 export interface GymAttributes {
     id?: number;
-    city: string;
+    cityName: string;
     address: string; // street address, e.g. 123 Fake St, 596 Unreal Boulevard
-    country: string;
     url: string; // link to the biz's website
     lat: number;
     long: number;
     icon?: string;
     name: string; // business name
     rating?: number;
+    cityId?: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -21,15 +22,15 @@ export type GymCreationAttributes = Optional<GymAttributes, GymOptionalAttribute
 
 export class Gym extends Model<GymAttributes, GymCreationAttributes> implements GymAttributes {
     public id!: number;
-    public city!: string;
+    public cityName!: string;
     public address!: string;
-    public country!: string;
     public url!: string;
     public lat!: number;
     public long!: number;
-    public icon?: string;
+    public icon!: string;
     public name!: string;
-    public rating?: number;
+    public rating!: number;
+    public cityId!: ForeignKey<City["cityId"]>;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -43,7 +44,7 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
                     autoIncrement: true,
                     primaryKey: true,
                 },
-                city: {
+                cityName: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
@@ -51,7 +52,6 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-                country: { type: DataTypes.STRING, allowNull: false },
                 url: {
                     type: DataTypes.STRING,
                     allowNull: false,
@@ -59,10 +59,12 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
                 lat: {
                     type: DataTypes.DOUBLE,
                     allowNull: false,
+                    unique: true,
                 },
                 long: {
                     type: DataTypes.DOUBLE,
                     allowNull: false,
+                    unique: true,
                 },
                 icon: { type: DataTypes.STRING, allowNull: true },
                 name: { type: DataTypes.STRING, allowNull: false },

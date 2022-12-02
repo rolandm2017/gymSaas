@@ -25,12 +25,13 @@ import AdminService from "./service/admin.service";
 import App from "./app";
 import GymService from "./service/gym.service";
 import GymDAO from "./database/dao/gym.dao";
-import { cache } from "joi";
+import GooglePlacesAPI from "./api/googlePlaces";
 
 const port = parseInt(process.env.PORT!, 10);
 
 // misc
 const accountUtil: AccountUtil = new AccountUtil();
+const googlePlacesAPI: GooglePlacesAPI = new GooglePlacesAPI();
 
 // dao
 const batchDAO = new BatchDAO();
@@ -51,7 +52,7 @@ const scraperService = new ScraperService();
 const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
 const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
-const gymService = new GymService(gymDAO);
+const gymService = new GymService(gymDAO, googlePlacesAPI);
 
 const app = new App({
     port: port || 8000,

@@ -5,7 +5,7 @@ import { CityEnum } from "../enum/city.enum";
 export const SEED_CITIES: CityCreationAttributes[] = [
     {
         stateId: ProvinceIdEnum.britishColumbia,
-        cityName: CityEnum.vancouver,
+        cityName: CityEnum.vancouver, // 1
         country: "Canada",
         centerLat: 49.2827,
         centerLong: -123.1207,
@@ -14,7 +14,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.alberta,
-        cityName: CityEnum.calgary,
+        cityName: CityEnum.calgary, // 2
         country: "Canada",
         centerLat: 51.0447,
         centerLong: -114.0719,
@@ -23,7 +23,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.alberta,
-        cityName: CityEnum.edmonton,
+        cityName: CityEnum.edmonton, // 3
         country: "Canada",
         centerLat: 53.5461,
         centerLong: -113.4937,
@@ -32,7 +32,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.manitoba,
-        cityName: CityEnum.winnipeg,
+        cityName: CityEnum.winnipeg, // 4
         country: "Canada",
         centerLat: 49.8954,
         centerLong: -97.1385,
@@ -41,7 +41,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.ontario,
-        cityName: CityEnum.toronto,
+        cityName: CityEnum.toronto, // 5
         country: "Canada",
         centerLat: 43.6532,
         centerLong: -79.3832,
@@ -49,8 +49,44 @@ export const SEED_CITIES: CityCreationAttributes[] = [
         lastScan: null,
     },
     {
+        stateId: ProvinceIdEnum.ontario,
+        cityName: CityEnum.mississauga, // 6
+        country: "Canada",
+        centerLat: 43.589,
+        centerLong: -79.6441,
+        scanRadius: 25,
+        lastScan: null,
+    },
+    {
+        stateId: ProvinceIdEnum.ontario,
+        cityName: CityEnum.brampton, // 7
+        country: "Canada",
+        centerLat: 43.7315,
+        centerLong: -79.7624,
+        scanRadius: 25,
+        lastScan: null,
+    },
+    {
+        stateId: ProvinceIdEnum.ontario,
+        cityName: CityEnum.hamilton, // 8
+        country: "Canada",
+        centerLat: 43.2557,
+        centerLong: -79.8711,
+        scanRadius: 25,
+        lastScan: null,
+    },
+    {
+        stateId: ProvinceIdEnum.ontario,
+        cityName: CityEnum.ottawa, // 9
+        country: "Canada",
+        centerLat: 45.4215,
+        centerLong: -75.6972,
+        scanRadius: 25,
+        lastScan: null,
+    },
+    {
         stateId: ProvinceIdEnum.quebec,
-        cityName: CityEnum.montreal,
+        cityName: CityEnum.montreal, // 10
         country: "Canada",
         centerLat: 45.5019,
         centerLong: -73.5674,

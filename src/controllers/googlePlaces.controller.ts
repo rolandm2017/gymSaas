@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+//
 import GymService from "../service/gym.service";
 
 class GooglePlacesController {
@@ -8,23 +9,22 @@ class GooglePlacesController {
 
     constructor(gymService: GymService) {
         this.gymService = gymService;
-        this.router.get("/gyms", this.getGyms);
-        this.router.get("/saved", this.getSavedGymsFromDB);
+        this.router.get("/gyms", this.getGyms.bind(this));
+        this.router.get("/saved", this.getSavedGymsFromDB.bind(this));
+        this.router.delete("/all", this.deleteAll.bind(this));
     }
 
     async getGyms(request: Request, response: Response) {
-        const city = request.body.city;
-        const stateOrProvince = request.body.state;
-        const country = request.body.country;
-        if (!city || !stateOrProvince || !country) {
+        const cityName = request.query.cityName;
+        const stateOrProvince = request.query.state;
+        const country = request.query.country;
+        if (typeof cityName !== "string" || typeof stateOrProvince !== "string" || typeof country !== "string") {
             return response.status(400).send({ err: "Parameter missing" }).end();
         }
-        const gyms = await this.gymService.findGymsInLocation(country, stateOrProvince, city);
-        // const gyms = [{}];
-        this.gymService.saveGyms(gyms, city, country);
-        // console.log(gyms.length, "Number of gyms found");
+        const gyms = await this.gymService.findGymsInLocation(country, stateOrProvince, cityName);
+        const saved = await this.gymService.saveGyms(gyms, cityName);
 
-        return response.status(200).json(gyms);
+        return response.status(200).json({ gyms, saved });
     }
 
     async getSavedGymsFromDB(request: Request, response: Response) {
@@ -35,6 +35,11 @@ class GooglePlacesController {
         const gymsFromDB = await this.gymService.getSavedGymsFromDB(city);
 
         return response.status(200).json(gymsFromDB);
+    }
+
+    async deleteAll(request: Request, response: Response) {
+        const affected = await this.gymService.deleteAll();
+        return response.status(200).json({ message: `Deleted ${affected} gyms in the db` });
     }
 }
 

@@ -10,6 +10,11 @@ class CityDAO {
             console.log(err);
         }
     };
+
+    public getAllCities = async () => {
+        return await City.findAll({});
+    };
+
     public getMultipleCities = (limit: number, offset?: number) => {
         return City.findAndCountAll({ offset, limit });
     };

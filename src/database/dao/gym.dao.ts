@@ -7,8 +7,12 @@ class GymDAO {
         return await Gym.create(gym);
     };
 
-    getMultipleGyms = async (city: string, limit?: number, offset?: number) => {
-        return await Gym.findAndCountAll({ where: { city }, limit, offset });
+    getMultipleGyms = async (cityName: string, limit?: number, offset?: number) => {
+        return await Gym.findAndCountAll({ where: { cityName }, limit, offset });
+    };
+
+    deleteAllGyms = async () => {
+        return await Gym.destroy({ where: {} });
     };
 }
 
