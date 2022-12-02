@@ -2,21 +2,24 @@ import { Gym } from "../database/models/Gym";
 import { IGym } from "../interface/Gym.interface";
 
 export function gymDbEntryToIGym(gym: Gym): IGym {
-    const g = {
+    const g: IGym = {
         business_status: "OPERATIONAL",
-        formatted_address: "",
+        formatted_address: gym.address,
         geometry: {
             location: {
                 lat: gym.lat,
                 lng: gym.long,
             },
         },
-        icon: "",
-        name: "",
+        url: gym.url,
+        icon: gym.icon,
+        name: gym.name,
         place_id: "",
-        rating: 5,
+        rating: gym.rating,
         lat: gym.lat,
         long: gym.long,
+        cityId: gym.cityId,
+        cityName: gym.cityName,
     };
     return g;
 }

@@ -11,7 +11,7 @@ class GymsController {
 
     constructor(gymService: GymService) {
         this.gymService = gymService;
-        this.router.get("/gyms", this.getGyms.bind(this));
+        this.router.get("/gyms", this.getGymsFromGoogle.bind(this));
         this.router.get("/saved", this.getSavedGymsFromDB.bind(this));
         this.router.post("/add_city_id", this.addCityIdWhereMissing.bind(this));
         this.router.get("/count", this.countGymsByCity.bind(this));
@@ -19,7 +19,7 @@ class GymsController {
         this.router.delete("/all", this.deleteAll.bind(this));
     }
 
-    async getGyms(request: Request, response: Response) {
+    async getGymsFromGoogle(request: Request, response: Response) {
         const cityName = request.query.cityName;
         const stateOrProvince = request.query.state;
         const country = request.query.country;
@@ -39,12 +39,12 @@ class GymsController {
     }
 
     async getSavedGymsFromDB(request: Request, response: Response) {
-        const city = request.query.city;
-        if (typeof city !== "string") {
+        const cityName = request.query.cityName;
+        console.log(cityName, "43rm");
+        if (typeof cityName !== "string") {
             return response.status(500).json({ err: "bad input" }).end();
         }
-        const gymsFromDB = await this.gymService.getSavedGymsFromDB(city);
-
+        const gymsFromDB = await this.gymService.getSavedGymsFromDB(cityName);
         return response.status(200).json(gymsFromDB);
     }
 

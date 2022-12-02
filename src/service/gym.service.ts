@@ -105,15 +105,16 @@ class GymService {
         return { successes, failures: gyms.length - successes };
     }
 
-    public async getSavedGymsFromDB(city: string): Promise<IGym[]> {
+    public async getSavedGymsFromDB(city: string): Promise<Gym[]> {
         const gymsFromDb = await this.gymDAO.getMultipleGyms(city);
         const rowsOfGyms: Gym[] = gymsFromDb.rows;
-        const gyms: IGym[] = [];
-        for (const row of rowsOfGyms) {
-            const g: IGym = gymDbEntryToIGym(row);
-            gyms.push(g);
-        }
-        return gyms;
+        return rowsOfGyms;
+        // const gyms: IGym[] = [];
+        // for (const row of rowsOfGyms) {
+        //     const g: IGym = gymDbEntryToIGym(row);
+        //     gyms.push(g);
+        // }
+        // return gyms;
     }
 
     public async correctNullEntries() {

@@ -35,4 +35,6 @@ export interface IGym {
     long: number; // duplicate value? sure is!
     url?: string;
     associatedUnits?: IAssociation[];
+    cityId: number;
+    cityName: string;
 }
