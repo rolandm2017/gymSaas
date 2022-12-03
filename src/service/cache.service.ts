@@ -39,8 +39,8 @@ class CacheService {
         return true;
     }
 
-    public addBatchNumIfNotExists(newNum: number) {
-        addBatchNumIfNotExists(newNum, this.batchDAO);
+    public addBatchNumIfNotExists(newNum: number): Promise<number[] | undefined> {
+        return addBatchNumIfNotExists(newNum, this.batchDAO);
     }
 
     public async getAllBatchNums() {

@@ -45,7 +45,6 @@ describe("we see if drop all tables really drops all tables", () => {
         initCity2 = await cityDAO.createCity(cityPayload);
         if (initCity === undefined) fail("must be defined");
         expect(initCity.cityId).toBeDefined();
-        console.log(initCity, "40rm");
         cityId = initCity.cityId;
     });
     test("spam tasks", async () => {

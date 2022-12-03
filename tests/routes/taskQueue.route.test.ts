@@ -10,6 +10,8 @@ import { smlFaster } from "../mocks/smallRealResults/smlFaster";
 import { smlSeeker } from "../mocks/smallRealResults/smlSeeker";
 import { testTasks } from "../mocks/testTasks";
 import { app, server } from "../mocks/mockServer";
+import CacheService from "../../src/service/cache.service";
+import CityDAO from "../../src/database/dao/city.dao";
 
 const miniPayloadRentCanada = {
     provider: ProviderEnum.rentCanada,
@@ -32,6 +34,10 @@ const miniPayloadRentSeeker = {
     zoomWidth: 10,
     batchNum: 0,
 };
+
+const cityDAO = new CityDAO();
+const batchDAO = new BatchDAO();
+const cacheService = new CacheService(cityDAO, batchDAO);
 
 beforeAll(async () => {
     await app.connectDB();
@@ -58,11 +64,17 @@ describe("Test taskQueue controller with supertest", () => {
     });
     test("we can get the batch number", async () => {
         // we can get the batch number...but we have to create one first
-        const batchDAO = new BatchDAO();
-        const newlyCreatedBatch = await batchDAO.addBatchNum(1);
-        const currentBatchNum = await request(server).get("/task_queue/next_batch_number");
-        expect(currentBatchNum.body.nextBatchNum).toBe(newlyCreatedBatch?.batchId);
-        batchNum = currentBatchNum.body.nextBatchNum;
+        // const newlyCreatedBatch = await batchDAO.addBatchNum(onlyBatchNumInSystem);
+        await cacheService.addBatchNumIfNotExists(0);
+        await cacheService.addBatchNumIfNotExists(1);
+        const targetBatchNumForTests = 2;
+        const newlyCreatedBatch = await cacheService.addBatchNumIfNotExists(targetBatchNumForTests);
+        expect(newlyCreatedBatch).toBeDefined();
+        if (newlyCreatedBatch === undefined) fail("adding if not exists should return an array, and it didn't!");
+        const currentBatchNumResponse = await request(server).get("/task_queue/next_batch_number");
+        const currentBatchNum = currentBatchNumResponse.body.nextBatchNum;
+        expect(currentBatchNum).toBe(targetBatchNumForTests);
+        batchNum = currentBatchNum; // used in the next test
     });
     test("retrieve queued tasks from the queue - works [integration]", async () => {
         await app.dropTable("task");
@@ -119,9 +131,9 @@ describe("Test taskQueue controller with supertest", () => {
     describe("Marking complete works", () => {
         test("report tasks' results into db and mark them complete - works for rentCanada [integration]", async () => {
             await app.dropTable("task");
-            const tasks = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
-            const tasks2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
-            const tasks3 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
             // speculative payload
             const payload = { provider: ProviderEnum.rentCanada };
             // get all tasks for rentCanada, mark them complete.
@@ -161,9 +173,9 @@ describe("Test taskQueue controller with supertest", () => {
         });
 
         test("report tasks' results into db and mark them complete - works for rentFaster [integration]", async () => {
-            const tasks = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
-            const tasks2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
-            const tasks3 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
             // speculative payload
             const payload = { provider: ProviderEnum.rentFaster };
             const tasksResponse = await request(server).get("/task_queue/next_tasks_for_scraper").send(payload);
@@ -199,9 +211,9 @@ describe("Test taskQueue controller with supertest", () => {
         });
 
         test("report tasks' results into db and mark them complete - works for rentSeeker [integration]", async () => {
-            const tasks = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
-            const tasks2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
-            const tasks3 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
+            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
             // speculative payload
             const payload = { provider: ProviderEnum.rentSeeker };
             const tasksResponse = await request(server).get("/task_queue/next_tasks_for_scraper").send(payload);

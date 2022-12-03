@@ -70,45 +70,42 @@ describe("invalid inputs yield an error about the input being invalid", () => {
         //
     });
     test("getApartmentsByLocation", async () => {
-        // requires at least one of cityName or stateName, and in either case, it must be a string
-        // case 1: neither
         const req: Request = { query: {}, body: {} } as Request;
-
         const res: Response = mockResponse();
         res.json = jest.fn();
         await controller.getApartmentsByLocation(req, res);
         expect(res.json).toHaveBeenCalled();
-        expect(res.json).toHaveBeenCalledWith({ error: "at least one of cityName or state must be provided" });
-        // case 2: both but ... wait, any string will do ... nevermind, no 2nd case
+        expect(res.json).toHaveBeenCalledWith({ error: "cityName must be string" });
     });
     test("getApartmentsByCityIdAndBatchNum", async () => {
         // requires cityId and batchNum to both be integers
         // case: neither is supplied
-        const req: Request = { query: {}, body: {} } as Request;
+        const req1: Request = { query: {}, body: {} } as Request;
         const res1: Response = mockResponse();
         res1.json = jest.fn();
-        await controller.getApartmentsByCityIdAndBatchNum(req, res1);
+        await controller.getApartmentsByCityIdAndBatchNum(req1, res1);
         expect(res1.json).toHaveBeenCalled();
-        expect(res1.json).toHaveBeenCalledWith({ error: "cityId and batchNum must be int" }); // this error is fine
+        expect(res1.json).toHaveBeenCalledWith({ error: "cityId must be a string integer" }); // this error is fine
 
         // case: batchNum is not int
-        req.query.cityId = "5";
-        req.query.batchNum = "hats"; // fails
+        const req2: Request = { query: {}, body: {} } as Request;
+        req2.query.cityId = "5";
+        req2.query.batchNum = "hats"; // fails
         const res2: Response = mockResponse();
         res2.json = jest.fn();
-        await controller.getApartmentsByCityIdAndBatchNum(req, res2);
+        await controller.getApartmentsByCityIdAndBatchNum(req2, res2);
         expect(res2.json).toHaveBeenCalled();
         expect(res2.json).toHaveBeenCalledWith({ error: "cityId and batchNum must be int" });
 
         // case: cityId is not int
-        const req2: Request = { query: {}, body: {} } as Request;
-        req2.query.cityId = "foo"; // fails
-        req2.query.batchNum = "1";
+        const req3: Request = { query: {}, body: {} } as Request;
+        req3.query.cityId = "foo"; // fails
+        req3.query.batchNum = "1";
         const res3: Response = mockResponse();
         res3.json = jest.fn();
-        await controller.getApartmentsByCityIdAndBatchNum(req2, res3);
+        await controller.getApartmentsByCityIdAndBatchNum(req3, res3);
         expect(res3.json).toHaveBeenCalled();
-        expect(res3.json).toHaveBeenCalledWith({ error: "cityId and batchNum must be int" });
+        expect(res3.json).toHaveBeenCalledWith({ error: "cityId must be a string integer" });
     });
     test("getTasksByBatchNum", async () => {
         // requires batchNum field to be an integer

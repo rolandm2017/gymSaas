@@ -55,7 +55,6 @@ describe("confirm task DAO works as expected", () => {
         payload.batch = highestBatch.batch + 1;
         let t2 = await taskDAO.createTask(payload);
         highestBatch = await taskDAO.getHighestBatchNum();
-        console.log(highestBatch, "5rm");
         if (highestBatch === null) throw new Error("expected batch does not exist");
         // 3
         payload.batch = highestBatch.batch + 1;
@@ -64,7 +63,6 @@ describe("confirm task DAO works as expected", () => {
         if (highestBatch === null) throw new Error("expected batch does not exist");
         // try now
         highestBatch = await taskDAO.getHighestBatchNum();
-        console.log(highestBatch, "64rm");
         expect(highestBatch?.batch).toBe(3);
         expect(true).toBe(true);
     });

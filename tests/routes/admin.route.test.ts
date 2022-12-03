@@ -135,13 +135,13 @@ describe("Test admin controller with supertest", () => {
                 .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
                 .set("Authorization", "Bearer " + adminJWT);
             console.log(response.body, "128rm");
-            expect(response.body.apartments.length).toBe(findingsPayload2.apartments.results.listings.length); // used in payload findingsPayload3
+            expect(response.body.apartments.length).toBe(findingsPayload2.apartments.listings.length); // used in payload findingsPayload2
             cityId = findingsPayload3.cityId; // is the same as before
             batchNum = findingsPayload3.batchNum;
             const response2 = await request(server)
                 .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
                 .set("Authorization", "Bearer " + adminJWT);
-            expect(response2.body.apartments.length).toBe(findingsPayload3.apartments.results.hits.length); // used in payload findingsPayload3
+            expect(response2.body.apartments.length).toBe(findingsPayload3.apartments.hits.length); // used in payload findingsPayload3
         });
         test("Ban a user", async () => {
             // todo - yagni?

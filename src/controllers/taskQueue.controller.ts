@@ -59,7 +59,7 @@ class TaskQueueController {
     async getNextBatchNumber(request: Request, response: Response) {
         console.log("30rm");
         const highest = await this.cacheService.getBatchNumForNewBatches();
-        if (highest) return response.status(200).json({ nextBatchNum: highest });
+        if (typeof highest === "number" && highest >= 0) return response.status(200).json({ nextBatchNum: highest });
         // so this only happens once
         this.cacheService.setBatchNumForNewBatches(0);
         return response.status(200).json({ nextBatchNum: 0 });
