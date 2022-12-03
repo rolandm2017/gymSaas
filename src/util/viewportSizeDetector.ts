@@ -2,7 +2,7 @@
 
 import { IBounds } from "../interface/Bounds.interface";
 import { IHousing } from "../interface/Housing.interface";
-import { getDistanceFromLatLongInKm } from "./conversions";
+import { getDistanceInKMFromLatLong } from "./conversions";
 
 export function detectViewportSize(places: IHousing[]): IBounds {
     let northMax = places[0].lat;
@@ -27,8 +27,8 @@ export function detectViewportSize(places: IHousing[]): IBounds {
 
     const latitudeChange = Math.abs(northMax - southMax);
     const longitudeChange = Math.abs(eastMax - westMax);
-    const kmChangeNorthSouth = getDistanceFromLatLongInKm(westMax, northMax, westMax, southMax);
-    const kmChangeEastWest = getDistanceFromLatLongInKm(westMax, southMax, eastMax, southMax);
+    const kmChangeNorthSouth = getDistanceInKMFromLatLong(westMax, northMax, westMax, southMax);
+    const kmChangeEastWest = getDistanceInKMFromLatLong(westMax, southMax, eastMax, southMax);
 
     return {
         north: northMax,

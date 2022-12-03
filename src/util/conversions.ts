@@ -98,7 +98,7 @@ export function changeInEastWestKMToLongitudeDegrees(kmEast: number, currentLat:
 // }
 
 // Source: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
-export function getDistanceFromLatLongInKm(lat1: number, long1: number, lat2: number, long2: number): number {
+export function getDistanceInKMFromLatLong(lat1: number, long1: number, lat2: number, long2: number): number {
     // "Convert lat long change into km change".
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat2 - lat1); // deg2rad below

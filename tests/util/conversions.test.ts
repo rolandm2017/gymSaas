@@ -4,7 +4,7 @@ import {
     convertProgressTowardsNorthPoleAsPercentage,
     changeInNorthSouthKMToLatitudeDegrees,
     changeInEastWestKMToLongitudeDegrees,
-    getDistanceFromLatLongInKm,
+    getDistanceInKMFromLatLong,
 } from "../../src/util/conversions";
 
 // **
@@ -134,19 +134,19 @@ describe("Changes in lat,long yield the correct KM change", () => {
     // I don't actually have the math skills to figure out if these answers are "good enough"
     // or downright wrong. It *looks* approximately right to me.
     test("Travelling only east/west", () => {
-        expect(getDistanceFromLatLongInKm(latitudeAtEquator, 0, latitudeAtEquator, 1)).toBe(111.19492664455873);
-        expect(getDistanceFromLatLongInKm(latitudeAtEquator, 1, latitudeAtEquator, 2)).toBe(111.19492664455873);
-        expect(getDistanceFromLatLongInKm(oneFourthUpSphere, 0, oneFourthUpSphere, 1)).toBe(102.73052588961731);
-        expect(getDistanceFromLatLongInKm(oneThirdUpSphere, 0, oneThirdUpSphere, 1)).toBe(96.29732567761188);
-        expect(getDistanceFromLatLongInKm(halfwayUpSphere, 0, halfwayUpSphere, 1)).toBe(78.62618767687454);
+        expect(getDistanceInKMFromLatLong(latitudeAtEquator, 0, latitudeAtEquator, 1)).toBe(111.19492664455873);
+        expect(getDistanceInKMFromLatLong(latitudeAtEquator, 1, latitudeAtEquator, 2)).toBe(111.19492664455873);
+        expect(getDistanceInKMFromLatLong(oneFourthUpSphere, 0, oneFourthUpSphere, 1)).toBe(102.73052588961731);
+        expect(getDistanceInKMFromLatLong(oneThirdUpSphere, 0, oneThirdUpSphere, 1)).toBe(96.29732567761188);
+        expect(getDistanceInKMFromLatLong(halfwayUpSphere, 0, halfwayUpSphere, 1)).toBe(78.62618767687454);
     });
     test("Travelling only north/south", () => {
         // still just documenting the stackOverflow code
-        expect(getDistanceFromLatLongInKm(0, 1, 1, 1)).toBe(111.19492664455873);
-        expect(getDistanceFromLatLongInKm(10, 1, 20, 1)).toBe(1111.9492664455872);
+        expect(getDistanceInKMFromLatLong(0, 1, 1, 1)).toBe(111.19492664455873);
+        expect(getDistanceInKMFromLatLong(10, 1, 20, 1)).toBe(1111.9492664455872);
     });
     test("Travelling nowhere", () => {
-        expect(getDistanceFromLatLongInKm(0, 0, 0, 0)).toBe(0);
-        expect(getDistanceFromLatLongInKm(10, 10, 10, 10)).toBe(0);
+        expect(getDistanceInKMFromLatLong(0, 0, 0, 0)).toBe(0);
+        expect(getDistanceInKMFromLatLong(10, 10, 10, 10)).toBe(0);
     });
 });

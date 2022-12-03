@@ -14,10 +14,11 @@ import { Account } from "./database/models/Account";
 import { SEED_CITIES } from "./seed/seedCities";
 import { SEED_STATES } from "./seed/seedStates";
 import { SEED_USERS } from "./seed/seedUsers";
-import AccountUtil from "./util/accountUtil";
 import CacheService from "./service/cache.service";
 import CityDAO from "./database/dao/city.dao";
 import BatchDAO from "./database/dao/batch.dao";
+import { SEED_GYMS_CANADA } from "./seed/gyms";
+import { Gym } from "./database/models/Gym";
 
 class App {
     public app: Application;
@@ -72,7 +73,7 @@ class App {
         });
     }
 
-    private async seedDb() {
+    private async seedDb(alsoGyms?: boolean) {
         for (const state of SEED_STATES) {
             const found = await State.findOne({ where: state });
             if (found) continue;
@@ -89,6 +90,13 @@ class App {
             const found = await Account.findOne({ where: { email: user.email } });
             if (found) continue;
             Account.create(user);
+        }
+        if (alsoGyms) {
+            for (const cityGyms of SEED_GYMS_CANADA) {
+                for (const gym of cityGyms) {
+                    Gym.create(gym);
+                }
+            }
         }
     }
 

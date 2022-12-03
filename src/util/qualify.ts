@@ -2,7 +2,7 @@ import { IAssociation } from "../interface/Association.interface";
 import { IGym } from "../interface/Gym.interface";
 import { IHousing } from "../interface/Housing.interface";
 import { ILatLong } from "../interface/LatLong.interface";
-import { convertLatLongDifferenceIntoKM, getDistanceFromLatLongInKm } from "./conversions";
+import { convertLatLongDifferenceIntoKM, getDistanceInKMFromLatLong } from "./conversions";
 
 // NOTE: Everything in this file presumes a flat surface.
 // Therefore feeding a qualifying distance of "50 km" will get slightly off #s due to the curvature of the Earth.

@@ -9,4 +9,4 @@ import { Toronto } from "./Toronto";
 import { Vancouver } from "./Vancouver";
 import { Winnipeg } from "./Winnipeg";
 
-export const SEED_GYMS = [Brampton, Calgary, Edmonton, Hamilton, Mississauga, Montreal, Ottawa, Toronto, Vancouver, Winnipeg];
+export const SEED_GYMS_CANADA = [Brampton, Calgary, Edmonton, Hamilton, Mississauga, Montreal, Ottawa, Toronto, Vancouver, Winnipeg];
