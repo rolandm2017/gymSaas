@@ -78,8 +78,9 @@ class AdminController {
         if (typeof batchNumInput !== "string") return response.status(400).json({ error: "batchNum must be a string integer" });
         const cityId = parseInt(cityIdInput, 10);
         const batchNum = parseInt(batchNumInput, 10);
-        if (typeof cityId !== "number" || typeof batchNum !== "number" || isNaN(cityId) || isNaN(batchNum))
-            return response.status(400).json({ error: "cityId and batchNum must be int" });
+        const cityIdIsNaN = isNaN(cityId);
+        const batchNumIsNaN = isNaN(batchNum);
+        if (cityIdIsNaN || batchNumIsNaN) return response.status(400).json({ error: "cityId and batchNum must be int" });
         console.log(cityId, batchNum, "83rm");
         if (!cityId || !batchNum) return response.status(400).json({ error: "must provide both cityId and batchNum" });
         const aps: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(cityId, batchNum);

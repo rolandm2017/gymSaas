@@ -105,7 +105,7 @@ describe("invalid inputs yield an error about the input being invalid", () => {
         res3.json = jest.fn();
         await controller.getApartmentsByCityIdAndBatchNum(req3, res3);
         expect(res3.json).toHaveBeenCalled();
-        expect(res3.json).toHaveBeenCalledWith({ error: "cityId must be a string integer" });
+        expect(res3.json).toHaveBeenCalledWith({ error: "cityId and batchNum must be int" });
     });
     test("getTasksByBatchNum", async () => {
         // requires batchNum field to be an integer
