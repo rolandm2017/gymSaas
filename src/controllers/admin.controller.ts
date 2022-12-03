@@ -7,7 +7,7 @@ import { HealthCheck } from "../enum/routes/healthCheck.enum";
 import { IBatch } from "../interface/Batch.interface";
 import authorize from "../middleware/authorize.middleware";
 import AdminService from "../service/admin.service";
-import ApartmentService from "../service/apartment.service";
+import HousingService from "../service/housing.service";
 import TaskQueueService from "../service/taskQueue.service";
 
 class AdminController {
@@ -15,12 +15,12 @@ class AdminController {
     public router = express.Router();
     private adminService: AdminService;
     private taskQueueService: TaskQueueService;
-    private apartmentService: ApartmentService;
+    private housingService: HousingService;
 
-    constructor(adminService: AdminService, taskQueueService: TaskQueueService, apartmentService: ApartmentService) {
+    constructor(adminService: AdminService, taskQueueService: TaskQueueService, housingService: HousingService) {
         this.adminService = adminService;
         this.taskQueueService = taskQueueService;
-        this.apartmentService = apartmentService;
+        this.housingService = housingService;
         // batches, apartments
         // this.router.get("/batches/all", authorize([Role.Admin]), this.getAllBatchNumbers.bind(this));
         // this.router.get("/task_queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
@@ -65,7 +65,7 @@ class AdminController {
         const cityName = request.query.cityName;
         // do I need by country or state? YAGNI?
         if (typeof cityName !== "string") return response.status(400).json({ error: "cityName must be string" });
-        const aps: Housing[] = await this.apartmentService.getApartmentsByLocation(cityName);
+        const aps: Housing[] = await this.housingService.getApartmentsByLocation(cityName);
         return response.status(200).json({ apartments: aps });
     }
 
@@ -79,7 +79,7 @@ class AdminController {
         if (typeof cityId !== "number" || typeof batchNum !== "number")
             return response.status(400).json({ error: "cityId and batchNum must be int" });
         if (!cityId || !batchNum) return response.status(400).json({ error: "must provide both cityId and batchNum" });
-        const aps: Housing[] = await this.apartmentService.getHousingByCityIdAndBatchNum(cityId, batchNum);
+        const aps: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(cityId, batchNum);
         return response.status(200).json({ apartments: aps });
     }
 

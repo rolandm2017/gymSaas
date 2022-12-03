@@ -1,3 +1,4 @@
+import { boolean } from "joi";
 import { DataTypes, Model, Sequelize, Optional, ForeignKey } from "sequelize";
 import { Batch } from "./Batch";
 import { City } from "./City";
@@ -13,6 +14,7 @@ interface HousingAttributes {
     url: string;
     lat: number;
     long: number;
+    nearAGym: boolean | null;
     taskId?: number;
     cityId?: number;
     stateId?: number;
@@ -34,6 +36,7 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public url!: string;
     public lat!: number;
     public long!: number;
+    public nearAGym!: boolean | null;
     public taskId!: ForeignKey<Task["taskId"]>;
     public cityId!: ForeignKey<City["cityId"]>;
     public stateId!: ForeignKey<State["stateId"]>;
@@ -78,6 +81,10 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                 long: {
                     type: DataTypes.DOUBLE,
                     allowNull: false,
+                },
+                nearAGym: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: true,
                 },
             },
             {

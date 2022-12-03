@@ -15,7 +15,7 @@ import TaskDAO from "./database/dao/task.dao";
 import CityDAO from "./database/dao/city.dao";
 import HousingDAO from "./database/dao/housing.dao";
 import StateDAO from "./database/dao/state.dao";
-import ApartmentService from "./service/apartment.service";
+import HousingService from "./service/housing.service";
 import ScraperService from "./service/scraper.service";
 import CacheService from "./service/cache.service";
 import BatchDAO from "./database/dao/batch.dao";
@@ -46,11 +46,11 @@ const gymDAO = new GymDAO();
 // services
 // is there a better place to initialize these?
 const adminService = new AdminService(acctDAO);
-const e: EmailService = new EmailService(acctDAO);
-const apartmentService = new ApartmentService(housingDAO);
+const emailService: EmailService = new EmailService(acctDAO);
 const scraperService = new ScraperService();
-const authService: AuthService = new AuthService(e, accountUtil, acctDAO, resetTokenDAO);
+const authService: AuthService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
+const housingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
 const gymService = new GymService(gymDAO, cacheService, googlePlacesAPI);
 
@@ -60,9 +60,9 @@ const app = new App({
     controllers: [
         new AuthController(authService),
         new GymsController(gymService),
-        new HousingController(apartmentService, scraperService),
+        new HousingController(housingService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
-        new AdminController(adminService, taskQueueService, apartmentService),
+        new AdminController(adminService, taskQueueService, housingService),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });

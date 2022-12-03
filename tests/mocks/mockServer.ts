@@ -6,8 +6,8 @@ import cors from "cors";
 import morgan from "morgan";
 import { Model, Sequelize } from "sequelize";
 // controller
-import GooglePlacesController from "../../src/controllers/googlePlaces.controller";
-import HousingController from "../../src/controllers/apartments.controller";
+import GymsController from "../../src/controllers/gyms.controller";
+import HousingController from "../../src/controllers/housing.controller";
 import AuthController from "../../src/controllers/auth.controller";
 import TaskQueueController from "../../src/controllers/taskQueue.controller";
 import AdminController from "../../src/controllers/admin.controller";
@@ -19,7 +19,7 @@ import { TEST_DB_HOST, TEST_DB_NAME, TEST_DB_PASSWORD, TEST_DB_PORT, TEST_DB_USE
 // service
 import AuthService from "../../src/service/auth.service";
 import EmailService from "../../src/service/email.service";
-import ApartmentService from "../../src/service/apartment.service";
+import HousingService from "../../src/service/housing.service";
 import AdminService from "../../src/service/admin.service";
 import TaskQueueService from "../../src/service/taskQueue.service";
 import ScraperService from "../../src/service/scraper.service";
@@ -49,6 +49,7 @@ import testDatabase from "../database/Database";
 import { SEED_USERS } from "../../src/seed/seedUsers";
 import { SEED_STATES } from "../../src/seed/seedStates";
 import { SEED_CITIES } from "../../src/seed/seedCities";
+import GooglePlacesAPI from "../../src/api/googlePlaces";
 
 class App {
     public app: Application;
@@ -183,6 +184,7 @@ const port = parseInt(process.env.PORT!, 10);
 
 // misc
 const accountUtil = new AccountUtil();
+const googlePlacesAPI = new GooglePlacesAPI();
 // initialize dao
 const stateDAO = new StateDAO();
 const batchDAO = new BatchDAO();
@@ -194,22 +196,22 @@ const resetTokenDAO = new ResetTokenDAO(acctDAO);
 const gymDAO = new GymDAO();
 // services
 const adminService = new AdminService(acctDAO);
-const apartmentService = new ApartmentService(housingDAO);
 const scraperService = new ScraperService();
 const emailService = new EmailService(acctDAO, "testing");
 const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
+const housingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
-const gymService = new GymService(gymDAO);
+const gymService = new GymService(gymDAO, cacheService, googlePlacesAPI);
 
 export const app = new App({
     port: port || 8000,
 
     controllers: [
-        new AdminController(adminService, taskQueueService, apartmentService),
+        new AdminController(adminService, taskQueueService, housingService),
         new AuthController(authService),
-        new GooglePlacesController(gymService),
-        new HousingController(apartmentService, scraperService),
+        new GymsController(gymService),
+        new HousingController(housingService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],

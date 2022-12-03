@@ -21,6 +21,10 @@ class HousingDAO {
         return Housing.create({ ...housing });
     };
 
+    public countHousingsInCity = (cityId: number) => {
+        return Housing.count({ where: { cityId } });
+    };
+
     public getMultipleHousings = async (limit?: number, offset?: number) => {
         if (limit === undefined && offset === undefined) return await Housing.findAndCountAll({ where: {} });
         return await Housing.findAndCountAll({ offset, limit });
@@ -73,11 +77,36 @@ class HousingDAO {
         return await Housing.findAll({ where: { cityId: city.cityId } });
     };
 
+    // update section
     public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {
         return Housing.update(housing, { where: { housingId } });
     };
 
-    public deleteHousing = (housingId: number) => {
+    public markQualified = async (
+        cityId: number,
+        upperLimitLatitude: number,
+        lowerLimitLatitude: number,
+        upperLimitLongitude: number,
+        lowerLimitLongitude: number,
+    ) => {
+        return await Housing.update(
+            { nearAGym: true },
+            {
+                where: {
+                    cityId,
+                    lat: {
+                        $between: [lowerLimitLatitude, upperLimitLatitude],
+                    },
+                    long: {
+                        $between: [lowerLimitLongitude, upperLimitLongitude],
+                    },
+                    nearAGym: null,
+                },
+            },
+        );
+    };
+
+    public deleteHousingByHousingId = (housingId: number) => {
         return Housing.destroy({ where: { housingId } });
     };
 

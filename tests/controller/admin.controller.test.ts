@@ -4,7 +4,7 @@ import express, { NextFunction, Request, Response } from "express";
 import AdminController from "../../src/controllers/admin.controller";
 import AdminService from "../../src/service/admin.service";
 import TaskQueueService from "../../src/service/taskQueue.service";
-import ApartmentService from "../../src/service/apartment.service";
+import HousingService from "../../src/service/apartment.service";
 import AccountDAO from "../../src/database/dao/account.dao";
 import CityDAO from "../../src/database/dao/city.dao";
 import BatchDAO from "../../src/database/dao/batch.dao";
@@ -22,7 +22,7 @@ let taskDAO: TaskDAO;
 
 let adminService: AdminService;
 let taskQueueService: TaskQueueService;
-let apartmentService: ApartmentService;
+let housingService: HousingService;
 
 let controller: AdminController;
 
@@ -38,9 +38,9 @@ beforeAll(() => {
     // service
     adminService = new AdminService(accountDAO);
     taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO);
-    apartmentService = new ApartmentService(housingDAO);
+    housingService = new HousingService(housingDAO);
 
-    controller = new AdminController(adminService, taskQueueService, apartmentService);
+    controller = new AdminController(adminService, taskQueueService, housingService);
 });
 
 afterEach(() => {

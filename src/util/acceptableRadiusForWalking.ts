@@ -17,7 +17,7 @@ const startingLong = SEED_CITIES[0].centerLong;
 const degChangeLatitude = convertKMChangeToLatLong(0, MAX_KM_TRAVELED, startingLat, startingLong);
 const degChangeLongitude = convertKMChangeToLatLong(MAX_KM_TRAVELED, 0, startingLat, startingLong);
 
-export const MAX_ACCEPTABLE_LATITUDE_DIFFERENCE = degChangeLatitude;
-export const MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE = degChangeLongitude;
+export const MAX_ACCEPTABLE_LATITUDE_DIFFERENCE = degChangeLatitude.lat;
+export const MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE = degChangeLongitude.long;
 
 export const ACCEPTABLE_RADIUS_FOR_WALKING = 0;
