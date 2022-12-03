@@ -1,41 +1,40 @@
 import request from "supertest";
 //
 import { HealthCheck } from "../../src/enum/routes/healthCheck.enum";
-import AccountDAO from "../../src/database/dao/account.dao";
-import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 
-import { app, server } from "../mocks/mockServer";
 import { adminCredentials } from "../mocks/adminCredentials";
 import { ProviderEnum } from "../../src/enum/provider.enum";
-import { CityEnum } from "../../src/enum/city.enum";
-import { testTasks } from "../mocks/testTasks";
-import { smlCanada } from "../mocks/smallRealResults/smlCanada";
-import { smlFaster } from "../mocks/smallRealResults/smlFaster";
-import { smlSeeker } from "../mocks/smallRealResults/smlSeeker";
+import { CityNameEnum } from "../../src/enum/cityName.enum";
+
 import CityDAO from "../../src/database/dao/city.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import HousingDAO from "../../src/database/dao/housing.dao";
 import StateDAO from "../../src/database/dao/state.dao";
+import { testTasks } from "../mocks/testTasks";
+import { smlCanada } from "../mocks/smallRealResults/smlCanada";
+import { smlFaster } from "../mocks/smallRealResults/smlFaster";
+import { smlSeeker } from "../mocks/smallRealResults/smlSeeker";
+import { app, server } from "../mocks/mockServer";
 
 let adminJWT: string = "";
 
 const miniPayloadRentCanada = {
     provider: ProviderEnum.rentCanada,
-    city: CityEnum.montreal,
+    city: CityNameEnum.montreal,
     coords: testTasks[0],
     zoomWidth: 10,
     batchNum: 0,
 };
 const miniPayloadRentFaster = {
     provider: ProviderEnum.rentFaster,
-    city: CityEnum.montreal,
+    city: CityNameEnum.montreal,
     coords: testTasks[1],
     zoomWidth: 10,
     batchNum: 1,
 };
 const miniPayloadRentSeeker = {
     provider: ProviderEnum.rentSeeker,
-    city: CityEnum.montreal,
+    city: CityNameEnum.montreal,
     coords: testTasks[2],
     zoomWidth: 10,
     batchNum: 2,
@@ -72,23 +71,23 @@ beforeAll(async () => {
     //
     // create some apartments so there are some to find
     // get city id for mtl so we can use it in the cityId so we can find cities by searching for "Montreal" later
-    const mtl = await cityDAO.getCityByName(CityEnum.montreal);
+    const mtl = await cityDAO.getCityByName(CityNameEnum.montreal);
     findingsPayload1 = {
         provider: ProviderEnum.rentCanada,
         taskId: 1,
-        apartments: smlCanada,
+        apartments: smlCanada.results,
         cityId: mtl?.cityId,
         batchNum: 0,
     };
     targetCityId = mtl?.cityId;
 
     const completedTasksResponse1 = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayload1);
-    findingsPayload2 = { provider: ProviderEnum.rentFaster, taskId: 2, apartments: smlFaster, cityId: mtl?.cityId, batchNum: 1 };
+    findingsPayload2 = { provider: ProviderEnum.rentFaster, taskId: 2, apartments: smlFaster.results, cityId: mtl?.cityId, batchNum: 1 };
     const completedTasksResponse2 = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayload2);
     findingsPayload3 = {
         provider: ProviderEnum.rentSeeker,
         taskId: 3,
-        apartments: smlSeeker,
+        apartments: smlSeeker.results,
         cityId: mtl?.cityId,
         batchNum: 2,
     };

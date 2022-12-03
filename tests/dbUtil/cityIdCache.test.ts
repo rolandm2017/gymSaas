@@ -15,6 +15,7 @@ describe("test the city id cache", () => {
             createCity: jest.fn(),
             updateCity: jest.fn(),
             deleteCity: jest.fn(),
+            getAllCities: jest.fn(),
         };
         const cityId = await getCityIdFromCacheElseDb("vancouver", fakeCityDAO);
         expect(cityId).toBe(3);

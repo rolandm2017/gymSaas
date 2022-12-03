@@ -1,7 +1,7 @@
 import CityDAO from "../../src/database/dao/city.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { CityCreationAttributes } from "../../src/database/models/City";
-import { ProviderEnum } from "../../src/enum/provider.enum";
+// mock stuff
 import { app } from "../mocks/mockServer";
 
 let cityDAO: CityDAO = new CityDAO();

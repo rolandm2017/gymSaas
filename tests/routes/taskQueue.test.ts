@@ -1,36 +1,33 @@
 import request from "supertest";
 //
-import { testTasks } from "../mocks/testTasks";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { ProviderEnum } from "../../src/enum/provider.enum";
-import { CityEnum } from "../../src/enum/city.enum";
-
-import { app, server } from "../mocks/mockServer";
-import { realResultsRentFaster } from "../mocks/realResults/rentFaster";
+import { CityNameEnum } from "../../src/enum/cityName.enum";
 import { Task } from "../../src/database/models/Task";
+import BatchDAO from "../../src/database/dao/batch.dao";
 import { smlCanada } from "../mocks/smallRealResults/smlCanada";
 import { smlFaster } from "../mocks/smallRealResults/smlFaster";
 import { smlSeeker } from "../mocks/smallRealResults/smlSeeker";
-import BatchDAO from "../../src/database/dao/batch.dao";
-import CityDAO from "../../src/database/dao/city.dao";
+import { testTasks } from "../mocks/testTasks";
+import { app, server } from "../mocks/mockServer";
 
 const miniPayloadRentCanada = {
     provider: ProviderEnum.rentCanada,
-    city: CityEnum.montreal,
+    city: CityNameEnum.montreal,
     coords: testTasks[0],
     zoomWidth: 10,
     batchNum: 0,
 };
 const miniPayloadRentFaster = {
     provider: ProviderEnum.rentFaster,
-    city: CityEnum.montreal,
+    city: CityNameEnum.montreal,
     coords: testTasks[1],
     zoomWidth: 10,
     batchNum: 0,
 };
 const miniPayloadRentSeeker = {
     provider: ProviderEnum.rentSeeker,
-    city: CityEnum.montreal,
+    city: CityNameEnum.montreal,
     coords: testTasks[2],
     zoomWidth: 10,
     batchNum: 0,
@@ -83,7 +80,7 @@ describe("Test taskQueue controller with supertest", () => {
         // 2nd payload, another provider
         const miniPayloadRentFaster = {
             provider: ProviderEnum.rentFaster,
-            city: CityEnum.montreal,
+            city: CityNameEnum.montreal,
             coords: [
                 {
                     lat: 45.5019,
@@ -136,7 +133,7 @@ describe("Test taskQueue controller with supertest", () => {
                 return {
                     provider: ProviderEnum.rentCanada,
                     taskId: t.taskId,
-                    apartments: smlCanada,
+                    apartments: smlCanada.results,
                 };
             });
             let tasksTriedToComplete = 0;
@@ -145,7 +142,7 @@ describe("Test taskQueue controller with supertest", () => {
                 const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
                 // now all the ones for rentCanada should be marked complete
                 expect(completedTasksResponse.body.markedComplete).toBe(true);
-                expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.results.listings.length);
+                expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.listings.length);
                 expect(completedTasksResponse.body.taskId).toBe(findingsPayloads[i].taskId);
                 tasksTriedToComplete++;
             }
@@ -177,7 +174,7 @@ describe("Test taskQueue controller with supertest", () => {
                 return {
                     provider: ProviderEnum.rentFaster,
                     taskId: t.taskId,
-                    apartments: smlFaster,
+                    apartments: smlFaster.results,
                 };
             });
             let tasksTriedToComplete = 0;
@@ -185,7 +182,7 @@ describe("Test taskQueue controller with supertest", () => {
                 const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
                 // now all the ones for rentFaster should be marked complete
                 expect(completedTasksResponse.body.markedComplete).toBe(true);
-                expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.results.listings.length);
+                expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.listings.length);
                 expect(completedTasksResponse.body.taskId).toBe(findingsPayloads[i].taskId);
                 tasksTriedToComplete++;
             }
@@ -215,7 +212,7 @@ describe("Test taskQueue controller with supertest", () => {
                 return {
                     provider: ProviderEnum.rentSeeker,
                     taskId: t.taskId,
-                    apartments: smlSeeker,
+                    apartments: smlSeeker.results,
                 };
             });
             let tasksTriedToComplete = 0;
@@ -223,7 +220,7 @@ describe("Test taskQueue controller with supertest", () => {
                 const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
                 // now all the ones for rentSeeker should be marked complete
                 expect(completedTasksResponse.body.markedComplete).toBe(true); // note that "results.hits" is for rentSeeker
-                expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.results.hits.length);
+                expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.hits.length);
                 expect(completedTasksResponse.body.taskId).toBe(findingsPayloads[i].taskId);
                 tasksTriedToComplete++;
             }

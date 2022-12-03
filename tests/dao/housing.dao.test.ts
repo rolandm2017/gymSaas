@@ -44,6 +44,7 @@ describe("housingDAO tests", () => {
             url: "google.ca",
             lat: 45,
             long: 45,
+            nearAGym: null,
             cityId: initCity.cityId,
         };
         const ap2: HousingCreationAttributes = {
@@ -54,6 +55,7 @@ describe("housingDAO tests", () => {
             url: "google.ca",
             lat: 45,
             long: 45,
+            nearAGym: null,
             cityId: initCity.cityId,
         };
         const ap3: HousingCreationAttributes = {
@@ -64,6 +66,7 @@ describe("housingDAO tests", () => {
             url: "google.ca",
             lat: 45,
             long: 45,
+            nearAGym: null,
             cityId: initCity.cityId,
         };
         const ap1made = await housingDAO.createHousing(ap1);

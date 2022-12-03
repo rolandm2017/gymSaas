@@ -2,8 +2,8 @@ import request from "supertest";
 import AccountDAO from "../../src/database/dao/account.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 
-import { app, server } from "../mocks/mockServer";
 import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
+import { app, server } from "../mocks/mockServer";
 
 const path = "/auth";
 

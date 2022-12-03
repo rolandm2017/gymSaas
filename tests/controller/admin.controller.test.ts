@@ -1,17 +1,17 @@
-// todo: access token for an admin account;
 import express, { NextFunction, Request, Response } from "express";
 
 import AdminController from "../../src/controllers/admin.controller";
 import AdminService from "../../src/service/admin.service";
 import TaskQueueService from "../../src/service/taskQueue.service";
-import HousingService from "../../src/service/apartment.service";
+import HousingService from "../../src/service/housing.service";
 import AccountDAO from "../../src/database/dao/account.dao";
 import CityDAO from "../../src/database/dao/city.dao";
 import BatchDAO from "../../src/database/dao/batch.dao";
 import HousingDAO from "../../src/database/dao/housing.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import StateDAO from "../../src/database/dao/state.dao";
-import { request } from "http";
+import CacheService from "../../src/service/cache.service";
+import GymDAO from "../../src/database/dao/gym.dao";
 
 let accountDAO: AccountDAO;
 let cityDAO: CityDAO;
@@ -19,10 +19,12 @@ let stateDAO: StateDAO;
 let batchDAO: BatchDAO;
 let housingDAO: HousingDAO;
 let taskDAO: TaskDAO;
+let gymDAO: GymDAO;
 
 let adminService: AdminService;
 let taskQueueService: TaskQueueService;
 let housingService: HousingService;
+let cacheService: CacheService;
 
 let controller: AdminController;
 
@@ -34,11 +36,12 @@ beforeAll(() => {
     batchDAO = new BatchDAO();
     housingDAO = new HousingDAO(stateDAO, cityDAO);
     taskDAO = new TaskDAO();
+    gymDAO = new GymDAO();
 
     // service
     adminService = new AdminService(accountDAO);
-    taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO);
-    housingService = new HousingService(housingDAO);
+    taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
+    housingService = new HousingService(housingDAO, gymDAO, cacheService);
 
     controller = new AdminController(adminService, taskQueueService, housingService);
 });

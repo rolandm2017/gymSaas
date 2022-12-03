@@ -1,9 +1,7 @@
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import AccountDAO from "../../src/database/dao/account.dao";
-import { ResetToken } from "../../src/database/models/ResetToken";
-import { app } from "../mocks/mockServer";
 
-import { FAKE_ACCOUNT } from "../mocks/userCredentials";
+import { app } from "../mocks/mockServer";
 
 let acctDAO: AccountDAO = new AccountDAO();
 let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);

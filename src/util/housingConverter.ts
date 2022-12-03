@@ -23,6 +23,7 @@ export function convertIHousingToCreationAttr(
         taskId,
         cityId,
         batchId: batchNum,
+        nearAGym: house.nearAGym !== undefined ? house.nearAGym : null,
     };
     return creationPayload;
 }

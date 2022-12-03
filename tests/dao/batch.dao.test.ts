@@ -1,4 +1,5 @@
 import BatchDAO from "../../src/database/dao/batch.dao";
+// mock stuff
 import { app } from "../mocks/mockServer";
 
 const batchDAO: BatchDAO = new BatchDAO();
