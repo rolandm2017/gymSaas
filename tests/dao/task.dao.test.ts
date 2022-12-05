@@ -42,28 +42,28 @@ describe("confirm task DAO works as expected", () => {
             lat: 50,
             long: 50,
             zoomWidth: 0,
-            batch: 1,
+            batchId: 1,
             lastScan: null,
             cityId: initCity.cityId,
         };
         let t = await taskDAO.createTask(payload);
         if (t === undefined) fail("t should be defined here");
-        expect(t.batch).toBe(1);
+        expect(t.batchId).toBe(1);
         let highestBatch = await taskDAO.getHighestBatchNum();
         if (highestBatch === null) throw new Error("expected batch does not exist");
         // 2
-        payload.batch = highestBatch.batch + 1;
+        payload.batchId = highestBatch.batchId + 1;
         let t2 = await taskDAO.createTask(payload);
         highestBatch = await taskDAO.getHighestBatchNum();
         if (highestBatch === null) throw new Error("expected batch does not exist");
         // 3
-        payload.batch = highestBatch.batch + 1;
+        payload.batchId = highestBatch.batchId + 1;
         let t3 = await taskDAO.createTask(payload);
         highestBatch = await taskDAO.getHighestBatchNum();
         if (highestBatch === null) throw new Error("expected batch does not exist");
         // try now
         highestBatch = await taskDAO.getHighestBatchNum();
-        expect(highestBatch?.batch).toBe(3);
+        expect(highestBatch?.batchId).toBe(3);
         expect(true).toBe(true);
     });
 });

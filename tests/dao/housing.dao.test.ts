@@ -115,7 +115,7 @@ describe("housingDAO tests", () => {
             console.log(err);
             console.log(err);
         }
-        // put in some apartments
+        // put in some apartments (still arranging!)
         const apartmentsToAdd = smlCanada.results.listings;
         try {
             for (const apartment of apartmentsToAdd) {
@@ -141,22 +141,9 @@ describe("housingDAO tests", () => {
             console.log(errrr);
             console.log(errrr);
         }
-        if (targetCityId == undefined) fail("city id was undefined somehow");
+        if (targetCityId == undefined) fail("city id was undefined somehow"); // appeasing typescript
         // act
-        const r = await housingDAO.markQualified(targetCityId, 40, 50, -80, -70);
-        // check that $between works the way I think it does
-        const temp = await housingDAO.betweenTest(40, 50, -80, -70);
-        console.log(
-            temp.map(ap => [ap.lat, ap.long, ap.nearAGym, ap.housingId]),
-            "144rm",
-        );
-        const temp2 = await housingDAO.getAllHousing();
-        console.log(
-            temp2.map(ap => [ap.lat, ap.long, ap.housingId]),
-            "146rm",
-        );
-        console.log(r, "158rm");
-        // assert
-        expect(r).toBe(apartmentsToAdd.length);
+        const affectedRowsArr = await housingDAO.markQualified(targetCityId, 40, 50, -80, -70);
+        expect(affectedRowsArr[0]).toBe(apartmentsToAdd.length);
     });
 });

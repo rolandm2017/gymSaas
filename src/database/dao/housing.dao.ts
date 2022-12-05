@@ -78,19 +78,6 @@ class HousingDAO {
         return await Housing.findAll({ where: { cityId: city.cityId } });
     };
 
-    public betweenTest = async (lowerLimitLatitude: number, upperLimitLatitude: number, lowerLimitLongitude: number, upperLimitLongitude: number) => {
-        return await Housing.findAll({
-            where: {
-                lat: {
-                    [Op.between]: [lowerLimitLatitude, upperLimitLatitude],
-                },
-                long: {
-                    [Op.between]: [lowerLimitLongitude, upperLimitLongitude],
-                },
-            },
-        });
-    };
-
     // update section
     public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {
         return Housing.update(housing, { where: { housingId } });
@@ -107,12 +94,12 @@ class HousingDAO {
             { nearAGym: true }, // "qualified"
             {
                 where: {
-                    cityId,
+                    cityId: cityId,
                     lat: {
-                        $between: [lowerLimitLatitude, upperLimitLatitude],
+                        [Op.between]: [lowerLimitLatitude, upperLimitLatitude],
                     },
                     long: {
-                        $between: [lowerLimitLongitude, upperLimitLongitude], // -30, -40
+                        [Op.between]: [lowerLimitLongitude, upperLimitLongitude], // -30, -40
                     },
                     nearAGym: null,
                 },
