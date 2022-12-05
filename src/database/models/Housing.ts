@@ -15,6 +15,8 @@ interface HousingAttributes {
     lat: number;
     long: number;
     nearAGym: boolean | null;
+    source: string;
+    idAtSource: number;
     taskId?: number;
     cityId?: number;
     stateId?: number;
@@ -37,6 +39,8 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public lat!: number;
     public long!: number;
     public nearAGym!: boolean | null;
+    public source!: string;
+    public idAtSource!: number;
     public taskId!: ForeignKey<Task["taskId"]>;
     public cityId!: ForeignKey<City["cityId"]>;
     public stateId!: ForeignKey<State["stateId"]>;
@@ -85,6 +89,14 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                 nearAGym: {
                     type: DataTypes.BOOLEAN,
                     allowNull: true,
+                },
+                source: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                idAtSource: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true, // because it only exists on the rentCanada entries
                 },
             },
             {

@@ -44,7 +44,7 @@ beforeAll(async () => {
     app.dropTable("housing");
 
     const batchIdForTest = 3;
-    batchDAO.addBatchNum(batchIdForTest);
+    await batchDAO.addBatchNum(batchIdForTest);
     const task: TaskCreationAttributes = {
         lastScan: null,
         lat: 45,
@@ -53,12 +53,15 @@ beforeAll(async () => {
         zoomWidth: 10,
         batchId: batchIdForTest,
     };
-    taskDAO.createTask(task); // so we don't get the error "orphaned task"
-
+    const createdTask = await taskDAO.createTask(task); // so we don't get the error "orphaned task"
+    console.log(createdTask, "57rm");
+    if (createdTask === undefined) throw new Error("task creation failed");
+    const allTasks = await taskDAO.getAllTasks();
+    console.log(allTasks.map(t => t.taskId));
     // insert them the way we'd expect in the real app.
     await taskQueueService.reportFindingsToDb(
         dummyApartmentData.provider,
-        dummyApartmentData.taskId,
+        createdTask.taskId,
         dummyApartmentData.apartments,
         dummyApartmentData.cityId,
         dummyApartmentData.batchNum,

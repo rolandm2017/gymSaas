@@ -73,6 +73,7 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
             {
                 timestamps: true,
                 sequelize: sequelize,
+                paranoid: true, // because I don't want to accidentally delete the gyms I paid $ to get from google
             },
         );
     }

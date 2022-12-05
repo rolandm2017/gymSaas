@@ -19,7 +19,7 @@ export function convertIHousingToCreationAttr(
         url: house.url !== undefined ? house.url : "",
         lat: house.lat,
         long: house.long,
-        idAtSource: house.idAtSource,
+        idAtSource: house.idAtSource ? house.idAtSource : 0, // 0 for "nonexistent"
         taskId,
         cityId,
         batchId: batchNum,

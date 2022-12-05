@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { City } from "../models/City";
 import { Housing, HousingCreationAttributes } from "../models/Housing";
 import { State } from "../models/State";
@@ -56,7 +57,7 @@ class HousingDAO {
         } else if (cityId) {
             conditions = { cityId };
         } else {
-            throw new Error("You need to supply arguments");
+            conditions = {};
         }
         return await Housing.findAll({ where: conditions });
     };
@@ -77,6 +78,19 @@ class HousingDAO {
         return await Housing.findAll({ where: { cityId: city.cityId } });
     };
 
+    public betweenTest = async (lowerLimitLatitude: number, upperLimitLatitude: number, lowerLimitLongitude: number, upperLimitLongitude: number) => {
+        return await Housing.findAll({
+            where: {
+                lat: {
+                    [Op.between]: [lowerLimitLatitude, upperLimitLatitude],
+                },
+                long: {
+                    [Op.between]: [lowerLimitLongitude, upperLimitLongitude],
+                },
+            },
+        });
+    };
+
     // update section
     public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {
         return Housing.update(housing, { where: { housingId } });
@@ -84,13 +98,13 @@ class HousingDAO {
 
     public markQualified = async (
         cityId: number,
-        upperLimitLatitude: number,
         lowerLimitLatitude: number,
-        upperLimitLongitude: number,
+        upperLimitLatitude: number,
         lowerLimitLongitude: number,
+        upperLimitLongitude: number,
     ) => {
         return await Housing.update(
-            { nearAGym: true },
+            { nearAGym: true }, // "qualified"
             {
                 where: {
                     cityId,
@@ -98,7 +112,7 @@ class HousingDAO {
                         $between: [lowerLimitLatitude, upperLimitLatitude],
                     },
                     long: {
-                        $between: [lowerLimitLongitude, upperLimitLongitude],
+                        $between: [lowerLimitLongitude, upperLimitLongitude], // -30, -40
                     },
                     nearAGym: null,
                 },
