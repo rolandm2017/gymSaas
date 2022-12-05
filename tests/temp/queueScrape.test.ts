@@ -5,7 +5,10 @@
 // // ***
 import request from "supertest";
 import BatchDAO from "../../src/database/dao/batch.dao";
+import CityDAO from "../../src/database/dao/city.dao";
 import GymDAO from "../../src/database/dao/gym.dao";
+import HousingDAO from "../../src/database/dao/housing.dao";
+import StateDAO from "../../src/database/dao/state.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { GymCreationAttributes } from "../../src/database/models/Gym";
 import { CityNameEnum } from "../../src/enum/cityName.enum";
@@ -13,6 +16,7 @@ import { ProviderEnum } from "../../src/enum/provider.enum";
 import { SEED_CITIES } from "../../src/seed/seedCities";
 
 import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../../src/util/acceptableRadiusForWalking";
+import { dummyGymData } from "../mocks/dummyGyms/dummyGyms";
 import { app, server } from "../mocks/mockServer";
 import { realResultsRentCanada } from "../mocks/realResults/rentCanada";
 import { smlCanada } from "../mocks/smallRealResults/smlCanada";
@@ -55,31 +59,13 @@ function makeUnacceptablyFarLong(gymLocLong: number, tooFarAwayAmount: number, e
     if (eastOrWest === "west") return gymLocLong - tooFarAwayAmount - MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
 }
 
-const dummyGymData: GymCreationAttributes[] = [
-    {
-        cityName: CityNameEnum.montreal,
-        address: "123 placeholder avenue",
-        url: "https://www.google.ca",
-        name: "Ron's Gym",
-        lat: SEED_CITIES[9].centerLat,
-        long: SEED_CITIES[9].centerLong,
-    },
-    {
-        cityName: CityNameEnum.montreal,
-        address: "123 placeholder avenue",
-        url: "https://www.google.ca",
-        name: "Ron's Gym",
-        lat: SEED_CITIES[9].centerLat - 0.01,
-        long: SEED_CITIES[9].centerLong - 0.01,
-    },
-];
 // find which apartments are within range of a gym
 const minAcceptableLat = dummyGymData[0].lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
 const maxAcceptableLat = dummyGymData[0].lat + MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
 const minAcceptableLong = dummyGymData[0].long - MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
 const maxAcceptableLong = dummyGymData[0].long + MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
-console.log(minAcceptableLat, maxAcceptableLat);
-console.log(minAcceptableLong, maxAcceptableLong);
+// console.log(minAcceptableLat, maxAcceptableLat);
+// console.log(minAcceptableLong, maxAcceptableLong);
 const qualifiedApartmentsForThatOneGym = latLongRealResultsRentCanada.filter(
     ap => ap.latitude > minAcceptableLat && ap.latitude < maxAcceptableLat && ap.longitude > minAcceptableLong && ap.longitude < maxAcceptableLong,
 );
@@ -93,9 +79,10 @@ const qualifiedApartmentsForThatOtherGym = latLongRealResultsRentCanada.filter(
 );
 
 const expectedQualifiedApartments = qualifiedApartmentsForThatOneGym.length + qualifiedApartmentsForThatOtherGym.length;
+console.log(qualifiedApartmentsForThatOneGym.length, qualifiedApartmentsForThatOtherGym.length, "96rm");
 // 4 + 15 = 19
 
-const testTargetCityId = 5;
+const testTargetCityId = SEED_CITIES[9].cityId;
 const dummyDataBatchNum = 5;
 
 const dummyApartmentData = {
@@ -108,27 +95,10 @@ const dummyApartmentData = {
 
 const gymDAO: GymDAO = new GymDAO();
 
-// const forProvider: ProviderEnum = request.body.provider;
-// const taskId: number = request.body.taskId;
-// const apartments: any[] = request.body.apartments;
-// const cityId = request.body.cityId;
-// const batchNum = request.body.batchNum;
-
 // **
-// this can't be done because it requires the external scraping microservice.
+// the first step, finding the viewport width, can't be done because it requires the external scraping microservice.
 // hence it would be too costly to run.
 // **
-// describe("first 3 steps of queuing a scrape work for various cities & providers", () => {
-//     test("Montreal, Quebec", async () => {
-//         //
-//     });
-//     test("Vancouver, BC", async () => {
-//         //
-//     });
-//     test("Toronto, Ontario", async () => {
-//         //
-//     });
-// });
 
 beforeAll(async () => {
     await app.connectDB();
@@ -192,8 +162,22 @@ describe("steps 2 through 5 of the scraping process works for batches of apartme
         const batchDAO = new BatchDAO();
         batchDAO.addBatchNum(dummyDataBatchNum);
         await request(server).post("/task_queue/report_findings_and_mark_complete").send(dummyApartmentData);
+        // temp - confirm the aps in db conform to the same filtering as whats above before the tests.
+        // const stateDAO = new StateDAO();
+        // const cityDAO = new CityDAO();
+        // const housingDAO = new HousingDAO(stateDAO, cityDAO);
+        // const housings = await housingDAO.getAllHousing();
+        // const remainingHousings1 = housings.filter(
+        //     ap => ap.lat > minAcceptableLat && ap.lat < maxAcceptableLat && ap.long > minAcceptableLong && ap.long < maxAcceptableLong,
+        // );
+        // const remainingHousings2 = housings.filter(
+        //     ap => ap.lat > minAcceptableLat1 && ap.lat < maxAcceptableLat1 && ap.long > minAcceptableLong1 && ap.long < maxAcceptableLong1,
+        // ); // this printed 4 & 15 units
+        // console.log(remainingHousings1.length, remainingHousings2.length, "193rm");
+
         // step 4 - qualify
-        const qualificationResponse = await request(server).get("/housing/qualify").query({ cityName: SEED_CITIES[4].cityName });
+        const targetCityName = SEED_CITIES[9].cityName;
+        const qualificationResponse = await request(server).get("/housing/qualify").query({ cityName: targetCityName });
         console.log(qualificationResponse.body, "197rm");
         expect(qualificationResponse.body.qualified).toBe(expectedQualifiedApartments);
         expect(qualificationResponse.body.outOf).toBe(dummyApartmentData.apartments.listings.length);
@@ -201,7 +185,7 @@ describe("steps 2 through 5 of the scraping process works for batches of apartme
         expect(qualificationResponse.body.percent).toBe(qualifiedPercent);
         const expectedDeletedAps = qualificationResponse.body.outOf - qualificationResponse.body.qualified;
         // step 5 - delete the unqualified
-        const deletedResponse = await request(server).delete("/housing/unqualified").query({ cityName: SEED_CITIES[4].cityName });
+        const deletedResponse = await request(server).delete("/housing/unqualified").query({ cityName: targetCityName });
         expect(deletedResponse.body.numberOfDeleted).toBe(expectedDeletedAps);
     });
 });

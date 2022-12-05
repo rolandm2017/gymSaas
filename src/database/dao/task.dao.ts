@@ -36,7 +36,7 @@ class TaskDAO {
     public getMostRecentTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
         let conditions;
         if (batchNum) {
-            conditions = { providerName: provider, batch: batchNum };
+            conditions = { providerName: provider, batchId: batchNum };
         } else {
             conditions = { providerName: provider };
         }
@@ -49,7 +49,7 @@ class TaskDAO {
 
     public getTasksByBatchNum = (batchNum: number) => {
         console.log(batchNum, "50rm");
-        return Task.findAll({ where: { batch: batchNum } });
+        return Task.findAll({ where: { batchId: batchNum } });
     };
 
     // Can't work because it doesn't allow create with associations.
@@ -60,7 +60,7 @@ class TaskDAO {
     public getNextUnfinishedTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
         let conditions;
         if (batchNum) {
-            conditions = { providerName: provider, batch: batchNum };
+            conditions = { providerName: provider, batchId: batchNum };
         } else {
             conditions = { providerName: provider };
         }
@@ -75,7 +75,7 @@ class TaskDAO {
     public getAllUnfinishedTasksForProvider = (provider: ProviderEnum, batchNum?: number) => {
         let conditions;
         if (batchNum) {
-            conditions = { providerName: provider, lastScan: null, batch: batchNum };
+            conditions = { providerName: provider, lastScan: null, batchId: batchNum };
         } else {
             conditions = { providerName: provider, lastScan: null };
         }

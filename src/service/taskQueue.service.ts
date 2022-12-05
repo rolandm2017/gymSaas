@@ -21,7 +21,7 @@ class TaskQueueService {
     private housingDAO: HousingDAO;
     private cacheService: CacheService;
 
-    constructor(cityDAO: CityDAO, housingDAO: HousingDAO, batchDAO: BatchDAO, taskDAO: TaskDAO, cacheService: CacheService) {
+    constructor(cityDAO: CityDAO, housingDAO: HousingDAO, taskDAO: TaskDAO, cacheService: CacheService) {
         this.cityDAO = cityDAO;
         this.housingDAO = housingDAO;
         this.taskDAO = taskDAO;
@@ -51,7 +51,7 @@ class TaskQueueService {
                     long: coords[i].long,
                     zoomWidth,
                     lastScan: null,
-                    batch: batchNum,
+                    batchId: batchNum,
                     cityId: cityForId.cityId,
                 });
                 successes.push({});

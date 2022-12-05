@@ -37,25 +37,25 @@ class Scraper {
         return housingData;
     }
 
-    async queueGridScrape(tasks: ILatLong[], zoomWidth: number): Promise<boolean> {
-        try {
-            // todo: go into shared db and queue tasks.
-            for (const task of tasks) {
-                const newTask: TaskCreationAttributes = {
-                    ...task,
-                    zoomWidth: zoomWidth,
-                    lastScan: null,
-                    batch: 1,
-                    providerName: ProviderEnum.rentCanada, // TODO: distribute tasks to all 3 providers when ready
-                };
-                await this.taskDAO.createTask(newTask);
-            }
-            return true;
-        } catch (err) {
-            console.log(err);
-            return false;
-        }
-    }
+    // async queueGridScrape(tasks: ILatLong[], zoomWidth: number, batchNum: number): Promise<boolean> {
+    //     try {
+    //         // todo: go into shared db and queue tasks.
+    //         for (const task of tasks) {
+    //             const newTask: TaskCreationAttributes = {
+    //                 ...task,
+    //                 zoomWidth: zoomWidth,
+    //                 lastScan: null,
+    //                 batchId: batchNum,
+    //                 providerName: ProviderEnum.rentCanada, // TODO: distribute tasks to all 3 providers when ready
+    //             };
+    //             await this.taskDAO.createTask(newTask);
+    //         }
+    //         return true;
+    //     } catch (err) {
+    //         console.log(err);
+    //         return false;
+    //     }
+    // }
 }
 
 export default Scraper;

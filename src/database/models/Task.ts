@@ -11,7 +11,6 @@ export interface TaskAttributes {
     lat: number;
     long: number;
     zoomWidth: number; // 0 = default
-    batch: number;
     lastScan: Date | null;
     cityId?: number;
     batchId?: number;
@@ -30,7 +29,6 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
     public lat!: number;
     public long!: number;
     public zoomWidth!: number;
-    public batch!: number;
     public lastScan!: Date | null;
     public cityId!: ForeignKey<City["cityId"]>;
     public batchId!: ForeignKey<Batch["batchId"]>;
@@ -60,10 +58,6 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
                     allowNull: false,
                 },
                 zoomWidth: {
-                    type: DataTypes.INTEGER,
-                    allowNull: false,
-                },
-                batch: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
                 },

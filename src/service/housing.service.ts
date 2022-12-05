@@ -2,6 +2,7 @@ import { Cache } from "joi";
 import GymDAO from "../database/dao/gym.dao";
 import HousingDAO from "../database/dao/housing.dao";
 import { Housing } from "../database/models/Housing";
+import { IQualificationReport } from "../interface/QualificationReport.interface";
 import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../util/acceptableRadiusForWalking";
 import CacheService from "./cache.service";
 
@@ -30,11 +31,11 @@ class HousingService {
     }
 
     // step 4 of scraping process
-    public async qualifyScrapedApartments(cityName: string) {
+    public async qualifyScrapedApartments(cityName: string): Promise<IQualificationReport> {
         const relevantCityId = await this.cacheService.getCityId(cityName);
         const gymsFromDb = await this.gymDAO.getMultipleGyms(cityName);
         const gyms = gymsFromDb.rows;
-        const affectedCount = {
+        const affectedCount: IQualificationReport = {
             qualified: 0,
             total: 0,
         };
@@ -53,6 +54,7 @@ class HousingService {
             console.log(affectedHousings, "53rm");
             affectedCount.qualified = affectedCount.qualified + affectedHousings[0];
         }
+        console.log(affectedCount, "56rm");
         const totalHousings = await this.housingDAO.countHousingsInCity(relevantCityId);
         affectedCount.total = totalHousings;
         return affectedCount;

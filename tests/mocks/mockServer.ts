@@ -206,7 +206,7 @@ const emailService = new EmailService(acctDAO, "testing");
 const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
 const housingService = new HousingService(housingDAO, gymDAO, cacheService);
-const taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
+const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO, cacheService);
 const gymService = new GymService(gymDAO, cacheService, googlePlacesAPI);
 
 export const app = new App({
