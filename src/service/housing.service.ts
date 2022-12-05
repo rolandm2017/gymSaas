@@ -40,16 +40,16 @@ class HousingService {
             total: 0,
         };
         for (const gym of gyms) {
-            const upperLimitLatitude = gym.lat + MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
             const lowerLimitLatitude = gym.lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
-            const upperLimitLongitude = gym.long + MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+            const upperLimitLatitude = gym.lat + MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
             const lowerLimitLongitude = gym.long - MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+            const upperLimitLongitude = gym.long + MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
             const affectedHousings = await this.housingDAO.markQualified(
                 relevantCityId,
-                upperLimitLatitude,
                 lowerLimitLatitude,
-                upperLimitLongitude,
+                upperLimitLatitude,
                 lowerLimitLongitude,
+                upperLimitLongitude,
             );
             console.log(affectedHousings, "53rm");
             affectedCount.qualified = affectedCount.qualified + affectedHousings[0];
@@ -63,7 +63,7 @@ class HousingService {
     // step 5 of scraping process
     public async deleteUnqualifiedApartments(cityName: string) {
         const relevantCityId = await this.cacheService.getCityId(cityName);
-        const deletedHousings = await this.housingDAO.deleteHousingByHousingId(relevantCityId);
+        const deletedHousings = await this.housingDAO.deleteUnqualifiedHousingByCityId(relevantCityId);
         return deletedHousings;
     }
 

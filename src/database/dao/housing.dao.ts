@@ -78,6 +78,20 @@ class HousingDAO {
         return await Housing.findAll({ where: { cityId: city.cityId } });
     };
 
+    public readBetween = async (lowerLimitLatitude: number, upperLimitLatitude: number, lowerLimitLongitude: number, upperLimitLongitude: number) => {
+        return await Housing.findAll({
+            where: {
+                lat: {
+                    [Op.between]: [lowerLimitLatitude, upperLimitLatitude],
+                },
+                long: {
+                    [Op.between]: [lowerLimitLongitude, upperLimitLongitude], // -30, -40
+                },
+                nearAGym: null,
+            },
+        });
+    };
+
     // update section
     public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {
         return Housing.update(housing, { where: { housingId } });
@@ -105,6 +119,16 @@ class HousingDAO {
                 },
             },
         );
+    };
+
+    // delete section
+    public deleteUnqualifiedHousingByCityId = async (cityId: number) => {
+        return await Housing.destroy({
+            where: {
+                cityId,
+                nearAGym: null,
+            },
+        });
     };
 
     public deleteHousingByHousingId = (housingId: number) => {

@@ -11,6 +11,7 @@ import { SEED_CITIES } from "../../src/seed/seedCities";
 import CacheService from "../../src/service/cache.service";
 import HousingService from "../../src/service/housing.service";
 import TaskQueueService from "../../src/service/taskQueue.service";
+import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../../src/util/acceptableRadiusForWalking";
 import { dummyGymData } from "../mocks/dummyGyms/dummyGyms";
 import { app } from "../mocks/mockServer";
 import { realResultsRentCanada } from "../mocks/realResults/rentCanada";
@@ -27,6 +28,28 @@ const cacheService: CacheService = new CacheService(cityDAO, batchDAO);
 
 const housingService: HousingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService: TaskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO, cacheService);
+
+// find which apartments are within range of a gym
+const minAcceptableLat = dummyGymData[0].lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
+const maxAcceptableLat = dummyGymData[0].lat + MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
+const minAcceptableLong = dummyGymData[0].long - MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+const maxAcceptableLong = dummyGymData[0].long + MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+// console.log(minAcceptableLat, maxAcceptableLat);
+// console.log(minAcceptableLong, maxAcceptableLong);
+const qualifiedApartmentsForThatOneGym = realResultsRentCanada.results.listings.filter(
+    ap => ap.latitude > minAcceptableLat && ap.latitude < maxAcceptableLat && ap.longitude > minAcceptableLong && ap.longitude < maxAcceptableLong,
+);
+const minAcceptableLat1 = dummyGymData[1].lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
+const maxAcceptableLat1 = dummyGymData[1].lat + MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
+const minAcceptableLong1 = dummyGymData[1].long - MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+const maxAcceptableLong1 = dummyGymData[1].long + MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+const qualifiedApartmentsForThatOtherGym = realResultsRentCanada.results.listings.filter(
+    ap =>
+        ap.latitude > minAcceptableLat1 && ap.latitude < maxAcceptableLat1 && ap.longitude > minAcceptableLong1 && ap.longitude < maxAcceptableLong1,
+);
+
+const expectedQualifiedApartments = qualifiedApartmentsForThatOneGym.length + qualifiedApartmentsForThatOtherGym.length;
+// again we get 4 + 15 = 19
 
 // arrange
 const batchIdForTest = 3;
@@ -55,13 +78,14 @@ beforeAll(async () => {
     };
     const createdTask = await taskDAO.createTask(task); // so we don't get the error "orphaned task"
     if (createdTask === undefined) throw new Error("task creation failed");
+    dummyApartmentData.taskId = createdTask.taskId;
     const allTasks = await taskDAO.getAllTasks();
     console.log(allTasks.map(t => t.taskId));
     console.log(dummyApartmentData.apartments.listings.length, "61rm");
     // insert them the way we'd expect in the real app.
     await taskQueueService.reportFindingsToDb(
         dummyApartmentData.provider,
-        createdTask.taskId,
+        dummyApartmentData.taskId,
         dummyApartmentData.apartments,
         dummyApartmentData.cityId,
         dummyApartmentData.batchNum,
@@ -79,9 +103,17 @@ afterAll(async () => {
 
 describe("test housing service on its own", () => {
     test("qualifying apartments works as expected", async () => {
-        expect(true).toBe(false);
+        for (const gym of dummyGymData) {
+            const upperLimitLatitude = gym.lat + MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
+            const lowerLimitLatitude = gym.lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
+            const upperLimitLongitude = gym.long + MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+            const lowerLimitLongitude = gym.long - MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+            const foundApartments = await housingDAO.readBetween(lowerLimitLatitude, upperLimitLatitude, lowerLimitLongitude, upperLimitLongitude);
+            console.log(foundApartments.length);
+        }
         const targetCityName = targetCity.cityName;
         const qualificationReport: IQualificationReport = await housingService.qualifyScrapedApartments(targetCityName);
         console.log(qualificationReport, "68rm");
+        expect(qualificationReport.qualified).toEqual(expectedQualifiedApartments);
     });
 });

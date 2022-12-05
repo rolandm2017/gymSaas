@@ -162,18 +162,6 @@ describe("steps 2 through 5 of the scraping process works for batches of apartme
         const batchDAO = new BatchDAO();
         batchDAO.addBatchNum(dummyDataBatchNum);
         await request(server).post("/task_queue/report_findings_and_mark_complete").send(dummyApartmentData);
-        // temp - confirm the aps in db conform to the same filtering as whats above before the tests.
-        // const stateDAO = new StateDAO();
-        // const cityDAO = new CityDAO();
-        // const housingDAO = new HousingDAO(stateDAO, cityDAO);
-        // const housings = await housingDAO.getAllHousing();
-        // const remainingHousings1 = housings.filter(
-        //     ap => ap.lat > minAcceptableLat && ap.lat < maxAcceptableLat && ap.long > minAcceptableLong && ap.long < maxAcceptableLong,
-        // );
-        // const remainingHousings2 = housings.filter(
-        //     ap => ap.lat > minAcceptableLat1 && ap.lat < maxAcceptableLat1 && ap.long > minAcceptableLong1 && ap.long < maxAcceptableLong1,
-        // ); // this printed 4 & 15 units
-        // console.log(remainingHousings1.length, remainingHousings2.length, "193rm");
 
         // step 4 - qualify
         const targetCityName = SEED_CITIES[9].cityName;
