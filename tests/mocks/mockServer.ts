@@ -50,6 +50,8 @@ import { SEED_USERS } from "../../src/seed/seedUsers";
 import { SEED_STATES } from "../../src/seed/seedStates";
 import { SEED_CITIES } from "../../src/seed/seedCities";
 import GooglePlacesAPI from "../../src/api/googlePlaces";
+import LocationDiscoveryService from "../../src/service/locationDiscovery.service";
+import ScraperConnectionFactory from "../../src/scrapers/connectionFactory";
 
 class App {
     public app: Application;
@@ -173,7 +175,6 @@ class App {
         for (const city of SEED_CITIES) {
             // check if city is seeded into db before trying to add a dupe
             const found = await City.findOne({ where: { cityName: city.cityName } });
-            const all = await City.findAll({});
             if (found) continue;
             City.create(city);
         }
@@ -185,18 +186,22 @@ const port = parseInt(process.env.PORT!, 10);
 // misc
 const accountUtil = new AccountUtil();
 const googlePlacesAPI = new GooglePlacesAPI();
+const locationDiscoveryService: LocationDiscoveryService = new LocationDiscoveryService();
+
 // initialize dao
-const stateDAO = new StateDAO();
-const batchDAO = new BatchDAO();
-const cityDAO = new CityDAO();
-const housingDAO = new HousingDAO(stateDAO, cityDAO);
-const taskDAO = new TaskDAO();
 const acctDAO = new AccountDAO();
+const stateDAO = new StateDAO();
+const cityDAO = new CityDAO();
+const batchDAO = new BatchDAO();
+const taskDAO = new TaskDAO();
+const housingDAO = new HousingDAO(stateDAO, cityDAO);
 const resetTokenDAO = new ResetTokenDAO(acctDAO);
 const gymDAO = new GymDAO();
+// had to wait to do this
+const scraperConnectionFactory: ScraperConnectionFactory = new ScraperConnectionFactory(taskDAO);
 // services
 const adminService = new AdminService(acctDAO);
-const scraperService = new ScraperService();
+const scraperService = new ScraperService(scraperConnectionFactory, locationDiscoveryService);
 const emailService = new EmailService(acctDAO, "testing");
 const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);

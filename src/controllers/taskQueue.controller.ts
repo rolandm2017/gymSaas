@@ -24,7 +24,7 @@ class TaskQueueController {
         this.scraperService = scraperService;
         this.cacheService = cacheService;
         // step 2 of 3 in queuing a scrape
-        this.router.get("/grid_scan_plan", this.getGridForScan.bind(this));
+        this.router.post("/plan_grid_scan", this.getGridForScan.bind(this));
         // step 3 of 3 in queuing a scrape
         this.router.post("/queue_grid_scan", this.addGridScanToQueue.bind(this)); // admin only
         // stuff (separate from the 3 step queuing)
@@ -33,7 +33,7 @@ class TaskQueueController {
         this.router.get("/next_tasks_for_scraper", this.getNextTasksForScraper.bind(this));
         this.router.post("/report_findings_and_mark_complete", this.reportFindingsToDbAndMarkComplete.bind(this));
 
-        // check tasks make sense
+        // used to check tasks make sense
         this.router.get("/all", this.getAllTasks.bind(this));
         // this.router.get("/batch", this.getTasksByBatch.bind(this));
         this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
@@ -48,7 +48,7 @@ class TaskQueueController {
         const stateOrProvince = request.body.state;
         const country = request.body.country;
         if (!city || !stateOrProvince || !country) {
-            return response.status(500).send({ err: "Parameter missing" }).end();
+            return response.status(400).send({ err: "Parameter missing" }).end();
         }
         console.log(city, stateOrProvince, country, "31rm");
         const aps: IHousing[] = await this.scraperService.scrapeApartments(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
@@ -71,7 +71,7 @@ class TaskQueueController {
         const radius: number = request.body.radius;
         // not doing input validation here.
         const gridCoords = await this.scraperService.planGrid(startCoords, bounds, radius);
-        return response.status(200).json(gridCoords);
+        return response.status(200).json({ gridCoords });
     }
 
     async addGridScanToQueue(request: Request, response: Response) {
@@ -96,7 +96,7 @@ class TaskQueueController {
 
         const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, city, batchNum);
         // console.log(queued, "54rm");
-        return response.status(200).json({ queued });
+        return response.status(200).json({ queued: queued });
     }
 
     async getNextTasksForScraper(request: Request, response: Response) {

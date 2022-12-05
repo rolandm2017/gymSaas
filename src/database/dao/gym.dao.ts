@@ -7,6 +7,10 @@ class GymDAO {
         return await Gym.create(gym);
     };
 
+    getGymByAddress = async (address: string) => {
+        return await Gym.findAll({ where: { address } });
+    };
+
     getEntriesWithNullCityId = async () => {
         return await Gym.findAll({ where: { cityId: null } });
     };

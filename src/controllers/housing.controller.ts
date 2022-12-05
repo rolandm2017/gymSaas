@@ -17,7 +17,7 @@ class HousingController {
         this.scraperService = scraperService;
 
         // step 1 of 3 in queuing a scrape
-        this.router.get("/viewport_width", this.detectProviderViewportWidth.bind(this));
+        this.router.post("/viewport_width", this.detectProviderViewportWidth.bind(this));
         // user queries
         this.router.get("/location", this.getSavedApartmentsByLocation.bind(this));
         // admin ish stuff
@@ -38,17 +38,14 @@ class HousingController {
         try {
             const city = request.body.city;
             const stateOrProvince = request.body.state;
-            const country = request.body.country;
-            if (!city || !stateOrProvince || !country) {
-                return response.status(500).send({ err: "Parameter missing" }).end();
+            const providerInput = request.body.provider;
+            if (!city || !stateOrProvince) {
+                return response.status(400).send({ err: "Parameter missing" }).end();
             }
-            console.log(city, stateOrProvince, country, "46rm");
-            const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(
-                ProviderEnum.rentCanada,
-                city,
-                stateOrProvince,
-                country,
-            ); // todo: advance from hardcode provider choice
+            const validProviderInput = Object.values(ProviderEnum).some(name => providerInput);
+            if (!validProviderInput) return response.status(400).json({ error: "Invalud provider input" });
+            console.log(city, stateOrProvince, "46rm");
+            const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(ProviderEnum.rentCanada, city, stateOrProvince); // todo: advance from hardcode provider choice
             return response.status(200).json(dimensions);
         } catch {
             return response.status(500).send();

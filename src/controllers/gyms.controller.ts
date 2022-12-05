@@ -42,7 +42,7 @@ class GymsController {
         const cityName = request.query.cityName;
         console.log(cityName, "43rm");
         if (typeof cityName !== "string") {
-            return response.status(500).json({ err: "bad input" }).end();
+            return response.status(400).json({ err: "bad input" }).end();
         }
         const gymsFromDB = await this.gymService.getSavedGymsFromDB(cityName);
         return response.status(200).json(gymsFromDB);

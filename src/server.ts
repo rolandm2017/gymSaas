@@ -26,12 +26,15 @@ import App from "./app";
 import GymService from "./service/gym.service";
 import GymDAO from "./database/dao/gym.dao";
 import GooglePlacesAPI from "./api/googlePlaces";
+import ScraperFactory from "./scrapers/connectionFactory";
+import LocationDiscoveryService from "./service/locationDiscovery.service";
 
 const port = parseInt(process.env.PORT!, 10);
 
 // misc
 const accountUtil: AccountUtil = new AccountUtil();
 const googlePlacesAPI: GooglePlacesAPI = new GooglePlacesAPI();
+const locationDiscoveryService: LocationDiscoveryService = new LocationDiscoveryService();
 
 // dao
 const batchDAO = new BatchDAO();
@@ -43,11 +46,12 @@ const acctDAO: AccountDAO = new AccountDAO();
 const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 const gymDAO = new GymDAO();
 
+const scraperFactory: ScraperFactory = new ScraperFactory(taskDAO);
 // services
 // is there a better place to initialize these?
 const adminService = new AdminService(acctDAO);
 const emailService: EmailService = new EmailService(acctDAO);
-const scraperService = new ScraperService();
+const scraperService = new ScraperService(scraperFactory, locationDiscoveryService);
 const authService: AuthService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
 const housingService = new HousingService(housingDAO, gymDAO, cacheService);

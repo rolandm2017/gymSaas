@@ -4,7 +4,6 @@ export let _usedBatchNumbers: number[] = [];
 
 export async function getBatchNumForNewBatches(batchDAO: BatchDAO): Promise<number> {
     if (_usedBatchNumbers.length != 0) return _usedBatchNumbers[_usedBatchNumbers.length - 1];
-    console.log("10rm");
     const batchWithHighestNum = await batchDAO.getHighestBatchNum();
     if (batchWithHighestNum === null) {
         _usedBatchNumbers = [0];
@@ -18,13 +17,11 @@ export async function setBatchNumForNewBatches(newNum: number, batchDAO: BatchDA
     const newNumIsLowerThanHighest = _usedBatchNumbers[_usedBatchNumbers.length - 1] > newNum;
     if (newNumIsLowerThanHighest) return; // was previously throw new Error("Can't decrease batch num")
     _usedBatchNumbers.push(newNum);
-    console.log(_usedBatchNumbers, "21rm");
     await batchDAO.addBatchNum(newNum);
     return _usedBatchNumbers; // return value is returned for inspection
 }
 
 export async function addBatchNumIfNotExists(newNum: number, batchDAO: BatchDAO): Promise<number[] | undefined> {
-    console.log(_usedBatchNumbers, "26rm");
     const exists = _usedBatchNumbers.includes(newNum);
     if (exists) return; // its already in the cache? do nothing!
     else {
