@@ -1,4 +1,4 @@
-export enum StateNames {
+export enum StateNamesEnum {
     britishColumbia = "British Columbia",
     alberta = "Alberta",
     saskatchewan = "Saskatchewan",

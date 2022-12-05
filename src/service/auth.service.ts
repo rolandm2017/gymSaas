@@ -86,7 +86,7 @@ class AuthService {
         } catch (err) {
             console.log(err);
             if (err instanceof Error) return { error: err.message };
-            else return { error: "Unexpected error" };
+            else return { error: "Unexpected error" }; // this will never happen but ts doesn't know that
         }
     }
 

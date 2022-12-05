@@ -20,6 +20,7 @@ import errorHandler from "../middleware/error.middleware";
 import { IAccount } from "../interface/Account.interface";
 import { ISmallError } from "../interface/SmallError.interface";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
+import { errorResponse } from "../util/errorResponseUtil";
 
 class AuthController {
     public path = "/auth";
@@ -70,10 +71,10 @@ class AuthController {
         try {
             const origin = request.get("origin");
             if (origin === undefined) {
-                return response.status(400).json({ message: "Origin is required and was undefined" });
+                return errorResponse(response, 400, "Origin is required and was undefined");
             }
             const accountDetails: IBasicDetails | ISmallError = await this.authService.register(request.body, origin);
-            if ("error" in accountDetails) return response.json({ error: accountDetails.error });
+            if ("error" in accountDetails) return errorResponse(response, 500, accountDetails.error);
             return response.json({
                 message: "Registration successful, please check your email for verification instructions",
                 accountDetails,
@@ -96,8 +97,8 @@ class AuthController {
         // accept token from request body or cookie
         const token = request.body.token || request.cookies.refreshToken;
         const ipAddress = request.ip;
-        if (request.user === undefined) return response.status(400).json({ message: "User is required" });
-        if (!token || request.user.ownsToken === undefined) return response.status(400).json({ message: "Token is required" });
+        if (request.user === undefined) return errorResponse(response, 400, "User is required");
+        if (!token || request.user.ownsToken === undefined) return errorResponse(response, 400, "Token is required");
         // users can revoke their own tokens and admins can revoke any tokens
         if (!request.user.ownsToken(token) && request.user.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
@@ -138,7 +139,7 @@ class AuthController {
         const email = request.body.email;
         const origin = request.get("origin");
         if (origin === undefined) {
-            return response.status(400).json({ message: "Origin is required and was undefined" });
+            return errorResponse(response, 400, "Origin is required and was undefined");
         }
         await this.authService.forgotPassword(email, origin);
         return response.json({ message: "Please check your email for password reset instructions" });
@@ -198,7 +199,7 @@ class AuthController {
     public _deleteAccount = async (request: RequestWithUser, response: Response) => {
         // users can delete their own account and admins can delete any account
         const idOfAcctToDelete = request.body.acctId;
-        if (request.user === undefined) return response.status(400).json({ message: "User missing" });
+        if (request.user === undefined) return errorResponse(response, 400, "User missing");
         if (idOfAcctToDelete !== request.user?.acctId && request.user?.role !== Role.Admin) {
             return response.status(401).json({ message: "Unauthorized" });
         }

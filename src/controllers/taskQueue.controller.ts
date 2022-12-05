@@ -8,6 +8,7 @@ import TaskQueueService from "../service/taskQueue.service";
 import { ILatLong } from "../interface/LatLong.interface";
 import { IBounds } from "../interface/Bounds.interface";
 import ScraperService from "../service/scraper.service";
+import { errorResponse } from "../util/errorResponseUtil";
 
 // do I need a "scraper controller" and a separate "task queue controller"?
 class TaskQueueController {
@@ -48,12 +49,10 @@ class TaskQueueController {
         const stateOrProvince = request.body.state;
         const country = request.body.country;
         if (!city || !stateOrProvince || !country) {
-            return response.status(400).send({ err: "Parameter missing" }).end();
+            return errorResponse(response, 400, "Parameter missing");
         }
-        console.log(city, stateOrProvince, country, "31rm");
         const aps: IHousing[] = await this.scraperService.scrapeApartments(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
-        // TODO: forward request to flask servers
-        return response.status(200).send("You made it");
+        return response.json({ aps });
     }
 
     async getNextBatchNumber(request: Request, response: Response) {
@@ -82,17 +81,17 @@ class TaskQueueController {
         const batchNum = request.body.batchNum; // admin should have gotten this from the previous endpoint
         // console.log(request.body, "40rm");
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
-            return response.status(400).send("Invalid provider input");
+            return errorResponse(response, 400, "Invalid provider input");
         }
         if (!Array.isArray(coords) || coords.length === 0) {
-            return response.status(400).send("Invalid coords input");
+            return errorResponse(response, 400, "Invalid coords input");
         }
         if (typeof zoomWidth !== "number" || zoomWidth < 0) {
-            return response.status(400).send("Invalid zoomWidth input");
+            return errorResponse(response, 400, "Invalid zoomWidth input");
         }
-        if (batchNum === undefined || batchNum === null) return response.status(400).send("batchNum must be defined");
+        if (batchNum === undefined || batchNum === null) return errorResponse(response, 400, "batchNum must be defined");
         // "if batchNum is supplied, check if its a number"
-        if (batchNum && typeof batchNum !== "number") return response.status(400).send("Invalid batchNum input");
+        if (batchNum && typeof batchNum !== "number") return errorResponse(response, 400, "Invalid batchNum input");
 
         const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, city, batchNum);
         // console.log(queued, "54rm");
@@ -106,7 +105,7 @@ class TaskQueueController {
         // If not specified: Get ALL unfinished tasks for provider.
         const batchNum = request.body.batchNum; // MIGHT need batch number, but also might not!
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
-            return response.status(400).send("Invalid provider input");
+            return errorResponse(response, 400, "Invalid provider input");
         }
 
         const tasks: Task[] = await this.taskQueueService.getNextTasksForScraper(provider, batchNum);
@@ -121,7 +120,7 @@ class TaskQueueController {
         const cityId = request.body.cityId;
         const batchNum = request.body.batchNum;
         if (typeof taskId !== "number" || taskId < 0) {
-            return response.status(400).send("Bad task ID input");
+            return errorResponse(response, 400, "Bad task ID input");
         }
         const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments, cityId, batchNum);
         const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
@@ -132,18 +131,11 @@ class TaskQueueController {
         const byProvider = request.body.provider; // provider only should work.
         const byBatchNum = request.body.batchNum; // batchNum only should work.
         // todo: neither should work; "get all, I really mean ALL"
-        if (byProvider && typeof byProvider !== "string") return response.status(400).json({ error: "provider must be int" });
-        if (byBatchNum && typeof byBatchNum !== "number") return response.status(400).json({ error: "batchNum must be int" });
-        // if (!byBatchNum && !byProvider) return response.status(400).json({ error: "Missing parameter" });
+        if (byProvider && typeof byProvider !== "string") return errorResponse(response, 400, "provider must be int");
+        if (byBatchNum && typeof byBatchNum !== "number") return errorResponse(response, 400, "batchNum must be int");
         const tasks: Task[] = await this.taskQueueService.getAllTasks(byProvider, byBatchNum, undefined);
         return response.status(200).json({ tasks });
     }
-
-    // async getTasksByBatch(request: Request, response: Response) {
-    //     const batchNum = request.params.batchNum;
-    //     if (batchNum && typeof batchNum !== "number") return response.status(400).json({error:"batchNum missing"})
-    //     const tasks:Task[] = await this.taskQueueService..getAllT
-    // }
 
     async cleanSpecific(request: Request, response: Response) {
         const bySpecificTaskIds = request.body.toDelete;
@@ -151,7 +143,7 @@ class TaskQueueController {
         // validation
         const usingByArray = Array.isArray(bySpecificTaskIds) && bySpecificTaskIds.every((i: any) => typeof i === "number" && i >= 0);
         const usingByRange = typeof request.body.start === "number" && typeof request.body.end === "number" && byRange[0] < byRange[1];
-        if (!usingByArray && !usingByRange) return response.status(400).json({ error: "bad inputs" });
+        if (!usingByArray && !usingByRange) return errorResponse(response, 400, "bad inputs");
         // service
         const deletedTaskIds: number[] = await this.taskQueueService.cleanSpecific(bySpecificTaskIds, byRange);
         return response.status(200).json({ deletedTaskIds });
@@ -168,7 +160,6 @@ class TaskQueueController {
     }
 
     async healthCheck(request: Request, response: Response) {
-        console.log("TaskQueue online");
         return response.status(200).json({ status: "Online" });
     }
 }

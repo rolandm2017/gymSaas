@@ -9,6 +9,7 @@ import authorize from "../middleware/authorize.middleware";
 import AdminService from "../service/admin.service";
 import HousingService from "../service/housing.service";
 import TaskQueueService from "../service/taskQueue.service";
+import { errorResponse } from "../util/errorResponseUtil";
 
 class AdminController {
     public path = "/admin";
@@ -52,11 +53,11 @@ class AdminController {
         const batchNumInput = request.query.batchNum; // optional
         const cityIdInput = request.query.cityId; // optional
         // validation
-        if (providerInput && typeof providerInput !== "string") return response.status(400).json({ error: "invalid provider" });
+        if (providerInput && typeof providerInput !== "string") return errorResponse(response, 400, "invalid provider");
         const provider = providerInput && providerInput in ProviderEnum ? (providerInput as ProviderEnum) : undefined;
-        if (batchNumInput && typeof batchNumInput !== "string") return response.status(400).json({ error: "invalid batchNum" });
+        if (batchNumInput && typeof batchNumInput !== "string") return errorResponse(response, 400, "invalid batchNum");
         const batchNum = batchNumInput ? parseInt(batchNumInput, 10) : undefined;
-        if (cityIdInput && typeof cityIdInput !== "string") return response.status(400).json({ error: "invalid cityId" });
+        if (cityIdInput && typeof cityIdInput !== "string") return errorResponse(response, 400, "invalid cityId");
         const cityId = cityIdInput ? parseInt(cityIdInput, 10) : undefined;
         //
         const tasks: Task[] = await this.taskQueueService.getAllTasks(provider, batchNum, cityId);
@@ -66,7 +67,7 @@ class AdminController {
     public async getApartmentsByLocation(request: Request, response: Response) {
         const cityName = request.query.cityName;
         // do I need by country or state? YAGNI?
-        if (typeof cityName !== "string") return response.status(400).json({ error: "cityName must be string" });
+        if (typeof cityName !== "string") return errorResponse(response, 400, "cityName must be string");
         const aps: Housing[] = await this.housingService.getApartmentsByLocation(cityName);
         return response.status(200).json({ apartments: aps });
     }
@@ -74,41 +75,41 @@ class AdminController {
     public async getApartmentsByCityIdAndBatchNum(request: Request, response: Response) {
         const cityIdInput = request.query.cityId;
         const batchNumInput = request.query.batchNum;
-        if (typeof cityIdInput !== "string") return response.status(400).json({ error: "cityId must be a string integer" });
-        if (typeof batchNumInput !== "string") return response.status(400).json({ error: "batchNum must be a string integer" });
+        if (typeof cityIdInput !== "string") return errorResponse(response, 400, "cityId must be a string integer");
+        if (typeof batchNumInput !== "string") return errorResponse(response, 400, "batchNum must be a string integer");
         const cityId = parseInt(cityIdInput, 10);
         const batchNum = parseInt(batchNumInput, 10);
         const cityIdIsNaN = isNaN(cityId);
         const batchNumIsNaN = isNaN(batchNum);
-        if (cityIdIsNaN || batchNumIsNaN) return response.status(400).json({ error: "cityId and batchNum must be int" });
+        if (cityIdIsNaN || batchNumIsNaN) return errorResponse(response, 400, "cityId and batchNum must be int");
         console.log(cityId, batchNum, "83rm");
-        if (!cityId || !batchNum) return response.status(400).json({ error: "must provide both cityId and batchNum" });
+        if (!cityId || !batchNum) return errorResponse(response, 400, "must provide both cityId and batchNum");
         const aps: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(cityId, batchNum);
         return response.status(200).json({ apartments: aps });
     }
 
     public async getTasksByBatchNum(request: Request, response: Response) {
         const batchNumInput = request.query.batchNum;
-        if (batchNumInput === undefined || typeof batchNumInput !== "string") return response.status(400).json({ error: "must supply batchNum" });
+        if (batchNumInput === undefined || typeof batchNumInput !== "string") return errorResponse(response, 400, "must supply batchNum");
         // todo: validation
         const batchNum = parseInt(batchNumInput, 10);
-        if (isNaN(batchNum)) return response.status(400).json({ error: "batchNum must be an integer" });
+        if (isNaN(batchNum)) return errorResponse(response, 400, "batchNum must be an integer");
         const tasks: Task[] = await this.taskQueueService.getTasksByBatchNum(batchNum);
         return response.status(200).json({ tasks });
     }
 
     public async banUser(request: Request, response: Response) {
         const acctIdInput = request.query.acctId;
-        if (acctIdInput === undefined || typeof acctIdInput !== "string") return response.status(400).json({ error: "must supply acctId" });
+        if (acctIdInput === undefined || typeof acctIdInput !== "string") return errorResponse(response, 400, "must supply acctId");
         const acctId = parseInt(acctIdInput, 10);
-        if (isNaN(acctId)) return response.status(400).json({ error: "acctId must be an integer" });
+        if (isNaN(acctId)) return errorResponse(response, 400, "acctId must be an integer");
         const success = await this.adminService.banUser(acctId);
         return response.status(200).json({ success });
     }
 
     public async makeAdmin(request: Request, response: Response) {
         const newAdminEmail = request.body.email;
-        if (newAdminEmail === undefined || typeof newAdminEmail !== "string") return response.status(400).json({ error: "must provide email" });
+        if (newAdminEmail === undefined || typeof newAdminEmail !== "string") return errorResponse(response, 400, "must provide email");
         const success = this.adminService.makeAdmin(newAdminEmail); // works until there is an admin in the system
         return response.status(200).json({ success });
     }
