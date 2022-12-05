@@ -103,13 +103,9 @@ class TaskQueueService {
         await this.taskDAO.updateLastScanDate(currentTask, new Date());
         // add apartments
         for (const apartment of parsedApartmentData) {
-            try {
-                const apartmentCreationPayload = convertIHousingToCreationAttr(apartment, provider, taskId, cityId, batchId);
-                this.housingDAO.createHousing(apartmentCreationPayload);
-                successes.push({});
-            } catch (err) {
-                console.log(err);
-            }
+            const apartmentCreationPayload = convertIHousingToCreationAttr(apartment, provider, taskId, cityId, batchId);
+            await this.housingDAO.createHousing(apartmentCreationPayload);
+            successes.push({});
         }
         const results = {
             pass: successes.length,

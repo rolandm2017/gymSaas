@@ -29,13 +29,14 @@ const housingService: HousingService = new HousingService(housingDAO, gymDAO, ca
 const taskQueueService: TaskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO, cacheService);
 
 // arrange
+const batchIdForTest = 3;
 const targetCity = SEED_CITIES[9];
 const dummyApartmentData = {
     provider: ProviderEnum.rentCanada,
     taskId: 0, // will set later
     apartments: realResultsRentCanada.results,
     cityId: targetCity.cityId,
-    batchNum: 5,
+    batchNum: batchIdForTest,
 };
 
 beforeAll(async () => {
@@ -43,7 +44,6 @@ beforeAll(async () => {
     app.dropTable("task");
     app.dropTable("housing");
 
-    const batchIdForTest = 3;
     await batchDAO.addBatchNum(batchIdForTest);
     const task: TaskCreationAttributes = {
         lastScan: null,
@@ -54,10 +54,10 @@ beforeAll(async () => {
         batchId: batchIdForTest,
     };
     const createdTask = await taskDAO.createTask(task); // so we don't get the error "orphaned task"
-    console.log(createdTask, "57rm");
     if (createdTask === undefined) throw new Error("task creation failed");
     const allTasks = await taskDAO.getAllTasks();
     console.log(allTasks.map(t => t.taskId));
+    console.log(dummyApartmentData.apartments.listings.length, "61rm");
     // insert them the way we'd expect in the real app.
     await taskQueueService.reportFindingsToDb(
         dummyApartmentData.provider,
@@ -79,6 +79,7 @@ afterAll(async () => {
 
 describe("test housing service on its own", () => {
     test("qualifying apartments works as expected", async () => {
+        expect(true).toBe(false);
         const targetCityName = targetCity.cityName;
         const qualificationReport: IQualificationReport = await housingService.qualifyScrapedApartments(targetCityName);
         console.log(qualificationReport, "68rm");
