@@ -90,7 +90,7 @@ describe("housingDAO tests", () => {
         const all = await housingDAO.getMultipleHousings();
         expect(all.count).toEqual(3);
     });
-    test("mark qualified works as expected", async () => {
+    test("mark qualified works as expected (and so does 'readBetween'!)", async () => {
         // arrange
         const dummyCity = SEED_CITIES[5];
         await cityDAO.createCity(dummyCity); // so city with
@@ -137,13 +137,17 @@ describe("housingDAO tests", () => {
                 };
                 await housingDAO.createHousing(payload);
             }
-        } catch (errrr) {
-            console.log(errrr);
-            console.log(errrr);
+        } catch (err) {
+            console.log(err);
+            console.log(err);
+            fail("probably there was a duplicate key or a missing key");
         }
         if (targetCityId == undefined) fail("city id was undefined somehow"); // appeasing typescript
         // act
-        const affectedRowsArr = await housingDAO.markQualified(targetCityId, 40, 50, -80, -70);
+        const affectedRowsArr = await housingDAO.markQualified(targetCityId, 40, 50, -80, -70); // note this is a HUGE hitbox, 1110 sq km!
         expect(affectedRowsArr[0]).toBe(apartmentsToAdd.length);
+        // this test is a twofer
+        const foundUnits = await housingDAO.readBetween(40, 50, -80, -70);
+        expect(foundUnits.length).toEqual(apartmentsToAdd.length);
     });
 });

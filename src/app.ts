@@ -79,6 +79,7 @@ class App {
             if (found) continue;
             State.create(state);
         }
+        // await City.destroy({ where: {} }); // sometimes needed when ??? occurs and there is a duplicate cityId
         for (const city of SEED_CITIES) {
             // check if city is seeded into db before trying to add a dupe
             const found = await City.findOne({ where: { cityName: city.cityName } });

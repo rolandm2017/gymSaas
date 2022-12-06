@@ -26,12 +26,12 @@ class GymsController {
         const country = request.query.country;
         // validation
         if (typeof cityName !== "string" || typeof stateOrProvince !== "string" || typeof country !== "string") {
-            return errorResponse(response, 400, "Parameter missing or isn't string");
+            return errorResponse(response, "Parameter missing or isn't string");
         }
         const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
-        if (!legitCityName) return errorResponse(response, 400, "cityName was not legit");
+        if (!legitCityName) return errorResponse(response, "cityName was not legit");
         const legitStateName = Object.values(StateNamesEnum).some(name => name == stateOrProvince);
-        if (!legitStateName) return errorResponse(response, 400, "state was not legit");
+        if (!legitStateName) return errorResponse(response, "state was not legit");
         //
         const gyms = await this.gymService.findGymsInLocation(country, stateOrProvince, cityName);
         const saved = await this.gymService.saveGyms(gyms, cityName);
@@ -43,7 +43,7 @@ class GymsController {
         const cityName = request.query.cityName;
         console.log(cityName, "43rm");
         if (typeof cityName !== "string") {
-            return errorResponse(response, 400, "cityName must be string");
+            return errorResponse(response, "cityName must be string");
         }
         const gymsFromDB = await this.gymService.getSavedGymsFromDB(cityName);
         return response.status(200).json(gymsFromDB);

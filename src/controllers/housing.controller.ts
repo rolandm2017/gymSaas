@@ -42,20 +42,23 @@ class HousingController {
         const neLongInput = request.query.neLong;
         const swLatInput = request.query.swLat;
         const swLongInput = request.query.swLong;
+
         // const zoomWidthInput = request.query.zoomWidth;
         if (neLatInput == undefined || neLongInput == undefined || swLatInput == undefined || swLongInput == undefined) {
-            return errorResponse(response, 400, "all inputs must be defined");
+            return errorResponse(response, "all inputs must be defined");
         }
         if (typeof neLatInput !== "string" || typeof neLongInput !== "string" || typeof swLatInput !== "string" || typeof swLongInput !== "string") {
-            return errorResponse(response, 400, "all inputs must be string integers");
+            return errorResponse(response, "all inputs must be string integers");
         }
-        const neLat = parseInt(neLatInput, 10); // max lat
-        const neLong = parseInt(neLongInput, 10); // max long
-        const swLat = parseInt(swLatInput, 10); // min lat
-        const swLong = parseInt(swLongInput, 10); // min long
+        const neLat = parseFloat(neLatInput); // max lat
+        const neLong = parseFloat(neLongInput); // max long
+        const swLat = parseFloat(swLatInput); // min lat
+        const swLong = parseFloat(swLongInput); // min long
         if (isNaN(neLat) || isNaN(neLong) || isNaN(swLat) || isNaN(swLong)) {
-            return errorResponse(response, 400, "all inputs must be string integers");
+            return errorResponse(response, "all inputs must be string integers");
         }
+        console.log("sml #, big ####", swLat, neLat);
+        console.log("sml negative #, bigger negative #", swLong, neLong, "59rm");
         const demoContent = await this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
         return response.status(200).json({ demoContent });
     }
@@ -66,10 +69,10 @@ class HousingController {
             const stateOrProvince = request.body.state;
             const providerInput = request.body.provider;
             if (!city || !stateOrProvince) {
-                return errorResponse(response, 400, "Parameter missing");
+                return errorResponse(response, "Parameter missing");
             }
             const validProviderInput = Object.values(ProviderEnum).some(name => name === providerInput);
-            if (!validProviderInput) return errorResponse(response, 400, "InvalId provider input");
+            if (!validProviderInput) return errorResponse(response, "InvalId provider input");
             console.log(city, stateOrProvince, "46rm");
             const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(ProviderEnum.rentCanada, city, stateOrProvince); // todo: advance from hardcode provider choice
             return response.status(200).json(dimensions);
@@ -81,9 +84,9 @@ class HousingController {
     public async getHousingByCityIdAndBatchNum(request: Request, response: Response) {
         const byBatchNum = request.body.batchNum;
         const byCityId = request.body.cityId;
-        if (!byBatchNum && !byCityId) return errorResponse(response, 400, "Missing parameter");
-        if (byBatchNum && typeof byBatchNum !== "number") return errorResponse(response, 400, "batchNum must be int");
-        if (byCityId && typeof byCityId !== "number") return errorResponse(response, 400, "cityId must be int");
+        if (!byBatchNum && !byCityId) return errorResponse(response, "Missing parameter");
+        if (byBatchNum && typeof byBatchNum !== "number") return errorResponse(response, "batchNum must be int");
+        if (byCityId && typeof byCityId !== "number") return errorResponse(response, "cityId must be int");
         const housing: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(byCityId, byBatchNum);
         return response.status(200).json({ housing });
     }
@@ -93,15 +96,15 @@ class HousingController {
         const cityName = request.query.cityName;
         const stateOrProvince = request.query.state;
         if (!cityIdString && !stateOrProvince && !cityName) {
-            return errorResponse(response, 400, "Parameter missing");
+            return errorResponse(response, "Parameter missing");
         }
         if (cityIdString && typeof cityIdString !== "string" && typeof cityIdString !== "number")
-            return errorResponse(response, 400, "cityId must be number or string");
-        if (cityName && typeof cityName !== "string") return errorResponse(response, 400, "cityName must be string");
-        if (stateOrProvince && typeof stateOrProvince !== "string") return errorResponse(response, 400, "state must be string");
+            return errorResponse(response, "cityId must be number or string");
+        if (cityName && typeof cityName !== "string") return errorResponse(response, "cityName must be string");
+        if (stateOrProvince && typeof stateOrProvince !== "string") return errorResponse(response, "state must be string");
         const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
-        if (!legitCityName) return errorResponse(response, 400, "cityName was not legit");
-        if (cityIdString === undefined) return errorResponse(response, 400, "cityId undefined");
+        if (!legitCityName) return errorResponse(response, "cityName was not legit");
+        if (cityIdString === undefined) return errorResponse(response, "cityId undefined");
         const cityId: number | undefined = cityIdString ? parseInt(cityIdString, 10) : undefined;
         const apartments: Housing[] = await this.housingService.getAllHousing(cityId, cityName, stateOrProvince);
         return response.status(200).json({ apartments });
@@ -120,18 +123,18 @@ class HousingController {
 
     public async qualifyScrapedApartments(request: Request, response: Response) {
         const cityName = request.query.cityName;
-        if (typeof cityName !== "string") return errorResponse(response, 400, "cityName must be string");
+        if (typeof cityName !== "string") return errorResponse(response, "cityName must be string");
         const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
-        if (!legitCityName) return errorResponse(response, 400, "cityName was not legit");
+        if (!legitCityName) return errorResponse(response, "cityName was not legit");
         const details = await this.housingService.qualifyScrapedApartments(cityName);
         return response.status(200).json({ qualified: details.qualified, outOf: details.total, percent: details.qualified / details.total });
     }
 
     public async deleteUnqualifiedApartments(request: Request, response: Response) {
         const cityName = request.query.cityName;
-        if (typeof cityName !== "string") return errorResponse(response, 400, "cityName must be string");
+        if (typeof cityName !== "string") return errorResponse(response, "cityName must be string");
         const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
-        if (!legitCityName) return errorResponse(response, 400, "cityName was not legit");
+        if (!legitCityName) return errorResponse(response, "cityName was not legit");
         const numberOfDeleted = await this.housingService.deleteUnqualifiedApartments(cityName);
         return response.status(200).json({ numberOfDeleted });
     }
