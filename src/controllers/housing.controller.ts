@@ -38,7 +38,26 @@ class HousingController {
     }
 
     async getDemoContent(request: Request, response: Response) {
-        const cityName = request.query.cityName;
+        const neLatInput = request.query.neLat;
+        const neLongInput = request.query.neLong;
+        const swLatInput = request.query.swLat;
+        const swLongInput = request.query.swLong;
+        // const zoomWidthInput = request.query.zoomWidth;
+        if (neLatInput == undefined || neLongInput == undefined || swLatInput == undefined || swLongInput == undefined) {
+            return errorResponse(response, 400, "all inputs must be defined");
+        }
+        if (typeof neLatInput !== "string" || typeof neLongInput !== "string" || typeof swLatInput !== "string" || typeof swLongInput !== "string") {
+            return errorResponse(response, 400, "all inputs must be string integers");
+        }
+        const neLat = parseInt(neLatInput, 10); // max lat
+        const neLong = parseInt(neLongInput, 10); // max long
+        const swLat = parseInt(swLatInput, 10); // min lat
+        const swLong = parseInt(swLongInput, 10); // min long
+        if (isNaN(neLat) || isNaN(neLong) || isNaN(swLat) || isNaN(swLong)) {
+            return errorResponse(response, 400, "all inputs must be string integers");
+        }
+        const demoContent = await this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
+        return response.status(200).json({ demoContent });
     }
 
     async detectProviderViewportWidth(request: Request, response: Response) {
@@ -73,7 +92,6 @@ class HousingController {
         const cityIdString = request.query.cityId;
         const cityName = request.query.cityName;
         const stateOrProvince = request.query.state;
-        console.log(cityIdString, cityName, stateOrProvince, "72rm");
         if (!cityIdString && !stateOrProvince && !cityName) {
             return errorResponse(response, 400, "Parameter missing");
         }

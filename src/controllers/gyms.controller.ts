@@ -26,7 +26,7 @@ class GymsController {
         const country = request.query.country;
         // validation
         if (typeof cityName !== "string" || typeof stateOrProvince !== "string" || typeof country !== "string") {
-            return errorResponse(response, 400, "Parameter missing");
+            return errorResponse(response, 400, "Parameter missing or isn't string");
         }
         const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
         if (!legitCityName) return errorResponse(response, 400, "cityName was not legit");

@@ -87,7 +87,6 @@ class HousingDAO {
                 long: {
                     [Op.between]: [lowerLimitLongitude, upperLimitLongitude], // -30, -40
                 },
-                nearAGym: null,
             },
         });
     };

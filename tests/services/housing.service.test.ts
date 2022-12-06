@@ -103,14 +103,6 @@ afterAll(async () => {
 
 describe("test housing service on its own", () => {
     test("qualifying apartments works as expected", async () => {
-        for (const gym of dummyGymData) {
-            const upperLimitLatitude = gym.lat + MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
-            const lowerLimitLatitude = gym.lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
-            const upperLimitLongitude = gym.long + MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
-            const lowerLimitLongitude = gym.long - MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
-            const foundApartments = await housingDAO.readBetween(lowerLimitLatitude, upperLimitLatitude, lowerLimitLongitude, upperLimitLongitude);
-            console.log(foundApartments.length);
-        }
         const targetCityName = targetCity.cityName;
         const qualificationReport: IQualificationReport = await housingService.qualifyScrapedApartments(targetCityName);
         console.log(qualificationReport, "68rm");

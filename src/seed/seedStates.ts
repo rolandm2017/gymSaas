@@ -1,71 +1,71 @@
 import { ProvinceIdEnum } from "../enum/canadaProvinceId.enum";
-import { StateNames } from "../enum/stateName.enum";
+import { StateNamesEnum } from "../enum/stateName.enum";
 
 // canada
 export const SEED_STATES = [
     {
         stateId: ProvinceIdEnum.britishColumbia,
-        name: StateNames.britishColumbia,
+        name: StateNamesEnum.britishColumbia,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.alberta,
-        name: StateNames.alberta,
+        name: StateNamesEnum.alberta,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.saskatchewan,
-        name: StateNames.saskatchewan,
+        name: StateNamesEnum.saskatchewan,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.manitoba,
-        name: StateNames.manitoba,
+        name: StateNamesEnum.manitoba,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.ontario,
-        name: StateNames.ontario,
+        name: StateNamesEnum.ontario,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.quebec,
-        name: StateNames.quebec,
+        name: StateNamesEnum.quebec,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.PEI,
-        name: StateNames.PEI,
+        name: StateNamesEnum.PEI,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.newBrunswick,
-        name: StateNames.newBrunswick,
+        name: StateNamesEnum.newBrunswick,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.novaScotia,
-        name: StateNames.novaScotia,
+        name: StateNamesEnum.novaScotia,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.newfoundland,
-        name: StateNames.newfoundland,
+        name: StateNamesEnum.newfoundland,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.yukon,
-        name: StateNames.yukon,
+        name: StateNamesEnum.yukon,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.nunavut,
-        name: StateNames.nunavut,
+        name: StateNamesEnum.nunavut,
         country: "Canada",
     },
     {
         stateId: ProvinceIdEnum.northwestTerritories,
-        name: StateNames.northwestTerritories,
+        name: StateNamesEnum.northwestTerritories,
         country: "Canada",
     },
 ];

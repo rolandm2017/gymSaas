@@ -1,5 +1,6 @@
-import { HousingCreationAttributes } from "../database/models/Housing";
+import { Housing, HousingCreationAttributes } from "../database/models/Housing";
 import { ProviderEnum } from "../enum/provider.enum";
+import { IDemoHousing } from "../interface/DemoHousing.interface";
 import { IHousing } from "../interface/Housing.interface";
 
 export function convertIHousingToCreationAttr(
@@ -26,4 +27,20 @@ export function convertIHousingToCreationAttr(
         nearAGym: house.nearAGym !== undefined ? house.nearAGym : null,
     };
     return creationPayload;
+}
+
+export function convertHousingsToDemoHousings(housings: Housing[]): IDemoHousing[] {
+    const demoHousings: IDemoHousing[] = [];
+    for (const housing of housings) {
+        const demoContent: IDemoHousing = {
+            housingId: housing.housingId,
+            buildingType: housing.buildingType == "apartment" ? housing.buildingType : "house",
+            agreementType: housing.agreementType == "rent" ? housing.agreementType : "buy",
+            lat: housing.lat,
+            long: housing.long,
+            nearAGym: housing.nearAGym,
+        };
+        demoHousings.push(demoContent);
+    }
+    return demoHousings;
 }

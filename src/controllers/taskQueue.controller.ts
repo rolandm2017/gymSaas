@@ -107,7 +107,6 @@ class TaskQueueController {
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return errorResponse(response, 400, "Invalid provider input");
         }
-
         const tasks: Task[] = await this.taskQueueService.getNextTasksForScraper(provider, batchNum);
 
         return response.status(200).json({ tasks });

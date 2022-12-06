@@ -2,8 +2,10 @@ import { Cache } from "joi";
 import GymDAO from "../database/dao/gym.dao";
 import HousingDAO from "../database/dao/housing.dao";
 import { Housing } from "../database/models/Housing";
+import { IDemoHousing } from "../interface/DemoHousing.interface";
 import { IQualificationReport } from "../interface/QualificationReport.interface";
 import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../util/acceptableRadiusForWalking";
+import { convertHousingsToDemoHousings } from "../util/housingConverter";
 import CacheService from "./cache.service";
 
 class HousingService {
@@ -15,6 +17,12 @@ class HousingService {
         this.housingDAO = housingDAO;
         this.gymDAO = gymDAO;
         this.cacheService = cacheService;
+    }
+
+    public async getDemoHousing(minLat: number, maxLat: number, minLong: number, maxLong: number): Promise<IDemoHousing[]> {
+        const housings: Housing[] = await this.housingDAO.readBetween(minLat, maxLat, minLong, maxLong);
+        const demoHousings: IDemoHousing[] = convertHousingsToDemoHousings(housings);
+        return demoHousings;
     }
 
     //
