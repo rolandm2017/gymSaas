@@ -16,7 +16,6 @@ import GymDAO from "../../src/database/dao/gym.dao";
 let accountDAO: AccountDAO;
 let cityDAO: CityDAO;
 let stateDAO: StateDAO;
-let batchDAO: BatchDAO;
 let housingDAO: HousingDAO;
 let taskDAO: TaskDAO;
 let gymDAO: GymDAO;
@@ -33,14 +32,13 @@ beforeAll(() => {
     accountDAO = new AccountDAO();
     cityDAO = new CityDAO();
     stateDAO = new StateDAO();
-    batchDAO = new BatchDAO();
     housingDAO = new HousingDAO(stateDAO, cityDAO);
     taskDAO = new TaskDAO();
     gymDAO = new GymDAO();
 
     // service
     adminService = new AdminService(accountDAO);
-    taskQueueService = new TaskQueueService(cityDAO, housingDAO, batchDAO, taskDAO, cacheService);
+    taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO, cacheService);
     housingService = new HousingService(housingDAO, gymDAO, cacheService);
 
     controller = new AdminController(adminService, taskQueueService, housingService);

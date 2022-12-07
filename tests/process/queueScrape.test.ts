@@ -145,13 +145,14 @@ describe("steps 2 through 5 of the scraping process works for batches of apartme
         // step 3 - queue scan
         const queueGridScanPayload = {
             provider: "rentCanada",
-            city: "Montreal",
+            cityName: "Montreal",
             batchNum: 1,
             zoomWidth: 13,
             coords: tasks,
         };
         const queuedGridScanResponse = await request(server).post("/task_queue/queue_grid_scan").send(queueGridScanPayload);
         expect(queuedGridScanResponse.body.queued.pass).toBe(queueGridScanPayload.coords.length); // all pass
+        // confirm all tasks have a cityId!
 
         // step 3.5 - report findings. Here we simulate the scraper responding with apartments.
         // put "realResultsRentCanada.results.length" apartments with various locations into the db

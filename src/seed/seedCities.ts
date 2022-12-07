@@ -1,11 +1,12 @@
 import { CityCreationAttributes } from "../database/models/City";
 import { ProvinceIdEnum } from "../enum/canadaProvinceId.enum";
 import { CityNameEnum } from "../enum/cityName.enum";
+import { CommonCityIdEnum } from "../enum/CommonCityId.enum";
 
 export const SEED_CITIES: CityCreationAttributes[] = [
     {
         stateId: ProvinceIdEnum.britishColumbia,
-        cityId: 0,
+        cityId: CommonCityIdEnum.vancouver,
         cityName: CityNameEnum.vancouver, // 1
         country: "Canada",
         centerLat: 49.2827,
@@ -15,7 +16,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.alberta,
-        cityId: 1,
+        cityId: CommonCityIdEnum.calgary,
         cityName: CityNameEnum.calgary, // 2
         country: "Canada",
         centerLat: 51.0447,
@@ -25,7 +26,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.alberta,
-        cityId: 2,
+        cityId: CommonCityIdEnum.edmonton,
         cityName: CityNameEnum.edmonton, // 3
         country: "Canada",
         centerLat: 53.5461,
@@ -35,7 +36,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.manitoba,
-        cityId: 3,
+        cityId: CommonCityIdEnum.winninpeg,
         cityName: CityNameEnum.winnipeg, // 4
         country: "Canada",
         centerLat: 49.8954,
@@ -45,7 +46,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.ontario,
-        cityId: 4,
+        cityId: CommonCityIdEnum.toronto,
         cityName: CityNameEnum.toronto, // 5
         country: "Canada",
         centerLat: 43.6532,
@@ -55,7 +56,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.ontario,
-        cityId: 5,
+        cityId: CommonCityIdEnum.mississauga,
         cityName: CityNameEnum.mississauga, // 6
         country: "Canada",
         centerLat: 43.589,
@@ -65,7 +66,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.ontario,
-        cityId: 6,
+        cityId: CommonCityIdEnum.brampton,
         cityName: CityNameEnum.brampton, // 7
         country: "Canada",
         centerLat: 43.7315,
@@ -75,7 +76,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.ontario,
-        cityId: 7,
+        cityId: CommonCityIdEnum.hamilton,
         cityName: CityNameEnum.hamilton, // 8
         country: "Canada",
         centerLat: 43.2557,
@@ -85,7 +86,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.ontario,
-        cityId: 8,
+        cityId: CommonCityIdEnum.ottawa,
         cityName: CityNameEnum.ottawa, // 9
         country: "Canada",
         centerLat: 45.4215,
@@ -95,7 +96,7 @@ export const SEED_CITIES: CityCreationAttributes[] = [
     },
     {
         stateId: ProvinceIdEnum.quebec,
-        cityId: 9,
+        cityId: CommonCityIdEnum.montreal,
         cityName: CityNameEnum.montreal, // 10
         country: "Canada",
         centerLat: 45.5019,

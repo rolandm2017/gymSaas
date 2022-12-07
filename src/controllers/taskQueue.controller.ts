@@ -9,6 +9,7 @@ import { ILatLong } from "../interface/LatLong.interface";
 import { IBounds } from "../interface/Bounds.interface";
 import ScraperService from "../service/scraper.service";
 import { errorResponse } from "../util/errorResponseUtil";
+import { CityNameEnum } from "../enum/cityName.enum";
 
 // do I need a "scraper controller" and a separate "task queue controller"?
 class TaskQueueController {
@@ -32,6 +33,7 @@ class TaskQueueController {
         this.router.get("/scrape", this.scrapeApartments.bind(this));
         this.router.get("/next_batch_number", this.getNextBatchNumber.bind(this));
         this.router.get("/next_tasks_for_scraper", this.getNextTasksForScraper.bind(this));
+        // step 3.5
         this.router.post("/report_findings_and_mark_complete", this.reportFindingsToDbAndMarkComplete.bind(this));
 
         // used to check tasks make sense
@@ -77,7 +79,7 @@ class TaskQueueController {
         const provider = request.body.provider;
         const coords = request.body.coords;
         const zoomWidth = request.body.zoomWidth;
-        const city = request.body.city;
+        const cityName = request.body.cityName;
         const batchNum = request.body.batchNum; // admin should have gotten this from the previous endpoint
         // console.log(request.body, "40rm");
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
@@ -92,8 +94,10 @@ class TaskQueueController {
         if (batchNum === undefined || batchNum === null) return errorResponse(response, "batchNum must be defined");
         // "if batchNum is supplied, check if its a number"
         if (batchNum && typeof batchNum !== "number") return errorResponse(response, "Invalid batchNum input");
+        const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
+        if (!legitCityName) return errorResponse(response, "cityName was not legit");
 
-        const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, city, batchNum);
+        const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, cityName, batchNum);
         // console.log(queued, "54rm");
         return response.status(200).json({ queued: queued });
     }

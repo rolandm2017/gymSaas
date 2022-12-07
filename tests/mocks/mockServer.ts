@@ -105,14 +105,6 @@ class App {
         this.dbConnOpen = true;
     }
 
-    public async dropAllTables() {
-        if (!this.dbConnOpen) return;
-        console.log("Dropping all tables...");
-        // await App.Database.drop();
-        // fixme: Never managed to make this work
-        await App.Database.sync({ force: true });
-    }
-
     public async dropTable(tableName: "account" | "resetToken" | "task" | "city" | "housing" | "batch"): Promise<void> {
         // await table.sync({ force: true })
         if (tableName === "account") {

@@ -35,16 +35,16 @@ class TaskQueueService {
         cityName: string,
         batchNum: number,
     ): Promise<{ pass: number; fail: number; batchNum: number }> {
-        this.cacheService.addBatchNumIfNotExists(batchNum);
+        await this.cacheService.addBatchNumIfNotExists(batchNum);
+
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
-        const cityForId = await this.cityDAO.getCityByName(cityName);
-        if (cityForId === null) throw new Error("City not found");
+        const correspondingCityId = await this.cacheService.getCityId(cityName);
 
         const successes: {}[] = [];
 
-        for (let i = 0; i < coords.length; i++) {
-            try {
+        try {
+            for (let i = 0; i < coords.length; i++) {
                 await this.taskDAO.createTask({
                     providerName: provider,
                     lat: coords[i].lat,
@@ -52,12 +52,13 @@ class TaskQueueService {
                     zoomWidth,
                     lastScan: null,
                     batchId: batchNum,
-                    cityId: cityForId.cityId,
+                    cityId: correspondingCityId,
                 });
                 successes.push({});
-            } catch (err) {
-                console.log(err);
             }
+        } catch (err) {
+            console.log(err);
+            throw err;
         }
 
         const results = {
@@ -93,7 +94,7 @@ class TaskQueueService {
     ): Promise<{ pass: number; fail: number }> {
         const parser = new Parser(provider);
         const parsedApartmentData: IHousing[] = parser.parse(apartments);
-        const successes: {}[] = [];
+        let successes = 0;
         // get city id for this task because its needed in the housing model for foreign key
         const currentTask = await this.taskDAO.getTaskById(taskId);
         if (currentTask === null) throw new Error("Orphaned task discovered");
@@ -102,25 +103,31 @@ class TaskQueueService {
         // update task's lastScan date
         await this.taskDAO.updateLastScanDate(currentTask, new Date());
         // add apartments
-        for (const apartment of parsedApartmentData) {
-            const apartmentCreationPayload = convertIHousingToCreationAttr(apartment, provider, taskId, cityId, batchId);
-            await this.housingDAO.createHousing(apartmentCreationPayload);
-            successes.push({});
+        console.log(taskId, "105rm");
+        try {
+            for (const apartment of parsedApartmentData) {
+                const apartmentCreationPayload = convertIHousingToCreationAttr(apartment, provider, taskId, cityId, batchId);
+                await this.housingDAO.createHousing(apartmentCreationPayload);
+                successes++;
+            }
+        } catch (err) {
+            console.log(err);
+            throw err;
         }
         const results = {
-            pass: successes.length,
-            fail: parsedApartmentData.length - successes.length,
+            pass: successes,
+            fail: parsedApartmentData.length - successes,
         };
         return results;
     }
 
     public async markTaskComplete(taskId: number): Promise<boolean> {
-        const s = await this.taskDAO.getTaskById(taskId);
-        if (s === null) {
+        const task = await this.taskDAO.getTaskById(taskId);
+        if (task === null) {
             return false;
         }
-        s.lastScan = new Date();
-        await this.taskDAO.updateTask(s, taskId);
+        task.lastScan = new Date();
+        await this.taskDAO.updateTask(task, taskId);
         return true;
     }
 

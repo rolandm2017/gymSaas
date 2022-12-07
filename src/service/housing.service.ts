@@ -20,7 +20,8 @@ class HousingService {
     }
 
     public async getDemoHousing(minLat: number, maxLat: number, minLong: number, maxLong: number): Promise<IDemoHousing[]> {
-        const housings: Housing[] = await this.housingDAO.readBetween(minLat, maxLat, minLong, maxLong);
+        const housings: Housing[] = await this.housingDAO.readBetween(10, 90, -5, -120);
+        // const housings: Housing[] = await this.housingDAO.readBetween(minLat, maxLat, minLong, maxLong);
         console.log(housings.length, "24rm");
         const demoHousings: IDemoHousing[] = convertHousingsToDemoHousings(housings);
         console.log(demoHousings, "26rm");

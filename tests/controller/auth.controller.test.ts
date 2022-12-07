@@ -163,7 +163,7 @@ describe("Test auth controller without services", () => {
             const n: NextFunction = {} as NextFunction;
             // ready
             const response = await controller.revokeToken(req, res, n);
-            expect(response.json).toHaveBeenCalledWith({ message: "User is required" });
+            expect(response.json).toHaveBeenCalledWith({ error: "User is required" });
             expect(s.revokeToken).not.toHaveBeenCalled();
         });
         test("says 'token is required' when there is none", async () => {
@@ -175,7 +175,7 @@ describe("Test auth controller without services", () => {
             const n: NextFunction = {} as NextFunction;
             // ready
             const response = await controller.revokeToken(req, res, n);
-            expect(response.json).toHaveBeenCalledWith({ message: "Token is required" });
+            expect(response.json).toHaveBeenCalledWith({ error: "Token is required" });
             expect(s.revokeToken).not.toHaveBeenCalled();
             expect(req.user.ownsToken).not.toHaveBeenCalled();
         });

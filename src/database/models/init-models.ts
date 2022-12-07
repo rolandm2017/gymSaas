@@ -44,7 +44,7 @@ function initModels(sequelize: Sequelize) {
         as: "scraping_tasks",
     });
     Task.belongsTo(City, {
-        foreignKey: "cityId",
+        foreignKey: { name: "cityId", allowNull: false }, // tasks must have a cityId // https://github.com/sequelize/sequelize/issues/2837
         as: "scraped_for_city",
     });
     Task.hasMany(Housing, {
@@ -52,7 +52,7 @@ function initModels(sequelize: Sequelize) {
         as: "scraped_aps",
     });
     Housing.belongsTo(Task, {
-        foreignKey: "taskId",
+        foreignKey: { name: "taskId", allowNull: false }, // housings must have a task
         as: "from_task",
     });
     City.hasMany(Gym, {
@@ -81,7 +81,7 @@ function initModels(sequelize: Sequelize) {
         as: "scraped_apartments",
     });
     Housing.belongsTo(City, {
-        foreignKey: "cityId",
+        foreignKey: { name: "cityId", allowNull: false }, // housings must have a city
         as: "belongs_to_city",
     });
     City.hasMany(Gym, {

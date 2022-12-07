@@ -20,7 +20,7 @@ export const gridScanPlan = {
 // http://127.0.0.1:8000/task_queue/queue_grid_scan
 export const queueGridScan = {
     provider: "rentCanada",
-    city: "Montreal",
+    cityName: "Montreal",
     batchNum: 1,
     zoomWidth: 13,
     coords: [
