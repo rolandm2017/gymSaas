@@ -32,9 +32,7 @@ class TaskQueueService {
         cityName: string,
         batchNum: number,
     ): Promise<{ pass: number; fail: number; batchNum: number }> {
-        console.log("adding ", batchNum, "to cache");
         const cachedNums = await this.cacheService.addBatchNumIfNotExists(batchNum);
-        console.log(cachedNums, "37rm");
 
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
@@ -102,7 +100,6 @@ class TaskQueueService {
         // update task's lastScan date
         await this.taskDAO.updateLastScanDate(currentTask, new Date());
         // add apartments
-        console.log(taskId, "105rm");
         try {
             for (const apartment of parsedApartmentData) {
                 const apartmentCreationPayload = convertIHousingToCreationAttr(apartment, provider, taskId, cityId, batchId);

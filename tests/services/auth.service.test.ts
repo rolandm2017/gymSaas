@@ -7,10 +7,11 @@ import { ISmallError } from "../../src/interface/SmallError.interface";
 import AuthService from "../../src/service/auth.service";
 import EmailService from "../../src/service/email.service";
 import AccountUtil from "../../src/util/accountUtil";
+import sendEmail from "../../src/util/sendEmail";
 
 import { app } from "../mocks/mockServer";
 
-import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
+import { emails, passwords } from "../mocks/userCredentials";
 
 const validCredentials = {
     email: emails[0],
@@ -36,7 +37,7 @@ beforeAll(async () => {
     acctDAO = new AccountDAO(); // reset to a fresh AcctDAO before every test.
     resetTokenDAO = new ResetTokenDAO(acctDAO);
     // //
-    emailService = new EmailService(acctDAO);
+    emailService = new EmailService(sendEmail, "testing");
     // // make an acct in db
     authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 });

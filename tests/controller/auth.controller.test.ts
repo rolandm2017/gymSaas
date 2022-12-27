@@ -10,13 +10,14 @@ import AccountUtil from "../../src/util/accountUtil";
 import { RequestWithUser } from "../../src/interface/RequestWithUser.interface";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import AccountDAO from "../../src/database/dao/account.dao";
+import sendEmail from "../../src/util/sendEmail";
 
-let s: AuthService;
+let authService: AuthService;
 let controller: AuthController;
-let aDAO: AccountDAO = new AccountDAO();
-let e: EmailService = new EmailService(aDAO, "testing");
-let a: AccountUtil = new AccountUtil();
-let rDAO: ResetTokenDAO = new ResetTokenDAO(aDAO);
+let accountDAO: AccountDAO = new AccountDAO();
+let emailService: EmailService = new EmailService(sendEmail, "testing");
+let accountUtil: AccountUtil = new AccountUtil();
+let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(accountDAO);
 
 const validEmail = "someValidEmail@gmail.com";
 const fakeButValidAccount: IBasicDetails = {
@@ -30,9 +31,9 @@ const fakeButValidAccount: IBasicDetails = {
 };
 
 beforeAll(() => {
-    s = new AuthService(e, a, aDAO, rDAO);
+    authService = new AuthService(emailService, accountUtil, accountDAO, resetTokenDAO);
 
-    controller = new AuthController(s);
+    controller = new AuthController(authService);
 });
 
 afterEach(() => {
@@ -51,8 +52,8 @@ const mockResponse = () => {
 describe("Test auth controller without services", () => {
     test("authenticate route succeeds for valid inputs", async () => {
         const credentialsWithJwtAndRefreshToken = { ...fakeButValidAccount };
-        s.authenticate = jest.fn().mockReturnValue(credentialsWithJwtAndRefreshToken);
-        controller = new AuthController(s);
+        authService.authenticate = jest.fn().mockReturnValue(credentialsWithJwtAndRefreshToken);
+        controller = new AuthController(authService);
         const req: Request = { body: {} } as Request;
         req.body.email = "someValidEmail@gmail.com";
         req.body.password = "validPassword999*";
@@ -70,7 +71,7 @@ describe("Test auth controller without services", () => {
         expect(res.cookie).toHaveBeenCalled();
     });
     test("authenticate route errors for invalid inputs", async () => {
-        s.authenticate = jest.fn().mockReturnValue({ error: "someTestValue22" });
+        authService.authenticate = jest.fn().mockReturnValue({ error: "someTestValue22" });
         const req: Request = {} as Request;
         const res: Response = mockResponse();
         res.json = jest.fn();
@@ -87,7 +88,7 @@ describe("Test auth controller without services", () => {
     });
 
     test("register route succeeds for valid inputs", async () => {
-        s.register = jest.fn().mockReturnValue(fakeButValidAccount);
+        authService.register = jest.fn().mockReturnValue(fakeButValidAccount);
         const req: any = {};
         req.get = function () {
             return "fictionalOriginForTest";
@@ -104,7 +105,7 @@ describe("Test auth controller without services", () => {
         expect(res.json).toHaveBeenCalled();
     });
     test("register route errors for invalid inputs", async () => {
-        s.register = jest.fn().mockReturnValue({ error: "the_error_msg_is_passed_properly" });
+        authService.register = jest.fn().mockReturnValue({ error: "the_error_msg_is_passed_properly" });
         const req: any = {};
         req.get = function () {
             return "fictionalOriginForTest2";
@@ -123,7 +124,7 @@ describe("Test auth controller without services", () => {
     describe("revoke token returns 'token revoked' when inputs are proper", () => {
         test("works with .token", async () => {
             // setup
-            s.revokeToken = jest.fn();
+            authService.revokeToken = jest.fn();
             const req: RequestWithUser = { body: {} } as Request;
             req.body.token = "aaaaaaaaa";
             req.ip = "195.1.1.3";
@@ -133,12 +134,12 @@ describe("Test auth controller without services", () => {
             // ready
             const response = await controller.revokeToken(req, res, n);
             expect(req.user.ownsToken).toBeCalled();
-            expect(s.revokeToken).toHaveBeenCalled();
+            expect(authService.revokeToken).toHaveBeenCalled();
             expect(res.json).toHaveBeenCalledWith({ message: "Token revoked" });
         });
         test("works with .refreshToken", async () => {
             // setup
-            s.revokeToken = jest.fn();
+            authService.revokeToken = jest.fn();
             const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
             req.cookies.refreshToken = "bbbbbb";
             req.ip = "195.1.1.3";
@@ -148,7 +149,7 @@ describe("Test auth controller without services", () => {
             // ready
             const response = await controller.revokeToken(req, res, n);
             expect(req.user.ownsToken).toBeCalled();
-            expect(s.revokeToken).toHaveBeenCalled();
+            expect(authService.revokeToken).toHaveBeenCalled();
             expect(response.json).toHaveBeenCalledWith({ message: "Token revoked" });
         });
     });
@@ -156,7 +157,7 @@ describe("Test auth controller without services", () => {
     describe("revoke token fails the way I expect", () => {
         test("kicks you out when user is undefined", async () => {
             // setup
-            s.revokeToken = jest.fn();
+            authService.revokeToken = jest.fn();
             const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
             req.user = undefined;
             const res: Response = mockResponse();
@@ -164,11 +165,11 @@ describe("Test auth controller without services", () => {
             // ready
             const response = await controller.revokeToken(req, res, n);
             expect(response.json).toHaveBeenCalledWith({ error: "User is required" });
-            expect(s.revokeToken).not.toHaveBeenCalled();
+            expect(authService.revokeToken).not.toHaveBeenCalled();
         });
         test("says 'token is required' when there is none", async () => {
             // setup
-            s.revokeToken = jest.fn();
+            authService.revokeToken = jest.fn();
             const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
             req.user = { role: "User", ownsToken: jest.fn(), acctId: 305 };
             const res: Response = mockResponse();
@@ -176,7 +177,7 @@ describe("Test auth controller without services", () => {
             // ready
             const response = await controller.revokeToken(req, res, n);
             expect(response.json).toHaveBeenCalledWith({ error: "Token is required" });
-            expect(s.revokeToken).not.toHaveBeenCalled();
+            expect(authService.revokeToken).not.toHaveBeenCalled();
             expect(req.user.ownsToken).not.toHaveBeenCalled();
         });
     });

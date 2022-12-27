@@ -27,7 +27,7 @@ const gymDAO = new GymDAO();
 const cacheService: CacheService = new CacheService(cityDAO, batchDAO);
 
 const housingService: HousingService = new HousingService(housingDAO, gymDAO, cacheService);
-const taskQueueService: TaskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO, cacheService);
+const taskQueueService: TaskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);
 
 // find which apartments are within range of a gym
 const minAcceptableLat = dummyGymData[0].lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
@@ -81,7 +81,6 @@ beforeAll(async () => {
     dummyApartmentData.taskId = createdTask.taskId;
     const allTasks = await taskDAO.getAllTasks();
     console.log(allTasks.map(t => t.taskId));
-    console.log(dummyApartmentData.apartments.listings.length, "61rm");
     // insert them the way we'd expect in the real app.
     await taskQueueService.reportFindingsToDb(
         dummyApartmentData.provider,
@@ -105,7 +104,6 @@ describe("test housing service on its own", () => {
     test("qualifying apartments works as expected", async () => {
         const targetCityName = targetCity.cityName;
         const qualificationReport: IQualificationReport = await housingService.qualifyScrapedApartments(targetCityName);
-        console.log(qualificationReport, "68rm");
         expect(qualificationReport.qualified).toEqual(expectedQualifiedApartments);
     });
 });

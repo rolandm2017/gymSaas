@@ -1,14 +1,13 @@
 import AccountDAO from "../../src/database/dao/account.dao";
 import { IAccount } from "../../src/interface/Account.interface";
 import EmailService from "../../src/service/email.service";
-import { emails } from "../mocks/userCredentials";
+import sendEmail from "../../src/util/sendEmail";
 
 let emailService: EmailService;
 
 beforeAll(async () => {
     const TEST_MODE = "testing";
-    const acctDAO = new AccountDAO();
-    emailService = new EmailService(acctDAO, TEST_MODE);
+    emailService = new EmailService(sendEmail, TEST_MODE);
     emailService.emailSenderReached = jest.fn();
 });
 

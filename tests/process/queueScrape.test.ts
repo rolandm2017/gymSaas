@@ -79,7 +79,6 @@ const qualifiedApartmentsForThatOtherGym = latLongRealResultsRentCanada.filter(
 );
 
 const expectedQualifiedApartments = qualifiedApartmentsForThatOneGym.length + qualifiedApartmentsForThatOtherGym.length;
-console.log(qualifiedApartmentsForThatOneGym.length, qualifiedApartmentsForThatOtherGym.length, "96rm");
 // 4 + 15 = 19
 
 const testTargetCityId = SEED_CITIES[9].cityId;
@@ -167,7 +166,6 @@ describe("steps 2 through 5 of the scraping process works for batches of apartme
         // step 4 - qualify
         const targetCityName = SEED_CITIES[9].cityName;
         const qualificationResponse = await request(server).get("/housing/qualify").query({ cityName: targetCityName });
-        console.log(qualificationResponse.body, "197rm");
         expect(qualificationResponse.body.qualified).toBe(expectedQualifiedApartments);
         expect(qualificationResponse.body.outOf).toBe(dummyApartmentData.apartments.listings.length);
         const qualifiedPercent = qualificationResponse.body.qualified / qualificationResponse.body.outOf;

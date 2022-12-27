@@ -158,7 +158,6 @@ describe("Test taskQueue controller with supertest", () => {
             await app.dropTable("task");
             await app.dropTable("batch");
             const allBatchNums = await batchDAO.getAllBatchNums();
-            console.log(allBatchNums, "162rm");
             const batchNumForIntegrationTest = 1111;
             miniPayloadRentCanada.batchNum = batchNumForIntegrationTest;
             miniPayloadRentFaster.batchNum = batchNumForIntegrationTest;
@@ -171,7 +170,6 @@ describe("Test taskQueue controller with supertest", () => {
             const payload = { provider: miniPayloadRentCanada.provider };
             // get all tasks for rentCanada, mark them complete.
             const tasksResponse = await request(server).get("/task_queue/next_tasks_for_scraper").send(payload);
-            console.log(tasksResponse.body.tasks, "174rm");
             expect(tasksResponse.body.tasks).toBeDefined();
             expect(tasksResponse.body.tasks.length).toEqual(miniPayloadRentCanada.coords.length);
             const tasksReceived = tasksResponse.body.tasks.length;
@@ -189,7 +187,6 @@ describe("Test taskQueue controller with supertest", () => {
             const tasks = await taskDAO.getAllTasks();
             console.log(tasks.map((t: Task) => t.taskId));
             for (let i = 0; i < findingsPayloads.length; i++) {
-                console.log(findingsPayloads[i].taskId, "198rm");
                 const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
                 // now all the ones for rentCanada should be marked complete
                 expect(completedTasksResponse.body.markedComplete).toBe(true);
@@ -200,8 +197,6 @@ describe("Test taskQueue controller with supertest", () => {
             expect(tasksReceived === tasksTriedToComplete).toBe(true); // testing inputs.
             // now verify that all tasks for this provider are completed.
             const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
-            // console.log(allTasksForThisProvider.body, "202rm");
-            console.log(allTasksForThisProvider.body, "209rm");
             const allTasksAreCompleted = allTasksForThisProvider.body.tasks.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!

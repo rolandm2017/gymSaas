@@ -30,7 +30,6 @@ class GymService {
         // TODO: refuse query if query was done within the past 24 hours (before making it to this method)
         let gyms: IGym[] = [];
         // initial request
-        console.log(this.googlePlacesAPI, "32rm");
         const request: string = this.googlePlacesAPI.embedLocation(country, state, city);
         let response: AxiosResponse<any, any> = await this.googlePlacesAPI.requestGyms(request);
         const results: IGym[] = this.convertJSONToGyms(response.data.results);
@@ -40,7 +39,6 @@ class GymService {
         // gather future responses
         let counter = 0;
         let nextPageToken = firstNextPgToken;
-        console.log(nextPageToken, counter, "24rm");
         await new Promise(r => setTimeout(r, 2000));
         // const TEMP_LIMIT_FOR_DEVELOPMENT = 5;
         while (nextPageToken) {
@@ -64,7 +62,6 @@ class GymService {
     private convertJSONToGyms(gyms: any[]): IGym[] {
         const output: IGym[] = [];
         for (let i = 0; i < gyms.length; i++) {
-            console.log(gyms[i], "62rm");
             const gym: IGym = gyms[i] as IGym;
             gym.lat = gym.geometry.location.lat;
             gym.long = gym.geometry.location.lng;

@@ -4,12 +4,12 @@ import AccountDAO from "../database/dao/account.dao";
 
 class EmailService {
     private emailSender: Function;
-    private testingMode: boolean | undefined;
+    private testingMode: boolean;
     public emailSenderReached: Function = (a: any) => {};
 
-    constructor(emailSender: Function, testing?: string) {
+    constructor(emailSender: Function, mode: "testing" | "production" | "development") {
         this.emailSender = emailSender;
-        this.testingMode = testing === "testing"; // safeguard to prevent accidentally setting to testing mode
+        this.testingMode = mode === "testing"; // safeguard to prevent accidentally setting to testing mode
     }
 
     public async sendVerificationEmail(account: IAccount, origin: string) {

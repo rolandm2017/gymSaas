@@ -58,7 +58,6 @@ class HousingController {
             return errorResponse(response, "all inputs must be string integers");
         }
         console.log("sml #, big ####", swLat, neLat);
-        console.log("sml negative #, bigger negative #", swLong, neLong, "59rm");
         const demoContent = await this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
         return response.status(200).json({ demoContent });
     }
@@ -73,7 +72,6 @@ class HousingController {
             }
             const validProviderInput = Object.values(ProviderEnum).some(name => name === providerInput);
             if (!validProviderInput) return errorResponse(response, "InvalId provider input");
-            console.log(city, stateOrProvince, "46rm");
             const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(ProviderEnum.rentCanada, city, stateOrProvince); // todo: advance from hardcode provider choice
             return response.status(200).json(dimensions);
         } catch {

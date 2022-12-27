@@ -81,7 +81,6 @@ class AdminController {
         const cityIdIsNaN = isNaN(cityId);
         const batchNumIsNaN = isNaN(batchNum);
         if (cityIdIsNaN || batchNumIsNaN) return errorResponse(response, "cityId and batchNum must be int");
-        console.log(cityId, batchNum, "83rm");
         if (!cityId || !batchNum) return errorResponse(response, "must provide both cityId and batchNum");
         const aps: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(cityId, batchNum);
         return response.status(200).json({ apartments: aps });

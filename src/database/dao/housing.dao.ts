@@ -73,7 +73,6 @@ class HousingDAO {
 
     public getApartmentsByLocation = async (cityName: string | undefined) => {
         const city: City | null = cityName ? await this.cityDAO.getCityByName(cityName) : null;
-        console.log(city?.cityId, "67rm");
         if (city === null) return [];
         return await Housing.findAll({ where: { cityId: city.cityId } });
     };

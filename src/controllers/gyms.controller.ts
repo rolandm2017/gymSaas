@@ -41,7 +41,6 @@ class GymsController {
 
     async getSavedGymsFromDB(request: Request, response: Response) {
         const cityName = request.query.cityName;
-        console.log(cityName, "43rm");
         if (typeof cityName !== "string") {
             return errorResponse(response, "cityName must be string");
         }

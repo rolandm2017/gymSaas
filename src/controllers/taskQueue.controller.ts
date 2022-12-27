@@ -58,7 +58,6 @@ class TaskQueueController {
     }
 
     async getNextBatchNumber(request: Request, response: Response) {
-        console.log("30rm");
         const highest = await this.cacheService.getBatchNumForNewBatches();
         if (typeof highest === "number" && highest >= 0) return response.status(200).json({ nextBatchNum: highest });
         // so this only happens once
@@ -81,7 +80,6 @@ class TaskQueueController {
         const zoomWidth = request.body.zoomWidth;
         const cityName = request.body.cityName;
         const batchNum = request.body.batchNum; // admin should have gotten this from the previous endpoint
-        // console.log(request.body, "40rm");
         if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
             return errorResponse(response, "Invalid provider input");
         }
@@ -98,7 +96,6 @@ class TaskQueueController {
         if (!legitCityName) return errorResponse(response, "cityName was not legit");
 
         const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, cityName, batchNum);
-        // console.log(queued, "54rm");
         return response.status(200).json({ queued: queued });
     }
 

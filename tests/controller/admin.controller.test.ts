@@ -38,7 +38,7 @@ beforeAll(() => {
 
     // service
     adminService = new AdminService(accountDAO);
-    taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO, cacheService);
+    taskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);
     housingService = new HousingService(housingDAO, gymDAO, cacheService);
 
     controller = new AdminController(adminService, taskQueueService, housingService);

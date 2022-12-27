@@ -36,7 +36,7 @@ class TaskDAO {
 
     public getHighestBatchNum = async () => {
         try {
-            return await Task.findOne({ order: [["batch", "DESC"]] }); // fixme: shouldnt this be "batchId"?
+            return await Task.findOne({ order: [["batchId", "DESC"]] }); // fixme: shouldnt this be "batchId"?
         } catch (err) {
             console.log(err);
             throw err;
@@ -64,7 +64,6 @@ class TaskDAO {
 
     public getTasksByBatchNum = async (batchNum: number) => {
         try {
-            console.log(batchNum, "50rm");
             return await Task.findAll({ where: { batchId: batchNum } });
         } catch (err) {
             console.log(err);
@@ -85,7 +84,6 @@ class TaskDAO {
             } else {
                 conditions = { providerName: provider };
             }
-            console.log("conditions", conditions, "44rm");
             return await Task.findAll({
                 limit: 1,
                 where: conditions,
