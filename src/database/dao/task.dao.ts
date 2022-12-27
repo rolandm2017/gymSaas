@@ -26,7 +26,12 @@ class TaskDAO {
     };
 
     public getTaskById = (id: number) => {
-        return Task.findByPk(id);
+        try {
+            return Task.findByPk(id);
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
     };
 
     public getHighestBatchNum = () => {
@@ -73,16 +78,21 @@ class TaskDAO {
     };
 
     public getAllUnfinishedTasksForProvider = (provider: ProviderEnum, batchNum?: number) => {
-        let conditions;
-        if (batchNum) {
-            conditions = { providerName: provider, lastScan: null, batchId: batchNum };
-        } else {
-            conditions = { providerName: provider, lastScan: null };
+        try {
+            let conditions;
+            if (batchNum) {
+                conditions = { providerName: provider, lastScan: null, batchId: batchNum };
+            } else {
+                conditions = { providerName: provider, lastScan: null };
+            }
+            return Task.findAll({
+                where: conditions,
+                order: [["createdAt", "DESC"]],
+            });
+        } catch (err) {
+            console.log(err);
+            throw err;
         }
-        return Task.findAll({
-            where: conditions,
-            order: [["createdAt", "DESC"]],
-        });
     };
 
     public getAllTasks = (providerName?: ProviderEnum, batchId?: number, cityId?: number) => {
@@ -109,12 +119,22 @@ class TaskDAO {
     };
 
     public updateTask = (task: TaskCreationAttributes, id: number) => {
-        return Task.update(task, { where: { taskId: id } });
+        try {
+            return Task.update(task, { where: { taskId: id } });
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
     };
 
     public updateLastScanDate = (t: Task, scanDate: Date) => {
-        t.lastScan = scanDate;
-        t.save();
+        try {
+            t.lastScan = scanDate;
+            t.save();
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
     };
 
     public deleteTask = (taskId: number) => {

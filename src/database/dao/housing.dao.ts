@@ -19,7 +19,12 @@ class HousingDAO {
     }
 
     public createHousing = (housing: HousingCreationAttributes) => {
-        return Housing.create({ ...housing });
+        try {
+            return Housing.create({ ...housing });
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
     };
 
     public countHousingsInCity = (cityId: number) => {
