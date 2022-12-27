@@ -39,9 +39,8 @@ class CacheService {
         return getAllBatchNums();
     }
 
-    public setBatchNumForNewBatches(newNum: number) {
-        setBatchNumForNewBatches(newNum, this.batchDAO);
-        return true;
+    public setBatchNumForNewBatches(newNum: number): Promise<number[]> {
+        return setBatchNumForNewBatches(newNum, this.batchDAO);
     }
 
     public addBatchNumIfNotExists(newNum: number): Promise<number[]> {

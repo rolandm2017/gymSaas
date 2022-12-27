@@ -8,6 +8,7 @@ class CityDAO {
             return City.create(city);
         } catch (err) {
             console.log(err);
+            throw err;
         }
     };
 

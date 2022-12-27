@@ -64,9 +64,6 @@ beforeAll(async () => {
     console.log(adminJWT, " admin JWT");
     // create batch nums to be used
     const batchDAO = new BatchDAO();
-    await batchDAO.addBatchNum(firstBatch);
-    await batchDAO.addBatchNum(secondBatch);
-    await batchDAO.addBatchNum(thirdBatch);
     // batch num is initially 0
     // create tasks for this batch number
     const tasks = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
@@ -123,63 +120,63 @@ describe("Test admin controller with supertest", () => {
             const response = await request(server).get("/admin" + HealthCheck.healthCheck);
             expect(response.body.message).toBe("active");
         });
-        // test("Get all batch numbers", async () => {
-        //     const response = await request(server)
-        //         .get("/admin/batches/all")
-        //         .set("Authorization", "Bearer " + adminJWT);
-        //     expect(response.body.batchNums.length).toBe(3); // because batchNums 0, 1 and 2 were used
-        // });
-        // test("Get all tasks", async () => {
-        //     const response = await request(server)
-        //         .get("/admin/task_queue/all")
-        //         .set("Authorization", "Bearer " + adminJWT);
-        //     expect(response.body.tasks.length).toBe(testTasks.flat().length);
-        // });
-        // test("Get housing by location", async () => {
-        //     const cityName = "Montreal";
-        //     // const stateName = "Quebec"; // i dont think it matters
-        //     const response = await request(server)
-        //         .get(`/admin/housing/by_location?cityName=${cityName}`)
-        //         .set("Authorization", "Bearer " + adminJWT);
-        //     expect(response.body.apartments.length).toBe(
-        //         [smlCanada.results.listings, smlFaster.results.listings, smlSeeker.results.hits].flat().length,
-        //     );
-        // });
-        // test("Get housing by city id and batch num", async () => {
-        //     let cityId = findingsPayload2.cityId;
-        //     let batchNum = findingsPayload2.batchNum;
-        //     const response = await request(server)
-        //         .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
-        //         .set("Authorization", "Bearer " + adminJWT);
-        //     expect(response.body.apartments.length).toBe(findingsPayload2.apartments.listings.length); // used in payload findingsPayload2
-        //     cityId = findingsPayload3.cityId; // is the same as before
-        //     batchNum = findingsPayload3.batchNum;
-        //     const response2 = await request(server)
-        //         .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
-        //         .set("Authorization", "Bearer " + adminJWT);
-        //     expect(response2.body.apartments.length).toBe(findingsPayload3.apartments.hits.length); // used in payload findingsPayload3
-        // });
+        test("Get all batch numbers", async () => {
+            const response = await request(server)
+                .get("/admin/batches/all")
+                .set("Authorization", "Bearer " + adminJWT);
+            expect(response.body.batchNums.length).toBe(3); // because batchNums 0, 1 and 2 were used
+        });
+        test("Get all tasks", async () => {
+            const response = await request(server)
+                .get("/admin/task_queue/all")
+                .set("Authorization", "Bearer " + adminJWT);
+            expect(response.body.tasks.length).toBe(testTasks.flat().length);
+        });
+        test("Get housing by location", async () => {
+            const cityName = "Montreal";
+            // const stateName = "Quebec"; // i dont think it matters
+            const response = await request(server)
+                .get(`/admin/housing/by_location?cityName=${cityName}`)
+                .set("Authorization", "Bearer " + adminJWT);
+            expect(response.body.apartments.length).toBe(
+                [smlCanada.results.listings, smlFaster.results.listings, smlSeeker.results.hits].flat().length,
+            );
+        });
+        test("Get housing by city id and batch num", async () => {
+            let cityId = findingsPayload2.cityId;
+            let batchNum = findingsPayload2.batchNum;
+            const response = await request(server)
+                .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
+                .set("Authorization", "Bearer " + adminJWT);
+            expect(response.body.apartments.length).toBe(findingsPayload2.apartments.listings.length); // used in payload findingsPayload2
+            cityId = findingsPayload3.cityId; // is the same as before
+            batchNum = findingsPayload3.batchNum;
+            const response2 = await request(server)
+                .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
+                .set("Authorization", "Bearer " + adminJWT);
+            expect(response2.body.apartments.length).toBe(findingsPayload3.apartments.hits.length); // used in payload findingsPayload3
+        });
     });
-    // describe("we can't bypass admin authorization", () => {
-    //     test("undefined jwt payload", async () => {
-    //         //
-    //         const response = await request(server).get("/admin/task_queue/all");
-    //         // .set("Authorization", "bearer " + ""); // undefined!
-    //         expect(response.body.message).toBe("Unauthorized");
-    //     });
-    //     test("empty string jwt payload", async () => {
-    //         //
-    //         const response = await request(server)
-    //             .get("/admin/task_queue/all")
-    //             .set("Authorization", "bearer " + "");
-    //         expect(response.body.message).toBe("Unauthorized");
-    //     });
-    //     test("unexpected inputs jwt payload", async () => {
-    //         //
-    //         const response = await request(server)
-    //             .get("/admin/task_queue/all")
-    //             .set("Authorization", "bearer " + "$#$#$#$#$@$#))(");
-    //         expect(response.body.message).toBe("Unauthorized");
-    //     });
-    // });
+    describe("we can't bypass admin authorization", () => {
+        test("undefined jwt payload", async () => {
+            //
+            const response = await request(server).get("/admin/task_queue/all");
+            // .set("Authorization", "bearer " + ""); // undefined!
+            expect(response.body.message).toBe("Unauthorized");
+        });
+        test("empty string jwt payload", async () => {
+            //
+            const response = await request(server)
+                .get("/admin/task_queue/all")
+                .set("Authorization", "bearer " + "");
+            expect(response.body.message).toBe("Unauthorized");
+        });
+        test("unexpected inputs jwt payload", async () => {
+            //
+            const response = await request(server)
+                .get("/admin/task_queue/all")
+                .set("Authorization", "bearer " + "$#$#$#$#$@$#))(");
+            expect(response.body.message).toBe("Unauthorized");
+        });
+    });
 });

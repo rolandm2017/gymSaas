@@ -21,19 +21,18 @@ export async function getBatchNumForNewBatches(batchDAO: BatchDAO): Promise<numb
 }
 
 export async function setBatchNumForNewBatches(newNum: number, batchDAO: BatchDAO): Promise<number[]> {
-    const newNumIsLowerThanHighest = _usedBatchNumbers[_usedBatchNumbers.length - 1] > newNum;
-    if (newNumIsLowerThanHighest) return []; // was previously throw new Error("Can't decrease batch num")
     _usedBatchNumbers.push(newNum);
     await batchDAO.addBatchNum(newNum);
-    return _usedBatchNumbers; // return value is returned for inspection
+    return _usedBatchNumbers; // cache is returned for inspection
 }
 
 export async function addBatchNumIfNotExists(newNum: number, batchDAO: BatchDAO): Promise<number[]> {
     const exists = _usedBatchNumbers.includes(newNum);
-    if (exists) return []; // its already in the cache? do nothing!
-    else {
-        const _usedBatchNumbers = await setBatchNumForNewBatches(newNum, batchDAO);
-        return [..._usedBatchNumbers]; // return value is returned for inspection
+    if (exists || _isTooLow(newNum)) {
+        return [..._usedBatchNumbers]; // its already in the cache? return it.
+    } else {
+        const _updatedBatchNums = await setBatchNumForNewBatches(newNum, batchDAO);
+        return [..._updatedBatchNums]; // cache is returned for inspection
     }
 }
 
@@ -47,4 +46,9 @@ export function getAllBatchNums() {
 
 export function resetBatchCache() {
     _usedBatchNumbers = [];
+}
+
+function _isTooLow(newNum: number) {
+    // was previously throw new Error("Can't decrease batch num") if condition
+    return _usedBatchNumbers[_usedBatchNumbers.length - 1] > newNum;
 }

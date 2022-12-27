@@ -89,42 +89,52 @@ class App {
     public async connectDB() {
         if (this.dbConnOpen) return;
 
-        App.initDB();
-        await App.Database.authenticate();
-        // console.log("Database Connection Established");
-        await App.Database.drop();
-        await initModels(App.Database);
-        await App.Database.sync({ force: true });
-        await this.seedDb();
-        // restore cache of batch ids from db
-        const batchDAO = new BatchDAO();
-        const cityDAO = new CityDAO();
-        const cacheService = new CacheService(cityDAO, batchDAO);
-        cacheService.initBatchCache();
+        try {
+            App.initDB();
+            await App.Database.authenticate();
+            // console.log("Database Connection Established");
+            await App.Database.drop();
+            await initModels(App.Database);
+            await App.Database.sync({ force: true });
+            await this.seedDb();
+            // restore cache of batch ids from db
+            const batchDAO = new BatchDAO();
+            const cityDAO = new CityDAO();
+            const cacheService = new CacheService(cityDAO, batchDAO);
+            cacheService.initBatchCache();
 
-        // console.log("Database Sync");
-        this.dbConnOpen = true;
+            // console.log("Database Sync");
+            this.dbConnOpen = true;
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
     }
 
     public async dropTable(tableName: "account" | "resetToken" | "task" | "city" | "housing" | "batch"): Promise<void> {
         // await table.sync({ force: true })
-        if (tableName === "account") {
-            await Account.destroy({ where: {} });
-        }
-        if (tableName === "resetToken") {
-            await ResetToken.destroy({ where: {} });
-        }
-        if (tableName === "task") {
-            await Task.destroy({ where: {} });
-        }
-        if (tableName === "city") {
-            await City.destroy({ where: {} });
-        }
-        if (tableName === "housing") {
-            await Housing.destroy({ where: {} });
-        }
-        if (tableName === "batch") {
-            await Batch.destroy({ where: {} });
+        try {
+            if (tableName === "account") {
+                await Account.destroy({ where: {} });
+            }
+            if (tableName === "resetToken") {
+                await ResetToken.destroy({ where: {} });
+            }
+            if (tableName === "task") {
+                await Task.destroy({ where: {} });
+            }
+            if (tableName === "city") {
+                await City.destroy({ where: {} });
+            }
+            if (tableName === "housing") {
+                await Housing.destroy({ where: {} });
+            }
+            if (tableName === "batch") {
+                await Batch.destroy({ where: {} });
+            }
+        } catch (err) {
+            console.log(err);
+            throw err;
         }
     }
 

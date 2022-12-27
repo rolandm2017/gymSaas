@@ -22,7 +22,7 @@ export class Batch extends Model<BatchAttributes, BatchCreationAttributes> imple
                     type: DataTypes.INTEGER,
                     autoIncrement: false,
                     primaryKey: true,
-                    unique: true, // important! no duplicate batch numbers
+                    unique: true, // no duplicate batch numbers
                 },
             },
             {

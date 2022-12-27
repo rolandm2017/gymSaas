@@ -58,9 +58,22 @@ describe("test the cache service", () => {
             expect(all[2]).toEqual(numsToAdd[2]);
             expect(all[3]).toEqual(numsToAdd[3]);
         });
-        test("", async () => {
-            // todo
-            await cacheService.setBatchNumForNewBatches;
+        test("setBatchNumForNewBatches adds a new num to the cache if it is higher than the last one", async () => {
+            // arrange, act
+            const cache = await cacheService.setBatchNumForNewBatches(15);
+            const cache2 = await cacheService.setBatchNumForNewBatches(16);
+            const cache3 = await cacheService.setBatchNumForNewBatches(17);
+            const cache4 = await cacheService.setBatchNumForNewBatches(21);
+            const allBatchNums = await batchDAO.getAllBatchNums();
+            // assert
+            expect(cache4[0]).toBe(15);
+            expect(cache4[1]).toBe(16);
+            expect(cache4[2]).toBe(17);
+            expect(cache4[3]).toBe(21);
+            expect(allBatchNums.includes(15)).toBe(true);
+            expect(allBatchNums.includes(16)).toBe(true);
+            expect(allBatchNums.includes(17)).toBe(true);
+            expect(allBatchNums.includes(21)).toBe(true);
         });
         test("addBatchNumIfNotExists works correctly", async () => {
             // arrange, act

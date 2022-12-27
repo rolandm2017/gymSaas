@@ -32,7 +32,9 @@ class TaskQueueService {
         cityName: string,
         batchNum: number,
     ): Promise<{ pass: number; fail: number; batchNum: number }> {
-        await this.cacheService.addBatchNumIfNotExists(batchNum);
+        console.log("adding ", batchNum, "to cache");
+        const cachedNums = await this.cacheService.addBatchNumIfNotExists(batchNum);
+        console.log(cachedNums, "37rm");
 
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
