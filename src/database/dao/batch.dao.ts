@@ -3,7 +3,7 @@ import { Batch } from "../models/Batch";
 class BatchDAO {
     constructor() {}
 
-    public addBatchNum = async (newBatchNum?: number) => {
+    public addBatchNum = async (newBatchNum?: number): Promise<Batch> => {
         try {
             if (newBatchNum !== undefined) {
                 return await Batch.create({ batchId: newBatchNum });
@@ -17,7 +17,7 @@ class BatchDAO {
         }
     };
 
-    public getHighestBatchNum = async () => {
+    public getHighestBatchNum = async (): Promise<number | null> => {
         try {
             const batches = await Batch.findAll({ where: {}, order: [["batchId", "DESC"]], limit: 1 });
             if (batches.length === 0) return null;
@@ -28,7 +28,7 @@ class BatchDAO {
         }
     };
 
-    public getAllBatchNums = async () => {
+    public getAllBatchNums = async (): Promise<number[]> => {
         try {
             const batches = await Batch.findAll({});
             const justNums: number[] = batches.map(b => b.batchId);

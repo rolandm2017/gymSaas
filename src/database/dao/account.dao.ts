@@ -6,29 +6,30 @@ import { RefreshToken } from "../models/RefreshToken";
 class AccountDAO {
     constructor() {}
 
-    public createAccount = async (account: AccountCreationAttributes) => {
+    public createAccount = async (account: AccountCreationAttributes): Promise<Account> => {
         const isReallyEmail = isEmail(account.email);
         if (!isReallyEmail) throw new Error("Email field wasn't an email");
         const created: Account = await Account.create(account);
         return created;
     };
 
-    public createAdmin = async (email: string) => {
-        return await Account.update({ role: Role.Admin }, { where: { email } });
+    public createAdmin = async (email: string): Promise<number> => {
+        const affected = await Account.update({ role: Role.Admin }, { where: { email } });
+        return affected[0];
     };
 
-    public countAdmins = async () => {
-        const accounts = await Account.findAll({ where: { role: Role.Admin } });
-        return accounts.length;
+    public countAdmins = async (): Promise<number> => {
+        const accounts = await Account.findAndCountAll({ where: { role: Role.Admin } });
+        return accounts.count;
     };
 
-    public findAllAccounts = () => {
+    public findAllAccounts = async (): Promise<Account[]> => {
         // 'find' instead of 'get' because 'getAllAccounts' is taken
-        return Account.findAll();
+        return await Account.findAll();
     };
 
-    public findAllAccountsWithTokens = () => {
-        return Account.findAll({ include: "their_refresh_tokens" });
+    public findAllAccountsWithTokens = async (): Promise<Account[]> => {
+        return await Account.findAll({ include: "their_refresh_tokens" });
     };
 
     public getMultipleAccounts = async (limit: number, offset?: number): Promise<{ rows: Account[]; count: number }> => {
@@ -39,11 +40,11 @@ class AccountDAO {
         return accts;
     };
 
-    public getAccountById = (id: number) => {
-        return Account.findByPk(id);
+    public getAccountById = async (id: number): Promise<Account | null> => {
+        return await Account.findByPk(id);
     };
 
-    public getAccountByEmail = async (email: string) => {
+    public getAccountByEmail = async (email: string): Promise<Account[]> => {
         const isReallyEmail = isEmail(email);
         if (!isReallyEmail) throw new Error("Email field wasn't an email");
         const acct: Account[] = await Account.findAll({
@@ -52,27 +53,30 @@ class AccountDAO {
         return acct;
     };
 
-    public getAccountByRefreshToken = (token: RefreshToken) => {
-        return Account.findAll({
+    public getAccountByRefreshToken = async (token: RefreshToken): Promise<Account[]> => {
+        return await Account.findAll({
             where: { acctId: token.token },
             include: "their_refresh_tokens",
         });
     };
 
-    public getAccountByVerificationToken = (token: string) => {
-        return Account.findOne({ where: { verificationToken: token } });
+    public getAccountByVerificationToken = async (token: string): Promise<Account | null> => {
+        return await Account.findOne({ where: { verificationToken: token } });
     };
 
-    public banUser = async (userId: number) => {
-        return await Account.update({ isBanned: true }, { where: { acctId: userId } });
+    public banUser = async (userId: number): Promise<number> => {
+        const affected = await Account.update({ isBanned: true }, { where: { acctId: userId } });
+        return affected[0];
     };
 
-    public updateAccount = (account: AccountCreationAttributes, id: number) => {
-        return Account.update(account, { where: { acctId: id } });
+    public updateAccount = async (account: AccountCreationAttributes, id: number): Promise<number> => {
+        const affected = await Account.update(account, { where: { acctId: id } });
+        return affected[0];
     };
 
-    public deleteAccount = (id: number) => {
-        return Account.destroy({ where: { acctId: id } });
+    public deleteAccount = async (id: number): Promise<number> => {
+        const affected = await Account.destroy({ where: { acctId: id } });
+        return affected;
     };
 }
 
