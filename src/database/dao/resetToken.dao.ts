@@ -15,16 +15,16 @@ class ResetTokenDAO {
         const acct = await this.acctDAO.getAccountByEmail(email);
         return await ResetToken.findOne({ where: { acctId: acct[0].acctId } });
     };
-    public getResetTokenByToken = (token: string) => {
-        return ResetToken.findOne({
+    public getResetTokenByToken = async (token: string) => {
+        return await ResetToken.findOne({
             where: {
                 token,
             },
         });
     };
 
-    public getAllResetTokensForAccount = (accountId: number) => {
-        return ResetToken.findAll({
+    public getAllResetTokensForAccount = async (accountId: number) => {
+        return await ResetToken.findAll({
             where: {
                 acctId: accountId,
             },
@@ -35,12 +35,12 @@ class ResetTokenDAO {
         return await ResetToken.findAll({ where: {} });
     };
 
-    public deleteResetTokenById = (tokenId: number) => {
-        return ResetToken.destroy({ where: { tokenId: tokenId } });
+    public deleteResetTokenById = async (tokenId: number) => {
+        return await ResetToken.destroy({ where: { tokenId: tokenId } });
     };
 
-    public deleteResetTokenByModel = (resetToken: ResetToken) => {
-        return resetToken.destroy();
+    public deleteResetTokenByModel = async (resetToken: ResetToken) => {
+        return await resetToken.destroy();
     };
 }
 

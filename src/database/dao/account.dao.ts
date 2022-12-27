@@ -31,7 +31,7 @@ class AccountDAO {
         return Account.findAll({ include: "their_refresh_tokens" });
     };
 
-    public getMultipleAccounts = async (limit: number, offset?: number) => {
+    public getMultipleAccounts = async (limit: number, offset?: number): Promise<{ rows: Account[]; count: number }> => {
         const accts: {
             rows: Account[];
             count: number;

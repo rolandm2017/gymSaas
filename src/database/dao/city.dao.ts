@@ -3,41 +3,42 @@ import { City, CityCreationAttributes } from "../models/City";
 class CityDAO {
     constructor() {}
 
-    public createCity = (city: CityCreationAttributes) => {
+    public createCity = async (city: CityCreationAttributes): Promise<City> => {
         try {
-            return City.create(city);
+            return await City.create(city);
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public getAllCities = async () => {
+    public getAllCities = async (): Promise<City[]> => {
         return await City.findAll({});
     };
 
-    public getMultipleCities = (limit: number, offset?: number) => {
-        return City.findAndCountAll({ offset, limit });
+    public getMultipleCities = async (limit: number, offset?: number): Promise<{ rows: City[]; count: number }> => {
+        return await City.findAndCountAll({ offset, limit });
     };
 
-    public getCityById = (id: number) => {
-        return City.findByPk(id);
+    public getCityById = async (id: number): Promise<City | null> => {
+        return await City.findByPk(id);
     };
 
-    public getCityByName = (cityName: string) => {
-        return City.findOne({
+    public getCityByName = async (cityName: string): Promise<City | null> => {
+        return await City.findOne({
             where: {
                 cityName: cityName,
             },
         });
     };
 
-    public updateCity = (city: CityCreationAttributes, id: number) => {
-        return City.update(city, { where: { cityId: id } });
+    public updateCity = async (city: CityCreationAttributes, id: number): Promise<number> => {
+        const affected = await City.update(city, { where: { cityId: id } });
+        return affected[0];
     };
 
-    public deleteCity = (id: number) => {
-        return City.destroy({ where: { cityId: id } });
+    public deleteCity = async (id: number): Promise<number> => {
+        return await City.destroy({ where: { cityId: id } });
     };
 }
 

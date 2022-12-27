@@ -7,43 +7,43 @@ import { Task, TaskCreationAttributes } from "../models/Task";
 class TaskDAO {
     constructor() {}
 
-    public createTask = (task: TaskCreationAttributes) => {
+    public createTask = async (task: TaskCreationAttributes) => {
         try {
-            return Task.create(task);
+            return await Task.create(task);
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public getMultipleTasks = (limit: number, offset?: number) => {
+    public getMultipleTasks = async (limit: number, offset?: number): Promise<{ rows: Task[]; count: number }> => {
         try {
-            return Task.findAndCountAll({ offset, limit });
+            return await Task.findAndCountAll({ offset, limit });
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public getTaskById = (id: number) => {
+    public getTaskById = async (id: number) => {
         try {
-            return Task.findByPk(id);
+            return await Task.findByPk(id);
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public getHighestBatchNum = () => {
+    public getHighestBatchNum = async () => {
         try {
-            return Task.findOne({ order: [["batch", "DESC"]] }); // fixme: shouldnt this be "batchId"?
+            return await Task.findOne({ order: [["batch", "DESC"]] }); // fixme: shouldnt this be "batchId"?
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public getMostRecentTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
+    public getMostRecentTaskForProvider = async (provider: ProviderEnum, batchNum?: number) => {
         try {
             let conditions;
             if (batchNum) {
@@ -51,7 +51,7 @@ class TaskDAO {
             } else {
                 conditions = { providerName: provider };
             }
-            return Task.findAll({
+            return await Task.findAll({
                 limit: 1,
                 where: conditions,
                 order: [["createdAt", "DESC"]],
@@ -62,10 +62,10 @@ class TaskDAO {
         }
     };
 
-    public getTasksByBatchNum = (batchNum: number) => {
+    public getTasksByBatchNum = async (batchNum: number) => {
         try {
             console.log(batchNum, "50rm");
-            return Task.findAll({ where: { batchId: batchNum } });
+            return await Task.findAll({ where: { batchId: batchNum } });
         } catch (err) {
             console.log(err);
             throw err;
@@ -77,7 +77,7 @@ class TaskDAO {
     //     return Task.bulkCreate(tasks);
     // };
 
-    public getNextUnfinishedTaskForProvider = (provider: ProviderEnum, batchNum?: number) => {
+    public getNextUnfinishedTaskForProvider = async (provider: ProviderEnum, batchNum?: number) => {
         try {
             let conditions;
             if (batchNum) {
@@ -86,7 +86,7 @@ class TaskDAO {
                 conditions = { providerName: provider };
             }
             console.log("conditions", conditions, "44rm");
-            return Task.findAll({
+            return await Task.findAll({
                 limit: 1,
                 where: conditions,
                 order: [["createdAt", "DESC"]],
@@ -97,7 +97,7 @@ class TaskDAO {
         }
     };
 
-    public getAllUnfinishedTasksForProvider = (provider: ProviderEnum, batchNum?: number) => {
+    public getAllUnfinishedTasksForProvider = async (provider: ProviderEnum, batchNum?: number) => {
         try {
             let conditions;
             if (batchNum) {
@@ -105,7 +105,7 @@ class TaskDAO {
             } else {
                 conditions = { providerName: provider, lastScan: null };
             }
-            return Task.findAll({
+            return await Task.findAll({
                 where: conditions,
                 order: [["createdAt", "DESC"]],
             });
@@ -115,7 +115,7 @@ class TaskDAO {
         }
     };
 
-    public getAllTasks = (providerName?: ProviderEnum, batchId?: number, cityId?: number) => {
+    public getAllTasks = async (providerName?: ProviderEnum, batchId?: number, cityId?: number) => {
         try {
             // even finished ones.
             let conditions;
@@ -136,53 +136,53 @@ class TaskDAO {
             } else {
                 conditions = {};
             }
-            return Task.findAll({ where: conditions });
+            return await Task.findAll({ where: conditions });
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public updateTask = (task: TaskCreationAttributes, id: number) => {
+    public updateTask = async (task: TaskCreationAttributes, id: number) => {
         try {
-            return Task.update(task, { where: { taskId: id } });
+            return await Task.update(task, { where: { taskId: id } });
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public updateLastScanDate = (t: Task, scanDate: Date) => {
+    public updateLastScanDate = async (task: Task, scanDate: Date): Promise<void> => {
         try {
-            t.lastScan = scanDate;
-            t.save();
+            task.lastScan = scanDate;
+            await task.save();
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public deleteTask = (taskId: number) => {
+    public deleteTask = async (taskId: number) => {
         try {
-            return Task.destroy({ where: { taskId } });
+            return await Task.destroy({ where: { taskId } });
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public deleteAll = () => {
+    public deleteAll = async () => {
         try {
-            return Task.destroy({ where: {} });
+            return await Task.destroy({ where: {} });
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public deleteTasksOlderThanTwoMonths = () => {
+    public deleteTasksOlderThanTwoMonths = async () => {
         try {
-            return Task.destroy({
+            return await Task.destroy({
                 where: {
                     createdAt: { [Op.lte]: moment().subtract(2, "months").toDate() },
                 },

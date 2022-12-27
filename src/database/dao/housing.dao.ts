@@ -18,26 +18,26 @@ class HousingDAO {
         this.cityDAO = cityDAO;
     }
 
-    public createHousing = (housing: HousingCreationAttributes) => {
+    public createHousing = async (housing: HousingCreationAttributes) => {
         try {
-            return Housing.create({ ...housing });
+            return await Housing.create({ ...housing });
         } catch (err) {
             console.log(err);
             throw err;
         }
     };
 
-    public countHousingsInCity = (cityId: number) => {
-        return Housing.count({ where: { cityId } });
+    public countHousingsInCity = async (cityId: number) => {
+        return await Housing.count({ where: { cityId } });
     };
 
-    public getMultipleHousings = async (limit?: number, offset?: number) => {
+    public getMultipleHousings = async (limit?: number, offset?: number): Promise<{ rows: Housing[]; count: number }> => {
         if (limit === undefined && offset === undefined) return await Housing.findAndCountAll({ where: {} });
         return await Housing.findAndCountAll({ offset, limit });
     };
 
-    public getHousingById = (id: number) => {
-        return Housing.findByPk(id);
+    public getHousingById = async (id: number) => {
+        return await Housing.findByPk(id);
     };
 
     public getAllHousing = async (cityId?: number, cityName?: string, stateOrProvince?: string) => {
@@ -73,13 +73,8 @@ class HousingDAO {
 
     public getApartmentsByLocation = async (cityName: string | undefined) => {
         const city: City | null = cityName ? await this.cityDAO.getCityByName(cityName) : null;
-        // const state: State | null = stateName ? await this.stateDAO.getStateByName(stateName) : null; // yagni
         console.log(city?.cityId, "67rm");
         if (city === null) return [];
-        // if (state === null && city === null) return [];
-        // if (city && state === null) return await Housing.findAll({ where: { cityId: city.cityId } });
-        // if (city === null && state) return await Housing.findAll({ where: { stateId: state.stateId } });
-        // if (city === null || state === null) return []; // appeasing typescript, neither is null at this point
         return await Housing.findAll({ where: { cityId: city.cityId } });
     };
 
@@ -97,8 +92,8 @@ class HousingDAO {
     };
 
     // update section
-    public updateHousing = (housing: HousingCreationAttributes, housingId: number) => {
-        return Housing.update(housing, { where: { housingId } });
+    public updateHousing = async (housing: HousingCreationAttributes, housingId: number) => {
+        return await Housing.update(housing, { where: { housingId } });
     };
 
     public markQualified = async (
@@ -135,12 +130,12 @@ class HousingDAO {
         });
     };
 
-    public deleteHousingByHousingId = (housingId: number) => {
-        return Housing.destroy({ where: { housingId } });
+    public deleteHousingByHousingId = async (housingId: number) => {
+        return await Housing.destroy({ where: { housingId } });
     };
 
-    public deleteAllHousing = () => {
-        return Housing.destroy({ where: {} });
+    public deleteAllHousing = async () => {
+        return await Housing.destroy({ where: {} });
     };
 }
 

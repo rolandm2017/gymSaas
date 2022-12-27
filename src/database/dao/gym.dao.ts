@@ -15,7 +15,7 @@ class GymDAO {
         return await Gym.findAll({ where: { cityId: null } });
     };
 
-    getMultipleGyms = async (cityName: string, limit?: number, offset?: number) => {
+    getMultipleGyms = async (cityName: string, limit?: number, offset?: number): Promise<{ rows: Gym[]; count: number }> => {
         return await Gym.findAndCountAll({ where: { cityName }, limit, offset });
     };
 
@@ -24,10 +24,10 @@ class GymDAO {
     };
 
     // update
-    addCityIdToGyms = async (entriesToCorrect: Gym[], missingCityId: number) => {
+    addCityIdToGyms = async (entriesToCorrect: Gym[], missingCityId: number): Promise<number> => {
         const gymIdsToCorrect = entriesToCorrect.map(gym => gym.gymId);
         const updatedGyms = await Gym.update({ cityId: missingCityId }, { where: { gymId: gymIdsToCorrect } });
-        return updatedGyms;
+        return updatedGyms[0];
     };
 
     deleteAllGyms = async () => {

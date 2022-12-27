@@ -12,24 +12,24 @@ class RefreshTokenDAO {
         return rt;
     };
 
-    public getRefreshTokenById = (tokenId: number) => {
-        return RefreshToken.findOne({
+    public getRefreshTokenById = async (tokenId: number) => {
+        return await RefreshToken.findOne({
             where: {
                 tokenId: tokenId,
             },
         });
     };
 
-    public getRefreshTokenByTokenString = (tokenString: string) => {
-        return RefreshToken.findOne({
+    public getRefreshTokenByTokenString = async (tokenString: string) => {
+        return await RefreshToken.findOne({
             where: {
                 token: tokenString,
             },
         });
     };
 
-    public getAllRefreshTokensForAccount = (accountId: number) => {
-        return RefreshToken.findAll({
+    public getAllRefreshTokensForAccount = async (accountId: number) => {
+        return await RefreshToken.findAll({
             where: { acctId: accountId },
             include: "belongs_to_user",
         });
