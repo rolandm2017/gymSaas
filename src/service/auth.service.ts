@@ -18,9 +18,9 @@ class AuthService {
     private accountDAO: AccountDAO;
     private resetTokenDAO: ResetTokenDAO;
     private emailService: EmailService;
-    constructor(e: EmailService, a: AccountUtil, accountDAO: AccountDAO, resetTokenDAO: ResetTokenDAO) {
-        this.emailService = e;
-        this.accountUtil = a;
+    constructor(emailService: EmailService, accountUtil: AccountUtil, accountDAO: AccountDAO, resetTokenDAO: ResetTokenDAO) {
+        this.emailService = emailService;
+        this.accountUtil = accountUtil;
         this.resetTokenDAO = resetTokenDAO;
         this.accountDAO = accountDAO;
     }

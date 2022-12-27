@@ -12,17 +12,14 @@ import HousingDAO from "../database/dao/housing.dao";
 import { IHousing } from "../interface/Housing.interface";
 import { convertIHousingToCreationAttr } from "../util/housingConverter";
 import BatchDAO from "../database/dao/batch.dao";
-import { IBatch } from "../interface/Batch.interface";
 import CacheService from "./cache.service";
 
 class TaskQueueService {
-    private cityDAO: CityDAO;
     private taskDAO: TaskDAO;
     private housingDAO: HousingDAO;
     private cacheService: CacheService;
 
-    constructor(cityDAO: CityDAO, housingDAO: HousingDAO, taskDAO: TaskDAO, cacheService: CacheService) {
-        this.cityDAO = cityDAO;
+    constructor(housingDAO: HousingDAO, taskDAO: TaskDAO, cacheService: CacheService) {
         this.housingDAO = housingDAO;
         this.taskDAO = taskDAO;
         this.cacheService = cacheService;

@@ -1,4 +1,3 @@
-import { IBatch } from "../../interface/Batch.interface";
 import { Batch } from "../models/Batch";
 
 class BatchDAO {
@@ -14,23 +13,15 @@ class BatchDAO {
     };
 
     public getHighestBatchNum = async () => {
-        try {
-            const batches = await Batch.findAll({ where: {}, order: [["batchId", "DESC"]], limit: 1 });
-            if (batches.length === 0) return null;
-            return batches[0].batchId;
-        } catch (err) {
-            console.log(err);
-        }
+        const batches = await Batch.findAll({ where: {}, order: [["batchId", "DESC"]], limit: 1 });
+        if (batches.length === 0) return null;
+        return batches[0].batchId;
     };
 
     public getAllBatchNums = async () => {
         try {
             const batches = await Batch.findAll({});
-            const justNums: IBatch[] = batches.map(b => {
-                return {
-                    batchId: b.batchId,
-                };
-            });
+            const justNums: number[] = batches.map(b => b.batchId);
             return justNums;
         } catch (err) {
             console.log(err);

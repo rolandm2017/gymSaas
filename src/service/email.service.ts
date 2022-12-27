@@ -1,24 +1,20 @@
 import { IAccount } from "../interface/Account.interface";
 
-import sendEmail from "../util/sendEmail";
 import AccountDAO from "../database/dao/account.dao";
 
 class EmailService {
-    private accountDAO: AccountDAO;
-    private emailSender: any;
+    private emailSender: Function;
     private testingMode: boolean | undefined;
     public emailSenderReached: Function = (a: any) => {};
 
-    constructor(acctDAO: AccountDAO, testing?: string) {
-        this.accountDAO = acctDAO;
+    constructor(emailSender: Function, testing?: string) {
+        this.emailSender = emailSender;
         this.testingMode = testing === "testing"; // safeguard to prevent accidentally setting to testing mode
-        this.emailSender = sendEmail;
     }
 
     public async sendVerificationEmail(account: IAccount, origin: string) {
         let message;
-        if (account.verificationToken === undefined || account.verificationToken === "")
-            throw new Error("Verification token missing");
+        if (account.verificationToken === undefined || account.verificationToken === "") throw new Error("Verification token missing");
         if (origin) {
             const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
             message = `<p>Please click the below link to verify your email address:</p>

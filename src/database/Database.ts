@@ -16,6 +16,7 @@ const dbAddress = process.env.DB_ADDRESS;
 const sequelizeConnection = new Sequelize(dbName, dbUser, dbPassword, {
     host: dbHost,
     dialect: dbDriver,
+    logging: false,
 });
 
 export default sequelizeConnection;

@@ -5,10 +5,10 @@ import {
     addBatchNumIfNotExists,
     initBatchCacheFromDb,
     getAllBatchNums,
+    resetBatchCache,
 } from "../database/cache/batchNumCache";
 import CityDAO from "../database/dao/city.dao";
 import BatchDAO from "../database/dao/batch.dao";
-import { IBatch } from "../interface/Batch.interface";
 // todo
 
 class CacheService {
@@ -31,7 +31,12 @@ class CacheService {
 
     // batch num stuff
     public async getBatchNumForNewBatches() {
+        // returns highest available number.
         return await getBatchNumForNewBatches(this.batchDAO);
+    }
+
+    public async getAllBatchNums() {
+        return getAllBatchNums();
     }
 
     public setBatchNumForNewBatches(newNum: number) {
@@ -39,19 +44,18 @@ class CacheService {
         return true;
     }
 
-    public addBatchNumIfNotExists(newNum: number): Promise<number[] | undefined> {
+    public addBatchNumIfNotExists(newNum: number): Promise<number[]> {
         return addBatchNumIfNotExists(newNum, this.batchDAO);
     }
 
-    public async getAllBatchNums() {
-        return getAllBatchNums();
+    public clearBatchCache() {
+        resetBatchCache();
     }
 
     // init functions for when the server restarts
     public async initBatchCache() {
         const batchNums = await this.batchDAO.getAllBatchNums();
-        const justNums = batchNums.map((batch: IBatch) => batch.batchId);
-        initBatchCacheFromDb(justNums);
+        initBatchCacheFromDb(batchNums);
     }
 
     public async initCityIdCache(): Promise<void> {

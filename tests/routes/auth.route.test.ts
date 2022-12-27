@@ -44,7 +44,6 @@ let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 beforeAll(async () => {
     await app.connectDB();
     await app.dropTable("account");
-    // await app.dropAllTables(); // takes too long
 });
 
 afterAll(async () => {

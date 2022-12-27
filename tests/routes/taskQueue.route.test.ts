@@ -41,7 +41,6 @@ const cacheService = new CacheService(cityDAO, batchDAO);
 
 beforeAll(async () => {
     await app.connectDB();
-    // await app.dropAllTables(); // takes too long
     // await app.seedDb();
 });
 
@@ -61,69 +60,69 @@ describe("Test taskQueue controller with supertest", () => {
         const healthCheckRes = await request(server).get("/task_queue/health_check");
         expect(healthCheckRes.body.status).toBe("Online");
     });
-    test("we can get the batch number", async () => {
-        // we can get the batch number...but we have to create one first
-        // const newlyCreatedBatch = await batchDAO.addBatchNum(onlyBatchNumInSystem);
-        await cacheService.addBatchNumIfNotExists(0);
-        await cacheService.addBatchNumIfNotExists(1);
-        const targetBatchNumForTests = 2;
-        const newlyCreatedBatch = await cacheService.addBatchNumIfNotExists(targetBatchNumForTests);
-        expect(newlyCreatedBatch).toBeDefined();
-        if (newlyCreatedBatch === undefined) fail("adding if not exists should return an array, and it didn't!");
-        const currentBatchNumResponse = await request(server).get("/task_queue/next_batch_number");
-        const currentBatchNum = currentBatchNumResponse.body.nextBatchNum;
-        expect(currentBatchNum).toBe(targetBatchNumForTests);
-        batchNum = currentBatchNum; // used in the next test
-    });
-    test("retrieve queued tasks from the queue - works [integration]", async () => {
-        await app.dropTable("task");
-        // add some data so tests have sth to work with
-        const batchNumForThisTest = 1;
-        await batchDAO.addBatchNum(batchNumForThisTest);
+    // test("we can get the batch number", async () => {
+    //     // we can get the batch number...but we have to create one first
+    //     // const newlyCreatedBatch = await batchDAO.addBatchNum(onlyBatchNumInSystem);
+    //     await cacheService.addBatchNumIfNotExists(0);
+    //     await cacheService.addBatchNumIfNotExists(1);
+    //     const targetBatchNumForTests = 2;
+    //     const newlyCreatedBatch = await cacheService.addBatchNumIfNotExists(targetBatchNumForTests);
+    //     expect(newlyCreatedBatch).toBeDefined();
+    //     if (newlyCreatedBatch === undefined) fail("adding if not exists should return an array, and it didn't!");
+    //     const currentBatchNumResponse = await request(server).get("/task_queue/next_batch_number");
+    //     const currentBatchNum = currentBatchNumResponse.body.nextBatchNum;
+    //     expect(currentBatchNum).toBe(targetBatchNumForTests);
+    //     batchNum = currentBatchNum; // used in the next test
+    // });
+    // test("retrieve queued tasks from the queue - works [integration]", async () => {
+    //     await app.dropTable("task");
+    //     // add some data so tests have sth to work with
+    //     const batchNumForThisTest = 1;
+    //     await batchDAO.addBatchNum(batchNumForThisTest);
 
-        miniPayloadRentCanada.batchNum = batchNumForThisTest;
-        miniPayloadRentFaster.batchNum = batchNumForThisTest;
-        const queued = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
-        const queued2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
-        const queuedBody = queued.body;
-        const queuedBody2 = queued2.body;
-        expect(queuedBody.queued.pass).toBe(miniPayloadRentCanada.coords.length); // not the real point of the test, but, sanity
-        expect(queuedBody2.queued.pass).toBe(miniPayloadRentFaster.coords.length); // not the real point of the test, but, sanity
-        const allTasksViaEndpoint = await request(server).get("/task_queue/all");
-        expect(allTasksViaEndpoint.body.tasks.length).toEqual(miniPayloadRentCanada.coords.length + miniPayloadRentFaster.coords.length);
-    });
-    test("add tasks to the task queue - works [integration]", async () => {
-        const batchNumForThisTest = 1;
-        await batchDAO.addBatchNum(batchNumForThisTest);
+    //     miniPayloadRentCanada.batchNum = batchNumForThisTest;
+    //     miniPayloadRentFaster.batchNum = batchNumForThisTest;
+    //     const queued = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
+    //     const queued2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
+    //     const queuedBody = queued.body;
+    //     const queuedBody2 = queued2.body;
+    //     expect(queuedBody.queued.pass).toBe(miniPayloadRentCanada.coords.length); // not the real point of the test, but, sanity
+    //     expect(queuedBody2.queued.pass).toBe(miniPayloadRentFaster.coords.length); // not the real point of the test, but, sanity
+    //     const allTasksViaEndpoint = await request(server).get("/task_queue/all");
+    //     expect(allTasksViaEndpoint.body.tasks.length).toEqual(miniPayloadRentCanada.coords.length + miniPayloadRentFaster.coords.length);
+    // });
+    // test("add tasks to the task queue - works [integration]", async () => {
+    //     const batchNumForThisTest = 1;
+    //     await batchDAO.addBatchNum(batchNumForThisTest);
 
-        // 2nd payload, another provider
-        const miniPayloadRentFaster2 = {
-            provider: ProviderEnum.rentFaster,
-            cityName: CityNameEnum.montreal,
-            coords: [
-                {
-                    lat: 45.5019,
-                    long: -73.5674,
-                    index: 0,
-                },
-                {
-                    long: -73.66279309451045,
-                    lat: 45.54920096660751,
-                    index: 1,
-                },
-                {
-                    long: -73.7581861890209,
-                    lat: 45.596501933215016,
-                    index: 2,
-                },
-            ],
-            zoomWidth: 10,
-            batchNum: batchNumForThisTest,
-        };
-        const queuedScan = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster2);
-        const queuedScanBody = queuedScan.body;
-        expect(queuedScanBody.queued.pass).toBe(miniPayloadRentFaster.coords.length);
-    });
+    //     // 2nd payload, another provider
+    //     const miniPayloadRentFaster2 = {
+    //         provider: ProviderEnum.rentFaster,
+    //         cityName: CityNameEnum.montreal,
+    //         coords: [
+    //             {
+    //                 lat: 45.5019,
+    //                 long: -73.5674,
+    //                 index: 0,
+    //             },
+    //             {
+    //                 long: -73.66279309451045,
+    //                 lat: 45.54920096660751,
+    //                 index: 1,
+    //             },
+    //             {
+    //                 long: -73.7581861890209,
+    //                 lat: 45.596501933215016,
+    //                 index: 2,
+    //             },
+    //         ],
+    //         zoomWidth: 10,
+    //         batchNum: batchNumForThisTest,
+    //     };
+    //     const queuedScan = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster2);
+    //     const queuedScanBody = queuedScan.body;
+    //     expect(queuedScanBody.queued.pass).toBe(miniPayloadRentFaster.coords.length);
+    // });
     // test("we can retrieve tasks per provider - works [integration]", async () => {
     //     // arrange
     //     const batchNumForThisTest = 555;

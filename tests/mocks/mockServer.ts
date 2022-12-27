@@ -44,6 +44,7 @@ import TaskDAO from "../../src/database/dao/task.dao";
 import GymDAO from "../../src/database/dao/gym.dao";
 // misc
 import AccountUtil from "../../src/util/accountUtil";
+import sendEmail from "../../src/util/sendEmail";
 import testDatabase from "../database/Database";
 
 import { SEED_USERS } from "../../src/seed/seedUsers";
@@ -194,11 +195,11 @@ const scraperConnectionFactory: ScraperConnectionFactory = new ScraperConnection
 // services
 const adminService = new AdminService(acctDAO);
 const scraperService = new ScraperService(scraperConnectionFactory, locationDiscoveryService);
-const emailService = new EmailService(acctDAO, "testing");
+const emailService = new EmailService(sendEmail, "testing");
 const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);
 const housingService = new HousingService(housingDAO, gymDAO, cacheService);
-const taskQueueService = new TaskQueueService(cityDAO, housingDAO, taskDAO, cacheService);
+const taskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);
 const gymService = new GymService(gymDAO, cacheService, googlePlacesAPI);
 
 export const app = new App({

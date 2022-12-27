@@ -11,7 +11,6 @@ let newAcct;
 beforeAll(async () => {
     await app.connectDB();
     await app.dropTable("resetToken");
-    // await app.dropAllTables(); // takes too long
     const newAcctDetails = {
         email: "kim@gmail.com",
         passwordHash: "afsdoifsaofj",

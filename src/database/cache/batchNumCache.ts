@@ -3,14 +3,21 @@ import BatchDAO from "../dao/batch.dao";
 export let _usedBatchNumbers: number[] = [];
 
 export async function getBatchNumForNewBatches(batchDAO: BatchDAO): Promise<number> {
-    if (_usedBatchNumbers.length != 0) return _usedBatchNumbers[_usedBatchNumbers.length - 1];
-    const batchWithHighestNum = await batchDAO.getHighestBatchNum();
-    if (batchWithHighestNum === null) {
+    // checks the variable,
+    // then asks the db for one (and puts it into the variable if its there).
+    // value is returned from first location its found in.
+    if (_usedBatchNumbers.length != 0) {
+        return _usedBatchNumbers[_usedBatchNumbers.length - 1];
+    }
+    const highestBatchNum = await batchDAO.getHighestBatchNum();
+    if (highestBatchNum === null) {
         _usedBatchNumbers = [0];
         await batchDAO.addBatchNum(0);
+        return 0;
+    } else {
+        _usedBatchNumbers = [highestBatchNum];
+        return highestBatchNum;
     }
-    const batchNumForNewBatches = _usedBatchNumbers.length !== 0 ? _usedBatchNumbers[_usedBatchNumbers.length - 1] : 0;
-    return batchNumForNewBatches;
 }
 
 export async function setBatchNumForNewBatches(newNum: number, batchDAO: BatchDAO): Promise<number[]> {
@@ -36,4 +43,8 @@ export function initBatchCacheFromDb(numsFromDb: number[]) {
 
 export function getAllBatchNums() {
     return _usedBatchNumbers;
+}
+
+export function resetBatchCache() {
+    _usedBatchNumbers = [];
 }

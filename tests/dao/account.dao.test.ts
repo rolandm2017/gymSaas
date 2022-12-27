@@ -9,7 +9,6 @@ let activeAcctDAO: AccountDAO = new AccountDAO();
 
 beforeAll(async () => {
     await app.connectDB();
-    // await app.dropAllTables(); // takes too long
     await app.dropTable("account");
 });
 
