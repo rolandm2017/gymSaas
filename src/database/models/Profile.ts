@@ -10,6 +10,7 @@ import {
     Association,
 } from "sequelize";
 import { Account } from "./Account";
+import { Gym } from "./Gym";
 import { Housing } from "./Housing";
 
 // attaches to an account
@@ -41,10 +42,16 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
     declare addHousing: HasManyAddAssociationMixin<Housing, number>;
     declare addHousings: HasManyAddAssociationsMixin<Housing, number>;
 
+    declare getGyms: HasManyGetAssociationsMixin<Gym>;
+    declare addGym: HasManyAddAssociationMixin<Gym, number>;
+    declare addGyms: HasManyAddAssociationsMixin<Gym, number>;
+
     public readonly Housings?: Housing[];
+    public readonly Gyms?: Gym[];
 
     public static associations: {
         Housings: Association<Profile, Housing>;
+        Gyms: Association<Profile, Gym>;
     };
 
     static initModel(sequelize: S): typeof Profile {

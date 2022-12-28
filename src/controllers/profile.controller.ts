@@ -11,17 +11,25 @@ class ProfileController {
 
     constructor(profileService: ProfileService) {
         this.profileService = profileService;
-        this.router.post("/pick-public", this.recordPickPublic.bind(this));
+        this.router.post("/pick-public/housing", this.recordPublicPickHousing.bind(this));
+        this.router.post("/pick-public/gym", this.recordPublicPickGym.bind(this));
         this.router.post("/wish", this.createWish.bind(this));
         this.router.get("/all/picks", this.getAllPicks.bind(this));
         this.router.get("/all/wish", this.getAllWishesForAccount.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
     }
 
-    public async recordPickPublic(request: Request, response: Response) {
+    public async recordPublicPickHousing(request: Request, response: Response) {
         const ip = request.ip;
-        const apartmentId = request.body.apartmentId;
-        await this.profileService.recordPickPublic(ip, apartmentId);
+        const housingId = request.body.housingId;
+        await this.profileService.recordPublicPickHousing(ip, housingId);
+        return response.status(200).json({ message: "Success" });
+    }
+
+    public async recordPublicPickGym(request: Request, response: Response) {
+        const ip = request.ip;
+        const gymId = request.body.gymId;
+        await this.profileService.recordPublicPickGym(ip, gymId);
         return response.status(200).json({ message: "Success" });
     }
 

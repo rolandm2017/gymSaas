@@ -1,5 +1,6 @@
 import { Association, DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
 import { City } from "./City";
+import { Profile } from "./Profile";
 
 export interface GymAttributes {
     gymId?: number;
@@ -35,6 +36,12 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
+
+    public readonly Profiles?: Profile[];
+
+    public static associations: {
+        Gyms: Association<Gym, Profile>;
+    };
 
     static initModel(sequelize: Sequelize): typeof Gym {
         return Gym.init(

@@ -10,8 +10,12 @@ class ProfileService {
         this.wishDAO = wishDAO;
     }
 
-    public async recordPickPublic(ipAddress: string, housingId: number) {
-        return await this.profileDAO.recordPickPublic(ipAddress, housingId);
+    public async recordPublicPickHousing(ipAddress: string, housingId: number) {
+        // return await this.profileDAO.recordPublicPickHousing(ipAddress, housingId);
+    }
+
+    public async recordPublicPickGym(ipAddress: string, housingId: number) {
+        return await this.profileDAO.recordPublicPickGym(ipAddress, housingId);
     }
 
     public async createWish(wishLocation: string, acctId: number) {
