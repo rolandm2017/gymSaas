@@ -34,18 +34,18 @@ class AuthController {
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate);
         this.router.post("/register", registerUserSchema, this.register);
         // verify email
-        this.router.post("/verify_email", verifyEmailSchema, this.verifyEmail);
-        this.router.get("/bypass_authentication_token", this.bypassEmail);
+        this.router.post("/verify-email", verifyEmailSchema, this.verifyEmail);
+        this.router.get("/bypass-authentication-token", this.bypassEmail);
         // tokens
-        this.router.post("/refresh_token", this.refreshToken);
-        // note: /revoke_token === /log_out
-        this.router.post("/revoke_token", authorize(), revokeTokenSchema, this.revokeToken);
+        this.router.post("/refresh-token", this.refreshToken);
+        // note: /revoke-token === /log-out
+        this.router.post("/revoke-token", authorize(), revokeTokenSchema, this.revokeToken);
         // update pw
-        this.router.post("/update_password", authorize(), updatePasswordSchema, this.updatePassword);
+        this.router.post("/update-password", authorize(), updatePasswordSchema, this.updatePassword);
         // pw reset
-        this.router.post("/forgot_password", forgotPasswordSchema, this.forgotPassword);
-        this.router.post("/validate_reset_token", validateResetTokenSchema, this.validateResetToken);
-        this.router.post("/reset_password", resetPasswordSchema, this.resetPassword);
+        this.router.post("/forgot-password", forgotPasswordSchema, this.forgotPassword);
+        this.router.post("/validate-reset-token", validateResetTokenSchema, this.validateResetToken);
+        this.router.post("/reset-password", resetPasswordSchema, this.resetPassword);
         // authorized routes
         this.router.get("/", authorize([Role.Admin]), this.getAllAccounts);
         this.router.get("/:id", authorize(), this.getAccountById);

@@ -23,19 +23,19 @@ class AdminController {
         this.housingService = housingService;
         // batches, apartments
         this.router.get("/batches/all", authorize([Role.Admin]), this.getAllBatchNumbers.bind(this));
-        this.router.get("/task_queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
-        this.router.get("/housing/by_location", authorize([Role.Admin]), this.getApartmentsByLocation.bind(this));
-        this.router.get("/housing/by_city_id_and_batch_num", authorize([Role.Admin]), this.getApartmentsByCityIdAndBatchNum.bind(this));
+        this.router.get("/task-queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
+        this.router.get("/housing/by-location", authorize([Role.Admin]), this.getApartmentsByLocation.bind(this));
+        this.router.get("/housing/by-city-id-and-batch-num", authorize([Role.Admin]), this.getApartmentsByCityIdAndBatchNum.bind(this));
         // **
         // note the authorization is turned off
         // this.router.get("/batches/all", this.getAllBatchNumbers.bind(this));
-        // this.router.get("/task_queue/all", this.getAllTasks.bind(this));
-        // this.router.get("/task_queue/tasks_by_batch_num", this.getTasksByBatchNum.bind(this));
-        // this.router.get("/housing/by_location", this.getApartmentsByLocation.bind(this));
-        // this.router.get("/housing/by_city_id_and_batch_num", this.getApartmentsByCityIdAndBatchNum.bind(this));
+        // this.router.get("/task-queue/all", this.getAllTasks.bind(this));
+        // this.router.get("/task-queue/tasks-by-batch-num", this.getTasksByBatchNum.bind(this));
+        // this.router.get("/housing/by-location", this.getApartmentsByLocation.bind(this));
+        // this.router.get("/housing/by-city-id-and-batch-num", this.getApartmentsByCityIdAndBatchNum.bind(this));
         // user stuff
         this.router.post("/user/ban", authorize([Role.Admin]), this.banUser.bind(this));
-        this.router.post("/user/make_admin", this.makeAdmin.bind(this));
+        this.router.post("/user/make-admin", this.makeAdmin.bind(this));
         // journey
         this.router.get("/user/journey", authorize([Role.Admin]), this.getUserJourney.bind(this));
         // health check

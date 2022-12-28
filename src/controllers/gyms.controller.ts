@@ -14,7 +14,7 @@ class GymsController {
         this.gymService = gymService;
         this.router.get("/gyms", this.getGymsFromGoogle.bind(this));
         this.router.get("/saved", this.getSavedGymsFromDB.bind(this));
-        this.router.post("/add_city_id", this.addCityIdWhereMissing.bind(this));
+        this.router.post("/add-city-id", this.addCityIdWhereMissing.bind(this));
         this.router.get("/count", this.countGymsByCity.bind(this));
         this.router.get("/all", this.getAllGyms.bind(this));
         this.router.delete("/all", this.deleteAll.bind(this));

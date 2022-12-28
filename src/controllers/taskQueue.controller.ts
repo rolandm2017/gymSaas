@@ -10,10 +10,11 @@ import { IBounds } from "../interface/Bounds.interface";
 import ScraperService from "../service/scraper.service";
 import { errorResponse } from "../util/errorResponseUtil";
 import { CityNameEnum } from "../enum/cityName.enum";
+import { HealthCheck } from "../enum/healthCheck.enum";
 
 // do I need a "scraper controller" and a separate "task queue controller"?
 class TaskQueueController {
-    public path = "/task_queue";
+    public path = "/task-queue";
     public router = express.Router();
     private taskQueueService: TaskQueueService;
     private scraperService: ScraperService;
@@ -26,24 +27,24 @@ class TaskQueueController {
         this.scraperService = scraperService;
         this.cacheService = cacheService;
         // step 2 of 3 in queuing a scrape
-        this.router.post("/plan_grid_scan", this.getGridForScan.bind(this));
+        this.router.post("/plan-grid-scan", this.getGridForScan.bind(this));
         // step 3 of 3 in queuing a scrape
-        this.router.post("/queue_grid_scan", this.addGridScanToQueue.bind(this)); // admin only
+        this.router.post("/queue-grid-scan", this.addGridScanToQueue.bind(this)); // admin only
         // stuff (separate from the 3 step queuing)
         this.router.get("/scrape", this.scrapeApartments.bind(this));
-        this.router.get("/next_batch_number", this.getNextBatchNumber.bind(this));
-        this.router.get("/next_tasks_for_scraper", this.getNextTasksForScraper.bind(this));
+        this.router.get("/next-batch-number", this.getNextBatchNumber.bind(this));
+        this.router.get("/next-tasks-for-scraper", this.getNextTasksForScraper.bind(this));
         // step 3.5
-        this.router.post("/report_findings_and_mark_complete", this.reportFindingsToDbAndMarkComplete.bind(this));
+        this.router.post("/report-findings-and-mark-complete", this.reportFindingsToDbAndMarkComplete.bind(this));
 
         // used to check tasks make sense
         this.router.get("/all", this.getAllTasks.bind(this));
         // this.router.get("/batch", this.getTasksByBatch.bind(this));
         this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
-        this.router.delete("/by_id", this.cleanSpecific.bind(this));
+        this.router.delete("/by-id", this.cleanSpecific.bind(this));
         this.router.delete("/all", this.cleanAll.bind(this));
-        // this.router.get("/db_contents", )
-        this.router.get("/health_check", this.healthCheck.bind(this));
+        // this.router.get("/db-contents", )
+        this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
     }
 
     async scrapeApartments(request: Request, response: Response) {

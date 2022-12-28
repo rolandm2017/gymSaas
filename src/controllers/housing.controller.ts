@@ -6,6 +6,7 @@ import HousingService from "../service/housing.service";
 import { Housing } from "../database/models/Housing";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { errorResponse } from "../util/errorResponseUtil";
+import { HealthCheck } from "../enum/healthCheck.enum";
 
 class HousingController {
     public path = "/housing";
@@ -20,20 +21,20 @@ class HousingController {
         // public endpoint for demo
         this.router.get("/demo", this.getDemoContent.bind(this));
         // step 1 of 3 in queuing a scrape
-        this.router.post("/viewport_width", this.detectProviderViewportWidth.bind(this));
+        this.router.post("/viewport-width", this.detectProviderViewportWidth.bind(this));
         // user queries
         this.router.get("/location", this.getSavedApartmentsByLocation.bind(this));
         // admin ish stuff
-        this.router.get("/by_city_id_and_batch_id", this.getHousingByCityIdAndBatchNum.bind(this));
+        this.router.get("/by-city-id-and-batch-id", this.getHousingByCityIdAndBatchNum.bind(this));
         this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
-        this.router.get("/by_location", this.getSavedApartmentsByLocation.bind(this));
+        this.router.get("/by-location", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
         this.router.delete("/all", this.deleteAllApartments.bind(this)); // todo: authorize admin only
         // step 4 of queuing a scrape - for after the scrape of the city is done
         this.router.get("/qualify", this.qualifyScrapedApartments.bind(this));
         // step 5 of queuing a scrape - for after the apartments have been qualified
         this.router.delete("/unqualified", this.deleteUnqualifiedApartments.bind(this));
-        this.router.get("/health_check", this.healthCheck);
+        this.router.get(HealthCheck.healthCheck, this.healthCheck);
         // this.router.post("/task", this.queueScrape);
     }
 
