@@ -109,7 +109,7 @@ describe("Test auth controller with supertest", () => {
             const madeAcct = await acctDAO.getAccountByEmail(credentials.email);
             const token = madeAcct[0].verificationToken;
             const payload = { token: token };
-            const acctVerificationRes = await request(server).post(`${path}/verify_email`).send(payload);
+            const acctVerificationRes = await request(server).post(`${path}/verify-email`).send(payload);
             expect(acctVerificationRes.body.message).toBe("Verification successful, you can now login");
             // now we expect logging in with this new account to "just work"
             const loginPayload = { email: credentials.email, password: pw };
@@ -134,7 +134,7 @@ describe("Test auth controller with supertest", () => {
                 confirmNewPw: newPw,
             };
             const changedPwRes = await request(server)
-                .post(`${path}/update_password`)
+                .post(`${path}/update-password`)
                 .set("Authorization", "bearer " + jwtToken)
                 .send(emailChangerPayload);
             expect(changedPwRes.body.message).toBe("Password updated!");
@@ -172,21 +172,21 @@ describe("Test auth controller with supertest", () => {
             if (madeAcct.length === 0) fail("No account found when there should've been one");
             const token = madeAcct[0].verificationToken;
             const payload = { token: token };
-            const acctVerificationRes = await request(server).post(`${path}/verify_email`).send(payload);
+            const acctVerificationRes = await request(server).post(`${path}/verify-email`).send(payload);
             expect(acctVerificationRes.body.message).toBe("Verification successful, you can now login");
             // The real reason the test is here
             const forgotPwPayload = {
                 email: credentials3.email,
             };
-            const forgotPwRes = await request(server).post(`${path}/forgot_password`).set("origin", "testSuite").send(forgotPwPayload);
+            const forgotPwRes = await request(server).post(`${path}/forgot-password`).set("origin", "testSuite").send(forgotPwPayload);
             expect(forgotPwRes.body.message).toBe("Please check your email for password reset instructions");
             // bypass email, get token directly
             const forgotPwToken = await resetTokenDAO.getResetTokenByEmail(forgotPwPayload.email);
             const t = { token: forgotPwToken?.token };
-            const validateTokenRes = await request(server).post(`${path}/validate_reset_token`).send(t);
+            const validateTokenRes = await request(server).post(`${path}/validate-reset-token`).send(t);
             expect(validateTokenRes.body.message).toBe("Token is valid");
             const newPwPayload = { ...t, password: "someNewPw99##", confirmPassword: "someNewPw99##" };
-            const resetPwRes = await request(server).post(`${path}/reset_password`).send(newPwPayload);
+            const resetPwRes = await request(server).post(`${path}/reset-password`).send(newPwPayload);
             expect(resetPwRes.body.message).toBe("Password reset successful, you can now login");
         });
     });

@@ -66,15 +66,15 @@ beforeAll(async () => {
     const batchDAO = new BatchDAO();
     // batch num is initially 0
     // create tasks for this batch number
-    const tasks = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
+    const tasks = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentCanada);
     expect(tasks.body.queued.pass).toEqual(miniPayloadRentCanada.coords.length);
     // increment batch number
     // create tasks for this batch number
-    const tasks2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
+    const tasks2 = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentFaster);
     expect(tasks2.body.queued.pass).toEqual(miniPayloadRentFaster.coords.length);
     // increment batch number
     // create tasks for this batch number
-    const tasks3 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+    const tasks3 = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentSeeker);
     expect(tasks3.body.queued.pass).toEqual(miniPayloadRentSeeker.coords.length);
     const allTasks = await taskDAO.getAllTasks();
     expect(allTasks.length).toEqual(testTasks.flat().length);
@@ -95,9 +95,9 @@ beforeAll(async () => {
     };
     targetCityId = mtl?.cityId;
 
-    await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayload1);
+    await request(server).post("/task-queue/report-findings-and-mark-complete").send(findingsPayload1);
     findingsPayload2 = { provider: ProviderEnum.rentFaster, taskId: 2, apartments: smlFaster.results, cityId: mtl?.cityId, batchNum: secondBatch };
-    await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayload2);
+    await request(server).post("/task-queue/report-findings-and-mark-complete").send(findingsPayload2);
     findingsPayload3 = {
         provider: ProviderEnum.rentSeeker,
         taskId: 3,
@@ -105,7 +105,7 @@ beforeAll(async () => {
         cityId: mtl?.cityId,
         batchNum: thirdBatch,
     };
-    await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayload3);
+    await request(server).post("/task-queue/report-findings-and-mark-complete").send(findingsPayload3);
     const allHousing = await housingDAO.getAllHousing();
     expect(allHousing.length).toEqual([smlCanada.results.listings, smlFaster.results.listings, smlSeeker.results.hits].flat().length);
 });
@@ -128,7 +128,7 @@ describe("Test admin controller with supertest", () => {
         });
         test("Get all tasks", async () => {
             const response = await request(server)
-                .get("/admin/task_queue/all")
+                .get("/admin/task-queue/all")
                 .set("Authorization", "Bearer " + adminJWT);
             expect(response.body.tasks.length).toBe(testTasks.flat().length);
         });
@@ -136,7 +136,7 @@ describe("Test admin controller with supertest", () => {
             const cityName = "Montreal";
             // const stateName = "Quebec"; // i dont think it matters
             const response = await request(server)
-                .get(`/admin/housing/by_location?cityName=${cityName}`)
+                .get(`/admin/housing/by-location?cityName=${cityName}`)
                 .set("Authorization", "Bearer " + adminJWT);
             expect(response.body.apartments.length).toBe(
                 [smlCanada.results.listings, smlFaster.results.listings, smlSeeker.results.hits].flat().length,
@@ -146,13 +146,13 @@ describe("Test admin controller with supertest", () => {
             let cityId = findingsPayload2.cityId;
             let batchNum = findingsPayload2.batchNum;
             const response = await request(server)
-                .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
+                .get(`/admin/housing/by-city-id-and-batch-num?cityId=${cityId}&batchNum=${batchNum}`)
                 .set("Authorization", "Bearer " + adminJWT);
             expect(response.body.apartments.length).toBe(findingsPayload2.apartments.listings.length); // used in payload findingsPayload2
             cityId = findingsPayload3.cityId; // is the same as before
             batchNum = findingsPayload3.batchNum;
             const response2 = await request(server)
-                .get(`/admin/housing/by_city_id_and_batch_num?cityId=${cityId}&batchNum=${batchNum}`)
+                .get(`/admin/housing/by-city-id-and-batch-num?cityId=${cityId}&batchNum=${batchNum}`)
                 .set("Authorization", "Bearer " + adminJWT);
             expect(response2.body.apartments.length).toBe(findingsPayload3.apartments.hits.length); // used in payload findingsPayload3
         });
@@ -160,21 +160,21 @@ describe("Test admin controller with supertest", () => {
     describe("we can't bypass admin authorization", () => {
         test("undefined jwt payload", async () => {
             //
-            const response = await request(server).get("/admin/task_queue/all");
+            const response = await request(server).get("/admin/task-queue/all");
             // .set("Authorization", "bearer " + ""); // undefined!
             expect(response.body.message).toBe("Unauthorized");
         });
         test("empty string jwt payload", async () => {
             //
             const response = await request(server)
-                .get("/admin/task_queue/all")
+                .get("/admin/task-queue/all")
                 .set("Authorization", "bearer " + "");
             expect(response.body.message).toBe("Unauthorized");
         });
         test("unexpected inputs jwt payload", async () => {
             //
             const response = await request(server)
-                .get("/admin/task_queue/all")
+                .get("/admin/task-queue/all")
                 .set("Authorization", "bearer " + "$#$#$#$#$@$#))(");
             expect(response.body.message).toBe("Unauthorized");
         });

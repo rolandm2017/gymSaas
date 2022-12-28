@@ -57,7 +57,7 @@ afterAll(async () => {
 describe("Test taskQueue controller with supertest", () => {
     let batchNum = 0;
     test("health check!", async () => {
-        const healthCheckRes = await request(server).get("/task_queue/health_check");
+        const healthCheckRes = await request(server).get("/task-queue/health-check");
         expect(healthCheckRes.body.status).toBe("Online");
     });
     test("we can get the batch number", async () => {
@@ -69,7 +69,7 @@ describe("Test taskQueue controller with supertest", () => {
         const newlyCreatedBatch = await cacheService.addBatchNumIfNotExists(targetBatchNumForTests);
         expect(newlyCreatedBatch).toBeDefined();
         if (newlyCreatedBatch === undefined) fail("adding if not exists should return an array, and it didn't!");
-        const currentBatchNumResponse = await request(server).get("/task_queue/next_batch_number");
+        const currentBatchNumResponse = await request(server).get("/task-queue/next-batch-number");
         const currentBatchNum = currentBatchNumResponse.body.nextBatchNum;
         expect(currentBatchNum).toBe(targetBatchNumForTests);
         batchNum = currentBatchNum; // used in the next test
@@ -82,13 +82,13 @@ describe("Test taskQueue controller with supertest", () => {
 
         miniPayloadRentCanada.batchNum = batchNumForThisTest;
         miniPayloadRentFaster.batchNum = batchNumForThisTest;
-        const queued = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
-        const queued2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
+        const queued = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentCanada);
+        const queued2 = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentFaster);
         const queuedBody = queued.body;
         const queuedBody2 = queued2.body;
         expect(queuedBody.queued.pass).toBe(miniPayloadRentCanada.coords.length); // not the real point of the test, but, sanity
         expect(queuedBody2.queued.pass).toBe(miniPayloadRentFaster.coords.length); // not the real point of the test, but, sanity
-        const allTasksViaEndpoint = await request(server).get("/task_queue/all");
+        const allTasksViaEndpoint = await request(server).get("/task-queue/all");
         expect(allTasksViaEndpoint.body.tasks.length).toEqual(miniPayloadRentCanada.coords.length + miniPayloadRentFaster.coords.length);
     });
     test("add tasks to the task queue - works [integration]", async () => {
@@ -119,7 +119,7 @@ describe("Test taskQueue controller with supertest", () => {
             zoomWidth: 10,
             batchNum: batchNumForThisTest,
         };
-        const queuedScan = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster2);
+        const queuedScan = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentFaster2);
         const queuedScanBody = queuedScan.body;
         expect(queuedScanBody.queued.pass).toBe(miniPayloadRentFaster.coords.length);
     });
@@ -128,8 +128,8 @@ describe("Test taskQueue controller with supertest", () => {
         const batchNumForThisTest = 555;
         miniPayloadRentFaster.batchNum = batchNumForThisTest;
         miniPayloadRentSeeker.batchNum = batchNumForThisTest;
-        const queued = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
-        const queued2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+        const queued = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentFaster);
+        const queued2 = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentSeeker);
         expect(true).toEqual(true);
         // test that inputs work!
         expect(queued.body.queued.pass).toEqual(miniPayloadRentFaster.coords.length);
@@ -137,9 +137,9 @@ describe("Test taskQueue controller with supertest", () => {
         expect(miniPayloadRentFaster.coords.length).not.toEqual(miniPayloadRentSeeker.coords.length); // testing inputs
         // act
         const payload = { provider: ProviderEnum.rentSeeker, batchNum: batchNumForThisTest };
-        const allTasksFromEndpoint = await request(server).get("/task_queue/next_tasks_for_scraper").send(payload);
+        const allTasksFromEndpoint = await request(server).get("/task-queue/next-tasks-for-scraper").send(payload);
         const payload2 = { provider: ProviderEnum.rentFaster, batchNum: batchNumForThisTest };
-        const allTasksFromEndpoint2 = await request(server).get("/task_queue/next_tasks_for_scraper").send(payload2);
+        const allTasksFromEndpoint2 = await request(server).get("/task-queue/next-tasks-for-scraper").send(payload2);
         // assert
         // done like this for inspection w/ debugger
         const allTasksBody = allTasksFromEndpoint.body;
@@ -163,13 +163,13 @@ describe("Test taskQueue controller with supertest", () => {
             miniPayloadRentFaster.batchNum = batchNumForIntegrationTest;
             miniPayloadRentSeeker.batchNum = batchNumForIntegrationTest;
 
-            const tasks1 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
-            const tasks2 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
-            const tasks3 = await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+            const tasks1 = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentCanada);
+            const tasks2 = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentFaster);
+            const tasks3 = await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentSeeker);
             // speculative payload
             const payload = { provider: miniPayloadRentCanada.provider };
             // get all tasks for rentCanada, mark them complete.
-            const tasksResponse = await request(server).get("/task_queue/next_tasks_for_scraper").send(payload);
+            const tasksResponse = await request(server).get("/task-queue/next-tasks-for-scraper").send(payload);
             expect(tasksResponse.body.tasks).toBeDefined();
             expect(tasksResponse.body.tasks.length).toEqual(miniPayloadRentCanada.coords.length);
             const tasksReceived = tasksResponse.body.tasks.length;
@@ -187,7 +187,7 @@ describe("Test taskQueue controller with supertest", () => {
             const tasks = await taskDAO.getAllTasks();
             console.log(tasks.map((t: Task) => t.taskId));
             for (let i = 0; i < findingsPayloads.length; i++) {
-                const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
+                const completedTasksResponse = await request(server).post("/task-queue/report-findings-and-mark-complete").send(findingsPayloads[i]);
                 // now all the ones for rentCanada should be marked complete
                 expect(completedTasksResponse.body.markedComplete).toBe(true);
                 expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.listings.length);
@@ -196,12 +196,12 @@ describe("Test taskQueue controller with supertest", () => {
             }
             expect(tasksReceived === tasksTriedToComplete).toBe(true); // testing inputs.
             // now verify that all tasks for this provider are completed.
-            const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
+            const allTasksForThisProvider = await request(server).get("/task-queue/all").send(payload);
             const allTasksAreCompleted = allTasksForThisProvider.body.tasks.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!
             payload.provider = ProviderEnum.rentSeeker;
-            const allTasksForThisProvider2 = await request(server).get("/task_queue/all").send(payload);
+            const allTasksForThisProvider2 = await request(server).get("/task-queue/all").send(payload);
             const allTasksAreIncomplete = allTasksForThisProvider2.body.tasks.every((task: Task) => task.lastScan === null);
             expect(allTasksAreIncomplete).toBe(true);
         });
@@ -212,12 +212,12 @@ describe("Test taskQueue controller with supertest", () => {
             miniPayloadRentCanada.batchNum = batchNumForIntegrationTest;
             miniPayloadRentFaster.batchNum = batchNumForIntegrationTest;
             miniPayloadRentSeeker.batchNum = batchNumForIntegrationTest;
-            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
-            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
-            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+            await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentCanada);
+            await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentFaster);
+            await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentSeeker);
             // speculative payload
             const payload = { provider: ProviderEnum.rentFaster };
-            const tasksResponse = await request(server).get("/task_queue/next_tasks_for_scraper").send(payload);
+            const tasksResponse = await request(server).get("/task-queue/next-tasks-for-scraper").send(payload);
             expect(tasksResponse.body.tasks).toBeDefined();
             expect(tasksResponse.body.tasks.length).toBeGreaterThan(1);
             const tasksReceived = tasksResponse.body.tasks.length;
@@ -230,7 +230,7 @@ describe("Test taskQueue controller with supertest", () => {
             });
             let tasksTriedToComplete = 0;
             for (let i = 0; i < findingsPayloads.length; i++) {
-                const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
+                const completedTasksResponse = await request(server).post("/task-queue/report-findings-and-mark-complete").send(findingsPayloads[i]);
                 // now all the ones for rentFaster should be marked complete
                 expect(completedTasksResponse.body.markedComplete).toBe(true);
                 expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.listings.length);
@@ -239,12 +239,12 @@ describe("Test taskQueue controller with supertest", () => {
             }
             expect(tasksReceived === tasksTriedToComplete).toBe(true); // testing inputs.
             // now verify that all tasks for this provider are completed.
-            const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
+            const allTasksForThisProvider = await request(server).get("/task-queue/all").send(payload);
             const allTasksAreCompleted = allTasksForThisProvider.body.tasks.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!
             payload.provider = ProviderEnum.rentCanada;
-            const allTasksForThisProvider2 = await request(server).get("/task_queue/all").send(payload);
+            const allTasksForThisProvider2 = await request(server).get("/task-queue/all").send(payload);
             const allTasksAreIncomplete = allTasksForThisProvider2.body.tasks.every((task: Task) => task.lastScan === null);
             expect(allTasksAreIncomplete).toBe(true);
         });
@@ -255,12 +255,12 @@ describe("Test taskQueue controller with supertest", () => {
             miniPayloadRentCanada.batchNum = batchNumForIntegrationTest;
             miniPayloadRentFaster.batchNum = batchNumForIntegrationTest;
             miniPayloadRentSeeker.batchNum = batchNumForIntegrationTest;
-            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentCanada);
-            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentFaster);
-            await request(server).post("/task_queue/queue_grid_scan").send(miniPayloadRentSeeker);
+            await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentCanada);
+            await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentFaster);
+            await request(server).post("/task-queue/queue-grid-scan").send(miniPayloadRentSeeker);
             // speculative payload
             const payload = { provider: ProviderEnum.rentSeeker };
-            const tasksResponse = await request(server).get("/task_queue/next_tasks_for_scraper").send(payload);
+            const tasksResponse = await request(server).get("/task-queue/next-tasks-for-scraper").send(payload);
             expect(tasksResponse.body.tasks).toBeDefined();
             expect(tasksResponse.body.tasks.length).toBeGreaterThan(1);
             const tasksReceived = tasksResponse.body.tasks.length;
@@ -273,7 +273,7 @@ describe("Test taskQueue controller with supertest", () => {
             });
             let tasksTriedToComplete = 0;
             for (let i = 0; i < findingsPayloads.length; i++) {
-                const completedTasksResponse = await request(server).post("/task_queue/report_findings_and_mark_complete").send(findingsPayloads[i]);
+                const completedTasksResponse = await request(server).post("/task-queue/report-findings-and-mark-complete").send(findingsPayloads[i]);
                 // now all the ones for rentSeeker should be marked complete
                 expect(completedTasksResponse.body.markedComplete).toBe(true); // note that "results.hits" is for rentSeeker
                 expect(completedTasksResponse.body.successfullyLogged.pass).toBe(findingsPayloads[i].apartments.hits.length);
@@ -282,12 +282,12 @@ describe("Test taskQueue controller with supertest", () => {
             }
             expect(tasksReceived === tasksTriedToComplete).toBe(true); // testing inputs.
             // now verify that all tasks for this provider are completed.
-            const allTasksForThisProvider = await request(server).get("/task_queue/all").send(payload);
+            const allTasksForThisProvider = await request(server).get("/task-queue/all").send(payload);
             const allTasksAreCompleted = allTasksForThisProvider.body.tasks.every((task: Task) => task.lastScan !== null);
             expect(allTasksAreCompleted).toBe(true);
             // tasks for providers we didn't file reports for are still incomplete!
             payload.provider = ProviderEnum.rentFaster;
-            const allTasksForThisProvider2 = await request(server).get("/task_queue/all").send(payload);
+            const allTasksForThisProvider2 = await request(server).get("/task-queue/all").send(payload);
             const allTasksAreIncomplete = allTasksForThisProvider2.body.tasks.every((task: Task) => task.lastScan === null);
             expect(allTasksAreIncomplete).toBe(true);
         });
