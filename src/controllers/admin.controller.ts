@@ -48,68 +48,92 @@ class AdminController {
     }
 
     public async getAllTasks(request: Request, response: Response) {
-        const providerInput = request.query.provider; // optional
-        const batchNumInput = request.query.batchNum; // optional
-        const cityIdInput = request.query.cityId; // optional
-        // validation
-        if (providerInput && typeof providerInput !== "string") return handleErrorResponse(response, "invalid provider");
-        const provider = providerInput && providerInput in ProviderEnum ? (providerInput as ProviderEnum) : undefined;
-        if (batchNumInput && typeof batchNumInput !== "string") return handleErrorResponse(response, "invalid batchNum");
-        const batchNum = batchNumInput ? parseInt(batchNumInput, 10) : undefined;
-        if (cityIdInput && typeof cityIdInput !== "string") return handleErrorResponse(response, "invalid cityId");
-        const cityId = cityIdInput ? parseInt(cityIdInput, 10) : undefined;
-        //
-        const tasks: Task[] = await this.taskQueueService.getAllTasks(provider, batchNum, cityId);
-        return response.status(200).json({ tasks });
+        try {
+            const providerInput = request.query.provider; // optional
+            const batchNumInput = request.query.batchNum; // optional
+            const cityIdInput = request.query.cityId; // optional
+            // validation
+            if (providerInput && typeof providerInput !== "string") return handleErrorResponse(response, "invalid provider");
+            const provider = providerInput && providerInput in ProviderEnum ? (providerInput as ProviderEnum) : undefined;
+            if (batchNumInput && typeof batchNumInput !== "string") return handleErrorResponse(response, "invalid batchNum");
+            const batchNum = batchNumInput ? parseInt(batchNumInput, 10) : undefined;
+            if (cityIdInput && typeof cityIdInput !== "string") return handleErrorResponse(response, "invalid cityId");
+            const cityId = cityIdInput ? parseInt(cityIdInput, 10) : undefined;
+            //
+            const tasks: Task[] = await this.taskQueueService.getAllTasks(provider, batchNum, cityId);
+            return response.status(200).json({ tasks });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     public async getApartmentsByLocation(request: Request, response: Response) {
-        const cityName = request.query.cityName;
-        // do I need by country or state? YAGNI?
-        if (typeof cityName !== "string") return handleErrorResponse(response, "cityName must be string");
-        const aps: Housing[] = await this.housingService.getApartmentsByLocation(cityName);
-        return response.status(200).json({ apartments: aps });
+        try {
+            const cityName = request.query.cityName;
+            // do I need by country or state? YAGNI?
+            if (typeof cityName !== "string") return handleErrorResponse(response, "cityName must be string");
+            const aps: Housing[] = await this.housingService.getApartmentsByLocation(cityName);
+            return response.status(200).json({ apartments: aps });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     public async getApartmentsByCityIdAndBatchNum(request: Request, response: Response) {
-        const cityIdInput = request.query.cityId;
-        const batchNumInput = request.query.batchNum;
-        if (typeof cityIdInput !== "string") return handleErrorResponse(response, "cityId must be a string integer");
-        if (typeof batchNumInput !== "string") return handleErrorResponse(response, "batchNum must be a string integer");
-        const cityId = parseInt(cityIdInput, 10);
-        const batchNum = parseInt(batchNumInput, 10);
-        const cityIdIsNaN = isNaN(cityId);
-        const batchNumIsNaN = isNaN(batchNum);
-        if (cityIdIsNaN || batchNumIsNaN) return handleErrorResponse(response, "cityId and batchNum must be int");
-        if (!cityId || !batchNum) return handleErrorResponse(response, "must provide both cityId and batchNum");
-        const aps: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(cityId, batchNum);
-        return response.status(200).json({ apartments: aps });
+        try {
+            const cityIdInput = request.query.cityId;
+            const batchNumInput = request.query.batchNum;
+            if (typeof cityIdInput !== "string") return handleErrorResponse(response, "cityId must be a string integer");
+            if (typeof batchNumInput !== "string") return handleErrorResponse(response, "batchNum must be a string integer");
+            const cityId = parseInt(cityIdInput, 10);
+            const batchNum = parseInt(batchNumInput, 10);
+            const cityIdIsNaN = isNaN(cityId);
+            const batchNumIsNaN = isNaN(batchNum);
+            if (cityIdIsNaN || batchNumIsNaN) return handleErrorResponse(response, "cityId and batchNum must be int");
+            if (!cityId || !batchNum) return handleErrorResponse(response, "must provide both cityId and batchNum");
+            const aps: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(cityId, batchNum);
+            return response.status(200).json({ apartments: aps });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     public async getTasksByBatchNum(request: Request, response: Response) {
-        const batchNumInput = request.query.batchNum;
-        if (batchNumInput === undefined || typeof batchNumInput !== "string") return handleErrorResponse(response, "must supply batchNum");
-        // todo: validation
-        const batchNum = parseInt(batchNumInput, 10);
-        if (isNaN(batchNum)) return handleErrorResponse(response, "batchNum must be an integer");
-        const tasks: Task[] = await this.taskQueueService.getTasksByBatchNum(batchNum);
-        return response.status(200).json({ tasks });
+        try {
+            const batchNumInput = request.query.batchNum;
+            if (batchNumInput === undefined || typeof batchNumInput !== "string") return handleErrorResponse(response, "must supply batchNum");
+            // todo: validation
+            const batchNum = parseInt(batchNumInput, 10);
+            if (isNaN(batchNum)) return handleErrorResponse(response, "batchNum must be an integer");
+            const tasks: Task[] = await this.taskQueueService.getTasksByBatchNum(batchNum);
+            return response.status(200).json({ tasks });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     public async banUser(request: Request, response: Response) {
-        const acctIdInput = request.query.acctId;
-        if (acctIdInput === undefined || typeof acctIdInput !== "string") return handleErrorResponse(response, "must supply acctId");
-        const acctId = parseInt(acctIdInput, 10);
-        if (isNaN(acctId)) return handleErrorResponse(response, "acctId must be an integer");
-        const success = await this.adminService.banUser(acctId);
-        return response.status(200).json({ success });
+        try {
+            const acctIdInput = request.query.acctId;
+            if (acctIdInput === undefined || typeof acctIdInput !== "string") return handleErrorResponse(response, "must supply acctId");
+            const acctId = parseInt(acctIdInput, 10);
+            if (isNaN(acctId)) return handleErrorResponse(response, "acctId must be an integer");
+            const success = await this.adminService.banUser(acctId);
+            return response.status(200).json({ success });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     public async makeAdmin(request: Request, response: Response) {
-        const newAdminEmail = request.body.email;
-        if (newAdminEmail === undefined || typeof newAdminEmail !== "string") return handleErrorResponse(response, "must provide email");
-        const success = this.adminService.makeAdmin(newAdminEmail); // works until there is an admin in the system
-        return response.status(200).json({ success });
+        try {
+            const newAdminEmail = request.body.email;
+            if (newAdminEmail === undefined || typeof newAdminEmail !== "string") return handleErrorResponse(response, "must provide email");
+            const success = this.adminService.makeAdmin(newAdminEmail); // works until there is an admin in the system
+            return response.status(200).json({ success });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     public async getUserJourney(request: Request, response: Response) {

@@ -3,7 +3,7 @@ import { CityNameEnum } from "../enum/cityName.enum";
 import { StateNamesEnum } from "../enum/stateName.enum";
 //
 import GymService from "../service/gym.service";
-import { errorResponse } from "../util/responses/handleErrorResponse";
+import { handleErrorResponse } from "../util/responses/handleErrorResponse";
 
 class GymsController {
     public path = "/google";
@@ -21,51 +21,75 @@ class GymsController {
     }
 
     async getGymsFromGoogle(request: Request, response: Response) {
-        const cityName = request.query.cityName;
-        const stateOrProvince = request.query.state;
-        const country = request.query.country;
-        // validation
-        if (typeof cityName !== "string" || typeof stateOrProvince !== "string" || typeof country !== "string") {
-            return errorResponse(response, "Parameter missing or isn't string");
-        }
-        const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
-        if (!legitCityName) return errorResponse(response, "cityName was not legit");
-        const legitStateName = Object.values(StateNamesEnum).some(name => name == stateOrProvince);
-        if (!legitStateName) return errorResponse(response, "state was not legit");
-        //
-        const gyms = await this.gymService.findGymsInLocation(country, stateOrProvince, cityName);
-        const saved = await this.gymService.saveGyms(gyms, cityName);
+        try {
+            const cityName = request.query.cityName;
+            const stateOrProvince = request.query.state;
+            const country = request.query.country;
+            // validation
+            if (typeof cityName !== "string" || typeof stateOrProvince !== "string" || typeof country !== "string") {
+                return handleErrorResponse(response, "Parameter missing or isn't string");
+            }
+            const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
+            if (!legitCityName) return handleErrorResponse(response, "cityName was not legit");
+            const legitStateName = Object.values(StateNamesEnum).some(name => name == stateOrProvince);
+            if (!legitStateName) return handleErrorResponse(response, "state was not legit");
+            //
+            const gyms = await this.gymService.findGymsInLocation(country, stateOrProvince, cityName);
+            const saved = await this.gymService.saveGyms(gyms, cityName);
 
-        return response.status(200).json({ gyms, saved });
+            return response.status(200).json({ gyms, saved });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     async getSavedGymsFromDB(request: Request, response: Response) {
-        const cityName = request.query.cityName;
-        if (typeof cityName !== "string") {
-            return errorResponse(response, "cityName must be string");
+        try {
+            const cityName = request.query.cityName;
+            if (typeof cityName !== "string") {
+                return handleErrorResponse(response, "cityName must be string");
+            }
+            const gymsFromDB = await this.gymService.getSavedGymsFromDB(cityName);
+            return response.status(200).json(gymsFromDB);
+        } catch (err) {
+            return handleErrorResponse(response, err);
         }
-        const gymsFromDB = await this.gymService.getSavedGymsFromDB(cityName);
-        return response.status(200).json(gymsFromDB);
     }
 
     async addCityIdWhereMissing(request: Request, response: Response) {
-        const correctedGyms = await this.gymService.correctNullEntries();
-        return response.status(200).json({ correctedGyms });
+        try {
+            const correctedGyms = await this.gymService.correctNullEntries();
+            return response.status(200).json({ correctedGyms });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     async countGymsByCity(request: Request, response: Response) {
-        const countedByCity = await this.gymService.countGymsByCity();
-        return response.status(200).json({ countedByCity });
+        try {
+            const countedByCity = await this.gymService.countGymsByCity();
+            return response.status(200).json({ countedByCity });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     async getAllGyms(request: Request, response: Response) {
-        const gyms = await this.gymService.getAllGyms();
-        return response.status(200).json({ gyms });
+        try {
+            const gyms = await this.gymService.getAllGyms();
+            return response.status(200).json({ gyms });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     async deleteAll(request: Request, response: Response) {
-        const affected = await this.gymService.deleteAll();
-        return response.status(200).json({ message: `Deleted ${affected} gyms in the db` });
+        try {
+            const affected = await this.gymService.deleteAll();
+            return response.status(200).json({ message: `Deleted ${affected} gyms in the db` });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 }
 
