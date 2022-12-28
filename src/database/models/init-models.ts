@@ -49,6 +49,7 @@ function initModels(sequelize: Sequelize) {
     Account.hasOne(Profile, { foreignKey: "acctId", as: "their_profile" });
     Profile.belongsTo(Account, { foreignKey: "acctId", as: "profile_of" });
 
+    // https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/
     Profile.belongsToMany(Housing, { through: "Profile_Housings", as: "chosen_housings" });
     Housing.belongsToMany(Profile, { through: "Profile_Housings", as: "housings_chosen_by" });
 

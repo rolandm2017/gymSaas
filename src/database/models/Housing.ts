@@ -1,7 +1,8 @@
 import { boolean } from "joi";
-import { DataTypes, Model, Sequelize, Optional, ForeignKey } from "sequelize";
+import { DataTypes, Model, Sequelize, Optional, ForeignKey, Association } from "sequelize";
 import { Batch } from "./Batch";
 import { City } from "./City";
+import { Profile } from "./Profile";
 import { State } from "./State";
 import { Task } from "./Task";
 
@@ -49,6 +50,12 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
+
+    public readonly Profiles?: Profile[];
+
+    public static associations: {
+        Profiles: Association<Housing, Profile>;
+    };
 
     static initModel(sequelize: Sequelize): typeof Housing {
         return Housing.init(
