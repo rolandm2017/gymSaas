@@ -1,14 +1,15 @@
 import { Op } from "sequelize";
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { City } from "../models/City";
 import { Housing, HousingCreationAttributes } from "../models/Housing";
 import { State } from "../models/State";
 import CityDAO from "./city.dao";
 import StateDAO from "./state.dao";
 
-// interface FindApartmentsByLocationFilters {
-//     cityName?: string;
-//     stateName?: string;
-// }
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class HousingDAO {
     private stateDAO: StateDAO;
     private cityDAO: CityDAO;
@@ -19,12 +20,7 @@ class HousingDAO {
     }
 
     public createHousing = async (housing: HousingCreationAttributes) => {
-        try {
-            return await Housing.create({ ...housing });
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
+        return await Housing.create({ ...housing });
     };
 
     public countHousingsInCity = async (cityId: number) => {

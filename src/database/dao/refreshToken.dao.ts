@@ -1,5 +1,10 @@
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { RefreshToken, RefreshTokenCreationAttributes } from "../models/RefreshToken";
 
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class RefreshTokenDAO {
     public createRefreshToken = async (acctId: number, token: string, expires: Date, createdByIp: string) => {
         const rt: RefreshToken = await RefreshToken.create({

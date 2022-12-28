@@ -1,6 +1,11 @@
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { ResetToken, ResetTokenCreationAttributes } from "../models/ResetToken";
 import AccountDAO from "./account.dao";
 
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class ResetTokenDAO {
     private acctDAO: AccountDAO;
     constructor(acctDAO: AccountDAO) {

@@ -1,8 +1,13 @@
 import { Role } from "../../enum/role.enum";
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { isEmail } from "../../validationSchemas/schemas";
 import { Account, AccountCreationAttributes } from "../models/Account";
 import { RefreshToken } from "../models/RefreshToken";
 
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class AccountDAO {
     constructor() {}
 
@@ -33,10 +38,7 @@ class AccountDAO {
     };
 
     public getMultipleAccounts = async (limit: number, offset?: number): Promise<{ rows: Account[]; count: number }> => {
-        const accts: {
-            rows: Account[];
-            count: number;
-        } = await Account.findAndCountAll({ offset, limit });
+        const accts = await Account.findAndCountAll({ offset, limit });
         return accts;
     };
 

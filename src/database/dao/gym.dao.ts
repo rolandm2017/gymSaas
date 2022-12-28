@@ -1,5 +1,10 @@
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { Gym, GymCreationAttributes } from "../models/Gym";
 
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class GymDAO {
     constructor() {}
 

@@ -1,15 +1,15 @@
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { City, CityCreationAttributes } from "../models/City";
 
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class CityDAO {
     constructor() {}
 
     public createCity = async (city: CityCreationAttributes): Promise<City> => {
-        try {
-            return await City.create(city);
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
+        return await City.create(city);
     };
 
     public getAllCities = async (): Promise<City[]> => {

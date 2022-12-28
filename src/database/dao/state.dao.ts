@@ -1,5 +1,10 @@
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { State, StateCreationAttributes } from "../models/State";
 
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class StateDAO {
     // hopefully this isnt used much
     constructor() {
