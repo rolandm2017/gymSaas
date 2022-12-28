@@ -34,7 +34,7 @@ export const TryCatchMethodDecorator = (errorType: any, handler: HandlerFunction
     };
 };
 
-export const CatchAll = (handler: HandlerFunction): any => TryCatchMethodDecorator(Error, handler);
+export const CatchErrors = (handler: HandlerFunction): any => TryCatchMethodDecorator(Error, handler);
 
 function _handleError(context: any, errorType: any, handler: HandlerFunction, error: Error) {
     // Check if error is instance of given error type
