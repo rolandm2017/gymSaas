@@ -8,7 +8,7 @@ import authorize from "../middleware/authorize.middleware";
 import AdminService from "../service/admin.service";
 import HousingService from "../service/housing.service";
 import TaskQueueService from "../service/taskQueue.service";
-import { handleErrorResponse } from "../util/responses/handleErrorResponse";
+import { handleErrorResponse } from "../util/handleErrorResponse";
 import { isEmail, isProvider, isString, isStringInteger } from "../validationSchemas/inputValidation";
 
 class AdminController {

@@ -5,7 +5,7 @@ import ScraperService from "../service/scraper.service";
 import HousingService from "../service/housing.service";
 import { Housing } from "../database/models/Housing";
 import { CityNameEnum } from "../enum/cityName.enum";
-import { handleErrorResponse } from "../util/responses/handleErrorResponse";
+import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
 import { isLegitCityName, isProvider, isString, isStringInteger } from "../validationSchemas/inputValidation";
 import { detectViewportWidthSchema, getHousingByCityIdAndBatchNumSchema } from "../validationSchemas/housingSchemas";

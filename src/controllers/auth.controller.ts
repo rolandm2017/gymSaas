@@ -17,7 +17,7 @@ import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
 import AuthService from "../service/auth.service";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
-import { handleErrorResponse } from "../util/responses/handleErrorResponse";
+import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
 
 class AuthController {

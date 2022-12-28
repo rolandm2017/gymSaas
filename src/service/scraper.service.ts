@@ -58,18 +58,6 @@ class ScraperService {
         // todo: retrieve stored grid dimensions if they exist.
         return subdivisionLocations;
     }
-
-    // public async scanGrid(provider: ProviderEnum, coords: ILatLong[], zoomWidth: number, batchNum: number): Promise<boolean> {
-    //     // step 3: fwd the grid coords to the scraper along with the bounds.
-    //     // the scraper will scan every subdivision of the grid and report back its results.
-    //     const scraper: Scraper = this.scraperConnectionFactory.getScraperOfType(provider);
-    //     const successfullyQueued: boolean = await scraper.queueGridScrape(coords, zoomWidth, batchNum);
-    //     // TODO: figure out what to do here. scrapeGrid might take 1 hour.
-    //     // what if the process is interrupted?
-    //     // what if the scraper crashes halfway thru?
-    //     // I think the scraper should receive jobs from a queue, and report results to a db.
-    //     return successfullyQueued;
-    // }
 }
 
 export default ScraperService;

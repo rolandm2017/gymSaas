@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize as S, Model, Optional } from "sequelize";
+import { DataTypes, Sequelize as S, Model, Optional, ForeignKey } from "sequelize";
 
 interface AccountAttributes {
     acctId?: number;

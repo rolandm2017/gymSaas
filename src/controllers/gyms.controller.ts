@@ -3,7 +3,7 @@ import { CityNameEnum } from "../enum/cityName.enum";
 import { StateNamesEnum } from "../enum/stateName.enum";
 //
 import GymService from "../service/gym.service";
-import { handleErrorResponse } from "../util/responses/handleErrorResponse";
+import { handleErrorResponse } from "../util/handleErrorResponse";
 import { isString } from "../validationSchemas/inputValidation";
 
 class GymsController {

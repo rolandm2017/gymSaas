@@ -1,5 +1,5 @@
 import express, { ErrorRequestHandler, NextFunction, Request, Response } from "express";
-import { handleErrorResponse } from "../util/responses/handleErrorResponse";
+import { handleErrorResponse } from "../util/handleErrorResponse";
 
 // fixme: err definitely isnt 'any' but idk how to discover the types
 function errorHandler(err: any, request: Request, response: Response, next: NextFunction) {

@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize";
+//
 import { Account as _Account } from "./Account";
+import { Profile as _Profile } from "./Profile";
 import { Gym as _Gym } from "./Gym";
 import { Housing as _Housing } from "./Housing";
 import { RefreshToken as _RefreshToken } from "./RefreshToken";
@@ -17,14 +19,19 @@ function initModels(sequelize: Sequelize) {
     const Account = _Account.initModel(sequelize);
     const RefreshToken = _RefreshToken.initModel(sequelize);
     const ResetToken = _ResetToken.initModel(sequelize);
+    // account's non-account related stuff
+    const Profile = _Profile.initModel(sequelize);
+    const Wish = _Wish.initModel(sequelize);
     // city must be added before housing, gym, task, because they depend on it
     const State = _State.initModel(sequelize);
     const City = _City.initModel(sequelize);
+    //
     const Housing = _Housing.initModel(sequelize);
     const Gym = _Gym.initModel(sequelize);
+    // task related stuff
     const Task = _Task.initModel(sequelize);
     const Batch = _Batch.initModel(sequelize);
-    const Wish = _Wish.initModel(sequelize);
+    //
 
     Account.hasMany(RefreshToken, {
         foreignKey: "acctId",
@@ -37,6 +44,9 @@ function initModels(sequelize: Sequelize) {
         as: "their_reset_tokens",
     });
     ResetToken.belongsTo(Account, { as: "belongs_to_user", foreignKey: "acctId" });
+
+    Account.hasOne(Profile, { foreignKey: "acctId", as: "their_profile" });
+    Profile.hasOne(Account, { foreignKey: "acctId", as: "profile_of" });
 
     // Scraping tasks
     City.hasMany(Task, {
