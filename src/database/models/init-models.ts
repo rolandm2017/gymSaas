@@ -45,8 +45,15 @@ function initModels(sequelize: Sequelize) {
     });
     ResetToken.belongsTo(Account, { as: "belongs_to_user", foreignKey: "acctId" });
 
+    // profile stuff
     Account.hasOne(Profile, { foreignKey: "acctId", as: "their_profile" });
-    Profile.hasOne(Account, { foreignKey: "acctId", as: "profile_of" });
+    Profile.belongsTo(Account, { foreignKey: "acctId", as: "profile_of" });
+
+    Profile.belongsToMany(Housing, { through: "Profile_Housings", as: "chosen_housings" });
+    Housing.belongsToMany(Profile, { through: "Profile_Housings", as: "housings_chosen_by" });
+
+    Profile.belongsToMany(Gym, { through: "Profile_Gyms", as: "chosen_gyms" });
+    Gym.belongsToMany(Profile, { through: "Profile_Gyms", as: "gyms_chosen_by" });
 
     // Scraping tasks
     City.hasMany(Task, {
