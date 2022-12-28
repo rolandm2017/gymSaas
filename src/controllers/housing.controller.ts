@@ -7,6 +7,8 @@ import { Housing } from "../database/models/Housing";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { handleErrorResponse } from "../util/responses/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
+import { isLegitCityName, isProvider, isString, isStringInteger } from "../validationSchemas/inputValidation";
+import { detectViewportWidthSchema, getHousingByCityIdAndBatchNumSchema } from "../validationSchemas/housingSchemas";
 
 class HousingController {
     public path = "/housing";
@@ -21,11 +23,11 @@ class HousingController {
         // public endpoint for demo
         this.router.get("/demo", this.getDemoContent.bind(this));
         // step 1 of 3 in queuing a scrape
-        this.router.post("/viewport-width", this.detectProviderViewportWidth.bind(this));
+        this.router.post("/viewport-width", detectViewportWidthSchema, this.detectProviderViewportWidth.bind(this));
         // user queries
         this.router.get("/location", this.getSavedApartmentsByLocation.bind(this));
         // admin ish stuff
-        this.router.get("/by-city-id-and-batch-id", this.getHousingByCityIdAndBatchNum.bind(this));
+        this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
         this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by-location", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
@@ -38,32 +40,18 @@ class HousingController {
         // this.router.post("/task", this.queueScrape);
     }
 
-    async getDemoContent(request: Request, response: Response) {
+    public async getDemoContent(request: Request, response: Response) {
         try {
             const neLatInput = request.query.neLat;
             const neLongInput = request.query.neLong;
             const swLatInput = request.query.swLat;
             const swLongInput = request.query.swLong;
 
-            // const zoomWidthInput = request.query.zoomWidth;
-            if (neLatInput == undefined || neLongInput == undefined || swLatInput == undefined || swLongInput == undefined) {
-                return handleErrorResponse(response, "all inputs must be defined");
-            }
-            if (
-                typeof neLatInput !== "string" ||
-                typeof neLongInput !== "string" ||
-                typeof swLatInput !== "string" ||
-                typeof swLongInput !== "string"
-            ) {
-                return handleErrorResponse(response, "all inputs must be string integers");
-            }
-            const neLat = parseFloat(neLatInput); // max lat
-            const neLong = parseFloat(neLongInput); // max long
-            const swLat = parseFloat(swLatInput); // min lat
-            const swLong = parseFloat(swLongInput); // min long
-            if (isNaN(neLat) || isNaN(neLong) || isNaN(swLat) || isNaN(swLong)) {
-                return handleErrorResponse(response, "all inputs must be string integers");
-            }
+            const neLat = isStringInteger(neLatInput); // max lat
+            const neLong = isStringInteger(neLongInput); // max long
+            const swLat = isStringInteger(swLatInput); // min lat
+            const swLong = isStringInteger(swLongInput); // min long
+
             console.log("sml #, big ####", swLat, neLat);
             const demoContent = await this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
             return response.status(200).json({ demoContent });
@@ -72,17 +60,13 @@ class HousingController {
         }
     }
 
-    async detectProviderViewportWidth(request: Request, response: Response) {
+    public async detectProviderViewportWidth(request: Request, response: Response) {
         try {
             const city = request.body.city;
             const stateOrProvince = request.body.state;
             const providerInput = request.body.provider;
-            if (!city || !stateOrProvince) {
-                return handleErrorResponse(response, "Parameter missing");
-            }
-            const validProviderInput = Object.values(ProviderEnum).some(name => name === providerInput);
-            if (!validProviderInput) return handleErrorResponse(response, "InvalId provider input");
-            const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(ProviderEnum.rentCanada, city, stateOrProvince); // todo: advance from hardcode provider choice
+            const provider = isProvider(providerInput); // throws if invalid
+            const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(provider, city, stateOrProvince); // todo: advance from hardcode provider choice
             return response.status(200).json(dimensions);
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -93,9 +77,6 @@ class HousingController {
         try {
             const byBatchNum = request.body.batchNum;
             const byCityId = request.body.cityId;
-            if (!byBatchNum && !byCityId) return handleErrorResponse(response, "Missing parameter");
-            if (byBatchNum && typeof byBatchNum !== "number") return handleErrorResponse(response, "batchNum must be int");
-            if (byCityId && typeof byCityId !== "number") return handleErrorResponse(response, "cityId must be int");
             const housing: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(byCityId, byBatchNum);
             return response.status(200).json({ housing });
         } catch (err) {
@@ -105,21 +86,15 @@ class HousingController {
 
     public async getSavedApartmentsByLocation(request: Request, response: Response) {
         try {
-            const cityIdString = request.query.cityId;
-            const cityName = request.query.cityName;
-            const stateOrProvince = request.query.state;
-            if (!cityIdString && !stateOrProvince && !cityName) {
-                return handleErrorResponse(response, "Parameter missing");
-            }
-            if (cityIdString && typeof cityIdString !== "string" && typeof cityIdString !== "number")
-                return handleErrorResponse(response, "cityId must be number or string");
-            if (cityName && typeof cityName !== "string") return handleErrorResponse(response, "cityName must be string");
-            if (stateOrProvince && typeof stateOrProvince !== "string") return handleErrorResponse(response, "state must be string");
-            const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
-            if (!legitCityName) return handleErrorResponse(response, "cityName was not legit");
-            if (cityIdString === undefined) return handleErrorResponse(response, "cityId undefined");
-            const cityId: number | undefined = cityIdString ? parseInt(cityIdString, 10) : undefined;
-            const apartments: Housing[] = await this.housingService.getAllHousing(cityId, cityName, stateOrProvince);
+            const cityIdInput = request.query.cityId;
+            const cityNameInput = request.query.cityName;
+            const stateOrProvinceInput = request.query.state;
+            // validation
+            // Note it could be an invalid state/province but, not checking that. It could just fail.
+            const stateOrProvince = stateOrProvinceInput ? isString(stateOrProvinceInput) : undefined;
+            const legitCityName = cityNameInput ? isLegitCityName(cityNameInput) : undefined;
+            const cityId = cityIdInput ? isStringInteger(cityIdInput) : undefined;
+            const apartments: Housing[] = await this.housingService.getAllHousing(cityId, legitCityName, stateOrProvince);
             return response.status(200).json({ apartments });
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -127,7 +102,7 @@ class HousingController {
     }
 
     public async getAllApartments(request: Request, response: Response) {
-        // keep this one SIMPLE. Really: "Get ALL."
+        // Really: "Get ALL."
         try {
             const apartments: Housing[] = await this.housingService.getAllHousing();
             return response.status(200).json({ apartments, length: apartments.length });

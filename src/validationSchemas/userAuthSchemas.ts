@@ -5,14 +5,14 @@ import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
 
 function isEmail(maybeEmail: string): boolean {
-    const schema: ObjectSchema<any> = Joi.object({ email: Joi.string().email().required() });
+    const schema: ObjectSchema = Joi.object({ email: Joi.string().email().required() });
     const { error, value } = schema.validate({ email: maybeEmail });
     if (error) return false;
     else return true;
 }
 
 function authenticateUserSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string().required(),
     });
@@ -20,7 +20,7 @@ function authenticateUserSchema(req: Request, res: Response, next: NextFunction)
 }
 
 function registerUserSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref("password")).required(),
@@ -30,7 +30,7 @@ function registerUserSchema(req: Request, res: Response, next: NextFunction) {
 }
 
 function updatePasswordSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         email: Joi.string().email().required(),
         oldPw: Joi.string().min(6).required(),
         newPw: Joi.string().min(6).required(),
@@ -40,7 +40,7 @@ function updatePasswordSchema(req: Request, res: Response, next: NextFunction) {
 }
 
 function createAccountSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         // title: Joi.string().required(),
         // firstName: Joi.string().required(),
         // lastName: Joi.string().required(),
@@ -53,21 +53,21 @@ function createAccountSchema(req: Request, res: Response, next: NextFunction) {
 }
 
 function verifyEmailSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         token: Joi.string().required(),
     });
     validateRequest(req, next, schema);
 }
 
 function forgotPasswordSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         email: Joi.string().email().required(),
     });
     validateRequest(req, next, schema);
 }
 
 function resetPasswordSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         token: Joi.string().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref("password")).required(),
@@ -76,14 +76,14 @@ function resetPasswordSchema(req: Request, res: Response, next: NextFunction) {
 }
 
 function validateResetTokenSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         token: Joi.string().required(),
     });
     validateRequest(req, next, schema);
 }
 
 function revokeTokenSchema(req: Request, res: Response, next: NextFunction) {
-    const schema: ObjectSchema<any> = Joi.object({
+    const schema: ObjectSchema = Joi.object({
         token: Joi.string().empty(""),
     });
     validateRequest(req, next, schema);

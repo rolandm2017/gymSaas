@@ -4,6 +4,7 @@ import { StateNamesEnum } from "../enum/stateName.enum";
 //
 import GymService from "../service/gym.service";
 import { handleErrorResponse } from "../util/responses/handleErrorResponse";
+import { isString } from "../validationSchemas/inputValidation";
 
 class GymsController {
     public path = "/google";
@@ -45,10 +46,8 @@ class GymsController {
 
     async getSavedGymsFromDB(request: Request, response: Response) {
         try {
-            const cityName = request.query.cityName;
-            if (typeof cityName !== "string") {
-                return handleErrorResponse(response, "cityName must be string");
-            }
+            const cityNameInput = request.query.cityName;
+            const cityName = isString(cityNameInput);
             const gymsFromDB = await this.gymService.getSavedGymsFromDB(cityName);
             return response.status(200).json(gymsFromDB);
         } catch (err) {

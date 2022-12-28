@@ -1,6 +1,6 @@
 import { Role } from "../../enum/role.enum";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
-import { isEmail } from "../../validationSchemas/schemas";
+import { isEmail } from "../../validationSchemas/userAuthSchemas";
 import { Account, AccountCreationAttributes } from "../models/Account";
 import { RefreshToken } from "../models/RefreshToken";
 

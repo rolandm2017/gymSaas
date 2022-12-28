@@ -11,7 +11,7 @@ import {
     updateRoleSchema,
     validateResetTokenSchema,
     verifyEmailSchema,
-} from "../validationSchemas/schemas";
+} from "../validationSchemas/userAuthSchemas";
 import authorize from "../middleware/authorize.middleware";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
@@ -58,9 +58,8 @@ class AuthController {
             const password: string = request.body.password;
             const ipAddress: string = request.ip;
             const accountDetails: IBasicDetails = await this.authService.authenticate(email, password, ipAddress);
-            if ("error" in accountDetails) return response.json({ error: accountDetails.error });
-            if (accountDetails.jwtToken === undefined) throw new Error("jwt missing");
-            if (accountDetails.refreshToken === undefined) throw new Error("refresh token missing");
+            if (accountDetails.jwtToken === undefined) throw new Error("jwt missing from authenticate response");
+            if (accountDetails.refreshToken === undefined) throw new Error("refresh token missing from authenticate response");
             this.setTokenCookie(response, accountDetails.refreshToken);
             return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
         } catch (err) {
@@ -75,7 +74,6 @@ class AuthController {
                 return handleErrorResponse(response, "Origin is required and was undefined");
             }
             const accountDetails: IBasicDetails = await this.authService.register(request.body, origin);
-            if ("error" in accountDetails) return handleErrorResponse(response, accountDetails.error);
             return response.json({
                 message: "Registration successful, please check your email for verification instructions",
                 accountDetails,
@@ -109,7 +107,6 @@ class AuthController {
                 return response.status(401).json({ message: "Unauthorized" });
             }
             await this.authService.revokeToken(token, ipAddress);
-            // .then(() response.json({ message: "Token revoked" }))
             return response.json({ message: "Token revoked" });
         } catch (err) {
             return handleErrorResponse(response, err);

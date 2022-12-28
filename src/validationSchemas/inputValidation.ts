@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CityNameEnum } from "../enum/cityName.enum";
 import { ProviderEnum } from "../enum/provider.enum";
 
 const stringSchema = z.string();
@@ -14,6 +15,14 @@ export function isStringInteger(testSubject: unknown): number {
     return numberSchema.parse(toNumber);
 }
 
+export function isInteger(testSubject: unknown): number {
+    return numberSchema.parse(testSubject);
+}
+
+export function isString(testSubject: unknown): string {
+    return stringSchema.parse(testSubject);
+}
+
 export function isEmail(testSubject: unknown): string {
     return emailSchema.parse(testSubject);
 }
@@ -24,12 +33,10 @@ export function isProvider(testSubject: unknown): ProviderEnum {
     else throw new Error("Invalid provider");
 }
 
-export function isInteger(testSubject: unknown): number {
-    return numberSchema.parse(testSubject);
-}
-
-export function isString(testSubject: unknown): string {
-    return stringSchema.parse(testSubject);
+export function isLegitCityName(testSubject: unknown): CityNameEnum {
+    const isCityName = Object.values(CityNameEnum).some(name => name == testSubject);
+    if (isCityName) return testSubject as CityNameEnum;
+    else throw new Error("Invalid city name");
 }
 
 export function arrayIsAllStrings(testSubject: unknown[]): string[] {
