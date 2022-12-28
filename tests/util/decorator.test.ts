@@ -57,10 +57,12 @@ describe("the try/catch decorators", () => {
     });
     test("you can throw in the class decorator handler func", () => {
         // arrange
+        console.log = jest.fn();
         const errMsgOne = "Something went wrong!";
         const errMsgTwo = "Not intended error";
 
         @TryCatchClassDecorator(Error, (err, context) => {
+            console.log(context, err);
             throw err;
         })
         class YeOleTestObject {
@@ -80,7 +82,9 @@ describe("the try/catch decorators", () => {
 
         // thrower();
         expect(objToTest.throwSomeStuff).toThrow(expectedError);
+        expect(console.log).toBeCalledWith(undefined, expectedError); // tbh I have no idea why its 'undefined' here and '{}' up above
         expect(objToTest.yeOleThrower).toThrow(expectedErrorTwo);
+        expect(console.log).toBeCalledWith(undefined, expectedErrorTwo);
     });
     test("you can throw in the method decorator handler func", () => {
         // arrange
@@ -91,12 +95,17 @@ describe("the try/catch decorators", () => {
         class ThyTestObject {
             // @TryCatchMethodDecorator(Error, (err, context) => console.log(context, err))
             @TryCatchMethodDecorator(Error, (err, context) => {
+                console.log(context, err);
                 throw err;
             })
             throwOtherStuff() {
                 throw new Error(errMsgTwo);
             }
 
+            @TryCatchMethodDecorator(Error, (err, context) => {
+                console.log(context, err);
+                throw err;
+            })
             throwMoreStuff() {
                 throw new Error(errMsgThree);
             }
@@ -108,6 +117,8 @@ describe("the try/catch decorators", () => {
         const expectedErrorThree = new Error(errMsgThree);
 
         expect(objToTestTwo.throwOtherStuff).toThrow(expectedErrorTwo);
+        expect(console.log).toBeCalledWith(undefined, expectedErrorTwo); // tbh I have no idea why its 'undefined' here and '{}' up above
         expect(objToTestTwo.throwMoreStuff).toThrow(expectedErrorThree);
+        expect(console.log).toBeCalledWith(undefined, expectedErrorThree);
     });
 });
