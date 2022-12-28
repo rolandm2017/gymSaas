@@ -64,7 +64,7 @@ class AuthController {
             this.setTokenCookie(response, accountDetails.refreshToken);
             return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -81,7 +81,7 @@ class AuthController {
                 accountDetails,
             });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -93,7 +93,7 @@ class AuthController {
             this.setTokenCookie(response, refreshToken);
             return response.json(account);
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -112,7 +112,7 @@ class AuthController {
             // .then(() response.json({ message: "Token revoked" }))
             return response.json({ message: "Token revoked" });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -122,7 +122,7 @@ class AuthController {
             await this.authService.verifyEmail(token);
             return response.json({ message: "Verification successful, you can now login" });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -132,7 +132,7 @@ class AuthController {
             await this.authService.logVerificationToken(email);
             return response.status(200).json({ message: "success" });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -150,7 +150,7 @@ class AuthController {
             if (success) return response.json({ message: "Password updated!" });
             else return response.json({ error: "You entered the wrong starting password" });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -165,7 +165,7 @@ class AuthController {
             await this.authService.forgotPassword(email, origin);
             return response.json({ message: "Please check your email for password reset instructions" });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -176,7 +176,7 @@ class AuthController {
             if (success) return response.json({ message: "Token is valid" });
             else return response.json({ message: "Invalid token" });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -188,7 +188,7 @@ class AuthController {
             if (success) return response.json({ message: "Password reset successful, you can now login" });
             else return response.json({ message: "Reset password failed" });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -200,7 +200,7 @@ class AuthController {
             const accounts = await this.authService.getAllAccounts();
             return response.json(accounts);
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -215,7 +215,7 @@ class AuthController {
             const account = await this.authService.getAccountById(idAsNumber);
             return account ? response.json(account) : response.sendStatus(404);
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -224,7 +224,7 @@ class AuthController {
             const account = this.authService.createAccount(request.body);
             return response.json(account);
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -240,7 +240,7 @@ class AuthController {
             const account = this.authService.updateAccount(idAsNumber, request.body);
             return response.json(account);
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
@@ -256,7 +256,7 @@ class AuthController {
             await this.authService.deleteAccount(request.params.id);
             return response.json({ message: "Account deleted successfully" });
         } catch (err) {
-            handleErrorResponse(response, err);
+            return handleErrorResponse(response, err);
         }
     }
 
