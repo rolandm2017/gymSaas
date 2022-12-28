@@ -20,8 +20,8 @@ class AdminService {
 
     public async banUser(acctId: number): Promise<boolean> {
         const success = await this.accountDAO.banUser(acctId);
-        if (success.length > 1) throw new Error("banned multiple users via one account id");
-        if (success.length == 1) return true;
+        if (success > 1) throw new Error("banned multiple users via one account id");
+        if (success == 1) return true;
         return false;
     }
 }
