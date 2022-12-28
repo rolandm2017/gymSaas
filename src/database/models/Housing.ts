@@ -16,7 +16,7 @@ interface HousingAttributes {
     long: number;
     nearAGym: boolean | null;
     source: string;
-    idAtSource: number;
+    idAtSource: number | null;
     taskId?: number;
     cityId?: number;
     stateId?: number;
@@ -40,7 +40,7 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public long!: number;
     public nearAGym!: boolean | null;
     public source!: string;
-    public idAtSource!: number;
+    public idAtSource!: number | null;
     public taskId!: ForeignKey<Task["taskId"]>;
     public cityId!: ForeignKey<City["cityId"]>;
     public stateId!: ForeignKey<State["stateId"]>;

@@ -4,12 +4,12 @@ interface AccountAttributes {
     acctId?: number;
     email: string;
     passwordHash: string;
-    isVerified: boolean;
-    verificationToken: string;
-    updated: number;
+    isVerified: boolean | null;
+    verificationToken: string | null;
+    updated: number | null;
     role: string;
-    passwordReset: number; // Date.now()
-    isBanned?: boolean;
+    passwordReset: number | null; // Date.now()
+    isBanned?: boolean | null;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -22,9 +22,9 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public acctId!: number;
     public email!: string;
     public passwordHash!: string;
-    public isVerified!: boolean;
-    public verificationToken!: string;
-    public updated!: number; // todo: remove this. 'updatedAt' handles it
+    public isVerified!: boolean | null;
+    public verificationToken!: string | null;
+    public updated!: number | null; // todo: remove this. 'updatedAt' handles it
     public role!: string;
     public passwordReset!: number;
     public isBanned!: boolean;

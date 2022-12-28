@@ -8,9 +8,9 @@ export interface GymAttributes {
     url: string; // link to the biz's website
     lat: number;
     long: number;
-    icon?: string;
+    icon?: string | null;
     name: string; // business name
-    rating?: number;
+    rating?: number | null;
     cityId?: number | null;
     createdAt?: Date;
     updatedAt?: Date;
@@ -27,9 +27,9 @@ export class Gym extends Model<GymAttributes, GymCreationAttributes> implements 
     public url!: string;
     public lat!: number;
     public long!: number;
-    public icon!: string;
+    public icon!: string | null;
     public name!: string;
-    public rating!: number;
+    public rating!: number | null;
     public cityId!: ForeignKey<City["cityId"]>;
 
     public readonly createdAt!: Date;
