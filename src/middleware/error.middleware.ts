@@ -2,6 +2,7 @@ import express, { ErrorRequestHandler, NextFunction, Request, Response } from "e
 
 // fixme: err definitely isnt 'any' but idk how to discover the types
 function errorHandler(err: any, request: Request, response: Response, next: NextFunction) {
+    console.log(err, "5rm");
     switch (true) {
         case typeof err === "string":
             // custom application error

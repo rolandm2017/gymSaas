@@ -95,6 +95,7 @@ class App {
         if (alsoGyms) {
             for (const cityGyms of SEED_GYMS_CANADA) {
                 for (const gym of cityGyms) {
+                    // todo: associate seeded gym with its city. use the city id cache!
                     Gym.create(gym);
                 }
             }

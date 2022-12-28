@@ -3,7 +3,7 @@ import { Housing } from "../database/models/Housing";
 import { Task } from "../database/models/Task";
 import { ProviderEnum } from "../enum/provider.enum";
 import { Role } from "../enum/role.enum";
-import { HealthCheck } from "../enum/routes/healthCheck.enum";
+import { HealthCheck } from "../enum/healthCheck.enum";
 import authorize from "../middleware/authorize.middleware";
 import AdminService from "../service/admin.service";
 import HousingService from "../service/housing.service";

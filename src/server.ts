@@ -51,7 +51,7 @@ const scraperFactory: ScraperFactory = new ScraperFactory(taskDAO);
 // services
 // is there a better place to initialize these?
 const adminService = new AdminService(acctDAO);
-const emailService: EmailService = new EmailService(sendEmail);
+const emailService: EmailService = new EmailService(sendEmail, "development");
 const scraperService = new ScraperService(scraperFactory, locationDiscoveryService);
 const authService: AuthService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO);

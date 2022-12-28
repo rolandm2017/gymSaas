@@ -1,6 +1,6 @@
 import request from "supertest";
 //
-import { HealthCheck } from "../../src/enum/routes/healthCheck.enum";
+import { HealthCheck } from "../../src/enum/healthCheck.enum";
 
 import { adminCredentials } from "../mocks/adminCredentials";
 import { ProviderEnum } from "../../src/enum/provider.enum";
