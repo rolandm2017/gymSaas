@@ -32,7 +32,7 @@ class HousingDAO {
         return await Housing.findAndCountAll({ offset, limit });
     };
 
-    public getHousingById = async (id: number) => {
+    public getHousingById = async (id: number): Promise<Housing | null> => {
         return await Housing.findByPk(id);
     };
 

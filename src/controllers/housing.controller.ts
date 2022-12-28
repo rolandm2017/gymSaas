@@ -30,6 +30,7 @@ class HousingController {
         this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
         this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by-location", this.getSavedApartmentsByLocation.bind(this));
+        this.router.get("/real-url/:apartmentid", this.getRealURL.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
         this.router.delete("/all", this.deleteAllApartments.bind(this)); // todo: authorize admin only
         // step 4 of queuing a scrape - for after the scrape of the city is done
@@ -96,6 +97,18 @@ class HousingController {
             const cityId = cityIdInput ? isStringInteger(cityIdInput) : undefined;
             const apartments: Housing[] = await this.housingService.getAllHousing(cityId, legitCityName, stateOrProvince);
             return response.status(200).json({ apartments });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    public async getRealURL(request: Request, response: Response) {
+        // todo: get user from request & deduct a credit from his account
+        try {
+            const apartmentIdInput = request.params.apartmentid;
+            const apartmentId = isStringInteger(apartmentIdInput);
+            const realURL = await this.housingService.getRealURL(apartmentId);
+            return response.status(200).json({ apartmentId, realURL });
         } catch (err) {
             return handleErrorResponse(response, err);
         }

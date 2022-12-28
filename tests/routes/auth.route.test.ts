@@ -86,7 +86,7 @@ describe("Test auth controller with supertest", () => {
         });
     });
     describe("POST /authenticate", () => {
-        // authentic
+        // authenticate
         test("responds with success msg if body is populated properly", () => {
             // todo
         });

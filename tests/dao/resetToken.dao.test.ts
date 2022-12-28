@@ -37,7 +37,6 @@ describe("reset token DAO tests", () => {
         expect(definitelyNull.length).toBe(1); // 1 because something is added in beforeAll()
     });
     test("create one", async () => {
-        // todo
         const freshAcctDetails = {
             email: "sally@gmail.com",
             passwordHash: "afsdoifsaofj3adsfads",

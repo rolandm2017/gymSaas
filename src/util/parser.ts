@@ -23,8 +23,6 @@ class Parser {
     parseRentCanada(unprocessed: any): IHousing[] {
         // list of objects
         const mainList = unprocessed.listings; // do not change this
-        // fixme: what to do if .listings = []? answer: dont let it get into this method
-        // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousing[] = [];
         for (let i = 0; i < mainList.length; i++) {
             const unit = mainList[i];
@@ -35,6 +33,7 @@ class Parser {
                 state: unit.state,
                 price: undefined,
                 source: this.provider,
+                // url: // todo: fill me in (important! so users can see the apartment listing!)
                 lat: unit.latitude,
                 long: unit.longitude,
                 idAtSource: unit.id,

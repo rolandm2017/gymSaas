@@ -11,6 +11,7 @@ import ScraperService from "../service/scraper.service";
 import { handleErrorResponse } from "../util/responses/handleErrorResponse";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { HealthCheck } from "../enum/healthCheck.enum";
+import { isLegitCityName, isProvider, isStringInteger } from "../validationSchemas/inputValidation";
 
 // do I need a "scraper controller" and a separate "task queue controller"?
 class TaskQueueController {
@@ -52,10 +53,10 @@ class TaskQueueController {
             const city = request.body.city;
             const stateOrProvince = request.body.state;
             const country = request.body.country;
-            if (!city || !stateOrProvince || !country) {
-                return handleErrorResponse(response, "Parameter missing");
-            }
-            const aps: IHousing[] = await this.scraperService.scrapeApartments(ProviderEnum.rentCanada, city, stateOrProvince, country); // todo: advance from hardcode provider choice
+            const providerInput = request.body.provider;
+            const provider = isProvider(providerInput);
+            // todo: implement this method
+            const aps: IHousing[] = await this.scraperService.scrapeApartments(provider, city, stateOrProvince, country);
             return response.json({ aps });
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -65,8 +66,10 @@ class TaskQueueController {
     async getNextBatchNumber(request: Request, response: Response) {
         try {
             const highest = await this.cacheService.getBatchNumForNewBatches();
-            if (typeof highest === "number" && highest >= 0) return response.status(200).json({ nextBatchNum: highest });
-            // so this only happens once
+            if (highest >= 0) {
+                return response.status(200).json({ nextBatchNum: highest });
+            }
+            // this only happens once
             this.cacheService.setBatchNumForNewBatches(0);
             return response.status(200).json({ nextBatchNum: 0 });
         } catch (err) {
@@ -79,7 +82,7 @@ class TaskQueueController {
             const startCoords: ILatLong = request.body.startCoords;
             const bounds: IBounds = request.body.bounds;
             const radius: number = request.body.radius;
-            // not doing input validation here.
+            // Not doing input validation here. It will fail fine + validation would be a gong show.
             const gridCoords = await this.scraperService.planGrid(startCoords, bounds, radius);
             return response.status(200).json({ gridCoords });
         } catch (err) {
@@ -89,27 +92,23 @@ class TaskQueueController {
 
     async addGridScanToQueue(request: Request, response: Response) {
         try {
-            const provider = request.body.provider;
+            const providerInput = request.body.provider;
             const coords = request.body.coords;
-            const zoomWidth = request.body.zoomWidth;
-            const cityName = request.body.cityName;
-            const batchNum = request.body.batchNum; // admin should have gotten this from the previous endpoint
-            if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
-                return handleErrorResponse(response, "Invalid provider input");
-            }
+            const zoomWidthInput = request.body.zoomWidth;
+            const cityNameInput = request.body.cityName;
+            const batchNumInput = request.body.batchNum; // admin should have gotten this from the previous endpoint
+
+            const provider = isProvider(providerInput);
             if (!Array.isArray(coords) || coords.length === 0) {
+                // not doing more validation.
                 return handleErrorResponse(response, "Invalid coords input");
             }
-            if (typeof zoomWidth !== "number" || zoomWidth < 0) {
-                return handleErrorResponse(response, "Invalid zoomWidth input");
-            }
-            if (batchNum === undefined || batchNum === null) return handleErrorResponse(response, "batchNum must be defined");
-            // "if batchNum is supplied, check if its a number"
-            if (batchNum && typeof batchNum !== "number") return handleErrorResponse(response, "Invalid batchNum input");
-            const legitCityName = Object.values(CityNameEnum).some(name => name == cityName);
+            const zoomWidth = isStringInteger(zoomWidthInput);
+            const batchNum = isStringInteger(batchNumInput);
+            const legitCityName = isLegitCityName(cityNameInput);
             if (!legitCityName) return handleErrorResponse(response, "cityName was not legit");
 
-            const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, cityName, batchNum);
+            const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, legitCityName, batchNum);
             return response.status(200).json({ queued: queued });
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -118,16 +117,13 @@ class TaskQueueController {
 
     async getNextTasksForScraper(request: Request, response: Response) {
         try {
-            const provider = request.body.provider;
+            const providerInput = request.body.provider;
             // Currently batchNum is an OPTIONAL parameter!
             // If specified: Get that batch's unfinished tasks for provider.
             // If not specified: Get ALL unfinished tasks for provider.
             const batchNum = request.body.batchNum; // MIGHT need batch number, but also might not!
-            if (provider !== ProviderEnum.rentCanada && provider !== ProviderEnum.rentFaster && provider !== ProviderEnum.rentSeeker) {
-                return handleErrorResponse(response, "Invalid provider input");
-            }
+            const provider = isProvider(providerInput);
             const tasks: Task[] = await this.taskQueueService.getNextTasksForScraper(provider, batchNum);
-
             return response.status(200).json({ tasks });
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -136,6 +132,7 @@ class TaskQueueController {
 
     async reportFindingsToDbAndMarkComplete(request: Request, response: Response) {
         try {
+            // this is coming from the scraper so, no validation here!
             const forProvider: ProviderEnum = request.body.provider;
             const taskId: number = request.body.taskId;
             const apartments: any[] = request.body.apartments;
@@ -154,11 +151,11 @@ class TaskQueueController {
 
     async getAllTasks(request: Request, response: Response) {
         try {
-            const byProvider = request.body.provider; // provider only should work.
-            const byBatchNum = request.body.batchNum; // batchNum only should work.
+            const byProviderInput = request.body.provider; // provider only should work.
+            const byBatchNumInput = request.body.batchNum; // batchNum only should work.
             // todo: neither should work; "get all, I really mean ALL"
-            if (byProvider && typeof byProvider !== "string") return handleErrorResponse(response, "provider must be int");
-            if (byBatchNum && typeof byBatchNum !== "number") return handleErrorResponse(response, "batchNum must be int");
+            const byProvider = byProviderInput ? isProvider(byProviderInput) : undefined;
+            const byBatchNum = byBatchNumInput ? isStringInteger(byBatchNumInput) : undefined;
             const tasks: Task[] = await this.taskQueueService.getAllTasks(byProvider, byBatchNum, undefined);
             return response.status(200).json({ tasks });
         } catch (err) {

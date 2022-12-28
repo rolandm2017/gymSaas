@@ -31,6 +31,15 @@ class HousingService {
         return await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
     }
 
+    // todo: make this deduct a credit from the user's account.
+    public async getRealURL(apartmentId: number): Promise<string> {
+        const housing = await this.housingDAO.getHousingById(apartmentId);
+        if (housing === null) {
+            throw new Error("No housing found for this id");
+        }
+        return housing.url;
+    }
+
     public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number): Promise<Housing[]> {
         return await this.housingDAO.getHousingByCityIdAndBatchNum(cityId, batchNum);
     }
