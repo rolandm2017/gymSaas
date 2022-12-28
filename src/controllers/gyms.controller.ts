@@ -3,7 +3,7 @@ import { CityNameEnum } from "../enum/cityName.enum";
 import { StateNamesEnum } from "../enum/stateName.enum";
 //
 import GymService from "../service/gym.service";
-import { errorResponse } from "../util/errorResponseUtil";
+import { errorResponse } from "../util/responses/handleErrorResponse";
 
 class GymsController {
     public path = "/google";

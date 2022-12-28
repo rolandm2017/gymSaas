@@ -16,11 +16,8 @@ import authorize from "../middleware/authorize.middleware";
 import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
 import AuthService from "../service/auth.service";
-import errorHandler from "../middleware/error.middleware";
-import { IAccount } from "../interface/Account.interface";
-import { ISmallError } from "../interface/SmallError.interface";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
-import { errorResponse } from "../util/errorResponseUtil";
+import { handleErrorResponse } from "../util/responses/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
 
 class AuthController {
@@ -31,7 +28,7 @@ class AuthController {
     constructor(authService: AuthService) {
         this.authService = authService;
         // login & register
-        this.router.post("/authenticate", authenticateUserSchema, this.authenticate);
+        this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         this.router.post("/register", registerUserSchema, this.register);
         // verify email
         this.router.post("/verify-email", verifyEmailSchema, this.verifyEmail);
@@ -56,157 +53,211 @@ class AuthController {
     }
 
     public async authenticate(request: Request, response: Response, next: NextFunction) {
-        //
-        const email: string = request.body.email;
-        const password: string = request.body.password;
-        const ipAddress: string = request.ip;
-        const accountDetails: IBasicDetails | ISmallError = await this.authService.authenticate(email, password, ipAddress);
-        if ("error" in accountDetails) return response.json({ error: accountDetails.error });
-        if (accountDetails.jwtToken === undefined) throw new Error("jwt missing");
-        if (accountDetails.refreshToken === undefined) throw new Error("refresh token missing");
-        this.setTokenCookie(response, accountDetails.refreshToken);
-        return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
+        try {
+            const email: string = request.body.email;
+            const password: string = request.body.password;
+            const ipAddress: string = request.ip;
+            const accountDetails: IBasicDetails = await this.authService.authenticate(email, password, ipAddress);
+            if ("error" in accountDetails) return response.json({ error: accountDetails.error });
+            if (accountDetails.jwtToken === undefined) throw new Error("jwt missing");
+            if (accountDetails.refreshToken === undefined) throw new Error("refresh token missing");
+            this.setTokenCookie(response, accountDetails.refreshToken);
+            return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async register(request: Request, response: Response, next: NextFunction) {
         try {
             const origin = request.get("origin");
             if (origin === undefined) {
-                return errorResponse(response, "Origin is required and was undefined");
+                return handleErrorResponse(response, "Origin is required and was undefined");
             }
-            const accountDetails: IBasicDetails | ISmallError = await this.authService.register(request.body, origin);
-            if ("error" in accountDetails) return errorResponse(response, accountDetails.error);
+            const accountDetails: IBasicDetails = await this.authService.register(request.body, origin);
+            if ("error" in accountDetails) return handleErrorResponse(response, accountDetails.error);
             return response.json({
                 message: "Registration successful, please check your email for verification instructions",
                 accountDetails,
             });
         } catch (err) {
-            next(err);
+            handleErrorResponse(response, err);
         }
     }
 
     public async refreshToken(request: Request, response: Response) {
-        const token = request.cookies.refreshToken;
-        const ipAddress = request.ip;
-        const { refreshToken, ...account } = await this.authService.refreshToken(token, ipAddress);
-
-        this.setTokenCookie(response, refreshToken);
-        return response.json(account);
+        try {
+            const token = request.cookies.refreshToken;
+            const ipAddress = request.ip;
+            const { refreshToken, ...account } = await this.authService.refreshToken(token, ipAddress);
+            this.setTokenCookie(response, refreshToken);
+            return response.json(account);
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async revokeToken(request: RequestWithUser, response: Response, next: NextFunction) {
-        // accept token from request body or cookie
-        const token = request.body.token || request.cookies.refreshToken;
-        const ipAddress = request.ip;
-        if (request.user === undefined) return errorResponse(response, "User is required");
-        if (!token || request.user.ownsToken === undefined) return errorResponse(response, "Token is required");
-        // users can revoke their own tokens and admins can revoke any tokens
-        if (!request.user.ownsToken(token) && request.user.role !== Role.Admin) {
-            return response.status(401).json({ message: "Unauthorized" });
+        try {
+            // accept token from request body or cookie
+            const token = request.body.token || request.cookies.refreshToken;
+            const ipAddress = request.ip;
+            if (request.user === undefined) return handleErrorResponse(response, "User is required");
+            if (!token || request.user.ownsToken === undefined) return handleErrorResponse(response, "Token is required");
+            // users can revoke their own tokens and admins can revoke any tokens
+            if (!request.user.ownsToken(token) && request.user.role !== Role.Admin) {
+                return response.status(401).json({ message: "Unauthorized" });
+            }
+            await this.authService.revokeToken(token, ipAddress);
+            // .then(() response.json({ message: "Token revoked" }))
+            return response.json({ message: "Token revoked" });
+        } catch (err) {
+            handleErrorResponse(response, err);
         }
-        await this.authService.revokeToken(token, ipAddress);
-        // .then(() response.json({ message: "Token revoked" }))
-        return response.json({ message: "Token revoked" });
     }
 
     public async verifyEmail(request: Request, response: Response) {
-        const token = request.body.token;
-        await this.authService.verifyEmail(token);
-        return response.json({ message: "Verification successful, you can now login" });
+        try {
+            const token = request.body.token;
+            await this.authService.verifyEmail(token);
+            return response.json({ message: "Verification successful, you can now login" });
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async bypassEmail(request: Request, response: Response) {
-        const email = request.body.email;
-        await this.authService.logVerificationToken(email);
-        return response.status(200).json({ message: "success" });
+        try {
+            const email = request.body.email;
+            await this.authService.logVerificationToken(email);
+            return response.status(200).json({ message: "success" });
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async updatePassword(request: RequestWithUser, response: Response) {
-        // include email, because if we didn't, then any logged in user could
-        // try to change another logged in user's pw!
-        const email = request.body.email;
-        const oldPw = request.body.oldPw;
-        const newPw = request.body.newPw;
-        const confirmNewPw = request.body.confirmNewPw;
-        if (newPw === undefined || confirmNewPw === undefined) return response.json({ error: "A password was missing" });
-        if (newPw !== confirmNewPw) return response.json({ error: "Passwords did not match" });
-        const success: boolean = await this.authService.updatePassword(email, oldPw, newPw);
-        if (success) return response.json({ message: "Password updated!" });
-        else return response.json({ error: "You entered the wrong starting password" });
+        try {
+            // include email, because if we didn't, then any logged in user could
+            // try to change another logged in user's pw!
+            const email = request.body.email;
+            const oldPw = request.body.oldPw;
+            const newPw = request.body.newPw;
+            const confirmNewPw = request.body.confirmNewPw;
+            if (newPw === undefined || confirmNewPw === undefined) return response.json({ error: "A password was missing" });
+            if (newPw !== confirmNewPw) return response.json({ error: "Passwords did not match" });
+            const success: boolean = await this.authService.updatePassword(email, oldPw, newPw);
+            if (success) return response.json({ message: "Password updated!" });
+            else return response.json({ error: "You entered the wrong starting password" });
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     // part of a 3 step(?) flow. forgotPw => validateResetToken => resetPw
     public async forgotPassword(request: Request, response: Response) {
-        const email = request.body.email;
-        const origin = request.get("origin");
-        if (origin === undefined) {
-            return errorResponse(response, "Origin is required and was undefined");
+        try {
+            const email = request.body.email;
+            const origin = request.get("origin");
+            if (origin === undefined) {
+                return handleErrorResponse(response, "Origin is required and was undefined");
+            }
+            await this.authService.forgotPassword(email, origin);
+            return response.json({ message: "Please check your email for password reset instructions" });
+        } catch (err) {
+            handleErrorResponse(response, err);
         }
-        await this.authService.forgotPassword(email, origin);
-        return response.json({ message: "Please check your email for password reset instructions" });
     }
 
     public async validateResetToken(request: Request, response: Response) {
-        const token = request.body.token;
-        const success = await this.authService.validateResetToken(token);
-        if (success) return response.json({ message: "Token is valid" });
-        else return response.json({ message: "Invalid token" });
+        try {
+            const token = request.body.token;
+            const success = await this.authService.validateResetToken(token);
+            if (success) return response.json({ message: "Token is valid" });
+            else return response.json({ message: "Invalid token" });
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async resetPassword(request: Request, response: Response) {
-        const token = request.body.token;
-        const password = request.body.password;
-        const success = await this.authService.resetPassword(token, password);
-        if (success) return response.json({ message: "Password reset successful, you can now login" });
-        else return response.json({ message: "Reset password failed" });
+        try {
+            const token = request.body.token;
+            const password = request.body.password;
+            const success = await this.authService.resetPassword(token, password);
+            if (success) return response.json({ message: "Password reset successful, you can now login" });
+            else return response.json({ message: "Reset password failed" });
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     // **
     // authorized routes
     // **
     public async getAllAccounts(request: Request, response: Response) {
-        const accounts = await this.authService.getAllAccounts();
-        return response.json(accounts);
+        try {
+            const accounts = await this.authService.getAllAccounts();
+            return response.json(accounts);
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async getAccountById(request: RequestWithUser, response: Response) {
-        const requestedAcctId = request.body.acctId;
-        if (requestedAcctId !== request.user?.acctId && request.user?.role !== Role.Admin) {
-            return response.status(401).json({ message: "Unauthorized" });
-        }
-        const idAsNumber = parseInt(requestedAcctId, 10);
+        try {
+            const requestedAcctId = request.body.acctId;
+            if (requestedAcctId !== request.user?.acctId && request.user?.role !== Role.Admin) {
+                return response.status(401).json({ message: "Unauthorized" });
+            }
+            const idAsNumber = parseInt(requestedAcctId, 10);
 
-        const account = await this.authService.getAccountById(idAsNumber);
-        return account ? response.json(account) : response.sendStatus(404);
+            const account = await this.authService.getAccountById(idAsNumber);
+            return account ? response.json(account) : response.sendStatus(404);
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async createAccount(request: Request, response: Response) {
-        const account = this.authService.createAccount(request.body);
-        return response.json(account);
+        try {
+            const account = this.authService.createAccount(request.body);
+            return response.json(account);
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async updateAccount(request: RequestWithUser, response: Response) {
-        // users can update their own account and admins can update any account
-        const idOfAcctToUpdate = request.body.acctId;
-        if (idOfAcctToUpdate !== request.user?.acctId && request.user?.role !== Role.Admin) {
-            return response.status(401).json({ message: "Unauthorized" });
-        }
-        const idAsNumber = parseInt(idOfAcctToUpdate, 10);
+        try {
+            // users can update their own account and admins can update any account
+            const idOfAcctToUpdate = request.body.acctId;
+            if (idOfAcctToUpdate !== request.user?.acctId && request.user?.role !== Role.Admin) {
+                return response.status(401).json({ message: "Unauthorized" });
+            }
+            const idAsNumber = parseInt(idOfAcctToUpdate, 10);
 
-        const account = this.authService.updateAccount(idAsNumber, request.body);
-        return response.json(account);
+            const account = this.authService.updateAccount(idAsNumber, request.body);
+            return response.json(account);
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async _deleteAccount(request: RequestWithUser, response: Response) {
-        // users can delete their own account and admins can delete any account
-        const idOfAcctToDelete = request.body.acctId;
-        if (request.user === undefined) return errorResponse(response, "User missing");
-        if (idOfAcctToDelete !== request.user?.acctId && request.user?.role !== Role.Admin) {
-            return response.status(401).json({ message: "Unauthorized" });
-        }
+        try {
+            // users can delete their own account and admins can delete any account
+            const idOfAcctToDelete = request.body.acctId;
+            if (request.user === undefined) return handleErrorResponse(response, "User missing");
+            if (idOfAcctToDelete !== request.user?.acctId && request.user?.role !== Role.Admin) {
+                return response.status(401).json({ message: "Unauthorized" });
+            }
 
-        await this.authService.deleteAccount(request.params.id);
-        return response.json({ message: "Account deleted successfully" });
+            await this.authService.deleteAccount(request.params.id);
+            return response.json({ message: "Account deleted successfully" });
+        } catch (err) {
+            handleErrorResponse(response, err);
+        }
     }
 
     public async healthCheck(request: Request, response: Response) {

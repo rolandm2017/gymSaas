@@ -5,7 +5,7 @@ import ScraperService from "../service/scraper.service";
 import HousingService from "../service/housing.service";
 import { Housing } from "../database/models/Housing";
 import { CityNameEnum } from "../enum/cityName.enum";
-import { errorResponse } from "../util/errorResponseUtil";
+import { errorResponse } from "../util/responses/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
 
 class HousingController {

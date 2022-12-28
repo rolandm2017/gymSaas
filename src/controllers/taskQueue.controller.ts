@@ -8,7 +8,7 @@ import TaskQueueService from "../service/taskQueue.service";
 import { ILatLong } from "../interface/LatLong.interface";
 import { IBounds } from "../interface/Bounds.interface";
 import ScraperService from "../service/scraper.service";
-import { errorResponse } from "../util/errorResponseUtil";
+import { errorResponse } from "../util/responses/handleErrorResponse";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { HealthCheck } from "../enum/healthCheck.enum";
 

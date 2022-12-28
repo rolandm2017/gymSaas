@@ -3,7 +3,6 @@ import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import { Role } from "../../src/enum/role.enum";
 import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
 import { IRegistrationDetails } from "../../src/interface/RegistrationDetails.interface";
-import { ISmallError } from "../../src/interface/SmallError.interface";
 import AuthService from "../../src/service/auth.service";
 import EmailService from "../../src/service/email.service";
 import AccountUtil from "../../src/util/accountUtil";
@@ -59,7 +58,7 @@ describe("test auth service on its own", () => {
         test("[register] you can register an account", async () => {
             const testAcct = { ...validCredentials };
             testAcct.email = "someOtherEmail2@gmail.com";
-            const registered: IBasicDetails | ISmallError = await authService.register(testAcct, someOrigin);
+            const registered: IBasicDetails = await authService.register(testAcct, someOrigin);
             if ("email" in registered) {
                 expect(registered.email).toEqual(testAcct.email);
             } else {
