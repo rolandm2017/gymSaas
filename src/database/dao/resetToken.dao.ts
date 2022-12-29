@@ -12,41 +12,41 @@ class ResetTokenDAO {
         this.acctDAO = acctDAO;
     }
 
-    public createResetToken = async (acctId: number, token: string, expires: Date) => {
+    public async createResetToken(acctId: number, token: string, expires: Date) {
         return await ResetToken.create({ acctId: acctId, token: token, expires: expires });
-    };
+    }
 
-    public getResetTokenByEmail = async (email: string) => {
+    public async getResetTokenByEmail(email: string) {
         const acct = await this.acctDAO.getAccountByEmail(email);
         return await ResetToken.findOne({ where: { acctId: acct[0].acctId } });
-    };
-    public getResetTokenByToken = async (token: string) => {
+    }
+    public async getResetTokenByToken(token: string) {
         return await ResetToken.findOne({
             where: {
                 token,
             },
         });
-    };
+    }
 
-    public getAllResetTokensForAccount = async (accountId: number) => {
+    public async getAllResetTokensForAccount(accountId: number) {
         return await ResetToken.findAll({
             where: {
                 acctId: accountId,
             },
         });
-    };
+    }
 
-    public getAllResetTokens = async () => {
+    public async getAllResetTokens() {
         return await ResetToken.findAll({ where: {} });
-    };
+    }
 
-    public deleteResetTokenById = async (tokenId: number) => {
+    public async deleteResetTokenById(tokenId: number) {
         return await ResetToken.destroy({ where: { tokenId: tokenId } });
-    };
+    }
 
-    public deleteResetTokenByModel = async (resetToken: ResetToken) => {
+    public async deleteResetTokenByModel(resetToken: ResetToken) {
         return await resetToken.destroy();
-    };
+    }
 }
 
 export default ResetTokenDAO;

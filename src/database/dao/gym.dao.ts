@@ -8,36 +8,36 @@ import { Gym, GymCreationAttributes } from "../models/Gym";
 class GymDAO {
     constructor() {}
 
-    createGym = async (gym: GymCreationAttributes) => {
+    public async createGym(gym: GymCreationAttributes) {
         return await Gym.create(gym);
-    };
+    }
 
-    getGymByAddress = async (address: string) => {
+    public async getGymByAddress(address: string) {
         return await Gym.findAll({ where: { address } });
-    };
+    }
 
-    getEntriesWithNullCityId = async () => {
+    public async getEntriesWithNullCityId() {
         return await Gym.findAll({ where: { cityId: null } });
-    };
+    }
 
-    getMultipleGyms = async (cityName: string, limit?: number, offset?: number): Promise<{ rows: Gym[]; count: number }> => {
+    public async getMultipleGyms(cityName: string, limit?: number, offset?: number): Promise<{ rows: Gym[]; count: number }> {
         return await Gym.findAndCountAll({ where: { cityName }, limit, offset });
-    };
+    }
 
-    getAllGyms = async () => {
+    public async getAllGyms() {
         return await Gym.findAll({});
-    };
+    }
 
     // update
-    addCityIdToGyms = async (entriesToCorrect: Gym[], missingCityId: number): Promise<number> => {
+    public async addCityIdToGyms(entriesToCorrect: Gym[], missingCityId: number): Promise<number> {
         const gymIdsToCorrect = entriesToCorrect.map(gym => gym.gymId);
         const updatedGyms = await Gym.update({ cityId: missingCityId }, { where: { gymId: gymIdsToCorrect } });
         return updatedGyms[0];
-    };
+    }
 
-    deleteAllGyms = async () => {
+    public async deleteAllGyms() {
         return await Gym.destroy({ where: {} });
-    };
+    }
 }
 
 export default GymDAO;
