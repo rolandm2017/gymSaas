@@ -41,6 +41,10 @@ class ProfileService {
     public async getAllWishesForAccount(acctId: number) {
         return await this.wishDAO.getAllWishesForAccount(acctId);
     }
+
+    public async getAllWishes() {
+        return await this.wishDAO.getAllWishes();
+    }
 }
 
 export default ProfileService;

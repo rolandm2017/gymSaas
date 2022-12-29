@@ -1,6 +1,7 @@
 // sorry canada
 
-import { Association, DataTypes, Model, Optional, Sequelize } from "sequelize";
+import { Association, DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
+import { Profile } from "./Profile";
 
 export interface WishAttributes {
     wishId?: number;
@@ -15,6 +16,7 @@ export type WishCreationAttributes = Optional<WishAttributes, WishOptionalAttrib
 
 export class Wish extends Model<WishAttributes, WishCreationAttributes> implements WishAttributes {
     public query!: string;
+    public profileId!: ForeignKey<Profile["profileId"]>;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;

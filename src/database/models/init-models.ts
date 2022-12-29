@@ -117,7 +117,7 @@ function initModels(sequelize: Sequelize) {
         foreignKey: "batchId",
         as: "tasks_for_this_batch",
     });
-    Task.hasOne(Batch, {
+    Task.belongsTo(Batch, {
         foreignKey: "batchId",
         as: "task_from_batch",
     });
@@ -125,10 +125,14 @@ function initModels(sequelize: Sequelize) {
         foreignKey: "batchId",
         as: "housings_from_this_batch",
     });
-    Housing.hasOne(Batch, {
+    Housing.belongsTo(Batch, {
         foreignKey: "batchId",
         as: "housing_from_batch",
     });
+
+    // wish
+    Profile.hasMany(Wish, { foreignKey: "profileId" });
+    Wish.belongsTo(Profile, { foreignKey: "profileId" });
 
     return { Account, RefreshToken, ResetToken, Housing, Gym, City, Batch, Task, Wish };
 }

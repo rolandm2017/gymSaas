@@ -18,7 +18,8 @@ class ProfileController {
         this.router.get("/all/picks/housing/by-ip", this.getAllHousingPicksByIp.bind(this));
         this.router.get("/all/picks/gym", this.getAllGymPicks.bind(this));
         this.router.get("/all/picks/gym/by-ip", this.getAllGymPicksByIp.bind(this));
-        this.router.get("/all/wish", this.getAllWishesForAccount.bind(this));
+        this.router.get("/all/wish/:accountid", this.getAllWishesForAccount.bind(this));
+        this.router.get("/all/wish", this.getAllWishes.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
     }
 
@@ -86,6 +87,11 @@ class ProfileController {
         const acctId = isStringInteger(acctIdInput);
         const found = await this.profileService.getAllWishesForAccount(acctId);
         return response.status(200).json({ found });
+    }
+
+    public async getAllWishes(request: Request, response: Response) {
+        const wishes = await this.profileService.getAllWishes();
+        return response.status(200).json({ wishes });
     }
 
     async healthCheck(request: Request, response: Response) {

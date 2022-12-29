@@ -33,10 +33,10 @@ class Parser {
                 state: unit.state,
                 price: undefined,
                 source: this.provider,
-                // url: // todo: fill me in (important! so users can see the apartment listing!)
+                // url: // todo: fill me in as a cached value for rentCanada; rentFaster and rentSeeker don't need this caching
                 lat: unit.latitude,
                 long: unit.longitude,
-                idAtSource: unit.id,
+                idAtSource: unit.id, // this is correct. it is "id"
             };
             apList.push(ap);
         }

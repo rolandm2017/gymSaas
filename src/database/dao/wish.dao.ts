@@ -13,6 +13,10 @@ class WishDAO {
     public getAllWishesForAccount = async (acctId: number): Promise<Wish[]> => {
         return await Wish.findAll({ where: { acctId } });
     };
+
+    public getAllWishes = async (): Promise<Wish[]> => {
+        return await Wish.findAll({});
+    };
 }
 
 export default WishDAO;
