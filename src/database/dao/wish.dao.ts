@@ -6,17 +6,17 @@ class WishDAO {
     constructor() {}
     //
 
-    public createWish = async (wishLocation: string, acctId: number): Promise<Wish> => {
+    public async createWish(wishLocation: string, acctId: number): Promise<Wish> {
         return await Wish.create(startValue);
-    };
+    }
 
-    public getAllWishesForAccount = async (acctId: number): Promise<Wish[]> => {
+    public async getAllWishesForAccount(acctId: number): Promise<Wish[]> {
         return await Wish.findAll({ where: { acctId } });
-    };
+    }
 
-    public getAllWishes = async (): Promise<Wish[]> => {
+    public async getAllWishes(): Promise<Wish[]> {
         return await Wish.findAll({});
-    };
+    }
 }
 
 export default WishDAO;

@@ -1,6 +1,6 @@
 // https://javascript.plainenglish.io/a-try-catch-decorator-to-stylize-your-code-bdd0202765c8
 
-type HandlerFunction = (error: Error, ctx: any) => void;
+type HandlerFunction = (error: any, ctx: any) => void;
 
 // Decorator factory function // previously called Catch
 export const TryCatchClassDecorator = (errorType: any, handler: HandlerFunction): any => {

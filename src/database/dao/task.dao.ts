@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { EagerLoadingError, Op } from "sequelize";
 import moment from "moment";
 //
 import { ProviderEnum } from "../../enum/provider.enum";
@@ -6,26 +6,30 @@ import { Task, TaskCreationAttributes } from "../models/Task";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { Batch } from "../models/Batch";
 
+@TryCatchClassDecorator(EagerLoadingError, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class TaskDAO {
     constructor() {}
 
-    public createTask = async (task: TaskCreationAttributes) => {
+    public async createTask(task: TaskCreationAttributes) {
         return await Task.create(task);
-    };
+    }
 
-    public getMultipleTasks = async (limit: number, offset?: number): Promise<{ rows: Task[]; count: number }> => {
+    public async getMultipleTasks(limit: number, offset?: number): Promise<{ rows: Task[]; count: number }> {
         return await Task.findAndCountAll({ offset, limit });
-    };
+    }
 
-    public getTaskById = async (id: number) => {
+    public async getTaskById(id: number) {
         return await Task.findByPk(id);
-    };
+    }
 
-    public getHighestBatchNum = async () => {
+    public async getHighestBatchNum() {
         return await Task.findOne({ order: [["batchId", "DESC"]] }); // fixme: shouldnt this be "batchId"?
-    };
+    }
 
-    public getMostRecentTaskForProvider = async (provider: ProviderEnum, batchNum?: number) => {
+    public async getMostRecentTaskForProvider(provider: ProviderEnum, batchNum?: number) {
         let conditions;
         if (batchNum) {
             conditions = { providerName: provider, batchId: batchNum };
@@ -37,18 +41,18 @@ class TaskDAO {
             where: conditions,
             order: [["createdAt", "DESC"]],
         });
-    };
+    }
 
-    public getTasksByBatchNum = async (batchNum: number) => {
+    public async getTasksByBatchNum(batchNum: number) {
         return await Task.findAll({ where: { batchId: batchNum } });
-    };
+    }
 
     // Can't work because it doesn't allow create with associations.
-    // public  bulkCreateTask = (tasks: TaskCreationAttributes[]) => {
+    // public async async  bulkCreateTask = (tasks: TaskCreationAttributes[]) {
     //     return Task.bulkCreate(tasks);
     // };
 
-    public getNextUnfinishedTaskForProvider = async (provider: ProviderEnum, batchNum?: number) => {
+    public async getNextUnfinishedTaskForProvider(provider: ProviderEnum, batchNum?: number) {
         let conditions;
         if (batchNum) {
             conditions = { providerName: provider, batchId: batchNum };
@@ -60,9 +64,9 @@ class TaskDAO {
             where: conditions,
             order: [["createdAt", "DESC"]],
         });
-    };
+    }
 
-    public getAllUnfinishedTasksForProvider = async (provider: ProviderEnum, batchNum?: number) => {
+    public async getAllUnfinishedTasksForProvider(provider: ProviderEnum, batchNum?: number) {
         let conditions;
         if (batchNum) {
             conditions = { providerName: provider, lastScan: null, batchId: batchNum };
@@ -73,9 +77,9 @@ class TaskDAO {
             where: conditions,
             order: [["createdAt", "DESC"]],
         });
-    };
+    }
 
-    public getAllTasks = async (providerName?: ProviderEnum, batchId?: number, cityId?: number) => {
+    public async getAllTasks(providerName?: ProviderEnum, batchId?: number, cityId?: number) {
         // even finished ones.
         let conditions;
         if (providerName && batchId && cityId) {
@@ -96,43 +100,36 @@ class TaskDAO {
             conditions = {};
         }
         return await Task.findAll({ where: conditions });
-    };
+    }
 
-    public getScorecard = async (providerName: ProviderEnum, batchNum: number) => {
-        try {
-            return await Task.findAll({
-                where: { providerName, batchId: batchNum },
-            });
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    };
+    public async getScorecard(providerName: ProviderEnum, batchNum: number) {
+        return await Task.findAll({ where: { providerName }, include: { model: Batch, where: { batchId: batchNum } } });
+    }
 
-    public updateTask = async (task: TaskCreationAttributes, id: number) => {
+    public async updateTask(task: TaskCreationAttributes, id: number) {
         return await Task.update(task, { where: { taskId: id } });
-    };
+    }
 
-    public updateLastScanDate = async (task: Task, scanDate: Date): Promise<void> => {
+    public async updateLastScanDate(task: Task, scanDate: Date): Promise<void> {
         task.lastScan = scanDate;
         await task.save();
-    };
+    }
 
-    public deleteTask = async (taskId: number) => {
+    public async deleteTask(taskId: number) {
         return await Task.destroy({ where: { taskId } });
-    };
+    }
 
-    public deleteAll = async () => {
+    public async deleteAll() {
         return await Task.destroy({ where: {} });
-    };
+    }
 
-    public deleteTasksOlderThanTwoMonths = async () => {
+    public async deleteTasksOlderThanTwoMonths() {
         return await Task.destroy({
             where: {
                 createdAt: { [Op.lte]: moment().subtract(2, "months").toDate() },
             },
         });
-    };
+    }
 }
 
 export default TaskDAO;
