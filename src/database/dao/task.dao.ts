@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { EagerLoadingError, Op } from "sequelize";
 import moment from "moment";
 //
 import { ProviderEnum } from "../../enum/provider.enum";
@@ -6,7 +6,7 @@ import { Task, TaskCreationAttributes } from "../models/Task";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { Batch } from "../models/Batch";
 
-@TryCatchClassDecorator(Error, (err, context) => {
+@TryCatchClassDecorator(EagerLoadingError, (err, context) => {
     console.log(context, err);
     throw err;
 })
