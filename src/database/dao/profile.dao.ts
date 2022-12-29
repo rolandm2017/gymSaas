@@ -68,6 +68,10 @@ class ProfileDAO {
         return profile.getHousings();
     };
 
+    public getAllHousingPicksByIp = async (ip: string): Promise<Profile | null> => {
+        return await Profile.findOne({ where: { ipAddress: ip }, include: "housing" });
+    };
+
     public getAllGymPicks = async (acctId: number): Promise<Gym[]> => {
         const profile = await Profile.findOne({ include: { required: true, model: Account, where: { acctId } } });
         // const profile = await Profile.findOne({ where: { accountId: acctId } });

@@ -51,11 +51,11 @@ function initModels(sequelize: Sequelize) {
     Profile.belongsTo(Account, { foreignKey: "acctId", as: "profile_of" });
 
     // https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/
-    Profile.belongsToMany(Housing, { through: "Profile_Housings", foreignKey: "profileId", as: "chosen_housings" });
-    Housing.belongsToMany(Profile, { through: "Profile_Housings", foreignKey: "profileId", as: "housings_chosen_by" });
+    Profile.belongsToMany(Housing, { through: "Profile_Housings", foreignKey: "profileId", as: "housing" });
+    Housing.belongsToMany(Profile, { through: "Profile_Housings", foreignKey: "profileId", as: "profile" });
 
     Profile.belongsToMany(Gym, { through: "Profile_Gyms", as: "gym" });
-    Gym.belongsToMany(Profile, { through: "Profile_Gyms", as: "gym" });
+    Gym.belongsToMany(Profile, { through: "Profile_Gyms", as: "profile" });
 
     // Scraping tasks
     City.hasMany(Task, {

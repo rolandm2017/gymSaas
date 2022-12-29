@@ -15,6 +15,7 @@ class ProfileController {
         this.router.post("/pick-public/housing", this.recordPublicPickHousing.bind(this));
         this.router.post("/pick-public/gym", this.recordPublicPickGym.bind(this));
         this.router.get("/all/picks/housing", this.getAllHousingPicks.bind(this));
+        this.router.get("/all/picks/housing/by-ip", this.getAllHousingPicksByIp.bind(this));
         this.router.get("/all/picks/gym", this.getAllGymPicks.bind(this));
         this.router.get("/all/picks/gym/by-ip", this.getAllGymPicksByIp.bind(this));
         this.router.get("/all/wish", this.getAllWishesForAccount.bind(this));
@@ -59,6 +60,13 @@ class ProfileController {
         return response.status(200).json(housingPicks);
     }
 
+    public async getAllHousingPicksByIp(request: Request, response: Response) {
+        // probably useful only in testing.
+        const ip = request.ip;
+        const housingPicks = await this.profileService.getAllHousingPicksByIp(ip);
+        return response.status(200).json(housingPicks);
+    }
+
     public async getAllGymPicks(request: Request, response: Response) {
         const acctId = request.body.acctId;
         const gymPicks = await this.profileService.getAllGymPicks(acctId);
@@ -66,6 +74,7 @@ class ProfileController {
     }
 
     public async getAllGymPicksByIp(request: Request, response: Response) {
+        // probably useful only in testing.
         const ip = request.ip;
         const gymPicks = await this.profileService.getAllGymPicksByIp(ip);
         return response.status(200).json(gymPicks);

@@ -26,6 +26,10 @@ class ProfileService {
         return await this.profileDAO.getAllHousingPicks(acctId);
     }
 
+    public async getAllHousingPicksByIp(ipAddr: string) {
+        return await this.profileDAO.getAllHousingPicksByIp(ipAddr);
+    }
+
     public async getAllGymPicks(acctId: number) {
         return await this.profileDAO.getAllGymPicks(acctId);
     }
