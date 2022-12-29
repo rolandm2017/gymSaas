@@ -139,6 +139,7 @@ class TaskQueueService {
         const allTasks = await this.taskDAO.getScorecard(forProvider, batchNum);
         const complete = allTasks.filter(t => t.lastScan !== null);
         const incomplete = allTasks.filter(t => t.lastScan === null);
+        console.log(allTasks, allTasks.length, "142rm");
         return { complete, incomplete, completeTotal: complete.length, incompleteTotal: incomplete.length };
     }
 

@@ -6,10 +6,6 @@ import { Task, TaskCreationAttributes } from "../models/Task";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { Batch } from "../models/Batch";
 
-@TryCatchClassDecorator(Error, (err, context) => {
-    console.log(context, err);
-    throw err;
-})
 class TaskDAO {
     constructor() {}
 
@@ -103,7 +99,14 @@ class TaskDAO {
     };
 
     public getScorecard = async (providerName: ProviderEnum, batchNum: number) => {
-        return await Task.findAll({ where: { providerName }, include: { model: Batch, where: { batchId: batchNum } } });
+        try {
+            return await Task.findAll({
+                where: { providerName, batchId: batchNum },
+            });
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
     };
 
     public updateTask = async (task: TaskCreationAttributes, id: number) => {

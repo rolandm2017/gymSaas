@@ -174,7 +174,7 @@ class TaskQueueController {
             const byProvider = isProvider(byProviderInput);
             const byBatchNum = isInteger(byBatchNumInput);
             const scorecard = await this.taskQueueService.getScorecard(byProvider, byBatchNum);
-            return response.status(200).json({ scorecard });
+            return response.status(200).json({ ...scorecard });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
