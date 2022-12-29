@@ -78,7 +78,7 @@ class ProfileDAO {
     };
 
     public getAllGymPicksByIp = async (ip: string): Promise<Profile | null> => {
-        return await Profile.findOne({ where: { ipAddress: ip } });
+        return await Profile.findOne({ where: { ipAddress: ip }, include: "gym" });
     };
 }
 
