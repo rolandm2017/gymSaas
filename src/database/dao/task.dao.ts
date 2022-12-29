@@ -4,6 +4,7 @@ import moment from "moment";
 import { ProviderEnum } from "../../enum/provider.enum";
 import { Task, TaskCreationAttributes } from "../models/Task";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
+import { Batch } from "../models/Batch";
 
 @TryCatchClassDecorator(Error, (err, context) => {
     console.log(context, err);
@@ -99,6 +100,10 @@ class TaskDAO {
             conditions = {};
         }
         return await Task.findAll({ where: conditions });
+    };
+
+    public getScorecard = async (providerName: ProviderEnum, batchNum: number) => {
+        return await Task.findAll({ where: { providerName }, include: { model: Batch, where: { batchId: batchNum } } });
     };
 
     public updateTask = async (task: TaskCreationAttributes, id: number) => {

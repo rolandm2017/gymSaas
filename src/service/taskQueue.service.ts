@@ -132,6 +132,16 @@ class TaskQueueService {
         return all;
     }
 
+    public async getScorecard(
+        forProvider: ProviderEnum,
+        batchNum: number,
+    ): Promise<{ complete: Task[]; incomplete: Task[]; completeTotal: number; incompleteTotal: number }> {
+        const allTasks = await this.taskDAO.getScorecard(forProvider, batchNum);
+        const complete = allTasks.filter(t => t.lastScan !== null);
+        const incomplete = allTasks.filter(t => t.lastScan === null);
+        return { complete, incomplete, completeTotal: complete.length, incompleteTotal: incomplete.length };
+    }
+
     public async getAllBatchNumbers(): Promise<number[]> {
         const batches = await this.cacheService.getAllBatchNums();
         return batches;

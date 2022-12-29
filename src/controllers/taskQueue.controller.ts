@@ -11,7 +11,7 @@ import ScraperService from "../service/scraper.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { HealthCheck } from "../enum/healthCheck.enum";
-import { isLegitCityName, isProvider, isStringInteger } from "../validationSchemas/inputValidation";
+import { isInteger, isLegitCityName, isProvider, isStringInteger } from "../validationSchemas/inputValidation";
 
 // do I need a "scraper controller" and a separate "task queue controller"?
 class TaskQueueController {
@@ -40,6 +40,7 @@ class TaskQueueController {
 
         // used to check tasks make sense
         this.router.get("/all", this.getAllTasks.bind(this));
+        this.router.get("/scorecard", this.getScorecard.bind(this));
         // this.router.get("/batch", this.getTasksByBatch.bind(this));
         this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
         this.router.delete("/by-id", this.cleanSpecific.bind(this));
@@ -92,6 +93,7 @@ class TaskQueueController {
 
     async addGridScanToQueue(request: Request, response: Response) {
         try {
+            console.log("here 95rm");
             const providerInput = request.body.provider;
             const coords = request.body.coords;
             const zoomWidthInput = request.body.zoomWidth;
@@ -103,14 +105,16 @@ class TaskQueueController {
                 // not doing more validation.
                 return handleErrorResponse(response, "Invalid coords input");
             }
-            const zoomWidth = isStringInteger(zoomWidthInput);
-            const batchNum = isStringInteger(batchNumInput);
+            const zoomWidth = isInteger(zoomWidthInput);
+            const batchNum = isInteger(batchNumInput);
+            console.log(cityNameInput, "109rm");
             const legitCityName = isLegitCityName(cityNameInput);
             if (!legitCityName) return handleErrorResponse(response, "cityName was not legit");
 
             const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, legitCityName, batchNum);
             return response.status(200).json({ queued: queued });
         } catch (err) {
+            console.log("here", err, "115rm");
             return handleErrorResponse(response, err);
         }
     }
@@ -158,6 +162,19 @@ class TaskQueueController {
             const byBatchNum = byBatchNumInput ? isStringInteger(byBatchNumInput) : undefined;
             const tasks: Task[] = await this.taskQueueService.getAllTasks(byProvider, byBatchNum, undefined);
             return response.status(200).json({ tasks });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    public async getScorecard(request: Request, response: Response) {
+        try {
+            const byProviderInput = request.body.provider; // provider only should work.
+            const byBatchNumInput = request.body.batchNum; // batchNum only should work.
+            const byProvider = isProvider(byProviderInput);
+            const byBatchNum = isInteger(byBatchNumInput);
+            const scorecard = await this.taskQueueService.getScorecard(byProvider, byBatchNum);
+            return response.status(200).json({ scorecard });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
