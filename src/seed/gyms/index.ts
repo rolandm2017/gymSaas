@@ -1,12 +1,23 @@
-import { Brampton } from "./Brampton";
-import { Calgary } from "./Calgary";
-import { Edmonton } from "./Edmonton";
-import { Hamilton } from "./Hamilton";
-import { Mississauga } from "./Mississauga";
-import { Montreal } from "./Montreal";
-import { Ottawa } from "./Ottawa";
-import { Toronto } from "./Toronto";
-import { Vancouver } from "./Vancouver";
-import { Winnipeg } from "./Winnipeg";
+import { BramptonGymSeed } from "./Brampton";
+import { CalgaryGymSeed } from "./Calgary";
+import { EdmontonGymSeed } from "./Edmonton";
+import { HamiltonGymSeed } from "./Hamilton";
+import { MississaugaGymSeed } from "./Mississauga";
+import { MontrealGymSeed } from "./Montreal";
+import { OttawaGymSeed } from "./Ottawa";
+import { TorontoGymSeed } from "./Toronto";
+import { VancouverGymSeed } from "./Vancouver";
+import { WinnipegGymSeed } from "./Winnipeg";
 
-export const SEED_GYMS_CANADA = [Brampton, Calgary, Edmonton, Hamilton, Mississauga, Montreal, Ottawa, Toronto, Vancouver, Winnipeg];
+export const SEED_GYMS_CANADA = [
+    BramptonGymSeed,
+    CalgaryGymSeed,
+    EdmontonGymSeed,
+    HamiltonGymSeed,
+    MississaugaGymSeed,
+    MontrealGymSeed,
+    OttawaGymSeed,
+    TorontoGymSeed,
+    VancouverGymSeed,
+    WinnipegGymSeed,
+];

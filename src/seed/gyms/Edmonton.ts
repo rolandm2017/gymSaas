@@ -1,6 +1,6 @@
 import { GymCreationAttributes } from "../../database/models/Gym";
 
-export const Edmonton = [
+export const EdmontonGymSeed = [
     {
         gymId: 241,
         cityName: "Edmonton",

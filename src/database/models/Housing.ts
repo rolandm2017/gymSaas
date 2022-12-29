@@ -101,6 +101,11 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
+                // idAtSource is used to fill out e.g.
+                // GET https://www.rentcanada.com/api/listing/38422?includeSharedLocationListings=true
+                // which returns a response (duh) with the detail
+                //  "listing.url": "/montreal-qc/11666-boulevard-saint-germain/38422",
+                // which you put with the domain to form https://www.rentcanada.com/montreal-qc/11666-boulevard-saint-germain/38422
                 idAtSource: {
                     type: DataTypes.INTEGER,
                     allowNull: true, // because it only exists on the rentCanada entries
