@@ -8,6 +8,7 @@ const numberSchema = z.number();
 const dateSchema = z.date();
 const stringArr = z.array(z.string());
 const intArr = z.array(z.number());
+const providerArr = z.union([z.literal(ProviderEnum.rentCanada), z.literal(ProviderEnum.rentFaster), z.literal(ProviderEnum.rentSeeker)]);
 
 export function isStringInteger(testSubject: unknown): number {
     const stringInput = stringSchema.parse(testSubject);
@@ -28,9 +29,7 @@ export function isEmail(testSubject: unknown): string {
 }
 
 export function isProvider(testSubject: unknown): ProviderEnum {
-    const isProvider = Object.values(ProviderEnum).some(name => name === testSubject);
-    if (isProvider) return testSubject as ProviderEnum;
-    else throw new Error("Invalid provider");
+    return providerArr.parse(testSubject);
 }
 
 export function isLegitCityName(testSubject: unknown): CityNameEnum {
