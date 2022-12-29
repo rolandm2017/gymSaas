@@ -7,7 +7,7 @@ export const TryCatchClassDecorator = (errorType: any, handler: HandlerFunction)
     console.log("decraoting", errorType, "9rm");
     return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
         // Method decorator
-        console.log(target, Reflect.ownKeys(target.prototype), Object.getOwnPropertyNames(target.prototype), "12rm");
+        // console.log(target, Reflect.ownKeys(target.prototype), Object.getOwnPropertyNames(target.prototype), "12rm");
         if (descriptor) {
             return _generateDescriptor(descriptor, errorType, handler);
         }
@@ -70,7 +70,6 @@ function _handleError(ctx: any, errorType: any, handler: HandlerFunction, error:
     // Check if error is instance of given error type
     if (typeof handler === "function" && error instanceof errorType) {
         // Run handler with error object and class context
-        console.log(error, ctx, "58rm");
         handler.call(null, error, ctx);
     } else {
         // Throw error further

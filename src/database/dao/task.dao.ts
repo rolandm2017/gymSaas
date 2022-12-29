@@ -102,9 +102,9 @@ class TaskDAO {
         return await Task.findAll({ where: conditions });
     };
 
-    public getScorecard = async (providerName: ProviderEnum, batchNum: number) => {
+    public async getScorecard(providerName: ProviderEnum, batchNum: number) {
         return await Task.findAll({ where: { providerName }, include: { model: Batch, where: { batchId: batchNum } } });
-    };
+    }
 
     public updateTask = async (task: TaskCreationAttributes, id: number) => {
         return await Task.update(task, { where: { taskId: id } });
