@@ -19,25 +19,25 @@ class HousingDAO {
         this.cityDAO = cityDAO;
     }
 
-    public async  createHousing (housing: HousingCreationAttributes)  {
+    public async createHousing(housing: HousingCreationAttributes) {
         return await Housing.create({ ...housing });
-    };
+    }
 
-    public async  countHousingsInCity (cityId: number)  {
+    public async countHousingsInCity(cityId: number) {
         return await Housing.count({ where: { cityId } });
-    };
+    }
 
-    public async  getMultipleHousings (limit?: number, offset?: number): Promise<{ rows: Housing[]; count: number }>  {
+    public async getMultipleHousings(limit?: number, offset?: number): Promise<{ rows: Housing[]; count: number }> {
         if (limit === undefined && offset === undefined) return await Housing.findAndCountAll({ where: {} });
         return await Housing.findAndCountAll({ offset, limit });
-    };
+    }
 
-    public async  getHousingById (id: number): Promise<Housing | null>  {
+    public async getHousingById(id: number): Promise<Housing | null> {
         return await Housing.findByPk(id);
-    };
+    }
 
-    public async  getAllHousing (cityId?: number, cityName?: string, stateOrProvince?: string)  {
-        if ([cityId, cityName, stateOrProvince].every(arg  arg === undefined)) return await Housing.findAll({});
+    public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string) {
+        if ([cityId, cityName, stateOrProvince].every(arg => arg === undefined)) return await Housing.findAll({});
         let conditions;
         let state;
         if (stateOrProvince) {
@@ -61,19 +61,19 @@ class HousingDAO {
             conditions = {};
         }
         return await Housing.findAll({ where: conditions });
-    };
+    }
 
-    public async  getHousingByCityIdAndBatchNum (cityId: number, batchNum: number)  {
+    public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number) {
         return await Housing.findAll({ where: { cityId, batchId: batchNum } });
-    };
+    }
 
-    public async  getApartmentsByLocation (cityName: string | undefined)  {
+    public async getApartmentsByLocation(cityName: string | undefined) {
         const city: City | null = cityName ? await this.cityDAO.getCityByName(cityName) : null;
         if (city === null) return [];
         return await Housing.findAll({ where: { cityId: city.cityId } });
-    };
+    }
 
-    public async  readBetween (lowerLimitLatitude: number, upperLimitLatitude: number, lowerLimitLongitude: number, upperLimitLongitude: number)  {
+    public async readBetween(lowerLimitLatitude: number, upperLimitLatitude: number, lowerLimitLongitude: number, upperLimitLongitude: number) {
         return await Housing.findAll({
             where: {
                 lat: {
@@ -84,20 +84,20 @@ class HousingDAO {
                 },
             },
         });
-    };
+    }
 
     // update section
-    public async  updateHousing (housing: HousingCreationAttributes, housingId: number)  {
+    public async updateHousing(housing: HousingCreationAttributes, housingId: number) {
         return await Housing.update(housing, { where: { housingId } });
-    };
+    }
 
-    public async  markQualified (
+    public async markQualified(
         cityId: number,
         lowerLimitLatitude: number,
         upperLimitLatitude: number,
         lowerLimitLongitude: number,
         upperLimitLongitude: number,
-    )  {
+    ) {
         return await Housing.update(
             { nearAGym: true }, // "qualified"
             {
@@ -113,25 +113,25 @@ class HousingDAO {
                 },
             },
         );
-    };
+    }
 
     // delete section
-    public async  deleteUnqualifiedHousingByCityId (cityId: number)  {
+    public async deleteUnqualifiedHousingByCityId(cityId: number) {
         return await Housing.destroy({
             where: {
                 cityId,
                 nearAGym: null,
             },
         });
-    };
+    }
 
-    public async  deleteHousingByHousingId (housingId: number)  {
+    public async deleteHousingByHousingId(housingId: number) {
         return await Housing.destroy({ where: { housingId } });
-    };
+    }
 
-    public async  deleteAllHousing ()  {
+    public async deleteAllHousing() {
         return await Housing.destroy({ where: {} });
-    };
+    }
 }
 
 export default HousingDAO;
