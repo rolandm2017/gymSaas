@@ -22,8 +22,16 @@ class ProfileService {
         return await this.wishDAO.createWish(wishLocation, acctId);
     }
 
-    public async getAllPicks(acctId: number) {
-        //
+    public async getAllHousingPicks(acctId: number) {
+        return await this.profileDAO.getAllHousingPicks(acctId);
+    }
+
+    public async getAllGymPicks(acctId: number) {
+        return await this.profileDAO.getAllGymPicks(acctId);
+    }
+
+    public async getAllGymPicksByIp(ipAddr: string) {
+        return await this.profileDAO.getAllGymPicksByIp(ipAddr);
     }
 
     public async getAllWishesForAccount(acctId: number) {

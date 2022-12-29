@@ -46,7 +46,7 @@ class App {
                 console.log("Database Connection Established");
                 await initModels(Database);
                 await Database.sync({ alter: true, logging: false });
-                await this.seedDb(true);
+                await this.seedDb();
                 await this.initializeCaches();
                 console.log("Done syncing...");
             } catch (err) {

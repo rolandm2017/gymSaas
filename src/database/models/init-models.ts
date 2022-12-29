@@ -32,6 +32,7 @@ function initModels(sequelize: Sequelize) {
     const Task = _Task.initModel(sequelize);
     const Batch = _Batch.initModel(sequelize);
     //
+    console.log("models are init");
 
     Account.hasMany(RefreshToken, {
         foreignKey: "acctId",
@@ -53,8 +54,8 @@ function initModels(sequelize: Sequelize) {
     Profile.belongsToMany(Housing, { through: "Profile_Housings", foreignKey: "profileId", as: "chosen_housings" });
     Housing.belongsToMany(Profile, { through: "Profile_Housings", foreignKey: "profileId", as: "housings_chosen_by" });
 
-    Profile.belongsToMany(Gym, { through: "Profile_Gyms", as: "chosen_gyms" });
-    Gym.belongsToMany(Profile, { through: "Profile_Gyms", as: "gyms_chosen_by" });
+    Profile.belongsToMany(Gym, { through: "Profile_Gyms", as: "gym" });
+    Gym.belongsToMany(Profile, { through: "Profile_Gyms", as: "gym" });
 
     // Scraping tasks
     City.hasMany(Task, {

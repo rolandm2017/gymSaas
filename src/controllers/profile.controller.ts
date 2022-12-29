@@ -11,12 +11,24 @@ class ProfileController {
 
     constructor(profileService: ProfileService) {
         this.profileService = profileService;
+        this.router.post("/wish", this.createWish.bind(this));
         this.router.post("/pick-public/housing", this.recordPublicPickHousing.bind(this));
         this.router.post("/pick-public/gym", this.recordPublicPickGym.bind(this));
-        this.router.post("/wish", this.createWish.bind(this));
-        this.router.get("/all/picks", this.getAllPicks.bind(this));
+        this.router.get("/all/picks/housing", this.getAllHousingPicks.bind(this));
+        this.router.get("/all/picks/gym", this.getAllGymPicks.bind(this));
+        this.router.get("/all/picks/gym/by-ip", this.getAllGymPicksByIp.bind(this));
         this.router.get("/all/wish", this.getAllWishesForAccount.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
+    }
+
+    public async createWish(request: Request, response: Response) {
+        //
+        const acctIdInput = request.body.accountId;
+        const wishLocationInput = request.body.wish;
+        const acctId = isStringInteger(acctIdInput);
+        const wishLocation = isString(wishLocationInput);
+        const added = await this.profileService.createWish(wishLocation, acctId);
+        return response.status(200).json({ added });
     }
 
     public async recordPublicPickHousing(request: Request, response: Response) {
@@ -33,16 +45,6 @@ class ProfileController {
         return response.status(200).json({ message: "Success" });
     }
 
-    public async createWish(request: Request, response: Response) {
-        //
-        const acctIdInput = request.body.accountId;
-        const wishLocationInput = request.body.wish;
-        const acctId = isStringInteger(acctIdInput);
-        const wishLocation = isString(wishLocationInput);
-        const added = await this.profileService.createWish(wishLocation, acctId);
-        return response.status(200).json({ added });
-    }
-
     public async recordPickWithAuth(request: Request, response: Response) {
         //
         // const userId =
@@ -50,11 +52,23 @@ class ProfileController {
         return response.status(200).json();
     }
 
-    public async getAllPicks(request: Request, response: Response) {
+    public async getAllHousingPicks(request: Request, response: Response) {
         //
         const acctId = request.body.acctId;
-        const picks = await this.profileService.getAllPicks(acctId);
-        return response.status(200).json(picks);
+        const housingPicks = await this.profileService.getAllHousingPicks(acctId);
+        return response.status(200).json(housingPicks);
+    }
+
+    public async getAllGymPicks(request: Request, response: Response) {
+        const acctId = request.body.acctId;
+        const gymPicks = await this.profileService.getAllGymPicks(acctId);
+        return response.status(200).json(gymPicks);
+    }
+
+    public async getAllGymPicksByIp(request: Request, response: Response) {
+        const ip = request.ip;
+        const gymPicks = await this.profileService.getAllGymPicksByIp(ip);
+        return response.status(200).json(gymPicks);
     }
 
     public async getAllWishesForAccount(request: Request, response: Response) {
