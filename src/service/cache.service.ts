@@ -9,15 +9,18 @@ import {
 } from "../database/cache/batchNumCache";
 import CityDAO from "../database/dao/city.dao";
 import BatchDAO from "../database/dao/batch.dao";
-import { setQuestionOne, setQuestionTwo } from "../database/cache/questionsCache";
+import { getQuestions, setQuestionOne, setQuestionTwo } from "../database/cache/questionsCache";
+import FeedbackDAO from "../database/dao/feedback.dao";
 // todo
 
 class CacheService {
     private cityDAO: CityDAO;
     private batchDAO: BatchDAO;
-    constructor(cityDAO: CityDAO, batchDAO: BatchDAO) {
+    private feedbackDAO: FeedbackDAO;
+    constructor(cityDAO: CityDAO, batchDAO: BatchDAO, feedbackDAO: FeedbackDAO) {
         this.cityDAO = cityDAO;
         this.batchDAO = batchDAO;
+        this.feedbackDAO = feedbackDAO;
     }
 
     // city id stuff
@@ -27,38 +30,45 @@ class CacheService {
 
     public setCityId(cityName: string, cityId: number) {
         setCityId(cityName, cityId);
-        return true;
     }
 
     // batch num stuff
-    public async getBatchNumForNewBatches() {
+    public async getBatchNumForNewBatches(): Promise<number> {
         // returns highest available number.
         return await getBatchNumForNewBatches(this.batchDAO);
     }
 
-    public async getAllBatchNums() {
-        return getAllBatchNums();
+    public async getAllBatchNums(): Promise<number[]> {
+        return await getAllBatchNums();
     }
 
-    public setBatchNumForNewBatches(newNum: number): Promise<number[]> {
-        return setBatchNumForNewBatches(newNum, this.batchDAO);
+    public async setBatchNumForNewBatches(newNum: number): Promise<number[]> {
+        return await setBatchNumForNewBatches(newNum, this.batchDAO);
     }
 
-    public addBatchNumIfNotExists(newNum: number): Promise<number[]> {
-        return addBatchNumIfNotExists(newNum, this.batchDAO);
+    public async addBatchNumIfNotExists(newNum: number): Promise<number[]> {
+        return await addBatchNumIfNotExists(newNum, this.batchDAO);
     }
 
     public clearBatchCache() {
         resetBatchCache();
     }
 
-    public async initQuestionscache() {
+    // feedback stuff
+    public async getCurrentQuestions(): Promise<string[]> {
+        return await getQuestions();
+    }
+
+    // init functions for when the server restarts
+    public async initQuestionsCache() {
         const questions = await this.feedbackDAO.readLatest();
+        if (questions === null) {
+            throw new Error("No questions found");
+        }
         setQuestionOne(questions.questionOne);
         setQuestionTwo(questions.questionTwo);
     }
 
-    // init functions for when the server restarts
     public async initBatchCache() {
         const batchNums = await this.batchDAO.getAllBatchNums();
         initBatchCacheFromDb(batchNums);

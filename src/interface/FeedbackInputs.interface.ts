@@ -1,5 +1,5 @@
 export interface FeedbackInputs {
-    questionOneAnswer?: string;
-    questionTwoAnswer?: string;
-    largeTextAnswer?: string;
+    questionOneAnswer: string;
+    questionTwoAnswer: string;
+    largeTextAnswer: string;
 }

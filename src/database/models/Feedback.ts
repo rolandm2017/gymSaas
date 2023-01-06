@@ -6,10 +6,11 @@ import { Profile } from "./Profile";
 export interface FeedbackAttributes {
     feedbackId?: number;
     questionOne: string;
-    questionOneAnswer: number;
+    questionOneAnswer?: string;
     questionTwo: string;
-    questionTwoAnswer: number;
-    largeTextAnswer: string;
+    questionTwoAnswer?: string;
+    largeTextAnswer?: string;
+    submitted?: boolean | null;
     profileId?: number;
     createdAt?: Date;
     updatedAt?: Date;
@@ -21,11 +22,12 @@ export type FeedbackCreationAttributes = Optional<FeedbackAttributes, FeedbackOp
 
 export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttributes> implements FeedbackAttributes {
     public query!: string;
-    public questionOneText!: string;
-    public questionOneAnswer!: number;
-    public questionTwoText!: string;
-    public questionTwoAnswer!: number;
+    public questionOne!: string;
+    public questionOneAnswer!: string;
+    public questionTwo!: string;
+    public questionTwoAnswer!: string;
     public largeTextAnswer!: string;
+    public submitted!: boolean;
     public profileId!: ForeignKey<Profile["profileId"]>;
 
     public readonly createdAt!: Date;
@@ -42,7 +44,6 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                 questionOne: {
                     type: DataTypes.STRING,
                     allowNull: false,
-                    unique: true,
                 },
                 questionOneAnswer: {
                     type: DataTypes.INTEGER,
@@ -51,7 +52,6 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                 questionTwo: {
                     type: DataTypes.STRING,
                     allowNull: false,
-                    unique: true,
                 },
                 questionTwoAnswer: {
                     type: DataTypes.INTEGER,
@@ -59,6 +59,10 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                 },
                 largeTextAnswer: {
                     type: DataTypes.STRING,
+                },
+                submitted: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: true,
                 },
             },
             {
