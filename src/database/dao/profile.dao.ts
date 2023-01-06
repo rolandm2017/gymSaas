@@ -33,6 +33,10 @@ class ProfileDAO {
         }
     }
 
+    public async getProfileForAccountId(accountId: number): Promise<Profile | null> {
+        return await Profile.findOne({ where: { accountId } });
+    }
+
     public async recordPublicPickGym(ipAddress: string, gymId: number): Promise<Profile> {
         const profiles = await Profile.findAll({ where: { ipAddress } });
         const noneFound = profiles.length === 0;

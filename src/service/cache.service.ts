@@ -9,6 +9,7 @@ import {
 } from "../database/cache/batchNumCache";
 import CityDAO from "../database/dao/city.dao";
 import BatchDAO from "../database/dao/batch.dao";
+import { setQuestionOne, setQuestionTwo } from "../database/cache/questionsCache";
 // todo
 
 class CacheService {
@@ -49,6 +50,12 @@ class CacheService {
 
     public clearBatchCache() {
         resetBatchCache();
+    }
+
+    public async initQuestionscache() {
+        const questions = await this.feedbackDAO.readLatest();
+        setQuestionOne(questions.questionOne);
+        setQuestionTwo(questions.questionTwo);
     }
 
     // init functions for when the server restarts
