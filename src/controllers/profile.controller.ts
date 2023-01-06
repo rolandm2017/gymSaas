@@ -11,26 +11,13 @@ class ProfileController {
 
     constructor(profileService: ProfileService) {
         this.profileService = profileService;
-        this.router.post("/wish", this.createWish.bind(this));
         this.router.post("/pick-public/housing", this.recordPublicPickHousing.bind(this));
         this.router.post("/pick-public/gym", this.recordPublicPickGym.bind(this));
         this.router.get("/all/picks/housing", this.getAllHousingPicks.bind(this));
         this.router.get("/all/picks/housing/by-ip", this.getAllHousingPicksByIp.bind(this));
         this.router.get("/all/picks/gym", this.getAllGymPicks.bind(this));
         this.router.get("/all/picks/gym/by-ip", this.getAllGymPicksByIp.bind(this));
-        this.router.get("/all/wish/:accountid", this.getAllWishesForAccount.bind(this));
-        this.router.get("/all/wish", this.getAllWishes.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
-    }
-
-    public async createWish(request: Request, response: Response) {
-        //
-        const acctIdInput = request.body.accountId;
-        const wishLocationInput = request.body.wish;
-        const acctId = isStringInteger(acctIdInput);
-        const wishLocation = isString(wishLocationInput);
-        const added = await this.profileService.createWish(wishLocation, acctId);
-        return response.status(200).json({ added });
     }
 
     public async recordPublicPickHousing(request: Request, response: Response) {
@@ -79,19 +66,6 @@ class ProfileController {
         const ip = request.ip;
         const gymPicks = await this.profileService.getAllGymPicksByIp(ip);
         return response.status(200).json(gymPicks);
-    }
-
-    public async getAllWishesForAccount(request: Request, response: Response) {
-        //
-        const acctIdInput = request.body.accountId;
-        const acctId = isStringInteger(acctIdInput);
-        const found = await this.profileService.getAllWishesForAccount(acctId);
-        return response.status(200).json({ found });
-    }
-
-    public async getAllWishes(request: Request, response: Response) {
-        const wishes = await this.profileService.getAllWishes();
-        return response.status(200).json({ wishes });
     }
 
     async healthCheck(request: Request, response: Response) {
