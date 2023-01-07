@@ -21,17 +21,22 @@ class ProfileDAO {
 
     public async recordPublicPickHousing(ipAddress: string, housing: Housing): Promise<Profile> {
         const profiles = await Profile.findAll({ where: { ipAddress } });
+        console.log(profiles, "24rm");
         const noProfilesFound = profiles.length === 0;
         // if ip addr is new, create a profile;
         if (noProfilesFound) {
-            const created = await Profile.create({ ipAddress });
-            created.addHousing(housing);
-            return created.save();
+            const newProfile = await Profile.create({ ipAddress });
+            console.log("adding housing...", housing.housingId, "29rm");
+            await newProfile.addHousing(housing);
+            await newProfile.save();
+            return newProfile;
         } else {
             // if ip addr is previously seen, update their housing ids
             const profile = profiles[0];
-            profile.addHousing(housing);
-            return profile.save();
+            console.log("adding housing...", housing.housingId, "34rm");
+            await profile.addHousing(housing);
+            await profile.save();
+            return profile;
         }
     }
 
@@ -41,15 +46,12 @@ class ProfileDAO {
         // if ip addr is new, create a profile;
         if (noneFound) {
             const created = await Profile.create({ ipAddress });
-            console.log(created, "47rm");
             created.addGym(gym);
             created.save();
             return created;
         } else {
             // if ip addr is previously seen, update their housing ids
             const profile = profiles[0];
-            console.log(profile, "53rm");
-            console.log(profile.addGym, "54rm");
             profile.addGym(gym);
             profile.save();
             return profile;
@@ -84,6 +86,7 @@ class ProfileDAO {
             throw new Error("Profile not found for this profile id");
         }
         const housings = await profile.getHousings();
+        console.log(housings.length, "87rm");
         return housings;
     }
 

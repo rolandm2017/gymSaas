@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IHousing } from "../interface/Housing.interface";
-import Parser from "../util/parser";
+import Parser from "./parser";
 
 // class will handle info about various scraper types. "is it a long/lat or city input? does it return aps with streets, coords, both?"
 class Scraper {

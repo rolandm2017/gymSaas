@@ -21,8 +21,6 @@ interface ProfileAttributes {
     profileId?: number;
     acctId?: number;
     ipAddress: string;
-    pickedHousingIds?: number[];
-    pickedGymIds?: number[];
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -69,7 +67,6 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
                     primaryKey: true,
                 },
                 ipAddress: {
-                    // todo: expand to hold ipaddresses PLURAL because what if user logs in from diff device?
                     type: DataTypes.STRING,
                     allowNull: false,
                 },

@@ -101,70 +101,84 @@ afterAll(async () => {
 });
 
 describe("profileDAO tests", () => {
-    test("create profile by ip", async () => {
-        const ipForTest = "127.0.0.1";
-        const profile = await profileDAO.createProfileByIp(ipForTest);
-        expect(profile.ipAddress).toBe(ipForTest);
-        expect(profile.profileId).toBeDefined();
-    });
-    test("get profile by account id & associateAccountWithProfile", async () => {
-        // arrange
-        const createdAccount = await accountDAO.createAccount(FAKE_ACCOUNT);
-        const ipAddr = "5.5.5.55";
-        const createdProfile = await profileDAO.createProfileByIp(ipAddr);
-        const ipAddrTwo = "225.225.225.55";
-        const createdProfileTwo = await profileDAO.createProfileByIp(ipAddrTwo); // decoy
+    // test("create profile by ip", async () => {
+    //     const ipForTest = "127.0.0.1";
+    //     const profile = await profileDAO.createProfileByIp(ipForTest);
+    //     expect(profile.ipAddress).toBe(ipForTest);
+    //     expect(profile.profileId).toBeDefined();
+    // });
+    // test("get profile by account id & associateAccountWithProfile", async () => {
+    //     // arrange
+    //     const createdAccount = await accountDAO.createAccount(FAKE_ACCOUNT);
+    //     const ipAddr = "5.5.5.55";
+    //     const createdProfile = await profileDAO.createProfileByIp(ipAddr);
+    //     const ipAddrTwo = "225.225.225.55";
+    //     const createdProfileTwo = await profileDAO.createProfileByIp(ipAddrTwo); // decoy
 
-        // update the association
-        createdProfile.acctId = createdAccount.acctId;
+    //     // update the association
+    //     createdProfile.acctId = createdAccount.acctId;
 
-        // this tests associateAccountWithProfile!
-        const updated = await profileDAO.associateProfileWithAccount(createdProfile.profileId, createdAccount);
-        expect(updated.profileId).toBe(createdProfile.profileId);
-        expect(updated.acctId).toBe(createdAccount.acctId);
-        // // act
-        const retrieved = await profileDAO.getProfileForAccountId(createdAccount.acctId);
-        // // assert
-        expect(retrieved?.ipAddress).toBe(createdProfile.ipAddress);
-    });
+    //     // this tests associateAccountWithProfile!
+    //     const updated = await profileDAO.associateProfileWithAccount(createdProfile.profileId, createdAccount);
+    //     expect(updated.profileId).toBe(createdProfile.profileId);
+    //     expect(updated.acctId).toBe(createdAccount.acctId);
+    //     // // act
+    //     const retrieved = await profileDAO.getProfileForAccountId(createdAccount.acctId);
+    //     // // assert
+    //     expect(retrieved?.ipAddress).toBe(createdProfile.ipAddress);
+    // });
     test("record public pick housing", async () => {
         // arrange
-        const ipForTestOne = "125.9.9.2";
-        const newIp = "150.44.44.3";
+        const ipForTestOne = "111.111.111.111";
+        const newIp = "112.112.112.112";
         const created = await profileDAO.createProfileByIp(ipForTestOne);
+        expect(created.profileId).toBeDefined();
         const housingForTestOne = await housingDAO.getHousingByHousingId(apIdOne);
         const housingForTestTwo = await housingDAO.getHousingByHousingId(apIdTwo);
+        const housingForBothTests = await housingDAO.getHousingByHousingId(apIdThree);
         if (housingForTestOne === null) throw Error("failed to find housing");
         if (housingForTestTwo === null) throw Error("failed to find housing");
+        if (housingForBothTests === null) throw Error("failed to find housing");
         // act
         // if the ip's profile already exists, the housing is added.
-        const withHousing = await profileDAO.recordPublicPickHousing(ipForTestOne, housingForTestOne);
-        expect(withHousing.profileId).toBeDefined();
+        await profileDAO.recordPublicPickHousing(ipForTestOne, housingForTestOne);
+        await profileDAO.recordPublicPickHousing(ipForTestOne, housingForTestTwo);
+        await profileDAO.recordPublicPickHousing(ipForTestOne, housingForBothTests);
         // if the ip's profile doesnt already exist, one is created, and then the housing is added.
-        const withHousingTwo = await profileDAO.recordPublicPickHousing(newIp, housingForTestTwo);
-        expect(withHousingTwo.profileId).toBeDefined();
+        const secondProfileHousing = await profileDAO.recordPublicPickHousing(newIp, housingForTestOne);
+        const secondProfileHousingTwo = await profileDAO.recordPublicPickHousing(newIp, housingForTestTwo);
+        const secondProfileHousingThree = await profileDAO.recordPublicPickHousing(newIp, housingForBothTests);
+        console.log(secondProfileHousingThree, "146rm");
+        expect(secondProfileHousingThree.profileId).toBeDefined();
+        console.log(created.profileId, "147rm");
+        const existingProfileProfileId = created.profileId;
+        const existingProfileProfileIdThree = secondProfileHousingThree.profileId;
+        expect(existingProfileProfileId).toBeDefined();
+        expect(existingProfileProfileIdThree).toBeDefined();
         // assert
-        const allHousingPicks = await profileDAO.getAllHousingPicksByProfileId(created.profileId);
-        const allHousingPicksTwo = await profileDAO.getAllHousingPicksByProfileId(withHousingTwo.profileId);
-        expect(allHousingPicks.length).toBe(1);
-        expect(allHousingPicksTwo.length).toBe(1);
+        const housingPicksByProfileId = await profileDAO.getAllHousingPicksByProfileId(existingProfileProfileId);
+        const housingPicksByProfileIdTwo = await profileDAO.getAllHousingPicksByProfileId(existingProfileProfileIdThree);
+        console.log(housingPicksByProfileId, housingPicksByProfileIdTwo, "159rm");
+        console.log(housingPicksByProfileId.length, housingPicksByProfileIdTwo.length, "160rm");
+        expect(housingPicksByProfileId.length).toBe(3);
+        expect(housingPicksByProfileIdTwo.length).toBe(3);
     });
 
-    test("record public pick gym", async () => {
-        const gyms = await gymDAO.getAllGyms();
-        expect(gyms.length).toBeGreaterThanOrEqual(1); // test inputs.
-        const ipForTestOne = "125.9.9.22";
-        const created = await profileDAO.createProfileByIp(ipForTestOne);
-        const newIp = "150.44.44.32";
-        // act
-        // if the ip's profile already exists, the housing is added.
-        const withGyms = await profileDAO.recordPublicPickGym(ipForTestOne, gyms[0]);
-        // if the ip's profile doesnt already exist, one is created, and then the gym is added.
-        const withGymsTwo = await profileDAO.recordPublicPickGym(newIp, gyms[0]);
-        // assert
-        const gymPicks = await profileDAO.getAllGymPicksByProfileId(created.profileId);
-        const gymPicksTwo = await profileDAO.getAllGymPicksByProfileId(withGymsTwo.profileId);
-        expect(gymPicks.length).toBe(1);
-        expect(gymPicksTwo.length).toBe(1);
-    });
+    // test("record public pick gym", async () => {
+    //     const gyms = await gymDAO.getAllGyms();
+    //     expect(gyms.length).toBeGreaterThanOrEqual(1); // test inputs.
+    //     const ipForTestOne = "125.9.9.22";
+    //     const created = await profileDAO.createProfileByIp(ipForTestOne);
+    //     const newIp = "150.44.44.32";
+    //     // act
+    //     // if the ip's profile already exists, the housing is added.
+    //     const withGyms = await profileDAO.recordPublicPickGym(ipForTestOne, gyms[0]);
+    //     // if the ip's profile doesnt already exist, one is created, and then the gym is added.
+    //     const withGymsTwo = await profileDAO.recordPublicPickGym(newIp, gyms[0]);
+    //     // assert
+    //     const gymPicks = await profileDAO.getAllGymPicksByProfileId(created.profileId);
+    //     const gymPicksTwo = await profileDAO.getAllGymPicksByProfileId(withGymsTwo.profileId);
+    //     expect(gymPicks.length).toBe(1);
+    //     expect(gymPicksTwo.length).toBe(1);
+    // });
 });

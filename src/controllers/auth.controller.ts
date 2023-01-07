@@ -19,6 +19,7 @@ import AuthService from "../service/auth.service";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
+import { googleAuth, googleAuthCallback, passportJwt } from "../middleware/passport.middleware";
 
 class AuthController {
     public path = "/auth";
@@ -27,6 +28,11 @@ class AuthController {
 
     constructor(authService: AuthService) {
         this.authService = authService;
+        this.router.get("/google", googleAuth);
+        // Retrieve member data using the access token received;
+        this.router.get("/google/callback", googleAuthCallback, this.grantAccessToken);
+        // profile route after successful sign in;
+        this.router.get("/profile", passportJwt, this.getProfile);
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         this.router.post("/register", registerUserSchema, this.register);

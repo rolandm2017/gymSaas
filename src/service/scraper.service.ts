@@ -5,7 +5,7 @@ import express from "express";
 import dotenv from "dotenv";
 // imports
 import { IHousing } from "../interface/Housing.interface";
-import Parser from "../util/parser";
+import Parser from "../scrapers/parser";
 import { ProviderEnum } from "../enum/provider.enum";
 import Scraper from "../scrapers/scraper";
 import ScraperConnectionFactory from "../scrapers/connectionFactory";
