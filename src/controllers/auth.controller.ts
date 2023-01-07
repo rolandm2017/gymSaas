@@ -20,6 +20,7 @@ import { IBasicDetails } from "../interface/BasicDetails.interface";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
 import { googleAuth, googleAuthCallback, passportJwt } from "../middleware/passport.middleware";
+import { UserFromGoogle } from "../interface/UserFromGoogle.interface";
 
 class AuthController {
     public path = "/auth";
@@ -56,6 +57,20 @@ class AuthController {
         this.router.put("/:id", authorize(), updateRoleSchema, this.updateAccount);
         this.router.delete("/:id", authorize(), this._deleteAccount);
         this.router.get(HealthCheck.healthCheck, this.healthCheck);
+    }
+
+    // **
+    // ** passport stuff
+    public async grantAccessToken(req: Request, res: Response) {
+        // https://www.makeuseof.com/nodejs-google-authentication/
+        // "If you log in, you will receive the token."
+        const newUser = req.user as UserFromGoogle; // todo: discover type of 'user' property
+        const ipAddress = req.ip;
+        const accountDetails: IBasicDetails = await this.authService.grantRefreshToken(newUser, ipAddress);
+        // todo: figure out where this response is sent - presumably to the frontend
+        if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
+        this.setTokenCookie(response, accountDetails.refreshToken);
+        return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
     }
 
     public async authenticate(request: Request, response: Response, next: NextFunction) {
