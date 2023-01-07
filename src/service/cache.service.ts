@@ -11,7 +11,6 @@ import CityDAO from "../database/dao/city.dao";
 import BatchDAO from "../database/dao/batch.dao";
 import { getQuestions, setQuestionOne, setQuestionTwo } from "../database/cache/questionsCache";
 import FeedbackDAO from "../database/dao/feedback.dao";
-// todo
 
 class CacheService {
     private cityDAO: CityDAO;

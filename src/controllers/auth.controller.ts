@@ -58,8 +58,8 @@ class AuthController {
             const password: string = request.body.password;
             const ipAddress: string = request.ip;
             const accountDetails: IBasicDetails = await this.authService.authenticate(email, password, ipAddress);
-            if (accountDetails.jwtToken === undefined) throw new Error("jwt missing from authenticate response");
-            if (accountDetails.refreshToken === undefined) throw new Error("refresh token missing from authenticate response");
+            if (accountDetails.jwtToken === undefined) throw Error("jwt missing from authenticate response");
+            if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
             this.setTokenCookie(response, accountDetails.refreshToken);
             return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
         } catch (err) {

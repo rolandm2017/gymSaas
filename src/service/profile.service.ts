@@ -1,49 +1,48 @@
 import ProfileDAO from "../database/dao/profile.dao";
-import WishDAO from "../database/dao/wish.dao";
+import { Gym } from "../database/models/Gym";
+import { Housing } from "../database/models/Housing";
+import { Profile } from "../database/models/Profile";
 
 class ProfileService {
     private profileDAO: ProfileDAO;
-    private wishDAO: WishDAO;
-    constructor(profileDAO: ProfileDAO, wishDAO: WishDAO) {
+    constructor(profileDAO: ProfileDAO) {
         //
         this.profileDAO = profileDAO;
-        this.wishDAO = wishDAO;
     }
 
     public async recordPublicPickHousing(ipAddress: string, housingId: number) {
         // return await this.profileDAO.recordPublicPickHousing(ipAddress, housingId);
     }
 
-    public async recordPublicPickGym(ipAddress: string, housingId: number) {
+    public async recordPublicPickGym(ipAddress: string, housingId: number): Promise<Profile> {
         return await this.profileDAO.recordPublicPickGym(ipAddress, housingId);
     }
 
-    public async createWish(wishLocation: string, acctId: number) {
-        return await this.wishDAO.createWish(wishLocation, acctId);
-    }
-
-    public async getAllHousingPicks(acctId: number) {
+    public async getAllHousingPicks(acctId: number): Promise<Housing[]> {
         return await this.profileDAO.getAllHousingPicks(acctId);
     }
 
-    public async getAllHousingPicksByIp(ipAddr: string) {
+    public async getAllHousingPicksByIp(ipAddr: string): Promise<Housing[]> {
         return await this.profileDAO.getAllHousingPicksByIp(ipAddr);
     }
 
-    public async getAllGymPicks(acctId: number) {
+    public async getAllGymPicks(acctId: number): Promise<Gym[]> {
         return await this.profileDAO.getAllGymPicks(acctId);
     }
 
-    public async getAllGymPicksByIp(ipAddr: string) {
+    public async getAllGymPicksByIp(ipAddr: string): Promise<Profile | null> {
         return await this.profileDAO.getAllGymPicksByIp(ipAddr);
     }
 
-    public async getAllWishesForAccount(acctId: number) {
-        return await this.wishDAO.getAllWishesForAccount(acctId);
-    }
-
-    public async getAllWishes() {
-        return await this.wishDAO.getAllWishes();
+    public async associateAccountWithProfile(accountId: number, ipAddress: string): Promise<number> {
+        const profile = await this.profileDAO.getProfileByIp(ipAddress);
+        const noProfileFound = profile === null;
+        if (noProfileFound) {
+            // create one
+            const profile = await this.profileDAO.createProfileByIp(ipAddress);
+            return await this.profileDAO.associateAccountWithProfile(profile, accountId);
+        }
+        return await this.profileDAO.associateAccountWithProfile(profile, accountId);
     }
 }
 

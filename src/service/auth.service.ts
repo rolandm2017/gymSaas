@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import AccountDAO from "../database/dao/account.dao";
-import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import ResetTokenDAO from "../database/dao/resetToken.dao";
 import { Account } from "../database/models/Account";
 import { RefreshToken } from "../database/models/RefreshToken";

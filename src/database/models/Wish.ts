@@ -5,7 +5,8 @@ import { Profile } from "./Profile";
 
 export interface WishAttributes {
     wishId?: number;
-    query: string;
+    wishLocation: string;
+    profileId?: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -15,7 +16,7 @@ export type WishOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt";
 export type WishCreationAttributes = Optional<WishAttributes, WishOptionalAttributes>;
 
 export class Wish extends Model<WishAttributes, WishCreationAttributes> implements WishAttributes {
-    public query!: string;
+    public wishLocation!: string;
     public profileId!: ForeignKey<Profile["profileId"]>;
 
     public readonly createdAt!: Date;
@@ -29,7 +30,7 @@ export class Wish extends Model<WishAttributes, WishCreationAttributes> implemen
                     type: DataTypes.INTEGER,
                     primaryKey: true,
                 },
-                query: {
+                wishLocation: {
                     type: DataTypes.STRING,
                     allowNull: false,
                     unique: true,

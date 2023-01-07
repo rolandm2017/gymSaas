@@ -1,17 +1,18 @@
 import { start } from "repl";
 import { Housing } from "../models/Housing";
+import { Profile } from "../models/Profile";
 import { Wish, WishCreationAttributes } from "../models/Wish";
 
 class WishDAO {
     constructor() {}
     //
 
-    public async createWish(wishLocation: string, acctId: number): Promise<Wish> {
-        return await Wish.create(startValue);
+    public async createWish(wish: WishCreationAttributes): Promise<Wish> {
+        return await Wish.create(wish);
     }
 
-    public async getAllWishesForAccount(acctId: number): Promise<Wish[]> {
-        return await Wish.findAll({ where: { acctId } });
+    public async getAllWishesForProfile(profileId: number): Promise<Wish[]> {
+        return await Wish.findAll({ include: { required: true, model: Profile, where: { profileId } } });
     }
 
     public async getAllWishes(): Promise<Wish[]> {

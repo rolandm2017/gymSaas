@@ -8,8 +8,8 @@ class ProfileDAO {
     constructor() {}
     //
 
-    public async createProfileByIp(startValue: ProfileCreationAttributes): Promise<Profile> {
-        return await Profile.create(startValue);
+    public async createProfileByIp(ipAddress: string): Promise<Profile> {
+        return await Profile.create({ ipAddress });
     }
 
     public async recordPublicPickHousing(ipAddress: string, housingId: number) {
@@ -72,8 +72,12 @@ class ProfileDAO {
         return profile.getHousings();
     }
 
-    public async getAllHousingPicksByIp(ip: string): Promise<Profile | null> {
-        return await Profile.findOne({ where: { ipAddress: ip }, include: "housing" });
+    public async getAllHousingPicksByIp(ip: string): Promise<Housing[]> {
+        const profile = await Profile.findOne({ where: { ipAddress: ip }, include: "housing" });
+        if (profile === null) {
+            throw new Error("Profile not found for this account id");
+        }
+        return profile.getHousings();
     }
 
     public async getAllGymPicks(acctId: number): Promise<Gym[]> {
@@ -87,6 +91,16 @@ class ProfileDAO {
 
     public async getAllGymPicksByIp(ip: string): Promise<Profile | null> {
         return await Profile.findOne({ where: { ipAddress: ip }, include: "gym" });
+    }
+
+    public async getProfileByIp(ipAddress: string): Promise<Profile | null> {
+        const profile = await Profile.findOne({ where: { ipAddress } });
+        return profile;
+    }
+
+    public async associateAccountWithProfile(profile: Profile, accountId: number): Promise<number> {
+        const affected = await Profile.update(profile, { where: { accountId } });
+        return affected[0];
     }
 }
 
