@@ -32,8 +32,6 @@ class AuthController {
         this.router.get("/google", googleAuth);
         // Retrieve member data using the access token received;
         this.router.get("/google/callback", googleAuthCallback, this.grantAccessToken);
-        // profile route after successful sign in;
-        this.router.get("/profile", passportJwt, this.getProfile);
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         this.router.post("/register", registerUserSchema, this.register);
