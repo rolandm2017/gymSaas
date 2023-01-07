@@ -25,8 +25,6 @@ beforeAll(async () => {
     await resetTokenDAO.createResetToken(newAcct.acctId, "someTokenString", now);
 });
 
-beforeEach(async () => {});
-
 afterAll(async () => {
     await app.closeDB();
 });

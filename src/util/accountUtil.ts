@@ -78,11 +78,11 @@ class AccountUtil {
         const account: IAccount = {
             acctId: startAccount.acctId,
             email: startAccount.email,
-            isVerified: startAccount.isVerified,
-            updated: new Date(startAccount.updated),
+            isVerified: startAccount.isVerified ? startAccount.isVerified : false,
+            updated: startAccount.updated ? new Date(startAccount.updated) : new Date(),
             role: startAccount.role as Role,
             passwordHash: startAccount.passwordHash,
-            verificationToken: startAccount.verificationToken,
+            verificationToken: startAccount.verificationToken ? startAccount.verificationToken : "",
         };
         if (account.passwordHash === undefined) {
             throw Error("No hashed password found");

@@ -10,8 +10,8 @@ class ProfileService {
         this.profileDAO = profileDAO;
     }
 
-    public async recordPublicPickHousing(ipAddress: string, housingId: number) {
-        // return await this.profileDAO.recordPublicPickHousing(ipAddress, housingId);
+    public async recordPublicPickHousing(ipAddress: string, housingId: number): Promise<Profile> {
+        return await this.profileDAO.recordPublicPickHousing(ipAddress, housingId);
     }
 
     public async recordPublicPickGym(ipAddress: string, housingId: number): Promise<Profile> {
@@ -19,7 +19,7 @@ class ProfileService {
     }
 
     public async getAllHousingPicks(acctId: number): Promise<Housing[]> {
-        return await this.profileDAO.getAllHousingPicks(acctId);
+        return await this.profileDAO.getAllHousingPicksByAccountId(acctId);
     }
 
     public async getAllHousingPicksByIp(ipAddr: string): Promise<Housing[]> {
@@ -27,7 +27,7 @@ class ProfileService {
     }
 
     public async getAllGymPicks(acctId: number): Promise<Gym[]> {
-        return await this.profileDAO.getAllGymPicks(acctId);
+        return await this.profileDAO.getAllGymPicksByAccountId(acctId);
     }
 
     public async getAllGymPicksByIp(ipAddr: string): Promise<Profile | null> {

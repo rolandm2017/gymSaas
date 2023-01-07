@@ -1,5 +1,6 @@
 import BatchDAO from "../../src/database/dao/batch.dao";
 import CityDAO from "../../src/database/dao/city.dao";
+import FeedbackDAO from "../../src/database/dao/feedback.dao";
 import GymDAO from "../../src/database/dao/gym.dao";
 import HousingDAO from "../../src/database/dao/housing.dao";
 import StateDAO from "../../src/database/dao/state.dao";
@@ -20,11 +21,12 @@ const stateDAO = new StateDAO();
 const cityDAO = new CityDAO();
 const batchDAO = new BatchDAO();
 const taskDAO = new TaskDAO();
+const feedbackDAO = new FeedbackDAO();
 
 const housingDAO = new HousingDAO(stateDAO, cityDAO);
 const gymDAO = new GymDAO();
 
-const cacheService: CacheService = new CacheService(cityDAO, batchDAO);
+const cacheService: CacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
 
 const housingService: HousingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService: TaskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);
@@ -92,7 +94,7 @@ beforeAll(async () => {
     for (const gym of dummyGymData) {
         const foundGyms = await gymDAO.getGymByAddress(gym.address);
         if (foundGyms.length > 0) continue; // do not add same gym twice.
-        gymDAO.createGym(gym);
+        await gymDAO.createGym(gym);
     }
 });
 

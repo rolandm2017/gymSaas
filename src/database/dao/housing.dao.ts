@@ -1,10 +1,10 @@
 import { Op } from "sequelize";
-import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { City } from "../models/City";
 import { Housing, HousingCreationAttributes } from "../models/Housing";
 import { State } from "../models/State";
 import CityDAO from "./city.dao";
 import StateDAO from "./state.dao";
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 
 @TryCatchClassDecorator(Error, (err, context) => {
     console.log(context, err);

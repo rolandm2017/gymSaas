@@ -21,7 +21,7 @@ export type FeedbackOptionalAttributes = "createdAt" | "updatedAt" | "deletedAt"
 export type FeedbackCreationAttributes = Optional<FeedbackAttributes, FeedbackOptionalAttributes>;
 
 export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttributes> implements FeedbackAttributes {
-    public query!: string;
+    public feedbackId!: number;
     public questionOne!: string;
     public questionOneAnswer!: string;
     public questionTwo!: string;

@@ -1,9 +1,13 @@
-import { start } from "repl";
 import { Account } from "../models/Account";
 import { Gym } from "../models/Gym";
 import { Housing } from "../models/Housing";
 import { Profile, ProfileCreationAttributes } from "../models/Profile";
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class ProfileDAO {
     constructor() {}
     //
@@ -12,16 +16,16 @@ class ProfileDAO {
         return await Profile.create({ ipAddress });
     }
 
-    public async recordPublicPickHousing(ipAddress: string, housingId: number) {
+    public async recordPublicPickHousing(ipAddress: string, housingId: number): Promise<Profile> {
         const profiles = await Profile.findAll({ where: { ipAddress } });
-        const noneFound = profiles.length === 0;
+        const noProfilesFound = profiles.length === 0;
         const housing = await Housing.findByPk(housingId);
         const housingNotFound = housing == null;
         if (housingNotFound) {
             throw new Error("No housing found for this id");
         }
         // if ip addr is new, create a profile;
-        if (noneFound) {
+        if (noProfilesFound) {
             const created = await Profile.create({ ipAddress });
             created.addHousing(housing);
             return created.save();
@@ -31,10 +35,6 @@ class ProfileDAO {
             profile.addHousing(housing);
             return profile.save();
         }
-    }
-
-    public async getProfileForAccountId(accountId: number): Promise<Profile | null> {
-        return await Profile.findOne({ where: { accountId } });
     }
 
     public async recordPublicPickGym(ipAddress: string, gymId: number): Promise<Profile> {
@@ -63,7 +63,11 @@ class ProfileDAO {
         }
     }
 
-    public async getAllHousingPicks(acctId: number): Promise<Housing[]> {
+    public async getProfileForAccountId(accountId: number): Promise<Profile | null> {
+        return await Profile.findOne({ where: { accountId } });
+    }
+
+    public async getAllHousingPicksByAccountId(acctId: number): Promise<Housing[]> {
         const profile = await Profile.findOne({ include: { required: true, model: Account, where: { acctId } } });
 
         if (profile === null) {
@@ -72,25 +76,40 @@ class ProfileDAO {
         return profile.getHousings();
     }
 
-    public async getAllHousingPicksByIp(ip: string): Promise<Housing[]> {
-        const profile = await Profile.findOne({ where: { ipAddress: ip }, include: "housing" });
+    public async getAllHousingPicksByIp(ipAddress: string): Promise<Housing[]> {
+        const profile = await Profile.findOne({ where: { ipAddress }, include: "housing" });
         if (profile === null) {
             throw new Error("Profile not found for this account id");
         }
         return profile.getHousings();
     }
 
-    public async getAllGymPicks(acctId: number): Promise<Gym[]> {
+    public async getAllHousingPicksByProfileId(profileId: number): Promise<Housing[]> {
+        const profile = await Profile.findOne({ where: { profileId } });
+        if (profile === null) {
+            throw new Error("Profile not found for this account id");
+        }
+        return profile.getHousings();
+    }
+
+    public async getAllGymPicksByAccountId(acctId: number): Promise<Gym[]> {
         const profile = await Profile.findOne({ include: { required: true, model: Account, where: { acctId } } });
-        // const profile = await Profile.findOne({ where: { accountId: acctId } });
         if (profile === null) {
             throw new Error("Profile not found for this account id");
         }
         return profile.getGyms();
     }
 
-    public async getAllGymPicksByIp(ip: string): Promise<Profile | null> {
-        return await Profile.findOne({ where: { ipAddress: ip }, include: "gym" });
+    public async getAllGymPicksByProfileId(profileId: number): Promise<Gym[]> {
+        const profile = await Profile.findOne({ where: { profileId } });
+        if (profile === null) {
+            throw new Error("Profile not found for this account id");
+        }
+        return profile.getGyms();
+    }
+
+    public async getAllGymPicksByIp(ipAddress: string): Promise<Profile | null> {
+        return await Profile.findOne({ where: { ipAddress }, include: "gym" });
     }
 
     public async getProfileByIp(ipAddress: string): Promise<Profile | null> {

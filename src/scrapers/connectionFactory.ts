@@ -2,8 +2,6 @@ import TaskDAO from "../database/dao/task.dao";
 import { ProviderEnum } from "../enum/provider.enum";
 import Scraper from "./scraper";
 
-const taskDAO = new TaskDAO();
-
 const scraperAccess = {
     rentCanada: {
         site: "rentcanada.com",
@@ -35,19 +33,16 @@ class ScraperConnectionFactory {
             scraperAccess[ProviderEnum.rentCanada].site,
             scraperAccess[ProviderEnum.rentCanada].scraperIp,
             scraperAccess[ProviderEnum.rentCanada].scraperPort,
-            taskDAO,
         );
         this.rentFasterScraper = new Scraper(
             scraperAccess[ProviderEnum.rentFaster].site,
             scraperAccess[ProviderEnum.rentFaster].scraperIp,
             scraperAccess[ProviderEnum.rentFaster].scraperPort,
-            taskDAO,
         );
         this.rentSeekerScraper = new Scraper(
             scraperAccess[ProviderEnum.rentSeeker].site,
             scraperAccess[ProviderEnum.rentSeeker].scraperIp,
             scraperAccess[ProviderEnum.rentSeeker].scraperPort,
-            taskDAO,
         );
     }
 

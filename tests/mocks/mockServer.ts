@@ -11,6 +11,9 @@ import HousingController from "../../src/controllers/housing.controller";
 import AuthController from "../../src/controllers/auth.controller";
 import TaskQueueController from "../../src/controllers/taskQueue.controller";
 import AdminController from "../../src/controllers/admin.controller";
+import WishController from "../../src/controllers/wish.controller";
+import ProfileController from "../../src/controllers/profile.controller";
+import FeedbackController from "../../src/controllers/feedback.controller";
 
 import initModels from "../../src/database/models/init-models";
 import errorHandler from "../../src/middleware/error.middleware";
@@ -25,6 +28,9 @@ import TaskQueueService from "../../src/service/taskQueue.service";
 import ScraperService from "../../src/service/scraper.service";
 import CacheService from "../../src/service/cache.service";
 import GymService from "../../src/service/gym.service";
+import WishService from "../../src/service/wish.service";
+import FeedbackService from "../../src/service/feedback.service";
+import ProfileService from "../../src/service/profile.service";
 // model
 import { Account } from "../../src/database/models/Account";
 import { ResetToken } from "../../src/database/models/ResetToken";
@@ -42,6 +48,8 @@ import CityDAO from "../../src/database/dao/city.dao";
 import HousingDAO from "../../src/database/dao/housing.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import GymDAO from "../../src/database/dao/gym.dao";
+import FeedbackDAO from "../../src/database/dao/feedback.dao";
+import WishDAO from "../../src/database/dao/wish.dao";
 // misc
 import AccountUtil from "../../src/util/accountUtil";
 import sendEmail from "../../src/util/sendEmail";
@@ -53,6 +61,10 @@ import { SEED_CITIES } from "../../src/seed/seedCities";
 import GooglePlacesAPI from "../../src/api/googlePlaces";
 import LocationDiscoveryService from "../../src/service/locationDiscovery.service";
 import ScraperConnectionFactory from "../../src/scrapers/connectionFactory";
+import { Profile } from "../../src/database/models/Profile";
+import { Wish } from "../../src/database/models/Wish";
+import { Feedback } from "../../src/database/models/Feedback";
+import ProfileDAO from "../../src/database/dao/profile.dao";
 
 class App {
     public app: Application;
@@ -100,7 +112,8 @@ class App {
             // restore cache of batch ids from db
             const batchDAO = new BatchDAO();
             const cityDAO = new CityDAO();
-            const cacheService = new CacheService(cityDAO, batchDAO);
+            const feedbackDAO = new FeedbackDAO();
+            const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
             cacheService.initBatchCache();
 
             // console.log("Database Sync");
@@ -111,26 +124,29 @@ class App {
         }
     }
 
-    public async dropTable(tableName: "account" | "resetToken" | "task" | "city" | "housing" | "batch"): Promise<void> {
+    public async dropTable(
+        tableName: "account" | "resetToken" | "task" | "city" | "housing" | "batch" | "profile" | "wish" | "feedback",
+    ): Promise<void> {
         // await table.sync({ force: true })
         try {
             if (tableName === "account") {
                 await Account.destroy({ where: {} });
-            }
-            if (tableName === "resetToken") {
+            } else if (tableName === "resetToken") {
                 await ResetToken.destroy({ where: {} });
-            }
-            if (tableName === "task") {
+            } else if (tableName === "task") {
                 await Task.destroy({ where: {} });
-            }
-            if (tableName === "city") {
+            } else if (tableName === "city") {
                 await City.destroy({ where: {} });
-            }
-            if (tableName === "housing") {
+            } else if (tableName === "housing") {
                 await Housing.destroy({ where: {} });
-            }
-            if (tableName === "batch") {
+            } else if (tableName === "batch") {
                 await Batch.destroy({ where: {} });
+            } else if (tableName === "profile") {
+                await Profile.destroy({ where: {} });
+            } else if (tableName === "wish") {
+                await Wish.destroy({ where: {} });
+            } else if (tableName === "feedback") {
+                await Feedback.destroy({ where: {} });
             }
         } catch (err) {
             console.log(err);
@@ -200,17 +216,24 @@ const taskDAO = new TaskDAO();
 const housingDAO = new HousingDAO(stateDAO, cityDAO);
 const resetTokenDAO = new ResetTokenDAO(acctDAO);
 const gymDAO = new GymDAO();
+const feedbackDAO = new FeedbackDAO();
+const wishDAO = new WishDAO();
+const profileDAO = new ProfileDAO();
 // had to wait to do this
+
 const scraperConnectionFactory: ScraperConnectionFactory = new ScraperConnectionFactory(taskDAO);
 // services
+const emailService = new EmailService(sendEmail, "testing");
 const adminService = new AdminService(acctDAO);
 const scraperService = new ScraperService(scraperConnectionFactory, locationDiscoveryService);
-const emailService = new EmailService(sendEmail, "testing");
 const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
-const cacheService = new CacheService(cityDAO, batchDAO);
+const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
 const housingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);
 const gymService = new GymService(gymDAO, cacheService, googlePlacesAPI);
+const feedbackService = new FeedbackService(feedbackDAO, profileDAO, cacheService);
+const wishService = new WishService(wishDAO, profileDAO);
+const profileService = new ProfileService(profileDAO);
 
 export const app = new App({
     port: port || 8000,
@@ -221,6 +244,9 @@ export const app = new App({
         new GymsController(gymService),
         new HousingController(housingService, scraperService),
         new TaskQueueController(taskQueueService, scraperService, cacheService),
+        new FeedbackController(feedbackService),
+        new WishController(wishService),
+        new ProfileController(profileService),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });

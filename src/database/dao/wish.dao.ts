@@ -1,8 +1,11 @@
-import { start } from "repl";
-import { Housing } from "../models/Housing";
 import { Profile } from "../models/Profile";
 import { Wish, WishCreationAttributes } from "../models/Wish";
+import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 
+@TryCatchClassDecorator(Error, (err, context) => {
+    console.log(context, err);
+    throw err;
+})
 class WishDAO {
     constructor() {}
     //
