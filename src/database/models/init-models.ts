@@ -7,6 +7,7 @@ import { Housing as _Housing } from "./Housing";
 import { RefreshToken as _RefreshToken } from "./RefreshToken";
 import { ResetToken as _ResetToken } from "./ResetToken";
 import { Batch as _Batch } from "./Batch";
+import { Feedback as _Feedback } from "./Feedback";
 
 import { City as _City } from "./City";
 import { State as _State } from "./State";
@@ -22,6 +23,7 @@ function initModels(sequelize: Sequelize) {
     // account's non-account related stuff
     const Profile = _Profile.initModel(sequelize);
     const Wish = _Wish.initModel(sequelize);
+    const Feedback = _Feedback.initModel(sequelize);
     // city must be added before housing, gym, task, because they depend on it
     const State = _State.initModel(sequelize);
     const City = _City.initModel(sequelize);
@@ -47,15 +49,18 @@ function initModels(sequelize: Sequelize) {
     ResetToken.belongsTo(Account, { as: "belongs_to_user", foreignKey: "acctId" });
 
     // profile stuff
-    Account.hasOne(Profile, { foreignKey: "acctId", as: "their_profile" });
-    Profile.belongsTo(Account, { foreignKey: "acctId", as: "profile_of" });
+    Account.hasOne(Profile, { foreignKey: "acctId", as: "account" });
+    Profile.belongsTo(Account, { foreignKey: "acctId", as: "profile" });
 
     // https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/
-    Profile.belongsToMany(Housing, { through: "Profile_Housings", foreignKey: "profileId", as: "housing" });
+    Profile.belongsToMany(Housing, { through: "Profile_Housings", foreignKey: "profileId", as: "housings" });
     Housing.belongsToMany(Profile, { through: "Profile_Housings", foreignKey: "profileId", as: "profile" });
 
     Profile.belongsToMany(Gym, { through: "Profile_Gyms", as: "gym" });
     Gym.belongsToMany(Profile, { through: "Profile_Gyms", as: "profile" });
+
+    Profile.hasMany(Feedback, { foreignKey: "profileId", as: "their_feedback" });
+    Feedback.belongsTo(Profile, { foreignKey: "profileId", as: "feedback_from" });
 
     // Scraping tasks
     City.hasMany(Task, {

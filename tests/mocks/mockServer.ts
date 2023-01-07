@@ -31,6 +31,8 @@ import GymService from "../../src/service/gym.service";
 import WishService from "../../src/service/wish.service";
 import FeedbackService from "../../src/service/feedback.service";
 import ProfileService from "../../src/service/profile.service";
+import LocationDiscoveryService from "../../src/service/locationDiscovery.service";
+import ScraperConnectionFactory from "../../src/scrapers/connectionFactory";
 // model
 import { Account } from "../../src/database/models/Account";
 import { ResetToken } from "../../src/database/models/ResetToken";
@@ -39,6 +41,9 @@ import { City, CityCreationAttributes } from "../../src/database/models/City";
 import { Housing } from "../../src/database/models/Housing";
 import { Batch } from "../../src/database/models/Batch";
 import { State } from "../../src/database/models/State";
+import { Profile } from "../../src/database/models/Profile";
+import { Wish } from "../../src/database/models/Wish";
+import { Feedback } from "../../src/database/models/Feedback";
 // dao
 import AccountDAO from "../../src/database/dao/account.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
@@ -49,6 +54,7 @@ import HousingDAO from "../../src/database/dao/housing.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import GymDAO from "../../src/database/dao/gym.dao";
 import FeedbackDAO from "../../src/database/dao/feedback.dao";
+import ProfileDAO from "../../src/database/dao/profile.dao";
 import WishDAO from "../../src/database/dao/wish.dao";
 // misc
 import AccountUtil from "../../src/util/accountUtil";
@@ -59,12 +65,6 @@ import { SEED_USERS } from "../../src/seed/seedUsers";
 import { SEED_STATES } from "../../src/seed/seedStates";
 import { SEED_CITIES } from "../../src/seed/seedCities";
 import GooglePlacesAPI from "../../src/api/googlePlaces";
-import LocationDiscoveryService from "../../src/service/locationDiscovery.service";
-import ScraperConnectionFactory from "../../src/scrapers/connectionFactory";
-import { Profile } from "../../src/database/models/Profile";
-import { Wish } from "../../src/database/models/Wish";
-import { Feedback } from "../../src/database/models/Feedback";
-import ProfileDAO from "../../src/database/dao/profile.dao";
 
 class App {
     public app: Application;
@@ -231,9 +231,9 @@ const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
 const housingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);
 const gymService = new GymService(gymDAO, cacheService, googlePlacesAPI);
-const feedbackService = new FeedbackService(feedbackDAO, profileDAO, cacheService);
+const feedbackService = new FeedbackService(cacheService, feedbackDAO, profileDAO);
 const wishService = new WishService(wishDAO, profileDAO);
-const profileService = new ProfileService(profileDAO);
+const profileService = new ProfileService(profileDAO, acctDAO, housingDAO, gymDAO);
 
 export const app = new App({
     port: port || 8000,

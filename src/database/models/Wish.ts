@@ -29,11 +29,11 @@ export class Wish extends Model<WishAttributes, WishCreationAttributes> implemen
                 wishId: {
                     type: DataTypes.INTEGER,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
                 wishLocation: {
                     type: DataTypes.STRING,
                     allowNull: false,
-                    unique: true,
                 },
             },
             {

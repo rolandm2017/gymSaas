@@ -6,13 +6,13 @@ import { FeedbackInputs } from "../interface/FeedbackInputs.interface";
 import CacheService from "./cache.service";
 
 class FeedbackService {
+    private cacheService: CacheService;
     private feedbackDAO: FeedbackDAO;
     private profileDAO: ProfileDAO;
-    private cacheService: CacheService;
-    constructor(feedbackDAO: FeedbackDAO, profileDAO: ProfileDAO, cacheService: CacheService) {
+    constructor(cacheService: CacheService, feedbackDAO: FeedbackDAO, profileDAO: ProfileDAO) {
+        this.cacheService = cacheService;
         this.feedbackDAO = feedbackDAO;
         this.profileDAO = profileDAO;
-        this.cacheService = cacheService;
     }
 
     public async leaveFeedback(startingInput: FeedbackInputs, accountId: number): Promise<Feedback> {

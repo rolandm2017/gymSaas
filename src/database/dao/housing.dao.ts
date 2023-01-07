@@ -32,8 +32,8 @@ class HousingDAO {
         return await Housing.findAndCountAll({ offset, limit });
     }
 
-    public async getHousingById(id: number): Promise<Housing | null> {
-        return await Housing.findByPk(id);
+    public async getHousingByHousingId(housingId: number): Promise<Housing | null> {
+        return await Housing.findByPk(housingId);
     }
 
     public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string) {

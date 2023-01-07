@@ -3,6 +3,7 @@ import ProfileDAO from "../../src/database/dao/profile.dao";
 import { app } from "../mocks/mockServer";
 
 const feedbackDAO = new FeedbackDAO();
+
 const profileDAO = new ProfileDAO();
 
 beforeAll(async () => {
@@ -20,7 +21,13 @@ describe("feedback DAO", () => {
         // arrange
         const profile = await profileDAO.createProfileByIp("195.3.3.1");
         // act
-        const feedback = await feedbackDAO.createFeedback({ questionOne: "a?", questionTwo: "b?", questionOneAnswer: "c", questionTwoAnswer: "d" });
+        const feedback = await feedbackDAO.createFeedback({
+            questionOne: "a?",
+            questionTwo: "b?",
+            questionOneAnswer: "c",
+            questionTwoAnswer: "d",
+            profileId: profile.profileId,
+        });
         // assert
         expect(feedback.questionOne).toBe("a?");
         expect(feedback.questionOneAnswer).toBe("c");
@@ -59,18 +66,26 @@ describe("feedback DAO", () => {
     test("get all feedback for profile", async () => {
         // arrange
         const profile = await profileDAO.createProfileByIp("15.33.32.14");
-        const feedback = await feedbackDAO.createFeedback({ questionOne: "a?", questionTwo: "b?", questionOneAnswer: "c", questionTwoAnswer: "d" });
+        const feedback = await feedbackDAO.createFeedback({
+            questionOne: "a?",
+            questionTwo: "b?",
+            questionOneAnswer: "c",
+            questionTwoAnswer: "d",
+            profileId: profile.profileId,
+        });
         const feedbackTwo = await feedbackDAO.createFeedback({
             questionOne: "aa?",
             questionTwo: "bb?",
             questionOneAnswer: "cc",
             questionTwoAnswer: "dd",
+            profileId: profile.profileId,
         });
         const feedbackThree = await feedbackDAO.createFeedback({
             questionOne: "aaa?",
             questionTwo: "bbb?",
             questionOneAnswer: "ccc",
             questionTwoAnswer: "ddd",
+            profileId: profile.profileId,
         });
         // act
         const all = await feedbackDAO.getAllFeedbackForProfile(profile.profileId);

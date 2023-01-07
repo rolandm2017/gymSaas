@@ -23,13 +23,16 @@ class AccountDAO {
         return affected[0];
     }
 
+    public async getAccountByAccountId(accountId: number) {
+        return await Account.findByPk(accountId);
+    }
+
     public async countAdmins(): Promise<number> {
         const accounts = await Account.findAndCountAll({ where: { role: Role.Admin } });
         return accounts.count;
     }
 
-    public async findAllAccounts(): Promise<Account[]> {
-        // 'find' instead of 'get' because 'getAllAccounts' is taken
+    public async getAllAccounts(): Promise<Account[]> {
         return await Account.findAll();
     }
 

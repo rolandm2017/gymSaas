@@ -32,6 +32,12 @@ import sendEmail from "./util/sendEmail";
 import ProfileService from "./service/profile.service";
 import ProfileDAO from "./database/dao/profile.dao";
 import ProfileController from "./controllers/profile.controller";
+import FeedbackDAO from "./database/dao/feedback.dao";
+import FeedbackController from "./controllers/feedback.controller";
+import WishController from "./controllers/wish.controller";
+import FeedbackService from "./service/feedback.service";
+import WishService from "./service/wish.service";
+import WishDAO from "./database/dao/wish.dao";
 
 const port = parseInt(process.env.PORT!, 10);
 
@@ -50,6 +56,8 @@ const acctDAO: AccountDAO = new AccountDAO();
 const resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(acctDAO);
 const gymDAO = new GymDAO();
 const profileDAO = new ProfileDAO();
+const feedbackDAO = new FeedbackDAO();
+const wishDAO = new WishDAO();
 
 const scraperFactory: ScraperFactory = new ScraperFactory(taskDAO);
 // services
@@ -58,11 +66,13 @@ const adminService = new AdminService(acctDAO);
 const emailService: EmailService = new EmailService(sendEmail, "development");
 const scraperService = new ScraperService(scraperFactory, locationDiscoveryService);
 const authService: AuthService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
-const cacheService = new CacheService(cityDAO, batchDAO);
+const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
 const housingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);
 const gymService = new GymService(gymDAO, cacheService, googlePlacesAPI);
-const profileService = new ProfileService(profileDAO);
+const profileService = new ProfileService(profileDAO, acctDAO, housingDAO, gymDAO);
+const feedbackService = new FeedbackService(cacheService, feedbackDAO, profileDAO);
+const wishService = new WishService(wishDAO, profileDAO);
 
 const app = new App({
     port: port || 8000,
@@ -74,6 +84,8 @@ const app = new App({
         new TaskQueueController(taskQueueService, scraperService, cacheService),
         new AdminController(adminService, taskQueueService, housingService),
         new ProfileController(profileService),
+        new FeedbackController(feedbackService),
+        new WishController(wishService),
     ],
     middlewares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), cookieParser()],
 });

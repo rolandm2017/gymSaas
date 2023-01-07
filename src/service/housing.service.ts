@@ -33,7 +33,7 @@ class HousingService {
 
     // todo: make this deduct a credit from the user's account.
     public async getRealURL(apartmentId: number): Promise<string> {
-        const housing = await this.housingDAO.getHousingById(apartmentId);
+        const housing = await this.housingDAO.getHousingByHousingId(apartmentId);
         if (housing === null) {
             throw new Error("No housing found for this id");
         }

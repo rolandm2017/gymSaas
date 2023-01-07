@@ -40,13 +40,14 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                 feedbackId: {
                     type: DataTypes.INTEGER,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
                 questionOne: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
                 questionOneAnswer: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.STRING,
                     allowNull: true,
                 },
                 questionTwo: {
@@ -54,7 +55,7 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                     allowNull: false,
                 },
                 questionTwoAnswer: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.STRING,
                     allowNull: true,
                 },
                 largeTextAnswer: {

@@ -186,7 +186,7 @@ class AuthService {
 
     // authorized
     public async getAllAccounts() {
-        const accounts: Account[] = await this.accountDAO.findAllAccounts();
+        const accounts: Account[] = await this.accountDAO.getAllAccounts();
         return accounts.map((a: Account) => this.basicDetails(a));
     }
 

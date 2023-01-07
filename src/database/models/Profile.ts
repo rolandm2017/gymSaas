@@ -8,6 +8,9 @@ import {
     HasManyAddAssociationsMixin,
     HasManyGetAssociationsMixin,
     Association,
+    HasOneGetAssociationMixin,
+    BelongsToCreateAssociationMixin,
+    BelongsToGetAssociationMixin,
 } from "sequelize";
 import { Account } from "./Account";
 import { Gym } from "./Gym";
@@ -15,9 +18,8 @@ import { Housing } from "./Housing";
 
 // attaches to an account
 interface ProfileAttributes {
-    //
     profileId?: number;
-    accountId?: number; // non optional.
+    accountId?: number;
     ipAddress: string;
     pickedHousingIds?: number[];
     pickedGymIds?: number[];
@@ -37,6 +39,9 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
+
+    declare setAccount: BelongsToCreateAssociationMixin<Account>;
+    declare getAccount: BelongsToGetAssociationMixin<Account>;
 
     declare getHousings: HasManyGetAssociationsMixin<Housing>;
     declare addHousing: HasManyAddAssociationMixin<Housing, number>;

@@ -1,19 +1,13 @@
 import CityDAO from "../../src/database/dao/city.dao";
-import TaskDAO from "../../src/database/dao/task.dao";
 import { CityCreationAttributes } from "../../src/database/models/City";
 // mock stuff
 import { app } from "../mocks/mockServer";
 
 let cityDAO: CityDAO = new CityDAO();
-let taskDAO: TaskDAO = new TaskDAO();
 
 beforeAll(async () => {
     await app.connectDB();
     await app.dropTable("city");
-});
-
-beforeEach(async () => {
-    // await app.dropTable("city");
 });
 
 afterAll(async () => {

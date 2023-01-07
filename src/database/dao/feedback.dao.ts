@@ -7,6 +7,9 @@ import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
     throw err;
 })
 class FeedbackDAO {
+    constructor() {}
+    //
+
     public async createFeedback(feedback: FeedbackCreationAttributes): Promise<Feedback> {
         return await Feedback.create(feedback);
     }

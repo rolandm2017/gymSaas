@@ -12,6 +12,10 @@ class GymDAO {
         return await Gym.create(gym);
     }
 
+    public async getGymByGymId(gymId: number) {
+        return await Gym.findByPk(gymId);
+    }
+
     public async getGymByAddress(address: string) {
         return await Gym.findAll({ where: { address } });
     }

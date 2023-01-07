@@ -31,7 +31,7 @@ class ProfileController {
             if (noAccountId) {
                 return handleErrorResponse(response, "Must be logged in");
             }
-            await this.profileService.associateAccountWithProfile(accountId, ipAddress);
+            await this.profileService.associateProfileWithAccount(accountId, ipAddress);
             return response.status(200).json({ message: "Success!s" });
         } catch (err) {
             return handleErrorResponse(response, err);
