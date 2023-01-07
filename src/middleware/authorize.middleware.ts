@@ -26,17 +26,13 @@ function authorize(roles: Role[] = []) {
     }
 
     return [
-        // authenticate JWT token and attach user to request object (req.user)
         jwt({
-            secret,
+            secret, // authenticate JWT token and attach user to request object (req.user)
             algorithms: ["HS256"],
         }),
 
         // authorize based on user role
         async (request: RequestWithUser, res: Response, next: NextFunction) => {
-            // Note for Jason Watmore: If you're reading this, it looks like, at some point, express-jwt's devs changed things.
-            // see https://stackoverflow.com/questions/34775687/express-jwt-setting-user-object-to-req-user-doc-instead-of-just-req-user
-            // I discovered this while googling "jwt secret express jwt req.user"
             const acctInfo = request.auth;
             if (acctInfo?.acctId === undefined) {
                 return res.status(401).json({ message: "Unauthorized" });
@@ -59,7 +55,6 @@ function authorize(roles: Role[] = []) {
 
             // authentication and authorization successful
             request.user.role = account.role;
-            // req.user.ownsToken = token => !!refreshTokens.find((x: any) => x.token === token);
             request.user.ownsToken = (token: string) => !!refreshTokens.find((x: any) => x.token === token); // fixme: whats this do?
             next();
         },
