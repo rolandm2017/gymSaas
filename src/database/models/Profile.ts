@@ -19,7 +19,7 @@ import { Housing } from "./Housing";
 // attaches to an account
 interface ProfileAttributes {
     profileId?: number;
-    accountId?: number;
+    acctId?: number;
     ipAddress: string;
     pickedHousingIds?: number[];
     pickedGymIds?: number[];
@@ -33,7 +33,7 @@ export type ProfileCreationAttributes = Optional<ProfileAttributes, ProfileOptio
 
 export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes> implements ProfileAttributes {
     public profileId!: number;
-    public accountId!: ForeignKey<Account["acctId"]>;
+    public acctId!: ForeignKey<Account["acctId"]>;
     public ipAddress!: string;
 
     public readonly createdAt!: Date;

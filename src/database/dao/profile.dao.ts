@@ -57,7 +57,7 @@ class ProfileDAO {
     }
 
     public async getProfileForAccountId(accountId: number): Promise<Profile | null> {
-        return await Profile.findOne({ include: { required: true, model: Account, where: { acctId: accountId }, as: "profile_of" } });
+        return await Profile.findOne({ include: { required: true, model: Account, where: { acctId: accountId }, as: "account" } });
     }
 
     public async getAllHousingPicksByAccountId(acctId: number): Promise<Housing[]> {
@@ -113,7 +113,7 @@ class ProfileDAO {
     }
 
     public async getAllProfiles(): Promise<Profile[]> {
-        return await Profile.findAll({ include: { model: Account, as: "profile_of" } });
+        return await Profile.findAll({ include: { model: Account, as: "account" } });
     }
 
     public async associateProfileWithAccount(profileId: number, account: Account): Promise<Profile> {

@@ -63,7 +63,7 @@ class ProfileService {
             const profile = await this.profileDAO.createProfileByIp(ipAddress);
             return await this.profileDAO.associateProfileWithAccount(profile.profileId, account);
         }
-        profile.accountId = accountId;
+        profile.acctId = accountId;
         return await this.profileDAO.associateProfileWithAccount(profile.profileId, account);
     }
 }

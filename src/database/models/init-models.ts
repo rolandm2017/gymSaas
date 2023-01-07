@@ -49,14 +49,14 @@ function initModels(sequelize: Sequelize) {
     ResetToken.belongsTo(Account, { as: "belongs_to_user", foreignKey: "acctId" });
 
     // profile stuff
-    Account.hasOne(Profile, { foreignKey: "acctId", as: "account" });
-    Profile.belongsTo(Account, { foreignKey: "acctId", as: "profile" });
+    Account.hasOne(Profile, { foreignKey: "acctId", as: "profile" });
+    Profile.belongsTo(Account, { foreignKey: "acctId", as: "account" });
 
     // https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/
     Profile.belongsToMany(Housing, { through: "Profile_Housings", foreignKey: "profileId", as: "housings" });
     Housing.belongsToMany(Profile, { through: "Profile_Housings", foreignKey: "profileId", as: "profile" });
 
-    Profile.belongsToMany(Gym, { through: "Profile_Gyms", as: "gym" });
+    Profile.belongsToMany(Gym, { through: "Profile_Gyms", as: "gyms" });
     Gym.belongsToMany(Profile, { through: "Profile_Gyms", as: "profile" });
 
     Profile.hasMany(Feedback, { foreignKey: "profileId", as: "their_feedback" });
