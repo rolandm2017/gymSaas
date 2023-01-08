@@ -7,7 +7,6 @@ import AuthService from "../../src/service/auth.service";
 import { Role } from "../../src/enum/role.enum";
 import EmailService from "../../src/service/email.service";
 import AccountUtil from "../../src/util/accountUtil";
-import { RequestWithUser } from "../../src/interface/RequestWithUser.interface";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import AccountDAO from "../../src/database/dao/account.dao";
 import sendEmail from "../../src/util/sendEmail";
@@ -125,7 +124,7 @@ describe("Test auth controller without services", () => {
         test("works with .token", async () => {
             // setup
             authService.revokeToken = jest.fn();
-            const req: RequestWithUser = { body: {} } as Request;
+            const req: Request = { body: {} } as Request;
             req.body.token = "aaaaaaaaa";
             req.ip = "195.1.1.3";
             req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), acctId: 300 };
@@ -140,7 +139,7 @@ describe("Test auth controller without services", () => {
         test("works with .refreshToken", async () => {
             // setup
             authService.revokeToken = jest.fn();
-            const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
+            const req: Request = { body: {}, cookies: { refreshToken: "" } } as Request;
             req.cookies.refreshToken = "bbbbbb";
             req.ip = "195.1.1.3";
             req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), acctId: 303 };
@@ -158,7 +157,7 @@ describe("Test auth controller without services", () => {
         test("kicks you out when user is undefined", async () => {
             // setup
             authService.revokeToken = jest.fn();
-            const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
+            const req: Request = { body: {}, cookies: { refreshToken: "" } } as Request;
             req.user = undefined;
             const res: Response = mockResponse();
             const n: NextFunction = {} as NextFunction;
@@ -170,7 +169,7 @@ describe("Test auth controller without services", () => {
         test("says 'token is required' when there is none", async () => {
             // setup
             authService.revokeToken = jest.fn();
-            const req: RequestWithUser = { body: {}, cookies: { refreshToken: "" } } as Request;
+            const req: Request = { body: {}, cookies: { refreshToken: "" } } as Request;
             req.user = { role: "User", ownsToken: jest.fn(), acctId: 305 };
             const res: Response = mockResponse();
             const n: NextFunction = {} as NextFunction;

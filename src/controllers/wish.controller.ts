@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 
 import { HealthCheck } from "../enum/healthCheck.enum";
-import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import WishService from "../service/wish.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { isString, isStringInteger } from "../validationSchemas/inputValidation";
@@ -19,7 +18,7 @@ class WishController {
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
     }
 
-    public async createWish(request: RequestWithUser, response: Response) {
+    public async createWish(request: Request, response: Response) {
         try {
             const accountId = request.user?.acctId;
             const noAccountId = accountId === undefined;

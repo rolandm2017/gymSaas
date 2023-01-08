@@ -2,6 +2,7 @@ import { Role } from "../../enum/role.enum";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { isEmail } from "../../validationSchemas/userAuthSchemas";
 import { Account, AccountCreationAttributes } from "../models/Account";
+import { Profile } from "../models/Profile";
 import { RefreshToken } from "../models/RefreshToken";
 
 @TryCatchClassDecorator(Error, (err, context) => {
@@ -77,6 +78,15 @@ class AccountDAO {
     public async updateAccount(account: AccountCreationAttributes, id: number): Promise<number> {
         const affected = await Account.update(account, { where: { acctId: id } });
         return affected[0];
+    }
+
+    public async associateAccountWithProfile(accountId: number, profile: Profile): Promise<Account> {
+        const account = await Account.findOne({ where: { acctId: accountId } });
+        if (account === null) {
+            throw new Error("Account not found for this account id");
+        }
+        await account.setProfile(profile);
+        return account;
     }
 
     public async deleteAccount(id: number): Promise<number> {

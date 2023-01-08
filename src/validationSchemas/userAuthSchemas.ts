@@ -1,7 +1,6 @@
 import Joi, { ObjectSchema } from "joi";
 import express, { NextFunction, Request, Response } from "express";
 import validateRequest from "../middleware/validateRequest.middleware";
-import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
 
 function isEmail(maybeEmail: string): boolean {
@@ -89,7 +88,7 @@ function revokeTokenSchema(req: Request, res: Response, next: NextFunction) {
     validateRequest(req, next, schema);
 }
 
-function updateRoleSchema(req: RequestWithUser, res: Response, next: NextFunction) {
+function updateRoleSchema(req: Request, res: Response, next: NextFunction) {
     interface rolesUpdateSchema {
         // defined here explicitly only so that TS doesn't whine when .role property is added
         // title: Joi.StringSchema<string>;

@@ -13,7 +13,6 @@ import {
     verifyEmailSchema,
 } from "../validationSchemas/userAuthSchemas";
 import authorize from "../middleware/authorize.middleware";
-import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import { Role } from "../enum/role.enum";
 import AuthService from "../service/auth.service";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
@@ -95,7 +94,7 @@ class AuthController {
         }
     }
 
-    public async revokeToken(request: RequestWithUser, response: Response, next: NextFunction) {
+    public async revokeToken(request: Request, response: Response, next: NextFunction) {
         try {
             // accept token from request body or cookie
             const token = request.body.token || request.cookies.refreshToken;
@@ -133,7 +132,7 @@ class AuthController {
         }
     }
 
-    public async updatePassword(request: RequestWithUser, response: Response) {
+    public async updatePassword(request: Request, response: Response) {
         try {
             // include email, because if we didn't, then any logged in user could
             // try to change another logged in user's pw!
@@ -201,7 +200,7 @@ class AuthController {
         }
     }
 
-    public async getAccountById(request: RequestWithUser, response: Response) {
+    public async getAccountById(request: Request, response: Response) {
         try {
             const requestedAcctId = request.body.acctId;
             if (requestedAcctId !== request.user?.acctId && request.user?.role !== Role.Admin) {
@@ -225,7 +224,7 @@ class AuthController {
         }
     }
 
-    public async updateAccount(request: RequestWithUser, response: Response) {
+    public async updateAccount(request: Request, response: Response) {
         try {
             // users can update their own account and admins can update any account
             const idOfAcctToUpdate = request.body.acctId;
@@ -241,7 +240,7 @@ class AuthController {
         }
     }
 
-    public async _deleteAccount(request: RequestWithUser, response: Response) {
+    public async _deleteAccount(request: Request, response: Response) {
         try {
             // users can delete their own account and admins can delete any account
             const idOfAcctToDelete = request.body.acctId;

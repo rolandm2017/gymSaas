@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 
 import { HealthCheck } from "../enum/healthCheck.enum";
-import { RequestWithUser } from "../interface/RequestWithUser.interface";
 import FeedbackService from "../service/feedback.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { feedbackSchema } from "../validationSchemas/feedbackSchemas";
@@ -19,7 +18,7 @@ class FeedbackController {
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
     }
 
-    public async leaveFeedback(request: RequestWithUser, response: Response) {
+    public async leaveFeedback(request: Request, response: Response) {
         try {
             // const acctId = // from request.user;
             const accountId = request.user?.acctId;

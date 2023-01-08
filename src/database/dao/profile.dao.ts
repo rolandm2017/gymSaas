@@ -1,11 +1,8 @@
 import { Account } from "../models/Account";
 import { Gym } from "../models/Gym";
 import { Housing } from "../models/Housing";
-import { Profile, ProfileCreationAttributes } from "../models/Profile";
+import { Profile } from "../models/Profile";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
-import HousingDAO from "./housing.dao";
-import GymDAO from "./gym.dao";
-import AccountDAO from "./account.dao";
 
 @TryCatchClassDecorator(Error, (err, context) => {
     console.log(context, err);
@@ -108,12 +105,15 @@ class ProfileDAO {
     }
 
     public async getProfileByIp(ipAddress: string): Promise<Profile | null> {
-        const profile = await Profile.findOne({ where: { ipAddress } });
-        return profile;
+        return await Profile.findOne({ where: { ipAddress } });
     }
 
     public async getAllProfiles(): Promise<Profile[]> {
         return await Profile.findAll({ include: { model: Account, as: "account" } });
+    }
+
+    public async getAccountForProfile(profileId: number): Promise<Profile | null> {
+        return await Profile.findOne({ where: { profileId }, include: Account });
     }
 
     public async associateProfileWithAccount(profileId: number, account: Account): Promise<Profile> {

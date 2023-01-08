@@ -23,7 +23,7 @@ class ProfileController {
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
     }
 
-    public async associateProfileWithUser(request: RequestWithUser, response: Response) {
+    public async associateProfileWithUser(request: Request, response: Response) {
         try {
             const accountId = request.user?.acctId;
             const ipAddress = request.ip;
