@@ -1,4 +1,5 @@
-import { DataTypes, Sequelize as S, Model, Optional, ForeignKey } from "sequelize";
+import { DataTypes, Sequelize as S, Model, Optional, ForeignKey, HasOneSetAssociationMixin, HasOneGetAssociationMixin } from "sequelize";
+import { Profile } from "./Profile";
 
 interface AccountAttributes {
     acctId?: number;
@@ -32,6 +33,9 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
+
+    declare getProfile: HasOneGetAssociationMixin<Profile>;
+    declare setProfile: HasOneSetAssociationMixin<Profile, number>;
 
     static initModel(sequelize: S): typeof Account {
         return Account.init(

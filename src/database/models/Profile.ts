@@ -11,6 +11,7 @@ import {
     HasOneGetAssociationMixin,
     BelongsToCreateAssociationMixin,
     BelongsToGetAssociationMixin,
+    BelongsToSetAssociationMixin,
 } from "sequelize";
 import { Account } from "./Account";
 import { Gym } from "./Gym";
@@ -40,8 +41,8 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
 
-    declare setAccount: BelongsToCreateAssociationMixin<Account>;
     declare getAccount: BelongsToGetAssociationMixin<Account>;
+    declare setAccount: BelongsToSetAssociationMixin<Account, number>;
 
     declare getHousings: HasManyGetAssociationsMixin<Housing>;
     declare addHousing: HasManyAddAssociationMixin<Housing, number>;
