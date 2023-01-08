@@ -38,13 +38,9 @@ import WishController from "./controllers/wish.controller";
 import FeedbackService from "./service/feedback.service";
 import WishService from "./service/wish.service";
 import WishDAO from "./database/dao/wish.dao";
+import RefreshTokenDAO from "./database/dao/refreshToken.dao";
 
 const port = parseInt(process.env.PORT!, 10);
-
-// misc
-const accountUtil: AccountUtil = new AccountUtil();
-const googlePlacesAPI: GooglePlacesAPI = new GooglePlacesAPI();
-const locationDiscoveryService: LocationDiscoveryService = new LocationDiscoveryService();
 
 // dao
 const batchDAO = new BatchDAO();
@@ -58,6 +54,12 @@ const gymDAO = new GymDAO();
 const profileDAO = new ProfileDAO();
 const feedbackDAO = new FeedbackDAO();
 const wishDAO = new WishDAO();
+const refreshTokenDAO = new RefreshTokenDAO();
+
+// misc
+const accountUtil: AccountUtil = new AccountUtil(refreshTokenDAO);
+const googlePlacesAPI: GooglePlacesAPI = new GooglePlacesAPI();
+const locationDiscoveryService: LocationDiscoveryService = new LocationDiscoveryService();
 
 const scraperFactory: ScraperFactory = new ScraperFactory(taskDAO);
 // services
@@ -65,7 +67,7 @@ const scraperFactory: ScraperFactory = new ScraperFactory(taskDAO);
 const adminService = new AdminService(acctDAO);
 const emailService: EmailService = new EmailService(sendEmail, "development");
 const scraperService = new ScraperService(scraperFactory, locationDiscoveryService);
-const authService: AuthService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
+const authService: AuthService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO, refreshTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
 const housingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);

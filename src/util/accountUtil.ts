@@ -20,8 +20,8 @@ if (secret === "YOLO") {
 
 class AccountUtil {
     private refreshTokenDAO: RefreshTokenDAO;
-    constructor() {
-        this.refreshTokenDAO = new RefreshTokenDAO();
+    constructor(refreshTokenDAO: RefreshTokenDAO) {
+        this.refreshTokenDAO = refreshTokenDAO;
     }
 
     public randomTokenString() {

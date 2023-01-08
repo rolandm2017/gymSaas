@@ -65,6 +65,7 @@ import { SEED_USERS } from "../../src/seed/seedUsers";
 import { SEED_STATES } from "../../src/seed/seedStates";
 import { SEED_CITIES } from "../../src/seed/seedCities";
 import GooglePlacesAPI from "../../src/api/googlePlaces";
+import RefreshTokenDAO from "../../src/database/dao/refreshToken.dao";
 
 class App {
     public app: Application;
@@ -202,11 +203,6 @@ class App {
 
 const port = parseInt(process.env.PORT!, 10);
 
-// misc
-const accountUtil = new AccountUtil();
-const googlePlacesAPI = new GooglePlacesAPI();
-const locationDiscoveryService: LocationDiscoveryService = new LocationDiscoveryService();
-
 // initialize dao
 const acctDAO = new AccountDAO();
 const stateDAO = new StateDAO();
@@ -215,6 +211,7 @@ const batchDAO = new BatchDAO();
 const taskDAO = new TaskDAO();
 const housingDAO = new HousingDAO(stateDAO, cityDAO);
 const resetTokenDAO = new ResetTokenDAO(acctDAO);
+const refreshTokenDAO = new RefreshTokenDAO();
 const gymDAO = new GymDAO();
 const feedbackDAO = new FeedbackDAO();
 const wishDAO = new WishDAO();
@@ -222,11 +219,16 @@ const profileDAO = new ProfileDAO();
 // had to wait to do this
 
 const scraperConnectionFactory: ScraperConnectionFactory = new ScraperConnectionFactory(taskDAO);
+
+// misc
+const googlePlacesAPI = new GooglePlacesAPI();
+const locationDiscoveryService: LocationDiscoveryService = new LocationDiscoveryService();
+const accountUtil = new AccountUtil(refreshTokenDAO);
 // services
 const emailService = new EmailService(sendEmail, "testing");
 const adminService = new AdminService(acctDAO);
 const scraperService = new ScraperService(scraperConnectionFactory, locationDiscoveryService);
-const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
+const authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO, refreshTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
 const housingService = new HousingService(housingDAO, gymDAO, cacheService);
 const taskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);

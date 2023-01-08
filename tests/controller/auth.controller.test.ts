@@ -16,9 +16,9 @@ let authService: AuthService;
 let controller: AuthController;
 let accountDAO: AccountDAO = new AccountDAO();
 let emailService: EmailService = new EmailService(sendEmail, "testing");
-let accountUtil: AccountUtil = new AccountUtil();
 let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(accountDAO);
 const refreshTokenDAO = new RefreshTokenDAO();
+let accountUtil: AccountUtil = new AccountUtil(refreshTokenDAO);
 
 const validEmail = "someValidEmail@gmail.com";
 const fakeButValidAccount: IBasicDetails = {

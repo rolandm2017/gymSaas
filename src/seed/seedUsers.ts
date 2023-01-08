@@ -1,9 +1,12 @@
+import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import { Role } from "../enum/role.enum";
 import AccountUtil from "../util/accountUtil";
 
 export const ADMIN_ACCT_PASSWORD = "testTEST11!!";
 
-const pwHash = new AccountUtil().hash(ADMIN_ACCT_PASSWORD);
+const refreshTokenDAO = new RefreshTokenDAO();
+
+const pwHash = new AccountUtil(refreshTokenDAO).hash(ADMIN_ACCT_PASSWORD);
 
 export const SEED_USERS = [
     {

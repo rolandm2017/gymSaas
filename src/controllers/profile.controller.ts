@@ -4,7 +4,6 @@ import { HealthCheck } from "../enum/healthCheck.enum";
 import ProfileService from "../service/profile.service";
 import { isString, isStringInteger } from "../validationSchemas/inputValidation";
 import { handleErrorResponse } from "../util/handleErrorResponse";
-import { RequestWithUser } from "../interface/RequestWithUser.interface";
 
 class ProfileController {
     public path = "/profile";
