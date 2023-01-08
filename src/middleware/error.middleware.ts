@@ -1,4 +1,4 @@
-import express, { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 
 // fixme: err definitely isnt 'any' but idk how to discover the types

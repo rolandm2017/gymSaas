@@ -11,6 +11,7 @@ interface AccountAttributes {
     role: string;
     passwordReset: number | null; // Date.now()
     isBanned?: boolean | null;
+    googleId: string | null;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -29,6 +30,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public role!: string;
     public passwordReset!: number;
     public isBanned!: boolean;
+    public googleId!: string | null;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -76,6 +78,10 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 },
                 isBanned: {
                     type: DataTypes.BOOLEAN,
+                    allowNull: true,
+                },
+                googleId: {
+                    type: DataTypes.STRING,
                     allowNull: true,
                 },
             },

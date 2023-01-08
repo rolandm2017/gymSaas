@@ -14,18 +14,7 @@
                 "program": "${workspaceFolder}/node_modules/jest/bin/jest"
             }
         },
-        {
-            "type": "node-terminal",
-            "request": "launch",
-            "name": "Dev typescript-express-starter",
-            "command": "npm run dev"
-        },
-        {
-            "type": "node-terminal",
-            "request": "launch",
-            "name": "Mock typescript-express-starter",
-            "command": "npm run mock"
-        },
+
         {
             "type": "node-terminal",
             "request": "launch",
@@ -37,12 +26,6 @@
             "request": "launch",
             "name": "testTemp2 typescript-express-starter",
             "command": "npm run test:tt"
-        },
-        {
-            "type": "node-terminal",
-            "request": "launch",
-            "name": "Test typescript-express-starter",
-            "command": "npm run test"
         }
     ]
 }

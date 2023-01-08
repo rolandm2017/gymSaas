@@ -9,6 +9,7 @@ import { Role } from "../enum/role.enum";
 import { IAccount } from "../interface/Account.interface";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
 import { IRegistrationDetails } from "../interface/RegistrationDetails.interface";
+import { UserFromGoogle } from "../interface/UserFromGoogle.interface";
 import AccountUtil from "../util/accountUtil";
 import EmailService from "./email.service";
 
@@ -30,6 +31,22 @@ class AuthService {
         this.resetTokenDAO = resetTokenDAO;
         this.accountDAO = accountDAO;
         this.refreshTokenDAO = refreshTokenDAO;
+    }
+
+    public async grantRefreshToken(infoFromGoogle: UserFromGoogle, ipAddress: string): Promise<IBasicDetails> {
+        // this method is used after the user logs in via google.
+        // they are redirected to this callback URL, which receives their user details
+        // and an ip address (probably one of google's).
+        const accountEntry = await this.accountDAO.getAccountByGoogleId(infoFromGoogle.googleId);
+        if (accountEntry === null) {
+            throw new Error("Google SSO registration failed");
+        }
+        const account: IAccount = this.accountUtil.convertAccountModelToInterface(accountEntry);
+        const randomChars = this.accountUtil.randomTokenString();
+        const refreshToken: RefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
+        // save refresh tokenm
+        await refreshToken.save();
+        return { ...this.basicDetails(account), refreshToken: refreshToken.token };
     }
 
     public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails> {

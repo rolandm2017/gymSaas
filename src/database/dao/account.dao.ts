@@ -19,6 +19,10 @@ class AccountDAO {
         return created;
     }
 
+    public async createGoogleLoginAccount(googleId: string, email: string): Promise<Account> {
+        return await Account.create({ googleId, email, passwordHash: "", role: Role.User });
+    }
+
     public async createAdmin(email: string): Promise<number> {
         const affected = await Account.update({ role: Role.Admin }, { where: { email } });
         return affected[0];
@@ -44,6 +48,14 @@ class AccountDAO {
     public async getMultipleAccounts(limit: number, offset?: number): Promise<{ rows: Account[]; count: number }> {
         const accts = await Account.findAndCountAll({ offset, limit });
         return accts;
+    }
+
+    public async getAccountByGoogleId(googleId: string): Promise<Account | null> {
+        const all = await Account.findAll({ where: { googleId } });
+        if (all.length > 0) {
+            return all[0];
+        }
+        return null;
     }
 
     public async getAccountById(id: number): Promise<Account | null> {

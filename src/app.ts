@@ -1,4 +1,5 @@
 import express, { Application } from "express";
+import passport from "passport";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
@@ -19,6 +20,8 @@ import CityDAO from "./database/dao/city.dao";
 import BatchDAO from "./database/dao/batch.dao";
 import { SEED_GYMS_CANADA } from "./seed/gyms";
 import { Gym } from "./database/models/Gym";
+import passportConfig from "./util/passportConfig";
+import FeedbackDAO from "./database/dao/feedback.dao";
 
 class App {
     public app: Application;
@@ -31,9 +34,9 @@ class App {
         this.app.use(cors());
         this.app.use(morgan("dev"));
         this.app.use(cookieParser());
+        passportConfig(passport);
 
         this.middlewares(appInit.middlewares);
-        // this.app.use(ErrorMiddleware.handleRouteErrors); // this will catch any error thrown routes
         this.routes(appInit.controllers);
         this.app.use(errorHandler);
     }
@@ -105,7 +108,8 @@ class App {
     public async initializeCaches() {
         const cityDAO = new CityDAO();
         const batchDAO = new BatchDAO();
-        const cacheService = new CacheService(cityDAO, batchDAO);
+        const feedbackDAO = new FeedbackDAO();
+        const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
         await cacheService.initBatchCache();
         await cacheService.initCityIdCache();
     }

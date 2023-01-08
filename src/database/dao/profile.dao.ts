@@ -18,17 +18,20 @@ class ProfileDAO {
 
     public async recordPublicPickHousing(ipAddress: string, housing: Housing): Promise<Profile> {
         const profiles = await Profile.findAll({ where: { ipAddress } });
+        // console.log(profiles, "24rm");
         const noProfilesFound = profiles.length === 0;
         // if ip addr is new, create a profile;
         if (noProfilesFound) {
-            const created = await Profile.create({ ipAddress });
-            created.addHousing(housing);
-            return created.save();
+            const newProfile = await Profile.create({ ipAddress });
+            console.log("adding housing...", housing.housingId, housing.address, "29rm");
+            await newProfile.addHousings([housing]);
+            return newProfile;
         } else {
             // if ip addr is previously seen, update their housing ids
             const profile = profiles[0];
-            profile.addHousing(housing);
-            return profile.save();
+            console.log("adding housing...", housing.housingId, housing.address, "34rm");
+            await profile.addHousings([housing]);
+            return profile;
         }
     }
 
@@ -38,15 +41,12 @@ class ProfileDAO {
         // if ip addr is new, create a profile;
         if (noneFound) {
             const created = await Profile.create({ ipAddress });
-            console.log(created, "47rm");
             created.addGym(gym);
             created.save();
             return created;
         } else {
             // if ip addr is previously seen, update their housing ids
             const profile = profiles[0];
-            console.log(profile, "53rm");
-            console.log(profile.addGym, "54rm");
             profile.addGym(gym);
             profile.save();
             return profile;
@@ -67,12 +67,16 @@ class ProfileDAO {
     }
 
     public async getAllHousingPicksByIp(ipAddress: string): Promise<Housing[]> {
-        const profile = await Profile.findOne({ where: { ipAddress }, include: "housing" });
+        const profile = await Profile.findOne({ where: { ipAddress } });
         if (profile === null) {
             throw new Error("Profile not found for this ip address");
         }
         const housings = await profile.getHousings();
         return housings;
+    }
+
+    public async testGetAllHousings(profileId: number): Promise<Profile | null> {
+        return await Profile.findOne({ where: { profileId }, include: "housings" });
     }
 
     public async getAllHousingPicksByProfileId(profileId: number): Promise<Housing[]> {
@@ -81,6 +85,7 @@ class ProfileDAO {
             throw new Error("Profile not found for this profile id");
         }
         const housings = await profile.getHousings();
+        console.log(housings.length, "87rm");
         return housings;
     }
 

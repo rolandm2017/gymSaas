@@ -6,7 +6,6 @@ declare namespace Express {
         // inform the controller of who is making the request.
         user?: {
             role?: string;
-            ownsToken?: Function;
             acctId: number;
         };
         // This property comes into the system from the jwt in authorize.middleware.ts.

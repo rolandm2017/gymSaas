@@ -22,8 +22,6 @@ interface ProfileAttributes {
     profileId?: number;
     acctId?: number;
     ipAddress: string;
-    pickedHousingIds?: number[];
-    pickedGymIds?: number[];
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -52,8 +50,8 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
     declare addGym: HasManyAddAssociationMixin<Gym, number>;
     declare addGyms: HasManyAddAssociationsMixin<Gym, number>;
 
-    public readonly Housings?: Housing[];
-    public readonly Gyms?: Gym[];
+    public readonly housings?: Housing[];
+    public readonly gyms?: Gym[];
 
     public static associations: {
         Housings: Association<Profile, Housing>;

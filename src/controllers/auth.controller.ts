@@ -18,6 +18,8 @@ import AuthService from "../service/auth.service";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
+import { googleAuth, googleAuthCallback, passportJwt } from "../middleware/passport.middleware";
+import { UserFromGoogle } from "../interface/UserFromGoogle.interface";
 
 class AuthController {
     public path = "/auth";
@@ -26,6 +28,9 @@ class AuthController {
 
     constructor(authService: AuthService) {
         this.authService = authService;
+        this.router.get("/google", googleAuth);
+        // Retrieve member data using the access token received;
+        this.router.get("/google/callback", googleAuthCallback, this.grantAccessToken);
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         this.router.post("/register", registerUserSchema, this.register);
@@ -49,6 +54,21 @@ class AuthController {
         this.router.put("/:id", authorize(), updateRoleSchema, this.updateAccount);
         this.router.delete("/:id", authorize(), this._deleteAccount);
         this.router.get(HealthCheck.healthCheck, this.healthCheck);
+    }
+
+    // **
+    // ** passport stuff
+    public async grantAccessToken(req: Request, res: Response) {
+        // https://www.makeuseof.com/nodejs-google-authentication/
+        // "If you log in, you will receive the token."
+        const newUser = req.user as any; // FIXME
+        console.log(req.user, "65rm");
+        const ipAddress = req.ip;
+        const accountDetails: IBasicDetails = await this.authService.grantRefreshToken(newUser, ipAddress);
+        // todo: figure out where this response is sent - presumably to the frontend
+        if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
+        this.setTokenCookie(response, accountDetails.refreshToken);
+        return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
     }
 
     public async authenticate(request: Request, response: Response, next: NextFunction) {
@@ -100,7 +120,7 @@ class AuthController {
             const token = request.body.token || request.cookies.refreshToken;
             const ipAddress = request.ip;
             if (request.user === undefined) return handleErrorResponse(response, "User is required");
-            if (!token || request.user.ownsToken === undefined) return handleErrorResponse(response, "Token is required");
+            if (!token) return handleErrorResponse(response, "Token is required");
             // users can revoke their own tokens and admins can revoke any tokens
             const userOwnsToken = await this.authService.userOwnsToken(request.user.acctId, token);
             if (!userOwnsToken && request.user.role !== Role.Admin) {

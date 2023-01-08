@@ -23,9 +23,8 @@ function authorize(validRoles: Role[] = []) {
     }
 
     return [
-        // authenticate JWT token and attach user to request object (req.user)
         jwt({
-            secret,
+            secret, // authenticate JWT token and attach user to request object (req.user)
             algorithms: ["HS256"],
         }),
 

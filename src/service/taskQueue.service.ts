@@ -6,7 +6,7 @@ import { ILatLong } from "../interface/LatLong.interface";
 import { Task } from "../database/models/Task";
 import { ITask } from "../interface/Task.interface";
 import CityDAO from "../database/dao/city.dao";
-import Parser from "../util/parser";
+import Parser from "../scrapers/parser";
 import { HousingCreationAttributes } from "../database/models/Housing";
 import HousingDAO from "../database/dao/housing.dao";
 import { IHousing } from "../interface/Housing.interface";
