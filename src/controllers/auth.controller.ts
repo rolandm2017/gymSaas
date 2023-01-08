@@ -102,7 +102,7 @@ class AuthController {
             if (request.user === undefined) return handleErrorResponse(response, "User is required");
             if (!token || request.user.ownsToken === undefined) return handleErrorResponse(response, "Token is required");
             // users can revoke their own tokens and admins can revoke any tokens
-            const userOwnsToken = await this.authService.userOwnsToken(request.user, token);
+            const userOwnsToken = await this.authService.userOwnsToken(request.user.acctId, token);
             if (!userOwnsToken && request.user.role !== Role.Admin) {
                 return response.status(401).json({ message: "Unauthorized" });
             }

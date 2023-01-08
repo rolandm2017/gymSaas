@@ -10,6 +10,7 @@ import AccountUtil from "../../src/util/accountUtil";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import AccountDAO from "../../src/database/dao/account.dao";
 import sendEmail from "../../src/util/sendEmail";
+import RefreshTokenDAO from "../../src/database/dao/refreshToken.dao";
 
 let authService: AuthService;
 let controller: AuthController;
@@ -17,6 +18,7 @@ let accountDAO: AccountDAO = new AccountDAO();
 let emailService: EmailService = new EmailService(sendEmail, "testing");
 let accountUtil: AccountUtil = new AccountUtil();
 let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(accountDAO);
+const refreshTokenDAO = new RefreshTokenDAO();
 
 const validEmail = "someValidEmail@gmail.com";
 const fakeButValidAccount: IBasicDetails = {
@@ -30,7 +32,7 @@ const fakeButValidAccount: IBasicDetails = {
 };
 
 beforeAll(() => {
-    authService = new AuthService(emailService, accountUtil, accountDAO, resetTokenDAO);
+    authService = new AuthService(emailService, accountUtil, accountDAO, resetTokenDAO, refreshTokenDAO);
 
     controller = new AuthController(authService);
 });

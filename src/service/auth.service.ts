@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import AccountDAO from "../database/dao/account.dao";
+import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import ResetTokenDAO from "../database/dao/resetToken.dao";
 import { Account } from "../database/models/Account";
 import { RefreshToken } from "../database/models/RefreshToken";
@@ -16,11 +17,19 @@ class AuthService {
     private accountDAO: AccountDAO;
     private resetTokenDAO: ResetTokenDAO;
     private emailService: EmailService;
-    constructor(emailService: EmailService, accountUtil: AccountUtil, accountDAO: AccountDAO, resetTokenDAO: ResetTokenDAO) {
+    private refreshTokenDAO: RefreshTokenDAO;
+    constructor(
+        emailService: EmailService,
+        accountUtil: AccountUtil,
+        accountDAO: AccountDAO,
+        resetTokenDAO: ResetTokenDAO,
+        refreshTokenDAO: RefreshTokenDAO,
+    ) {
         this.emailService = emailService;
         this.accountUtil = accountUtil;
         this.resetTokenDAO = resetTokenDAO;
         this.accountDAO = accountDAO;
+        this.refreshTokenDAO = refreshTokenDAO;
     }
 
     public async authenticate(email: string, password: string, ipAddress: string): Promise<IBasicDetails> {
@@ -101,8 +110,10 @@ class AuthService {
         };
     }
 
-    public async userOwnsToken(user: unknown, token: string): Promise<boolean> {
-        // todo
+    public async userOwnsToken(acctId: number, submittedToken: string): Promise<boolean> {
+        const refreshTokens = await this.refreshTokenDAO.getAllRefreshTokensForAccount(acctId);
+        const userOwnsToken = refreshTokens.find((refreshToken: RefreshToken) => refreshToken.token === submittedToken) !== undefined;
+        return userOwnsToken;
     }
 
     public async revokeToken(tokenString: string, ipAddress: string) {

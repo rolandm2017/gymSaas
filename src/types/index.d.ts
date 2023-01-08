@@ -5,7 +5,7 @@ declare namespace Express {
         // This property is added in the authorize.middleware.ts to
         // inform the controller of who is making the request.
         user?: {
-            role: string;
+            role?: string;
             ownsToken?: Function;
             acctId: number;
         };

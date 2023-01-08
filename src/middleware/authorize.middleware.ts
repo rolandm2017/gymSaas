@@ -15,13 +15,12 @@ if (secret === "YOLO") {
 }
 
 const acctDAO = new AccountDAO();
-const rtDAO = new RefreshTokenDAO();
 
-function authorize(roles: Role[] = []) {
+function authorize(validRoles: Role[] = []) {
     // roles param can be a single role string (e.g. Role.User or 'User')
     // or an array of roles (e.g. [Role.Admin, Role.User] or ['Admin', 'User'])
-    if (typeof roles === "string") {
-        roles = [roles];
+    if (typeof validRoles === "string") {
+        validRoles = [validRoles];
     }
 
     return [
@@ -42,15 +41,12 @@ function authorize(roles: Role[] = []) {
             }
             request.user = {
                 acctId: acctInfo.acctId,
-                role: "", // temp to satisfy ts
             };
             const account: Account | null = await acctDAO.getAccountById(acctInfo.acctId);
             if (!account) return res.status(401).json({ message: "Unauthorized" });
-            const refreshTokens = await rtDAO.getAllRefreshTokensForAccount(account.acctId);
 
-            const validRoles = Object.values(Role);
             const acctRole: Role = account.role as Role;
-            const rolesFoundOnRequest = roles.length;
+            const rolesFoundOnRequest = validRoles.length;
             if (rolesFoundOnRequest && !validRoles.includes(acctRole)) {
                 // account no longer exists or role not authorized
                 return res.status(401).json({ message: "Unauthorized" });
@@ -58,7 +54,6 @@ function authorize(roles: Role[] = []) {
 
             // authentication and authorization successful
             request.user.role = account.role;
-            request.user.ownsToken = (token: string) => !!refreshTokens.find((x: any) => x.token === token); // fixme: whats this do?
             next();
         },
     ];
