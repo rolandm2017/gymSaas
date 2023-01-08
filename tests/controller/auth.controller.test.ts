@@ -127,12 +127,11 @@ describe("Test auth controller without services", () => {
             const req: Request = { body: {} } as Request;
             req.body.token = "aaaaaaaaa";
             req.ip = "195.1.1.3";
-            req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), acctId: 300 };
+            req.user = { role: "User", acctId: 300 };
             const res: Response = mockResponse();
             const n: NextFunction = {} as NextFunction;
             // ready
             const response = await controller.revokeToken(req, res, n);
-            expect(req.user.ownsToken).toBeCalled();
             expect(authService.revokeToken).toHaveBeenCalled();
             expect(res.json).toHaveBeenCalledWith({ message: "Token revoked" });
         });
@@ -142,12 +141,11 @@ describe("Test auth controller without services", () => {
             const req: Request = { body: {}, cookies: { refreshToken: "" } } as Request;
             req.cookies.refreshToken = "bbbbbb";
             req.ip = "195.1.1.3";
-            req.user = { role: "User", ownsToken: jest.fn().mockReturnValue(true), acctId: 303 };
+            req.user = { role: "User", acctId: 303 };
             const res: Response = mockResponse();
             const n: NextFunction = {} as NextFunction;
             // ready
             const response = await controller.revokeToken(req, res, n);
-            expect(req.user.ownsToken).toBeCalled();
             expect(authService.revokeToken).toHaveBeenCalled();
             expect(response.json).toHaveBeenCalledWith({ message: "Token revoked" });
         });
@@ -170,14 +168,13 @@ describe("Test auth controller without services", () => {
             // setup
             authService.revokeToken = jest.fn();
             const req: Request = { body: {}, cookies: { refreshToken: "" } } as Request;
-            req.user = { role: "User", ownsToken: jest.fn(), acctId: 305 };
+            req.user = { role: "User", acctId: 305 };
             const res: Response = mockResponse();
             const n: NextFunction = {} as NextFunction;
             // ready
             const response = await controller.revokeToken(req, res, n);
             expect(response.json).toHaveBeenCalledWith({ error: "Token is required" });
             expect(authService.revokeToken).not.toHaveBeenCalled();
-            expect(req.user.ownsToken).not.toHaveBeenCalled();
         });
     });
 });

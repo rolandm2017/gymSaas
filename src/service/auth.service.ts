@@ -101,6 +101,10 @@ class AuthService {
         };
     }
 
+    public async userOwnsToken(user: unknown, token: string): Promise<boolean> {
+        // todo
+    }
+
     public async revokeToken(tokenString: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
         // revoke token and save
