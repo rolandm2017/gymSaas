@@ -28,7 +28,7 @@ class AdminController {
         this.router.get("/housing/by-location", authorize([Role.Admin]), this.getApartmentsByLocation.bind(this));
         this.router.get("/housing/by-city-id-and-batch-num", authorize([Role.Admin]), this.getApartmentsByCityIdAndBatchNum.bind(this));
         // **
-        // note the authorization is turned off
+        // these routes are here to expedite toggling authorization on and off. note the authorization is turned off
         // this.router.get("/batches/all", this.getAllBatchNumbers.bind(this));
         // this.router.get("/task-queue/all", this.getAllTasks.bind(this));
         // this.router.get("/task-queue/tasks-by-batch-num", this.getTasksByBatchNum.bind(this));

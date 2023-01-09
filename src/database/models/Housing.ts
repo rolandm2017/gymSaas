@@ -40,7 +40,7 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public lat!: number;
     public long!: number;
     public nearAGym!: boolean | null;
-    public source!: string;
+    public source!: string; // source as in Provider
     public idAtSource!: number | null;
     public taskId!: ForeignKey<Task["taskId"]>;
     public cityId!: ForeignKey<City["cityId"]>;
@@ -83,7 +83,7 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                 },
                 url: {
                     type: DataTypes.STRING,
-                    allowNull: false,
+                    allowNull: true, // because rentCanada won't have it when its entered into the db
                 },
                 lat: {
                     type: DataTypes.DOUBLE,

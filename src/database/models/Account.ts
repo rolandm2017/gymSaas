@@ -1,3 +1,4 @@
+import { allow } from "joi";
 import { DataTypes, Sequelize as S, Model, Optional, ForeignKey, HasOneSetAssociationMixin, HasOneGetAssociationMixin } from "sequelize";
 import { Profile } from "./Profile";
 
@@ -11,7 +12,8 @@ interface AccountAttributes {
     role: string;
     passwordReset: number | null; // Date.now()
     isBanned?: boolean | null;
-    googleId: string | null;
+    googleId?: string | null;
+    credits: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -31,6 +33,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public passwordReset!: number;
     public isBanned!: boolean;
     public googleId!: string | null;
+    public credits!: number;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -83,6 +86,10 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 googleId: {
                     type: DataTypes.STRING,
                     allowNull: true,
+                },
+                credits: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
                 },
             },
             {

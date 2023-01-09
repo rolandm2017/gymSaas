@@ -9,6 +9,8 @@ import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
 import { isLegitCityName, isProvider, isString, isStringInteger } from "../validationSchemas/inputValidation";
 import { detectViewportWidthSchema, getHousingByCityIdAndBatchNumSchema } from "../validationSchemas/housingSchemas";
+import { authorize } from "passport";
+import { Role } from "../enum/role.enum";
 
 class HousingController {
     public path = "/housing";
@@ -25,14 +27,14 @@ class HousingController {
         // step 1 of 3 in queuing a scrape
         this.router.post("/viewport-width", detectViewportWidthSchema, this.detectProviderViewportWidth.bind(this));
         // user queries
-        this.router.get("/location", this.getSavedApartmentsByLocation.bind(this));
+        this.router.get("/location", authorize([Role.User]), this.getSavedApartmentsByLocation.bind(this));
+        this.router.get("/real-url/:apartmentid", authorize([Role.User]), this.getRealURL.bind(this));
         // admin ish stuff
         this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
         this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by-location", this.getSavedApartmentsByLocation.bind(this));
-        this.router.get("/real-url/:apartmentid", this.getRealURL.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
-        this.router.delete("/all", this.deleteAllApartments.bind(this)); // todo: authorize admin only
+        this.router.delete("/all", authorize([Role.Admin]), this.deleteAllApartments.bind(this)); // todo: authorize admin only
         // step 4 of queuing a scrape - for after the scrape of the city is done
         this.router.get("/qualify", this.qualifyScrapedApartments.bind(this));
         // step 5 of queuing a scrape - for after the apartments have been qualified
@@ -105,9 +107,13 @@ class HousingController {
     public async getRealURL(request: Request, response: Response) {
         // todo: get user from request & deduct a credit from his account
         try {
+            const userId = request.user?.acctId;
+            if (userId === undefined) {
+                return handleErrorResponse(response, "No user defined on request");
+            }
             const apartmentIdInput = request.params.apartmentid;
             const apartmentId = isStringInteger(apartmentIdInput);
-            const realURL = await this.housingService.getRealURL(apartmentId);
+            const realURL = await this.housingService.getRealURL(apartmentId, userId);
             return response.status(200).json({ apartmentId, realURL });
         } catch (err) {
             return handleErrorResponse(response, err);

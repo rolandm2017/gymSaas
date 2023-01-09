@@ -20,12 +20,18 @@ class AccountDAO {
     }
 
     public async createGoogleLoginAccount(googleId: string, email: string): Promise<Account> {
-        return await Account.create({ googleId, email, passwordHash: "", role: Role.User });
+        return await Account.create({ googleId, email, passwordHash: "", role: Role.User, credits: 10 });
     }
 
     public async createAdmin(email: string): Promise<number> {
         const affected = await Account.update({ role: Role.Admin }, { where: { email } });
         return affected[0];
+    }
+
+    public async getCurrentCredits(accountId: number): Promise<number> {
+        const account = await Account.findOne({ where: { acctId: accountId } });
+        if (account == null) throw Error("No account found for this id");
+        return account.credits;
     }
 
     public async getAccountByAccountId(accountId: number) {
@@ -99,6 +105,13 @@ class AccountDAO {
         }
         await account.setProfile(profile);
         return account;
+    }
+
+    public async deductCredit(accountId: number): Promise<void> {
+        const account = await Account.findOne({ where: { acctId: accountId } });
+        if (account == null) throw Error("No account found for this id");
+        const currentCredits = account.credits;
+        await Account.update({ credits: currentCredits - 1 }, { where: { acctId: accountId } });
     }
 
     public async deleteAccount(id: number): Promise<number> {

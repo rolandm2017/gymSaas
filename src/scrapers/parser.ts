@@ -56,6 +56,7 @@ class Parser {
                 address: unit.address,
                 state: undefined,
                 price: unit.price,
+                url: unit.link,
                 lat: unit.latitude,
                 long: unit.longitude,
                 source: this.provider,

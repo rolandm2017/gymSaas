@@ -1,22 +1,30 @@
 import { Cache } from "joi";
+import AccountDAO from "../database/dao/account.dao";
 import GymDAO from "../database/dao/gym.dao";
 import HousingDAO from "../database/dao/housing.dao";
 import { Housing } from "../database/models/Housing";
+import { ProviderEnum } from "../enum/provider.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
 import { IQualificationReport } from "../interface/QualificationReport.interface";
 import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../util/acceptableRadiusForWalking";
+import { createRealUrl } from "../util/createRealUrl";
 import { convertHousingsToDemoHousings } from "../util/housingConverter";
 import CacheService from "./cache.service";
+import ScraperService from "./scraper.service";
 
 class HousingService {
-    private cacheService: CacheService;
     private housingDAO: HousingDAO;
     private gymDAO: GymDAO;
+    private accountDAO: AccountDAO;
+    private cacheService: CacheService;
+    private scraperService: ScraperService;
 
-    constructor(housingDAO: HousingDAO, gymDAO: GymDAO, cacheService: CacheService) {
+    constructor(housingDAO: HousingDAO, gymDAO: GymDAO, accountDAO: AccountDAO, cacheService: CacheService, scraperService: ScraperService) {
         this.housingDAO = housingDAO;
         this.gymDAO = gymDAO;
+        this.accountDAO = accountDAO;
         this.cacheService = cacheService;
+        this.scraperService = scraperService;
     }
 
     public async getDemoHousing(minLat: number, maxLat: number, minLong: number, maxLong: number): Promise<IDemoHousing[]> {
@@ -32,12 +40,36 @@ class HousingService {
     }
 
     // todo: make this deduct a credit from the user's account.
-    public async getRealURL(apartmentId: number): Promise<string> {
+    public async getRealURL(apartmentId: number, accountId: number): Promise<string> {
+        const availableCredits = await this.accountDAO.getCurrentCredits(accountId);
+        if (availableCredits <= 0) {
+            return "No credits available";
+        }
         const housing = await this.housingDAO.getHousingByHousingId(apartmentId);
         if (housing === null) {
             throw new Error("No housing found for this id");
         }
-        return housing.url;
+        // if provider is rentCanada...
+        const isFromRentCanada = housing.source === ProviderEnum.rentCanada;
+        const alreadyRetrievedUrl = housing.url !== null;
+        if (!isFromRentCanada || alreadyRetrievedUrl) {
+            // (a) if the result is already there, return it
+            try {
+                await this.accountDAO.deductCredit(accountId);
+            } catch {
+                console.log("Failed to deduct a credit");
+            }
+            return createRealUrl(housing.url, housing.source);
+        }
+        // (b) if the result isn't already there, get the real URL using their API, cache the result, then return it
+        const urlFromApi = await this.scraperService.getURLForApartment(housing.idAtSource);
+        await this.housingDAO.addUrlToHousing(apartmentId, urlFromApi);
+        try {
+            await this.accountDAO.deductCredit(accountId);
+        } catch {
+            console.log("Failed to deduct a credit");
+        }
+        return createRealUrl(urlFromApi, ProviderEnum.rentCanada);
     }
 
     public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number): Promise<Housing[]> {

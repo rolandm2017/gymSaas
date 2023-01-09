@@ -26,4 +26,5 @@ export const FAKE_ACCOUNT = {
     updated: 1000,
     role: "User",
     passwordReset: 999,
+    credits: 10,
 };
