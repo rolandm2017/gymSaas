@@ -60,7 +60,7 @@ beforeAll(async () => {
         buildingType: BuildingTypeEnum.apartment,
         agreementType: AgreementTypeEnum.rent,
         price: 1002,
-        address: "33 cats street",
+        address: "33 cats drive",
         url: "pets.ca",
         lat: 45,
         long: 45,
@@ -73,7 +73,7 @@ beforeAll(async () => {
         buildingType: BuildingTypeEnum.apartment,
         agreementType: AgreementTypeEnum.rent,
         price: 100,
-        address: "22 bird street",
+        address: "22 bird avenue",
         url: "hotmail.ca",
         lat: 45,
         long: 45,
@@ -141,17 +141,9 @@ describe("profileDAO tests", () => {
         if (housingForBothTests === null) throw Error("failed to find housing");
         // act
         // if the ip's profile already exists, the housing is added.
-        console.log(housingForTestOne.address, housingForTestTwo.address, housingForBothTests.address, "145rm");
         await profileDAO.recordPublicPickHousing(ipForTestOne, housingForTestOne);
-        const temp1 = await profileDAO.testGetAllHousings(created.profileId);
         await profileDAO.recordPublicPickHousing(ipForTestOne, housingForTestTwo);
-        const temp2 = await profileDAO.testGetAllHousings(created.profileId);
         await profileDAO.recordPublicPickHousing(ipForTestOne, housingForBothTests);
-        const temp3 = await profileDAO.testGetAllHousings(created.profileId);
-        if (temp1 === null || temp2 === null || temp3 === null) throw Error("hats");
-        console.log(temp1.housings ? temp1.housings[0].address : null, "146rm");
-        console.log(temp2.housings ? temp2.housings[0].address : null, "149rm");
-        console.log(temp3.housings ? temp3.housings[0].address : null, "152rm");
         // if the ip's profile doesnt already exist, one is created, and then the housing is added.
         const secondProfileHousing = await profileDAO.recordPublicPickHousing(newIp, housingForTestOne);
         const secondProfileHousingTwo = await profileDAO.recordPublicPickHousing(newIp, housingForTestTwo);
@@ -164,18 +156,8 @@ describe("profileDAO tests", () => {
         expect(existingProfileProfileId).toBeDefined();
         expect(existingProfileProfileIdThree).toBeDefined();
         // assert
-
-        // TEMP TEST
-        const all = await profileDAO.testGetAllHousings(existingProfileProfileId);
-        // console.log(all, "162rm");
-        console.log(
-            all!.housings?.map(h => h.address),
-            "163rm",
-        );
         const housingPicksByProfileId = await profileDAO.getAllHousingPicksByProfileId(existingProfileProfileId);
         const housingPicksByProfileIdTwo = await profileDAO.getAllHousingPicksByProfileId(existingProfileProfileIdThree);
-        // console.log(housingPicksByProfileId, housingPicksByProfileId.length, "159rm");
-        // console.log(housingPicksByProfileIdTwo, housingPicksByProfileIdTwo.length, "160rm");
         expect(housingPicksByProfileId.length).toBe(3);
         expect(housingPicksByProfileIdTwo.length).toBe(3);
     });

@@ -23,13 +23,11 @@ class ProfileDAO {
         // if ip addr is new, create a profile;
         if (noProfilesFound) {
             const newProfile = await Profile.create({ ipAddress });
-            console.log("adding housing...", housing.housingId, housing.address, "29rm");
             await newProfile.addHousings([housing]);
             return newProfile;
         } else {
             // if ip addr is previously seen, update their housing ids
             const profile = profiles[0];
-            console.log("adding housing...", housing.housingId, housing.address, "34rm");
             await profile.addHousings([housing]);
             return profile;
         }
@@ -85,7 +83,6 @@ class ProfileDAO {
             throw new Error("Profile not found for this profile id");
         }
         const housings = await profile.getHousings();
-        console.log(housings.length, "87rm");
         return housings;
     }
 
