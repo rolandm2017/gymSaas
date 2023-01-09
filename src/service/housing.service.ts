@@ -61,6 +61,10 @@ class HousingService {
             }
             return createRealUrl(housing.url, housing.source);
         }
+        if (housing.idAtSource === null) {
+            // should never happen...
+            throw Error("Id failed to record for rentCanada");
+        }
         // (b) if the result isn't already there, get the real URL using their API, cache the result, then return it
         const urlFromApi = await this.scraperService.getURLForApartment(housing.idAtSource);
         await this.housingDAO.addUrlToHousing(apartmentId, urlFromApi);

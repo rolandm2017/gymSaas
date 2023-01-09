@@ -114,7 +114,7 @@ class HousingController {
             const apartmentIdInput = request.params.apartmentid;
             const apartmentId = isStringInteger(apartmentIdInput);
             const realURL = await this.housingService.getRealURL(apartmentId, userId);
-            return response.status(200).json({ apartmentId, realURL });
+            return response.status(200).json({ apartmentId, realURL, success: realURL !== "No credits available" });
         } catch (err) {
             return handleErrorResponse(response, err);
         }

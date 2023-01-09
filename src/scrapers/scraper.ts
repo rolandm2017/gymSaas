@@ -28,6 +28,13 @@ class Scraper {
         const housingData: IHousing[] = parser.parse(results.data);
         return housingData;
     }
+
+    public async fetchUrlForId(idAtRentCanada: number): Promise<string> {
+        const endpointUrl: string = this.ip + ":" + this.port + "/fetch-url?id=" + idAtRentCanada.toString();
+        const result = await axios.get(endpointUrl);
+        const url = result.data;
+        return url;
+    }
 }
 
 export default Scraper;

@@ -58,6 +58,13 @@ class ScraperService {
         // todo: retrieve stored grid dimensions if they exist.
         return subdivisionLocations;
     }
+
+    public async getURLForApartment(idFromRentCanada: number): Promise<string> {
+        //
+        const scraper: Scraper = this.scraperConnectionFactory.getScraperOfType(ProviderEnum.rentCanada);
+        const url = await scraper.fetchUrlForId(idFromRentCanada);
+        return url;
+    }
 }
 
 export default ScraperService;
