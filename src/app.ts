@@ -34,6 +34,7 @@ class App {
         this.app.use(cors());
         this.app.use(morgan("dev"));
         this.app.use(cookieParser());
+        this.app.use(passport.initialize());
         passportConfig(passport);
 
         this.middlewares(appInit.middlewares);

@@ -89,7 +89,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 },
                 credits: {
                     type: DataTypes.INTEGER,
-                    allowNull: false,
+                    allowNull: true,
                 },
             },
             {
