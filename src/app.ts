@@ -20,7 +20,7 @@ import CityDAO from "./database/dao/city.dao";
 import BatchDAO from "./database/dao/batch.dao";
 import { SEED_GYMS_CANADA } from "./seed/gyms";
 import { Gym } from "./database/models/Gym";
-import passportConfig from "./util/passportConfig";
+import passportConfig from "./config/passportConfig";
 import FeedbackDAO from "./database/dao/feedback.dao";
 
 class App {

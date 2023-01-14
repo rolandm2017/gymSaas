@@ -9,7 +9,6 @@ import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
 import { isLegitCityName, isProvider, isString, isStringInteger } from "../validationSchemas/inputValidation";
 import { detectViewportWidthSchema, getHousingByCityIdAndBatchNumSchema } from "../validationSchemas/housingSchemas";
-import { authorize as passportAuth } from "passport";
 import authorize from "../middleware/authorize.middleware";
 import { Role } from "../enum/role.enum";
 

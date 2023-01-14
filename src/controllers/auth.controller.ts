@@ -28,9 +28,11 @@ class AuthController {
 
     constructor(authService: AuthService) {
         this.authService = authService;
+        // ** passport stuff
         this.router.get("/google", googleAuth);
         // Retrieve member data using the access token received;
         this.router.get("/google/callback", googleAuthCallback, this.grantAccessToken);
+        // ** end passport stuff
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         this.router.post("/register", registerUserSchema, this.register);
