@@ -12,9 +12,9 @@ const GoogleStrategy = PassportGoogleAuth.Strategy;
 const googleClientId = process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID : "fail";
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET ? process.env.GOOGLE_CLIENT_SECRET : "fail";
 
-const secret: string = process.env.JWT_SECRET !== undefined ? process.env.JWT_SECRET : "Failed to load";
+const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "Failed to load";
 if (secret === "Failed to load") {
-    throw new Error("JWT_SECRET not found in env file");
+    throw new Error("SECRET not found in env file");
 }
 
 const passportConfig = (passport: any) => {
