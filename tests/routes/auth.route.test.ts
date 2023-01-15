@@ -14,28 +14,28 @@ const validCredentials = {
     email: emails[0],
     password: passwords[0],
     confirmPassword: passwords[0],
-    acceptTerms: true,
+    acceptsTerms: true,
 };
 
 const invalidCredentials1 = {
     email: emails[1],
     password: passwords[0],
     confirmPassword: passwords[0],
-    acceptTerms: false, // false is a problem
+    acceptsTerms: false, // false is a problem
 };
 
 const invalidCredentials2 = {
     email: emails[2],
     password: passwords[0],
     confirmPassword: passwords[1], // if pw no match, problem!
-    acceptTerms: true,
+    acceptsTerms: true,
 };
 
 const invalidCredentials3 = {
     email: "notAnEmail",
     password: passwords[1],
     confirmPassword: passwords[1],
-    acceptTerms: true,
+    acceptsTerms: true,
 };
 
 let acctDAO: AccountDAO = new AccountDAO();
@@ -161,7 +161,7 @@ describe("Test auth controller with supertest", () => {
                 pw: "catsDOGS444%%",
                 password: "jlg900#A",
                 confirmPassword: "jlg900#A",
-                acceptTerms: true,
+                acceptsTerms: true,
             };
             const registrationRes = await request(server).post(`${path}/register`).set("origin", "testSuite").send(credentials3);
             expect(registrationRes.body.message).toBe("Registration successful, please check your email for verification instructions");

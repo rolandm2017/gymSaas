@@ -73,6 +73,7 @@ class AuthService {
     }
 
     public async register(params: IRegistrationDetails, origin: string): Promise<IBasicDetails> {
+        console.log("creating account wiht details", params, "76rm");
         const acctsWithThisEmail: Account[] = await this.accountDAO.getAccountByEmail(params.email);
         const emailAlreadyExists: boolean = acctsWithThisEmail.length !== 0;
         if (emailAlreadyExists) {
@@ -95,6 +96,7 @@ class AuthService {
 
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct);
+        console.log("create account finished 99rm");
         await this.emailService.sendVerificationEmail(account, origin);
         return {
             ...this.basicDetails(account),

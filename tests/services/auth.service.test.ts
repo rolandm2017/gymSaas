@@ -18,7 +18,7 @@ const validCredentials = {
     email: emails[0],
     password: passwords[0],
     confirmPassword: passwords[0],
-    acceptTerms: true,
+    acceptsTerms: true,
     name: FAKE_NAME,
 };
 
