@@ -28,3 +28,5 @@ export const FAKE_ACCOUNT = {
     passwordReset: 999,
     credits: 10,
 };
+
+export const FAKE_NAME = "James Grant";

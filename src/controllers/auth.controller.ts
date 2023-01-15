@@ -35,26 +35,26 @@ class AuthController {
         // ** end passport stuff
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
-        this.router.post("/register", registerUserSchema, this.register);
+        this.router.post("/register", registerUserSchema, this.register.bind(this));
         // verify email
-        this.router.post("/verify-email", verifyEmailSchema, this.verifyEmail);
-        this.router.get("/bypass-authentication-token", this.bypassEmail);
+        this.router.post("/verify-email", verifyEmailSchema, this.verifyEmail.bind(this));
+        this.router.get("/bypass-authentication-token", this.bypassEmail.bind(this));
         // tokens
         this.router.post("/refresh-token", this.refreshToken.bind(this));
         // note: /revoke-token === /log-out
-        this.router.post("/revoke-token", authorize(), revokeTokenSchema, this.revokeToken);
+        this.router.post("/revoke-token", authorize(), revokeTokenSchema, this.revokeToken.bind(this));
         // update pw
-        this.router.post("/update-password", authorize(), updatePasswordSchema, this.updatePassword);
+        this.router.post("/update-password", authorize(), updatePasswordSchema, this.updatePassword.bind(this));
         // pw reset
-        this.router.post("/forgot-password", forgotPasswordSchema, this.forgotPassword);
-        this.router.post("/validate-reset-token", validateResetTokenSchema, this.validateResetToken);
-        this.router.post("/reset-password", resetPasswordSchema, this.resetPassword);
+        this.router.post("/forgot-password", forgotPasswordSchema, this.forgotPassword.bind(this));
+        this.router.post("/validate-reset-token", validateResetTokenSchema, this.validateResetToken.bind(this));
+        this.router.post("/reset-password", resetPasswordSchema, this.resetPassword.bind(this));
         // authorized routes
-        this.router.get("/", authorize([Role.Admin]), this.getAllAccounts);
-        this.router.get("/:id", authorize(), this.getAccountById);
-        this.router.post("/", authorize([Role.Admin]), createAccountSchema, this.createAccount);
-        this.router.put("/:id", authorize(), updateRoleSchema, this.updateAccount);
-        this.router.delete("/:id", authorize(), this._deleteAccount);
+        this.router.get("/", authorize([Role.Admin]), this.getAllAccounts.bind(this));
+        this.router.get("/:id", authorize(), this.getAccountById.bind(this));
+        this.router.post("/", authorize([Role.Admin]), createAccountSchema, this.createAccount.bind(this));
+        this.router.put("/:id", authorize(), updateRoleSchema, this.updateAccount.bind(this));
+        this.router.delete("/:id", authorize(), this._deleteAccount.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck);
     }
 

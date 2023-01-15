@@ -31,7 +31,15 @@ class App {
     constructor(appInit: { port: number; middlewares: any; controllers: any }) {
         this.app = express();
         this.port = appInit.port;
-        this.app.use(cors());
+        this.app.use(
+            cors({
+                origin: ["http://localhost:3000", "http://localhost:3001"],
+                methods: "GET, POST, PATCH, DELETE, PUT",
+                allowedHeaders: "Content-Type, Authorization",
+                credentials: true,
+            }),
+        );
+
         this.app.use(morgan("dev"));
         this.app.use(cookieParser("someSecretIllChangeLater"));
 

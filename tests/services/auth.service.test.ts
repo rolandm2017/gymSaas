@@ -1,4 +1,6 @@
+import { ref } from "joi";
 import AccountDAO from "../../src/database/dao/account.dao";
+import RefreshTokenDAO from "../../src/database/dao/refreshToken.dao";
 import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import { Role } from "../../src/enum/role.enum";
 import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
@@ -10,19 +12,21 @@ import sendEmail from "../../src/util/sendEmail";
 
 import { app } from "../mocks/mockServer";
 
-import { emails, passwords } from "../mocks/userCredentials";
+import { emails, FAKE_NAME, passwords } from "../mocks/userCredentials";
 
 const validCredentials = {
     email: emails[0],
     password: passwords[0],
     confirmPassword: passwords[0],
     acceptTerms: true,
+    name: FAKE_NAME,
 };
 
 const someOrigin = "whatever";
 
 let authService: AuthService;
 let acctDAO: AccountDAO;
+let refreshTokenDAO: RefreshTokenDAO;
 let resetTokenDAO: ResetTokenDAO;
 let emailService: EmailService;
 let accountUtil: AccountUtil;
@@ -31,14 +35,15 @@ beforeAll(async () => {
     await app.connectDB();
     await app.dropTable("account");
     // lots of setup
-    accountUtil = new AccountUtil();
+    refreshTokenDAO = new RefreshTokenDAO();
+    accountUtil = new AccountUtil(refreshTokenDAO);
 
     acctDAO = new AccountDAO(); // reset to a fresh AcctDAO before every test.
     resetTokenDAO = new ResetTokenDAO(acctDAO);
     // //
     emailService = new EmailService(sendEmail, "testing");
     // // make an acct in db
-    authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
+    authService = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO, refreshTokenDAO);
 });
 
 beforeEach(async () => {
@@ -78,7 +83,7 @@ describe("test auth service on its own", () => {
                 .mockReturnValueOnce([{ id: 9999999, resetToken: { token: "hats999" }, role: Role.User, passwordHash: "someText99" }]);
             resetTokenDAO.createResetToken = jest.fn();
             emailService.sendPasswordResetEmail = jest.fn();
-            const authService2 = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO);
+            const authService2 = new AuthService(emailService, accountUtil, acctDAO, resetTokenDAO, refreshTokenDAO);
             const goodEmail = validCredentials.email;
             const goodOrigin = "https://www.google.ca";
             await authService2.forgotPassword(goodEmail, goodOrigin);
