@@ -8,8 +8,8 @@ import { Role } from "../enum/role.enum";
 
 dotenv.config({ path: "./.env" });
 
-const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "YOLO";
-if (secret === "YOLO") {
+export const secret: string = process.env.SECRET !== undefined ? process.env.SECRET : "noSecretLoaded";
+if (secret === "noSecretLoaded") {
     throw new Error("secret not found in env file");
 }
 

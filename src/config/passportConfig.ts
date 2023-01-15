@@ -23,7 +23,7 @@ const passportConfig = (passport: any) => {
             {
                 clientID: googleClientId,
                 clientSecret: googleClientSecret,
-                callbackURL: "http://localhost:5200/auth/google/callback",
+                callbackURL: "http://localhost:8000/auth/google/callback",
                 passReqToCallback: true,
             },
             async (req: any, accessToken: string, refreshToken: any, profile: any, done: Function) => {
@@ -50,8 +50,7 @@ const passportConfig = (passport: any) => {
                     console.log(profile.emails[0]); // presuming the email they clicked on is the one sent in 0th position
                     // note that google ids are 20 digit string integers, so they must be stored as a string, not an integer.
                     const googleIdString: string = profile.id;
-                    //  name: { givenName: 'firstName', familyName: 'lastName ' }, <= appears on the profile object.
-                    const name = profile.name;
+
                     const newMember = await accountDAO.createGoogleLoginAccount(googleIdString, profile.emails[0].value);
 
                     req.accessToken = accessToken; // q: where does req go next?

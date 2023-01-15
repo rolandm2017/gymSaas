@@ -42,9 +42,8 @@ class AuthService {
             throw new Error("Google SSO registration failed");
         }
         const account: IAccount = this.accountUtil.convertAccountModelToInterface(accountEntry);
-        const randomChars = this.accountUtil.randomTokenString();
         const refreshToken: RefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
-        // save refresh tokenm
+        // save refresh tokenm\
         await refreshToken.save();
         return { ...this.basicDetails(account), refreshToken: refreshToken.token };
     }

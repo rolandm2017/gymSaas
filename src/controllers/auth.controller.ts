@@ -31,7 +31,7 @@ class AuthController {
         // ** passport stuff
         this.router.get("/google", googleAuth);
         // Retrieve member data using the access token received;
-        this.router.get("/google/callback", googleAuthCallback, this.grantAccessToken);
+        this.router.get("/google/callback", googleAuthCallback, this.grantAccessToken.bind(this));
         // ** end passport stuff
         // login & register
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
@@ -60,12 +60,11 @@ class AuthController {
 
     // **
     // ** passport stuff
-    public async grantAccessToken(req: Request, res: Response) {
+    public async grantAccessToken(request: Request, response: Response) {
         // https://www.makeuseof.com/nodejs-google-authentication/
         // "If you log in, you will receive the token."
-        const newUser = req.user as any; // FIXME
-        console.log(req.user, "65rm");
-        const ipAddress = req.ip;
+        const newUser = request.user as UserFromGoogle;
+        const ipAddress = request.ip;
         const accountDetails: IBasicDetails = await this.authService.grantRefreshToken(newUser, ipAddress);
         // todo: figure out where this response is sent - presumably to the frontend
         if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
@@ -75,6 +74,7 @@ class AuthController {
 
     public async authenticate(request: Request, response: Response, next: NextFunction) {
         try {
+            console.log(request.secret, "79rm");
             const email: string = request.body.email;
             const password: string = request.body.password;
             const ipAddress: string = request.ip;
@@ -82,8 +82,10 @@ class AuthController {
             if (accountDetails.jwtToken === undefined) throw Error("jwt missing from authenticate response");
             if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
             this.setTokenCookie(response, accountDetails.refreshToken);
+            console.log("86rm");
             return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
         } catch (err) {
+            console.log(err, "88rm");
             return handleErrorResponse(response, err);
         }
     }
@@ -289,6 +291,7 @@ class AuthController {
             httpOnly: true,
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         };
+        console.log(token, "293rm");
         response.cookie("refreshToken", token, cookieOptions);
     }
 }

@@ -1,5 +1,6 @@
 export interface UserFromGoogle {
     userId: number;
+    acctId: number;
     googleId: string;
     firstName: string;
     lastName: string;

@@ -1,4 +1,4 @@
-import config from "./emailConfig.json";
+import config from "../config/emailConfig.json";
 import nodemailer from "nodemailer";
 
 interface ISendEmail {

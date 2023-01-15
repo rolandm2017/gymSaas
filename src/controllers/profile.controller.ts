@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 
 import { HealthCheck } from "../enum/healthCheck.enum";
 import ProfileService from "../service/profile.service";
-import { isString, isStringInteger } from "../validationSchemas/inputValidation";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 
 class ProfileController {

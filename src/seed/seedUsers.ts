@@ -17,5 +17,6 @@ export const SEED_USERS = [
         role: Role.Admin,
         passwordReset: 0,
         updated: 0,
+        credits: 0,
     },
 ];
