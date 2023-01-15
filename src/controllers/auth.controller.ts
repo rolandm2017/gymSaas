@@ -40,7 +40,7 @@ class AuthController {
         this.router.post("/verify-email", verifyEmailSchema, this.verifyEmail);
         this.router.get("/bypass-authentication-token", this.bypassEmail);
         // tokens
-        this.router.post("/refresh-token", this.refreshToken);
+        this.router.post("/refresh-token", this.refreshToken.bind(this));
         // note: /revoke-token === /log-out
         this.router.post("/revoke-token", authorize(), revokeTokenSchema, this.revokeToken);
         // update pw
@@ -70,7 +70,7 @@ class AuthController {
             // todo: figure out where this response is sent - presumably to the frontend
             if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
             this.setTokenCookie(response, accountDetails.refreshToken);
-            return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
+            return response.redirect("http://localhost:3000"); // user gets access token from refresh-token endpoint.
         } catch (err) {
             return handleErrorResponse(response, err);
         }
