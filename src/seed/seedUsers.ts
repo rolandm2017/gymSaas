@@ -1,6 +1,7 @@
 import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import { Role } from "../enum/role.enum";
 import AccountUtil from "../util/accountUtil";
+import { FREE_CREDITS } from "../util/constants";
 
 export const ADMIN_ACCT_PASSWORD = "testTEST11!!";
 
@@ -17,6 +18,6 @@ export const SEED_USERS = [
         role: Role.Admin,
         passwordReset: 0,
         updated: 0,
-        credits: 0,
+        credits: FREE_CREDITS,
     },
 ];

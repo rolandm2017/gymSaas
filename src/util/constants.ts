@@ -9,3 +9,5 @@ export const minDegreesLatitude = -90;
 export const maxDegreesLongitude = 180;
 export const longitudeAtPrimeMeridian = 0; // mostly here as a reminder
 export const minDegreesLongitude = -180;
+
+export const FREE_CREDITS = 5;

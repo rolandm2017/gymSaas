@@ -26,7 +26,7 @@ export const FAKE_ACCOUNT = {
     updated: 1000,
     role: "User",
     passwordReset: 999,
-    credits: 10,
+    credits: 109,
 };
 
 export const FAKE_NAME = "James Grant";

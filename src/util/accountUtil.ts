@@ -10,6 +10,7 @@ import { Account, AccountCreationAttributes } from "../database/models/Account";
 import { Role } from "../enum/role.enum";
 import { RefreshToken } from "../database/models/RefreshToken";
 import { IRegistrationDetails } from "../interface/RegistrationDetails.interface";
+import { FREE_CREDITS } from "./constants";
 
 dotenv.config({ path: "./.env" });
 
@@ -67,6 +68,7 @@ class AccountUtil {
         // start.verified = 0;
         start.updated = 0;
         start.role = Role.User;
+        start.credits = FREE_CREDITS;
         const populated = { ...start } as AccountCreationAttributes;
         return populated;
     }

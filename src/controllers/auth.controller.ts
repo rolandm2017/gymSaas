@@ -85,6 +85,7 @@ class AuthController {
             if (accountDetails.jwtToken === undefined) throw Error("jwt missing from authenticate response");
             if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
             this.setTokenCookie(response, accountDetails.refreshToken);
+            delete accountDetails.refreshToken;
             return response.json({ ...accountDetails, jwtToken: accountDetails.jwtToken });
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -109,12 +110,16 @@ class AuthController {
 
     public async refreshToken(request: Request, response: Response) {
         try {
+            console.log("attempting to refresh token... 113rm");
             const token = request.cookies.refreshToken;
             const ipAddress = request.ip;
+            console.log(token, "116rm");
             const { refreshToken, ...account } = await this.authService.refreshToken(token, ipAddress);
             this.setTokenCookie(response, refreshToken);
+            console.log(refreshToken, "118rm");
             return response.json(account);
         } catch (err) {
+            console.log(err, "121rm");
             return handleErrorResponse(response, err);
         }
     }
@@ -291,6 +296,7 @@ class AuthController {
         const cookieOptions = {
             httpOnly: true,
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            SameSite: "none",
         };
         console.log(token, "293rm");
         response.cookie("refreshToken", token, cookieOptions);
