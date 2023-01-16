@@ -119,18 +119,18 @@ class ProfileController {
     public async deleteHousingPick(request: Request, response: Response) {
         const acctId = request.user?.acctId;
         const exists = isInteger(acctId);
-        const toDeleteInput = request.body.toDelete;
-        const toDelete = isInteger(toDeleteInput);
-        const deleted = await this.profileService.deleteHousingPick(acctId, toDelete);
+        const toDeleteIdInput = request.body.toDeleteId;
+        const toDeleteId = isInteger(toDeleteIdInput);
+        const deleted = await this.profileService.deleteHousingPick(exists, toDeleteId);
         return response.status(200).json({ deleted });
     }
 
     public async deleteGymPick(request: Request, response: Response) {
         const acctId = request.user?.acctId;
         const exists = isInteger(acctId);
-        const toDeleteInput = request.body.toDelete;
-        const toDelete = isInteger(toDeleteInput);
-        const deleted = await this.profileService.deleteGymPick(acctId, toDelete);
+        const toDeleteIdInput = request.body.toDeleteId;
+        const toDeleteId = isInteger(toDeleteIdInput);
+        const deleted = await this.profileService.deleteGymPick(exists, toDeleteId);
         return response.status(200).json({ deleted });
     }
 

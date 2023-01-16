@@ -4,7 +4,7 @@ import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import cookieSession from "cookie-session";
+// import cookieSession from "cookie-session";
 //
 import initModels from "./database/models/init-models";
 import Database from "./database/Database";
@@ -36,23 +36,30 @@ class App {
         this.port = appInit.port;
         this.app.use(
             cors({
-                origin: ["http://localhost:3000", "http://localhost:3001"],
+                origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
                 methods: "GET, POST, PATCH, DELETE, PUT",
                 allowedHeaders: "Content-Type, Authorization",
                 credentials: true,
             }),
         );
-        this.app.set("trust proxy", 1);
         this.app.use(
-            cookieSession({
-                name: "__session",
-                keys: ["key1"],
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                secure: true,
-                httpOnly: true,
-                sameSite: "none",
+            session({
+                secret: "secret",
+                resave: false,
+                saveUninitialized: true,
             }),
         );
+        // this.app.set("trust proxy", 1);
+        // this.app.use(
+        //     cookieSession({
+        //         name: "__session",
+        //         keys: ["key1"],
+        //         maxAge: 7 * 24 * 60 * 60 * 1000,
+        //         secure: true,
+        //         httpOnly: true,
+        //         sameSite: "none",
+        //     }),
+        // );
 
         this.app.use(morgan("dev"));
         this.app.use(cookieParser("someSecretIllChangeLater"));

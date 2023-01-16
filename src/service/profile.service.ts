@@ -66,6 +66,14 @@ class ProfileService {
         profile.acctId = accountId;
         return await this.profileDAO.associateProfileWithAccount(profile.profileId, account);
     }
+
+    public async deleteHousingPick(accountId: number, toDeleteId: number) {
+        //
+    }
+
+    public async deleteGymPick(accountId: number, toDeleteId: number) {
+        //
+    }
 }
 
 export default ProfileService;
