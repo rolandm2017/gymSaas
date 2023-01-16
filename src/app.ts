@@ -42,22 +42,11 @@ class App {
                 credentials: true,
             }),
         );
-        this.app.use(
-            session({
-                secret: "secret",
-                resave: false,
-                saveUninitialized: true,
-            }),
-        );
-        // this.app.set("trust proxy", 1);
         // this.app.use(
-        //     cookieSession({
-        //         name: "__session",
-        //         keys: ["key1"],
-        //         maxAge: 7 * 24 * 60 * 60 * 1000,
-        //         secure: true,
-        //         httpOnly: true,
-        //         sameSite: "none",
+        //     session({
+        //         secret: "secret",
+        //         resave: false,
+        //         saveUninitialized: true,
         //     }),
         // );
 

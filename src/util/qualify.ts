@@ -82,7 +82,6 @@ export function isCloseEnough(apartment: IHousing, gym: IGym, qualifyingDistance
 }
 
 export function lookAroundForNearbyGyms(apartment: IHousing, gyms: IGym[], start: number, qDist: number): IGym[] {
-    // todo: look west, look east. Return all qualified apartments.
     const nearbyGyms: IGym[] = [];
     for (let i = start; i >= 0; i--) {
         if (isCloseEnough(apartment, gyms[i], qDist)) {
@@ -102,7 +101,6 @@ export function lookAroundForNearbyGyms(apartment: IHousing, gyms: IGym[], start
 }
 
 export function lookAroundForQualifiedApartments(apartments: IHousing[], gym: IGym, start: number, qDist: number): IHousing[] {
-    // todo: look west, look east. Return all qualified apartments.
     const qualifiedUnits: IHousing[] = [];
     for (let i = start; i >= 0; i--) {
         if (isCloseEnough(apartments[i], gym, qDist)) {
@@ -133,29 +131,3 @@ export function createAssociations(apartment: IHousing, gyms: IGym[]): IAssociat
     }
     return associations;
 }
-
-//     // FIXME: this has bugs. the logic isn't right even though the words make sense.
-// export function pythagoras(a: number, b: number): number {
-//     if (a < 0 || b < 0) {
-//         throw new Error("Non-negative integers only");
-//     }
-//     const aSquared = a ** 2;
-//     const bSquared = b ** 2;
-//     const cSquared = aSquared + bSquared;
-//     const c = Math.sqrt(cSquared);
-//     return c;
-// }
-
-// export function difference(a: number, b: number): number {
-//     return Math.abs(a - b);
-// }
-
-// export function getDistanceBetween(apartment: IHousing | ILatLong, gym: IGym | ILatLong): number {
-//     if (apartment.lat === undefined || apartment.long === undefined || gym.lat === undefined || gym.long === undefined) {
-//         throw new Error("Place location data missing");
-//     }
-
-//     const northSouthDifference: number = difference(apartment.lat, gym.lat);
-//     const eastWestDifference: number = difference(apartment.long, gym.long);
-//     return pythagoras(northSouthDifference, eastWestDifference);
-// }

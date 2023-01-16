@@ -12,7 +12,6 @@ import {
 // Note going back and forth doesn't work precisely: Some functions give only approximations.
 // **
 
-// todo: kmChangeToLatlong
 const outOfBoundsLatitude = 91;
 const southernHemisphereLatitude = -1;
 const outOfBoundsLongitude = 181;

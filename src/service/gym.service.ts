@@ -27,7 +27,6 @@ class GymService {
     }
 
     public async findGymsInLocation(country: string, state: string, city: string): Promise<IGym[]> {
-        // TODO: refuse query if query was done within the past 24 hours (before making it to this method)
         let gyms: IGym[] = [];
         // initial request
         const request: string = this.googlePlacesAPI.embedLocation(country, state, city);

@@ -3,7 +3,7 @@ import { DataTypes, Sequelize, Model, Optional, ForeignKey } from "sequelize";
 import { Account } from "./Account";
 
 interface ResetTokenAttributes {
-    tokenId?: number; // todo: link to User model
+    tokenId?: number;
     token: string;
     expires: Date;
     acctId?: number;
@@ -29,7 +29,7 @@ export class ResetToken extends Model<ResetTokenAttributes, ResetTokenCreationAt
         return ResetToken.init(
             {
                 tokenId: {
-                    type: DataTypes.INTEGER, // todo: link to user model.
+                    type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true,
                 },

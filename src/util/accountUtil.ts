@@ -35,7 +35,6 @@ class AccountUtil {
 
     public async getRefreshTokenByTokenString(tokenString: string): Promise<RefreshToken> {
         const refreshToken = await this.refreshTokenDAO.getRefreshTokenByTokenString(tokenString);
-        // fixme: .populate("account"); does what? see line 64         const { account } = refreshToken;
         if (!refreshToken || !refreshToken.isActive) throw new Error("Invalid token");
         return refreshToken;
     }
@@ -62,10 +61,8 @@ class AccountUtil {
     public async attachMissingDetails(params: IRegistrationDetails): Promise<AccountCreationAttributes> {
         const start: any = { ...params };
         const pwHash: string = await this.generatePasswordHash(start.password);
-        // start.acctId = 0; // fixme: shouldnt this be an autoincrement value?
         start.passwordHash = pwHash;
         start.verificationToken = "";
-        // start.verified = 0;
         start.updated = 0;
         start.role = Role.User;
         start.credits = FREE_CREDITS;
@@ -85,6 +82,7 @@ class AccountUtil {
             role: startAccount.role as Role,
             passwordHash: startAccount.passwordHash,
             verificationToken: startAccount.verificationToken ? startAccount.verificationToken : "",
+            credits: startAccount.credits,
         };
         if (account.passwordHash === undefined) {
             throw Error("No hashed password found");

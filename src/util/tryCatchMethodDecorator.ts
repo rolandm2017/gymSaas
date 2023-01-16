@@ -1,4 +1,3 @@
-// TODO: implement this decorator to avoid try/catch spam
 // https://javascript.plainenglish.io/a-try-catch-decorator-to-stylize-your-code-bdd0202765c8
 type HandlerFunction = (error: Error, context: any) => void;
 

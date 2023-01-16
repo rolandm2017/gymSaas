@@ -56,7 +56,6 @@ const passportConfig = (passport: any) => {
                     req.accessToken = accessToken; // q: where does req go next?
                     return done(null, newMember);
                 } catch (error) {
-                    // todo: figure out how to handle errors here.
                     // Error 1: QueryFailedError: value "1047680853344410542227" is out of range for type integer
                     console.log(error);
                     return done(error, false);

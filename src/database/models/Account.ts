@@ -28,6 +28,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public passwordHash!: string;
     public isVerified!: boolean | null;
     public verificationToken!: string | null;
+    // updated field is deprecated
     public updated!: number | null; // todo: remove this. 'updatedAt' handles it
     public role!: string;
     public passwordReset!: number;

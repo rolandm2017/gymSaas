@@ -37,7 +37,6 @@ function getNextRing(focalPoint: ILatLong, jump: number, ringDistance: number): 
     const sideLength = ringDistance * 2;
     const subdivisions: number = sideLength / jump; // note: expecting integer values
 
-    // todo: fill me in
     const topEdge = [];
     const rightEdge = [];
     const bottomEdge = [];

@@ -1,14 +1,14 @@
-// todo
-
 import { _usedBatchNumbers } from "../../src/database/cache/batchNumCache";
 import BatchDAO from "../../src/database/dao/batch.dao";
 import CityDAO from "../../src/database/dao/city.dao";
+import FeedbackDAO from "../../src/database/dao/feedback.dao";
 import CacheService from "../../src/service/cache.service";
 import { app } from "../mocks/mockServer";
 
 const cityDAO = new CityDAO();
 const batchDAO = new BatchDAO();
-const cacheService = new CacheService(cityDAO, batchDAO);
+const feedbackDAO = new FeedbackDAO();
+const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
 
 beforeAll(async () => {
     await app.connectDB();

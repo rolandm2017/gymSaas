@@ -67,7 +67,6 @@ class AuthController {
             const newUser = request.user as UserFromGoogle;
             const ipAddress = request.ip;
             const accountDetails: IBasicDetails = await this.authService.grantRefreshToken(newUser, ipAddress);
-            // todo: figure out where this response is sent - presumably to the frontend
             if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
             this.setTokenCookie(response, accountDetails.refreshToken);
             return response.redirect("http://localhost:3000"); // user gets access token from refresh-token endpoint.

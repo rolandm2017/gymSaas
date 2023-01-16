@@ -6,6 +6,7 @@ export interface IAccount {
     isVerified: boolean;
     updated: Date | number; // Date or number repping time
     role: Role;
+    credits: number;
     created?: Date;
     verificationToken?: string;
     passwordHash?: string;

@@ -12,6 +12,8 @@ import { handleErrorResponse } from "../util/handleErrorResponse";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { HealthCheck } from "../enum/healthCheck.enum";
 import { isInteger, isLegitCityName, isProvider, isStringInteger } from "../validationSchemas/inputValidation";
+import authorize from "../middleware/authorize.middleware";
+import { Role } from "../enum/role.enum";
 
 // do I need a "scraper controller" and a separate "task queue controller"?
 class TaskQueueController {
@@ -28,9 +30,9 @@ class TaskQueueController {
         this.scraperService = scraperService;
         this.cacheService = cacheService;
         // step 2 of 3 in queuing a scrape
-        this.router.post("/plan-grid-scan", this.getGridForScan.bind(this));
+        this.router.post("/plan-grid-scan", authorize([Role.Admin]), this.getGridForScan.bind(this));
         // step 3 of 3 in queuing a scrape
-        this.router.post("/queue-grid-scan", this.addGridScanToQueue.bind(this)); // admin only
+        this.router.post("/queue-grid-scan", authorize([Role.Admin]), this.addGridScanToQueue.bind(this)); // admin only
         // stuff (separate from the 3 step queuing)
         this.router.get("/scrape", this.scrapeApartments.bind(this));
         this.router.get("/next-batch-number", this.getNextBatchNumber.bind(this));
@@ -41,11 +43,9 @@ class TaskQueueController {
         // used to check tasks make sense
         this.router.get("/all", this.getAllTasks.bind(this));
         this.router.get("/scorecard", this.getScorecard.bind(this));
-        // this.router.get("/batch", this.getTasksByBatch.bind(this));
-        this.router.delete("/cleanup", this.cleanOldTasks.bind(this));
-        this.router.delete("/by-id", this.cleanSpecific.bind(this));
-        this.router.delete("/all", this.cleanAll.bind(this));
-        // this.router.get("/db-contents", )
+        this.router.delete("/cleanup", authorize([Role.Admin]), this.cleanOldTasks.bind(this));
+        this.router.delete("/by-id", authorize([Role.Admin]), this.cleanSpecific.bind(this));
+        this.router.delete("/all", authorize([Role.Admin]), this.cleanAll.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
     }
 
@@ -56,7 +56,6 @@ class TaskQueueController {
             const country = request.body.country;
             const providerInput = request.body.provider;
             const provider = isProvider(providerInput);
-            // todo: implement this method
             const aps: IHousing[] = await this.scraperService.scrapeApartments(provider, city, stateOrProvince, country);
             return response.json({ aps });
         } catch (err) {
@@ -157,7 +156,7 @@ class TaskQueueController {
         try {
             const byProviderInput = request.body.provider; // provider only should work.
             const byBatchNumInput = request.body.batchNum; // batchNum only should work.
-            // todo: neither should work; "get all, I really mean ALL"
+            // submitting neither should work; "get all, I really mean ALL"
             const byProvider = byProviderInput ? isProvider(byProviderInput) : undefined;
             const byBatchNum = byBatchNumInput ? isStringInteger(byBatchNumInput) : undefined;
             const tasks: Task[] = await this.taskQueueService.getAllTasks(byProvider, byBatchNum, undefined);

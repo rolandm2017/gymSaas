@@ -39,7 +39,6 @@ class HousingService {
         return await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
     }
 
-    // todo: make this deduct a credit from the user's account.
     public async getRealURL(apartmentId: number, accountId: number): Promise<string> {
         const availableCredits = await this.accountDAO.getCurrentCredits(accountId);
         if (availableCredits <= 0) {

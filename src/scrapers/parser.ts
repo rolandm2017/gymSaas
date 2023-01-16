@@ -56,7 +56,7 @@ class Parser {
                 address: unit.address,
                 state: undefined,
                 price: unit.price,
-                url: unit.link,
+                url: unit.link, //rentFaster has url in json response
                 lat: unit.latitude,
                 long: unit.longitude,
                 source: this.provider,
@@ -79,7 +79,7 @@ class Parser {
                 address: unit.name,
                 state: undefined,
                 price: undefined,
-                url: unit.url,
+                url: unit.url, //rentSeeker has url in json response
                 lat: unit._geoloc.lat,
                 long: unit._geoloc.lng,
                 source: this.provider,

@@ -106,7 +106,6 @@ class AuthService {
     public async refreshToken(tokenString: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
         const acct: Account[] = await this.accountDAO.getAccountByRefreshToken(refreshToken);
-        // todo: throw err if multiple accts found & report
         const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct[0]);
 
         // replace old refresh token with a new one and save
@@ -175,7 +174,6 @@ class AuthService {
         if (acct.length === 0) return;
 
         // create reset token that expires after 24 hours
-        // todo: add reset token to reset token table linked to user
         const token = this.accountUtil.randomTokenString();
         const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
@@ -273,9 +271,9 @@ class AuthService {
     }
 
     private basicDetails(account: IAccount | Account): IBasicDetails {
-        const { acctId, email, role, updated, isVerified } = account;
+        const { acctId, email, role, updated, isVerified, credits } = account;
         const definitelyARole = role as Role;
-        return { acctId, email, role: definitelyARole, updated, isVerified };
+        return { acctId, email, role: definitelyARole, updated, isVerified, credits };
     }
 
     private async getAccount(id: number) {

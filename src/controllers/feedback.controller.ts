@@ -20,14 +20,12 @@ class FeedbackController {
 
     public async leaveFeedback(request: Request, response: Response) {
         try {
-            // const acctId = // from request.user;
             const accountId = request.user?.acctId;
             const noAccountId = accountId === undefined;
             if (noAccountId) {
                 return handleErrorResponse(response, "Must be logged in");
             }
             const { questionOneAnswer, questionTwoAnswer, largeTextAnswer } = request.body;
-            // todo: determine types of feedback
             const started = await this.feedbackService.leaveFeedback({ questionOneAnswer, questionTwoAnswer, largeTextAnswer }, accountId);
             return response.status(200).json({ started });
         } catch (err) {

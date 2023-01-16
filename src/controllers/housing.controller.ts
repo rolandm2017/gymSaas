@@ -34,7 +34,7 @@ class HousingController {
         this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by-location", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
-        this.router.delete("/all", authorize([Role.Admin]), this.deleteAllApartments.bind(this)); // todo: authorize admin only
+        this.router.delete("/all", authorize([Role.Admin]), this.deleteAllApartments.bind(this));
         // step 4 of queuing a scrape - for after the scrape of the city is done
         this.router.get("/qualify", this.qualifyScrapedApartments.bind(this));
         // step 5 of queuing a scrape - for after the apartments have been qualified
@@ -69,7 +69,7 @@ class HousingController {
             const stateOrProvince = request.body.state;
             const providerInput = request.body.provider;
             const provider = isProvider(providerInput); // throws if invalid
-            const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(provider, city, stateOrProvince); // todo: advance from hardcode provider choice
+            const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(provider, city, stateOrProvince);
             return response.status(200).json(dimensions);
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -105,7 +105,6 @@ class HousingController {
     }
 
     public async getRealURL(request: Request, response: Response) {
-        // todo: get user from request & deduct a credit from his account
         try {
             const userId = request.user?.acctId;
             if (userId === undefined) {

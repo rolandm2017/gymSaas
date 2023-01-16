@@ -26,7 +26,7 @@ class TaskDAO {
     }
 
     public async getHighestBatchNum() {
-        return await Task.findOne({ order: [["batchId", "DESC"]] }); // fixme: shouldnt this be "batchId"?
+        return await Task.findOne({ order: [["batchId", "DESC"]] });
     }
 
     public async getMostRecentTaskForProvider(provider: ProviderEnum, batchNum?: number) {
