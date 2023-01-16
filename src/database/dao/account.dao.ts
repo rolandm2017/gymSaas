@@ -77,11 +77,14 @@ class AccountDAO {
         return acct;
     }
 
-    public async getAccountByRefreshToken(token: RefreshToken): Promise<Account[]> {
-        return await Account.findAll({
-            where: { acctId: token.token },
+    public async getAccountByRefreshToken(token: RefreshToken): Promise<Account | null> {
+        const found = await Account.findAll({
+            where: { acctId: token.acctId },
             include: "their_refresh_tokens",
         });
+        if (found.length === 0) return null;
+        if (found.length >= 2) throw Error("Multiple accounts for a refresh token"); // todo: log failure
+        return found[0];
     }
 
     public async getAccountByVerificationToken(token: string): Promise<Account | null> {

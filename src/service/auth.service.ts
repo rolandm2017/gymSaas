@@ -105,12 +105,17 @@ class AuthService {
 
     public async refreshToken(tokenString: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
-        const acct: Account[] = await this.accountDAO.getAccountByRefreshToken(refreshToken);
-        const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct[0]);
+        // todo: kmChangeToLatlong
+        const acct: Account | null = await this.accountDAO.getAccountByRefreshToken(refreshToken);
+        const noAccountFound = acct == null;
+        if (noAccountFound) {
+            throw Error("No account found for refresh token"); // todo: log failure
+        }
+        const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct);
 
         // replace old refresh token with a new one and save
         const newRefreshToken = await this.accountUtil.generateRefreshToken(account, ipAddress);
-        refreshToken.revoked = Date.now();
+        refreshToken.revoked = new Date();
         refreshToken.revokedByIp = ipAddress;
         refreshToken.replacedByToken = newRefreshToken.token;
         await refreshToken.save();
@@ -118,7 +123,6 @@ class AuthService {
 
         // generate new jwt
         const jwtToken = this.accountUtil.generateJwtToken(account);
-
         // return basic details and tokens
         return {
             ...this.basicDetails(account),

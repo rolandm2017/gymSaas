@@ -8,7 +8,7 @@ interface RefreshTokenAttributes {
     isActive: boolean;
     expires: Date;
     createdByIp: string;
-    revoked?: number | null; // time since utc init represented as # of ms
+    revoked?: Date | null; // time since utc init represented as # of ms
     revokedByIp?: string | null;
     replacedByToken?: string | null;
     acctId?: number;
@@ -26,7 +26,7 @@ export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCrea
     public isActive!: boolean;
     public expires!: Date;
     public createdByIp!: string;
-    public revoked!: number | null;
+    public revoked!: Date | null;
     public revokedByIp!: string | null;
     public replacedByToken!: string | null;
     public acctId!: ForeignKey<Account["acctId"]>;
@@ -60,7 +60,7 @@ export class RefreshToken extends Model<RefreshTokenAttributes, RefreshTokenCrea
                     allowNull: false,
                 },
                 revoked: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.DATE,
                     allowNull: true,
                 },
                 revokedByIp: {
