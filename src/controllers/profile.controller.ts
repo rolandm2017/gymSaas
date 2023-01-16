@@ -1,8 +1,10 @@
 import express, { Request, Response } from "express";
 
 import { HealthCheck } from "../enum/healthCheck.enum";
+import authorize from "../middleware/authorize.middleware";
 import ProfileService from "../service/profile.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
+import { isInteger } from "../validationSchemas/inputValidation";
 
 class ProfileController {
     public path = "/profile";
@@ -18,6 +20,8 @@ class ProfileController {
         this.router.get("/all/picks/housing/by-ip", this.getAllHousingPicksByIp.bind(this));
         this.router.get("/all/picks/gym", this.getAllGymPicks.bind(this));
         this.router.get("/all/picks/gym/by-ip", this.getAllGymPicksByIp.bind(this));
+        this.router.delete("/pick/housing", authorize(), this.deleteHousingPick.bind(this));
+        this.router.delete("/pick/gym", authorize(), this.deleteGymPick.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
     }
 
@@ -106,10 +110,28 @@ class ProfileController {
             // probably useful only in testing.
             const ip = request.ip;
             const gymPicks = await this.profileService.getAllGymPicksByIp(ip);
-            return response.status(200).json(gymPicks);
+            return response.status(200).json({ gymPicks });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
+    }
+
+    public async deleteHousingPick(request: Request, response: Response) {
+        const acctId = request.user?.acctId;
+        const exists = isInteger(acctId);
+        const toDeleteInput = request.body.toDelete;
+        const toDelete = isInteger(toDeleteInput);
+        const deleted = await this.profileService.deleteHousingPick(acctId, toDelete);
+        return response.status(200).json({ deleted });
+    }
+
+    public async deleteGymPick(request: Request, response: Response) {
+        const acctId = request.user?.acctId;
+        const exists = isInteger(acctId);
+        const toDeleteInput = request.body.toDelete;
+        const toDelete = isInteger(toDeleteInput);
+        const deleted = await this.profileService.deleteGymPick(acctId, toDelete);
+        return response.status(200).json({ deleted });
     }
 
     async healthCheck(request: Request, response: Response) {

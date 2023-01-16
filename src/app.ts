@@ -3,6 +3,8 @@ import passport from "passport";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import session from "express-session";
+import cookieSession from "cookie-session";
 //
 import initModels from "./database/models/init-models";
 import Database from "./database/Database";
@@ -22,6 +24,7 @@ import { SEED_GYMS_CANADA } from "./seed/gyms";
 import { Gym } from "./database/models/Gym";
 import passportConfig from "./config/passportConfig";
 import FeedbackDAO from "./database/dao/feedback.dao";
+import { secret } from "./middleware/authorize.middleware";
 
 class App {
     public app: Application;
@@ -37,6 +40,17 @@ class App {
                 methods: "GET, POST, PATCH, DELETE, PUT",
                 allowedHeaders: "Content-Type, Authorization",
                 credentials: true,
+            }),
+        );
+        this.app.set("trust proxy", 1);
+        this.app.use(
+            cookieSession({
+                name: "__session",
+                keys: ["key1"],
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                secure: true,
+                httpOnly: true,
+                sameSite: "none",
             }),
         );
 

@@ -297,6 +297,7 @@ class AuthController {
             httpOnly: true,
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             SameSite: "none",
+            secure: false,
         };
         console.log(token, "293rm");
         response.cookie("refreshToken", token, cookieOptions);
