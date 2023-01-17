@@ -11,6 +11,7 @@ let TOKEN_COOKIES = "";
 let ACCESS_TOKEN = "";
 
 const validCredentials = {
+    name: "Bobby Fisher",
     email: emails[0],
     password: passwords[0],
     confirmPassword: passwords[0],
@@ -94,8 +95,8 @@ describe("Test auth controller with supertest", () => {
             // todo
         });
     });
-    describe("Complete user registration flow & password reset", () => {
-        test("works - integration - register => verify email => authenticate => change pw => login again", async () => {
+    describe("Complete user registration flow & password reset + refresh token", () => {
+        test("works - integration - register => verify email => authenticate => get refresh token (2x) => change pw => login again", async () => {
             const credentials = { ...validCredentials };
             credentials.email = "foobarbazgirl@gmail.com";
             const pw = "catsDOGS444%%";
@@ -117,6 +118,8 @@ describe("Test auth controller with supertest", () => {
             expect(authenticationRes.body.email).toBe(credentials.email);
             expect(authenticationRes.body.acctId).toBeDefined();
             expect(authenticationRes.body.isVerified).toBe(true); // the goods! verification successful.
+            expect(authenticationRes.body.name).toBeDefined();
+            expect(authenticationRes.body.name).toBe(validCredentials.name); // name exists!
             // check header for jwt and refresh token
             const jwtToken = authenticationRes.body.jwtToken;
             expect(jwtToken).toBeDefined();
@@ -125,6 +128,25 @@ describe("Test auth controller with supertest", () => {
             const refreshTokenString = refreshToken.split(";")[0].split("=")[1];
             expect(refreshTokenString).toBeDefined();
             expect(refreshTokenString.length).toBe(80);
+            // **
+            // ** refresh token dance
+            const rt1 = authenticationRes.headers["set-cookie"];
+            // act - we send back the 'httpOnly' cookie and get a new refresh token 5x in a row.
+            const refreshTokenPath = "/auth/refresh-token";
+            const refreshResponse1 = await request(server).post(refreshTokenPath).set("Cookie", rt1);
+            expect(refreshResponse1.body.name).toBe(validCredentials.name);
+            const rt2 = refreshResponse1.headers["set-cookie"];
+            const refreshResponse2 = await request(server).post(refreshTokenPath).set("Cookie", rt2);
+            expect(refreshResponse2.body.name).toBe(validCredentials.name);
+            const rt3 = refreshResponse2.headers["set-cookie"];
+            // assert
+            const allRTs = [rt1, rt2, rt3];
+
+            // rt1 !== rt2 !== rt3 !== rt4 !== rt5
+            const allRTsAreUnique = new Set(allRTs).size === allRTs.length;
+            expect(allRTsAreUnique).toBe(true);
+            // ** end check refresh token
+            // **
             // now try changing the password
             const newPw = pw + "str";
             const emailChangerPayload = {

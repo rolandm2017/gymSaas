@@ -53,7 +53,6 @@ class HousingService {
         /*
          * ** also handles deducting credit. if there is ever a payment system, I'll move this into a "payment controller"
          */
-        // if already revealed, return url
         const profile = await this.profileDAO.getProfileForAccountId(accountId);
         if (!profile) {
             throw Error("No profile found for this account id");
@@ -63,6 +62,7 @@ class HousingService {
             throw new Error("No housing found for this id");
         }
         const revealedToList = await housing.getRevealedToList();
+        // if already revealed, return url
         const isAlreadyRevealedToAccount = revealedToList.map(profile => profile.profileId).includes(profile.profileId);
         if (isAlreadyRevealedToAccount) {
             return createRealUrl(housing.url, housing.source);
