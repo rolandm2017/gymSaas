@@ -42,13 +42,13 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
     declare getAccount: BelongsToGetAssociationMixin<Account>;
     declare setAccount: BelongsToSetAssociationMixin<Account, number>;
 
-    declare getHousings: HasManyGetAssociationsMixin<Housing>;
-    declare addHousing: HasManyAddAssociationMixin<Housing, number>;
-    declare addHousings: HasManyAddAssociationsMixin<Housing, number>;
+    declare getHousingPicks: HasManyGetAssociationsMixin<Housing>;
+    declare addHousingPick: HasManyAddAssociationMixin<Housing, number>;
+    declare addHousingPicks: HasManyAddAssociationsMixin<Housing, number>;
 
-    declare getGyms: HasManyGetAssociationsMixin<Gym>;
-    declare addGym: HasManyAddAssociationMixin<Gym, number>;
-    declare addGyms: HasManyAddAssociationsMixin<Gym, number>;
+    declare getGymPicks: HasManyGetAssociationsMixin<Gym>;
+    declare addGymPick: HasManyAddAssociationMixin<Gym, number>;
+    declare addGymPicks: HasManyAddAssociationsMixin<Gym, number>;
 
     public readonly housings?: Housing[];
     public readonly gyms?: Gym[];

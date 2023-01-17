@@ -5,6 +5,7 @@ import { Profile } from "./Profile";
 interface AccountAttributes {
     acctId?: number;
     email: string;
+    name: string;
     passwordHash: string;
     isVerified: boolean | null;
     verificationToken: string | null;
@@ -25,6 +26,7 @@ export type AccountCreationAttributes = Optional<AccountAttributes, AccountOptio
 export class Account extends Model<AccountAttributes, AccountCreationAttributes> implements AccountAttributes {
     public acctId!: number;
     public email!: string;
+    public name!: string;
     public passwordHash!: string;
     public isVerified!: boolean | null;
     public verificationToken!: string | null;
@@ -55,6 +57,10 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                     type: DataTypes.STRING,
                     allowNull: false,
                     unique: true,
+                },
+                name: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
                 },
                 passwordHash: {
                     type: DataTypes.STRING,

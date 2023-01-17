@@ -2,6 +2,7 @@ import { Cache } from "joi";
 import AccountDAO from "../database/dao/account.dao";
 import GymDAO from "../database/dao/gym.dao";
 import HousingDAO from "../database/dao/housing.dao";
+import ProfileDAO from "../database/dao/profile.dao";
 import { Housing } from "../database/models/Housing";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
@@ -16,13 +17,22 @@ class HousingService {
     private housingDAO: HousingDAO;
     private gymDAO: GymDAO;
     private accountDAO: AccountDAO;
+    private profileDAO: ProfileDAO;
     private cacheService: CacheService;
     private scraperService: ScraperService;
 
-    constructor(housingDAO: HousingDAO, gymDAO: GymDAO, accountDAO: AccountDAO, cacheService: CacheService, scraperService: ScraperService) {
+    constructor(
+        housingDAO: HousingDAO,
+        gymDAO: GymDAO,
+        accountDAO: AccountDAO,
+        profileDAO: ProfileDAO,
+        cacheService: CacheService,
+        scraperService: ScraperService,
+    ) {
         this.housingDAO = housingDAO;
         this.gymDAO = gymDAO;
         this.accountDAO = accountDAO;
+        this.profileDAO = profileDAO;
         this.cacheService = cacheService;
         this.scraperService = scraperService;
     }
@@ -40,24 +50,34 @@ class HousingService {
     }
 
     public async getRealURL(apartmentId: number, accountId: number): Promise<string> {
-        const availableCredits = await this.accountDAO.getCurrentCredits(accountId);
-        if (availableCredits <= 0) {
-            return "No credits available";
+        /*
+         * ** also handles deducting credit. if there is ever a payment system, I'll move this into a "payment controller"
+         */
+        // if already revealed, return url
+        const profile = await this.profileDAO.getProfileForAccountId(accountId);
+        if (!profile) {
+            throw Error("No profile found for this account id");
         }
         const housing = await this.housingDAO.getHousingByHousingId(apartmentId);
         if (housing === null) {
             throw new Error("No housing found for this id");
         }
+        const isAlreadyRevealedToAccount = housing.revealedTo.includes(profile.profileId);
+        if (isAlreadyRevealedToAccount) {
+            return createRealUrl(housing.url, housing.source);
+        }
+        const availableCredits = await this.accountDAO.getCurrentCredits(accountId);
+        if (availableCredits <= 0) {
+            return "No credits available";
+        }
+
         // if provider is rentCanada...
         const isFromRentCanada = housing.source === ProviderEnum.rentCanada;
         const alreadyRetrievedUrl = housing.url !== null;
         if (!isFromRentCanada || alreadyRetrievedUrl) {
             // (a) if the result is already there, return it
-            try {
-                await this.accountDAO.deductCredit(accountId);
-            } catch {
-                console.log("Failed to deduct a credit");
-            }
+            this.tryDeductCredit(accountId);
+            this.tryAddRevealedTo(housing, profile.profileId);
             return createRealUrl(housing.url, housing.source);
         }
         if (housing.idAtSource === null) {
@@ -67,11 +87,8 @@ class HousingService {
         // (b) if the result isn't already there, get the real URL using their API, cache the result, then return it
         const urlFromApi = await this.scraperService.getURLForApartment(housing.idAtSource);
         await this.housingDAO.addUrlToHousing(apartmentId, urlFromApi);
-        try {
-            await this.accountDAO.deductCredit(accountId);
-        } catch {
-            console.log("Failed to deduct a credit");
-        }
+        this.tryDeductCredit(accountId);
+        this.tryAddRevealedTo(housing, accountId);
         return createRealUrl(urlFromApi, ProviderEnum.rentCanada);
     }
 
@@ -121,6 +138,24 @@ class HousingService {
     public async deleteAllHousing() {
         const affected = await this.housingDAO.deleteAllHousing();
         return affected;
+    }
+
+    private async tryAddRevealedTo(housing: Housing, profileId: number) {
+        try {
+            await this.housingDAO.addRevealedTo(housing, profileId);
+        } catch (err) {
+            console.log(err);
+            console.log("Failed to add user to revealedTo list");
+        }
+    }
+
+    private async tryDeductCredit(accountId: number) {
+        try {
+            await this.accountDAO.deductCredit(accountId);
+        } catch (err) {
+            console.log(err);
+            console.log("Failed to deduct a credit");
+        }
     }
 }
 

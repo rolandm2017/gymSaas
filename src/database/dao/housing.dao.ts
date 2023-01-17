@@ -95,6 +95,10 @@ class HousingDAO {
         return await Housing.update({ url }, { where: { housingId } });
     }
 
+    public async addRevealedTo(housing: Housing, profileId: number): Promise<void> {
+        await housing.addRevealedTo(profileId);
+    }
+
     public async markQualified(
         cityId: number,
         lowerLimitLatitude: number,
