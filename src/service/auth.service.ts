@@ -275,9 +275,9 @@ class AuthService {
     }
 
     private basicDetails(account: IAccount | Account): IBasicDetails {
-        const { acctId, email, role, updated, isVerified, credits } = account;
+        const { acctId, email, role, updated, isVerified, credits, name } = account;
         const definitelyARole = role as Role;
-        return { acctId, email, role: definitelyARole, updated, isVerified, credits };
+        return { acctId, email, role: definitelyARole, updated, isVerified, credits, name };
     }
 
     private async getAccount(id: number) {

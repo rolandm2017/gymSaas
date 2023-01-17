@@ -78,6 +78,7 @@ class AccountUtil {
         const account: IAccount = {
             acctId: startAccount.acctId,
             email: startAccount.email,
+            name: startAccount.name,
             isVerified: startAccount.isVerified ? startAccount.isVerified : false,
             updated: startAccount.updated ? new Date(startAccount.updated) : new Date(),
             role: startAccount.role as Role,

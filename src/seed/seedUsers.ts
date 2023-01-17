@@ -12,6 +12,7 @@ const pwHash = new AccountUtil(refreshTokenDAO).hash(ADMIN_ACCT_PASSWORD);
 export const SEED_USERS = [
     {
         email: "rolandmackintosh@outlook.com",
+        name: "Roland Mackintosh",
         passwordHash: pwHash,
         isVerified: true,
         verificationToken: "foo",

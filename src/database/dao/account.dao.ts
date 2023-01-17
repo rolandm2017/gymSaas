@@ -1,4 +1,5 @@
 import { Role } from "../../enum/role.enum";
+import { FREE_CREDITS } from "../../util/constants";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { isEmail } from "../../validationSchemas/userAuthSchemas";
 import { Account, AccountCreationAttributes } from "../models/Account";
@@ -19,8 +20,8 @@ class AccountDAO {
         return created;
     }
 
-    public async createGoogleLoginAccount(googleId: string, email: string): Promise<Account> {
-        return await Account.create({ googleId, email, passwordHash: "", role: Role.User, credits: 10 });
+    public async createGoogleLoginAccount(fullName: string, googleId: string, email: string): Promise<Account> {
+        return await Account.create({ googleId, email, passwordHash: "", role: Role.User, credits: FREE_CREDITS, name: fullName });
     }
 
     public async createAdmin(email: string): Promise<number> {

@@ -3,6 +3,7 @@ import { Role } from "../enum/role.enum";
 export interface IAccount {
     acctId: number;
     email: string;
+    name: string;
     isVerified: boolean;
     updated: Date | number; // Date or number repping time
     role: Role;

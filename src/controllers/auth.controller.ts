@@ -288,6 +288,7 @@ class AuthController {
     }
 
     public async healthCheck(request: Request, response: Response) {
+        console.log("HERE 291rm");
         return response.json({ message: "ok" });
     }
 
