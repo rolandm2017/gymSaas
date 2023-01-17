@@ -140,7 +140,7 @@ class AuthService {
     public async revokeToken(tokenString: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
         // revoke token and save
-        refreshToken.revoked = Date.now();
+        refreshToken.revoked = new Date();
         refreshToken.revokedByIp = ipAddress;
         await refreshToken.save();
     }

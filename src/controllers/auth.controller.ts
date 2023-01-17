@@ -124,6 +124,7 @@ class AuthController {
     }
 
     public async revokeToken(request: Request, response: Response, next: NextFunction) {
+        // "log out"
         try {
             // accept token from request body or cookie
             const token = request.body.token || request.cookies.refreshToken;
