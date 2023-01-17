@@ -96,7 +96,7 @@ class HousingDAO {
     }
 
     public async addRevealedTo(housing: Housing, profileId: number): Promise<void> {
-        await housing.addRevealedTo(profileId);
+        await housing.addRevealedToProfile(profileId);
     }
 
     public async markQualified(

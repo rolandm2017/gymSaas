@@ -62,7 +62,8 @@ class HousingService {
         if (housing === null) {
             throw new Error("No housing found for this id");
         }
-        const isAlreadyRevealedToAccount = housing.revealedTo.includes(profile.profileId);
+        const revealedToList = await housing.getRevealedToList();
+        const isAlreadyRevealedToAccount = revealedToList.map(profile => profile.profileId).includes(profile.profileId);
         if (isAlreadyRevealedToAccount) {
             return createRealUrl(housing.url, housing.source);
         }

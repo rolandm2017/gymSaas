@@ -1,5 +1,4 @@
-import { boolean } from "joi";
-import { DataTypes, Model, Sequelize, Optional, ForeignKey, Association } from "sequelize";
+import { DataTypes, Model, Sequelize, Optional, ForeignKey, Association, HasManyGetAssociationsMixin, HasManyAddAssociationMixin } from "sequelize";
 import { Batch } from "./Batch";
 import { City } from "./City";
 import { Profile } from "./Profile";
@@ -46,6 +45,9 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public cityId!: ForeignKey<City["cityId"]>;
     public stateId!: ForeignKey<State["stateId"]>;
     public batchId!: ForeignKey<Batch["batchId"]>;
+
+    declare getRevealedToList: HasManyGetAssociationsMixin<Profile>;
+    declare addRevealedToProfile: HasManyAddAssociationMixin<Profile, number>;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
