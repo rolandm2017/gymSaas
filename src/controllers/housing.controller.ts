@@ -22,16 +22,16 @@ class HousingController {
         this.housingService = housingService;
         this.scraperService = scraperService;
 
-        // public endpoint for demo
-        this.router.get("/demo", this.getDemoContent.bind(this));
         // step 1 of 3 in queuing a scrape
         this.router.post("/viewport-width", detectViewportWidthSchema, this.detectProviderViewportWidth.bind(this));
+        // public endpoint for demo
+        this.router.get("/demo", this.getDemoContent.bind(this));
         // user queries
-        this.router.get("/location", authorize([Role.User]), this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/real-url/:apartmentid", authorize([Role.User]), this.getRealURL.bind(this));
         // admin ish stuff
         this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
-        this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
+        // this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
+        // this.router.get("/location", authorize([Role.User]), this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by-location", this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
         this.router.delete("/all", authorize([Role.Admin]), this.deleteAllApartments.bind(this));

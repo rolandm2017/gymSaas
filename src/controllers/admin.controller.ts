@@ -22,7 +22,7 @@ class AdminController {
         this.adminService = adminService;
         this.taskQueueService = taskQueueService;
         this.housingService = housingService;
-        // batches, apartments
+        // batches, apartments, for admin panel
         this.router.get("/batches/all", authorize([Role.Admin]), this.getAllBatchNumbers.bind(this));
         this.router.get("/task-queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
         this.router.get("/housing/by-location", authorize([Role.Admin]), this.getApartmentsByLocation.bind(this));
@@ -37,6 +37,7 @@ class AdminController {
         // user stuff
         this.router.post("/user/ban", authorize([Role.Admin]), this.banUser.bind(this));
         this.router.post("/user/make-admin", this.makeAdmin.bind(this));
+        // todo: endpoint to view a user's picks and revealed urls, and credits, as admin
         // journey
         this.router.get("/user/journey", authorize([Role.Admin]), this.getUserJourney.bind(this));
         // health check
