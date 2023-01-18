@@ -51,19 +51,6 @@ afterAll(async () => {
     await app.closeDB();
 });
 
-function logTime(a: number) {
-    var d = new Date(); // for now
-    console.log(
-        a.toString() +
-            " - " +
-            d.getHours() +
-            ":" + // => 9
-            d.getMinutes() +
-            ":" + // =>  30
-            d.getSeconds(),
-    ); // => 51
-}
-
 describe("Test auth controller with supertest", () => {
     test("is active", async () => {
         const fullPath = `${path}/health-check`;
