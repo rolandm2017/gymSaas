@@ -1,6 +1,6 @@
-import { GymCreationAttributes } from "../../../src/database/models/Gym";
-import { CityNameEnum } from "../../../src/enum/cityName.enum";
-import { SEED_CITIES } from "../../../src/seed/seedCities";
+import { GymCreationAttributes } from "../../src/database/models/Gym";
+import { CityNameEnum } from "../../src/enum/cityName.enum";
+import { SEED_CITIES } from "../../src/seed/seedCities";
 
 export const dummyGymData: GymCreationAttributes[] = [
     {

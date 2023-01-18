@@ -1,11 +1,31 @@
 import request from "supertest";
 import AccountDAO from "../../src/database/dao/account.dao";
-import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 
-import { emails, passwords, badPasswords, tooShortPassword } from "../mocks/userCredentials";
+
+import HousingDAO from "../../src/database/dao/housing.dao";
+import GymDAO from "../../src/database/dao/gym.dao";
+import ProfileDAO from "../../src/database/dao/profile.dao";
+import StateDAO from "../../src/database/dao/state.dao";
+import CityDAO from "../../src/database/dao/city.dao";
+import { SEED_STATES } from "../../src/seed/seedStates";
+import { SEED_CITIES } from "../../src/seed/seedCities";
+import { HousingCreationAttributes } from "../../src/database/models/Housing";
+import { GymCreationAttributes } from "../../src/database/models/Gym";
+
+import { MontrealHousingSeed } from "../../src/seed/housing/Montreal";
+import { MontrealGymSeed } from "../../src/seed/gyms/Montreal";
+import { SEED_HOUSING } from "../../src/seed/seedHousing";
+import { emails, passwords } from "../mocks/userCredentials";
 import { app, server } from "../mocks/mockServer";
 
+const api = await request(server);
+
+const stateDAO = new StateDAO();
+const cityDAO = new CityDAO();
 let acctDAO: AccountDAO = new AccountDAO();
+const housingDAO: HousingDAO = new HousingDAO(stateDAO, cityDAO);
+const gymDAO: GymDAO = new GymDAO();
+const profileDAO: ProfileDAO = new ProfileDAO();
 
 const validCredentials = {
     name: "Bobby Fisher",
@@ -20,6 +40,18 @@ beforeAll(async () => {
     await app.dropTable("account");
     await app.dropTable("profile");
     await app.dropTable("housing");
+    await app.dropTable("gym");
+    // populate some fresh data
+    // const stateWithId = await stateDAO.createState(SEED_STATES[5]);
+    // const cityWithId = await cityDAO.createCity(SEED_CITIES[9]);
+    for (let i = 0; i < 30; i++) {
+        const housing: HousingCreationAttributes = MontrealHousingSeed[i];
+        await housingDAO.createHousing(housing);
+    }
+    for (let i = 0; i < 10; i++) {
+        const gym: GymCreationAttributes = MontrealGymSeed[i];
+        await gymDAO.createGym(gym);
+    }
 });
 
 afterAll(async () => {
@@ -30,6 +62,7 @@ describe("full e2e test", () => {
     test("full e2e test!", async () => {
         // ** **
         // ** **
+        // (0) test inputs; confirm everything required is there. 15 apartments, 5 gyms. Use seed data.
         // (1) pick some aps and gyms via ip =>
         // (2) register & authenticate =>
         // (3) view faved aps & gyms => add 3 more of each
@@ -38,6 +71,18 @@ describe("full e2e test", () => {
         // (6) "visit" the revealed urls by logging them
         // ** **
         // ** **
+
+        // *#*
+        // *#* (1) pick some aps and gyms via ip
+        // *#*
+        // arrange
+        const someLocationsThatWork = await housingDAO.getAllHousing();
+        // act
+        const getPublicHousingResponse = await 
+
+        // *#*
+        // *#* (2) register and authenticate
+        // *#*
         const authPath = "/auth";
 
         const credentials = { ...validCredentials };
@@ -74,5 +119,7 @@ describe("full e2e test", () => {
         expect(refreshTokenString.length).toBe(80);
 
         // ** Cool, we are now logged in.
-    });
+        // *#*
+        // *#* (3) view faves from pre-authed phase and add 3 more picks
+    }, 40000);
 });

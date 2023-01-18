@@ -19,7 +19,7 @@ interface HousingAttributes {
     idAtSource: number | null;
     taskId?: number;
     cityId?: number;
-    stateId?: number;
+    stateId?: number | null;
     batchId?: number;
     createdAt?: Date;
     updatedAt?: Date;

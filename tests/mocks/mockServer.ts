@@ -66,6 +66,7 @@ import { SEED_STATES } from "../../src/seed/seedStates";
 import { SEED_CITIES } from "../../src/seed/seedCities";
 import GooglePlacesAPI from "../../src/api/googlePlaces";
 import RefreshTokenDAO from "../../src/database/dao/refreshToken.dao";
+import { Gym } from "../../src/database/models/Gym";
 
 class App {
     public app: Application;
@@ -126,7 +127,7 @@ class App {
     }
 
     public async dropTable(
-        tableName: "account" | "resetToken" | "task" | "city" | "housing" | "batch" | "profile" | "wish" | "feedback",
+        tableName: "account" | "resetToken" | "task" | "city" | "housing" | "batch" | "profile" | "wish" | "feedback" | "gym",
     ): Promise<void> {
         // await table.sync({ force: true })
         try {
@@ -148,6 +149,8 @@ class App {
                 await Wish.destroy({ where: {} });
             } else if (tableName === "feedback") {
                 await Feedback.destroy({ where: {} });
+            } else if (tableName === "gym") {
+                await Gym.destroy({ where: {} });
             }
         } catch (err) {
             console.log(err);

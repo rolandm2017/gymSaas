@@ -1,8 +1,9 @@
+import { StateCreationAttributes } from "../database/models/State";
 import { ProvinceIdEnum } from "../enum/canadaProvinceId.enum";
 import { StateNamesEnum } from "../enum/stateName.enum";
 
 // canada
-export const SEED_STATES = [
+export const SEED_STATES: StateCreationAttributes[] = [
     {
         stateId: ProvinceIdEnum.britishColumbia,
         name: StateNamesEnum.britishColumbia,

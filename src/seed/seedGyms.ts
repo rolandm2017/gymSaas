@@ -1,3 +1,4 @@
+// note there is now an entire folder of gyms, listed per city
 export const SEED_GYMS = [
     {
         gyms: [
