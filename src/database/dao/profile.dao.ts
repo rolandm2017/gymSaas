@@ -56,7 +56,7 @@ class ProfileDAO {
     }
 
     public async getAllHousingPicksByAccountId(acctId: number): Promise<Housing[]> {
-        const profile = await Profile.findOne({ include: { required: true, model: Account, where: { acctId } } });
+        const profile = await Profile.findOne({ include: { required: true, model: Account, where: { acctId }, as: "account" } });
 
         if (profile === null) {
             throw new Error("Profile not found for this account id");

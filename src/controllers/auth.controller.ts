@@ -34,8 +34,8 @@ class AuthController {
         this.router.get("/google/callback", googleAuthCallback, this.grantAccessToken.bind(this));
         // ** end passport stuff
         // login & register
-        this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         this.router.post("/register", registerUserSchema, this.register.bind(this));
+        this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         // verify email
         this.router.post("/verify-email", verifyEmailSchema, this.verifyEmail.bind(this));
         this.router.get("/bypass-authentication-token", this.bypassEmail.bind(this));
@@ -93,7 +93,8 @@ class AuthController {
 
     public async register(request: Request, response: Response, next: NextFunction) {
         try {
-            const origin = request.get("origin");
+            const origin = request.get("origin") || ""; // fixme: what on earth is origin and do I even need it?
+            console.log(origin, "97rm");
             if (origin === undefined) {
                 return handleErrorResponse(response, "Origin is required and was undefined");
             }
@@ -146,7 +147,9 @@ class AuthController {
     public async verifyEmail(request: Request, response: Response) {
         try {
             const token = request.body.token;
-            await this.authService.verifyEmail(token);
+            const { success, accountEmail } = await this.authService.verifyEmail(token);
+            if (successfulVerification) {
+            }
             return response.json({ message: "Verification successful, you can now login" });
         } catch (err) {
             return handleErrorResponse(response, err);

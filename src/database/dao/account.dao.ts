@@ -21,7 +21,7 @@ class AccountDAO {
     }
 
     public async createGoogleLoginAccount(fullName: string, googleId: string, email: string): Promise<Account> {
-        return await Account.create({ googleId, email, passwordHash: "", role: Role.User, credits: FREE_CREDITS, name: fullName });
+        return await Account.create({ googleId, email, passwordHash: "", role: Role.User, credits: FREE_CREDITS, name: fullName, ipAddress: "" });
     }
 
     public async createAdmin(email: string): Promise<number> {

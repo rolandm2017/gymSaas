@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import AccountDAO from "../database/dao/account.dao";
+import ProfileDAO from "../database/dao/profile.dao";
 import RefreshTokenDAO from "../database/dao/refreshToken.dao";
 import ResetTokenDAO from "../database/dao/resetToken.dao";
 import { Account } from "../database/models/Account";
@@ -16,6 +17,7 @@ import EmailService from "./email.service";
 class AuthService {
     private accountUtil: AccountUtil;
     private accountDAO: AccountDAO;
+    private profileDAO: ProfileDAO;
     private resetTokenDAO: ResetTokenDAO;
     private emailService: EmailService;
     private refreshTokenDAO: RefreshTokenDAO;
@@ -23,13 +25,15 @@ class AuthService {
         emailService: EmailService,
         accountUtil: AccountUtil,
         accountDAO: AccountDAO,
+        profileDAO: ProfileDAO,
         resetTokenDAO: ResetTokenDAO,
         refreshTokenDAO: RefreshTokenDAO,
     ) {
         this.emailService = emailService;
         this.accountUtil = accountUtil;
-        this.resetTokenDAO = resetTokenDAO;
         this.accountDAO = accountDAO;
+        this.resetTokenDAO = resetTokenDAO;
+        this.profileDAO = profileDAO;
         this.refreshTokenDAO = refreshTokenDAO;
     }
 
@@ -103,6 +107,22 @@ class AuthService {
         };
     }
 
+    public async createOrAssociateProfile(email: string): Promise<void> {
+        const accountArr = await this.accountDAO.getAccountByEmail(email);
+        if (accountArr.length === 0) throw new Error("No account found for this email");
+        if (accountArr.length >= 2) throw new Error("More than one account found for this email");
+        const account = accountArr[0];
+        const accountIp = account.ipAddress;
+        const relatedProfile = await this.profileDAO.getProfileByIp(accountIp);
+        if (relatedProfile === null) {
+            const created = await this.profileDAO.createProfileByIp(accountIp);
+            await this.accountDAO.associateAccountWithProfile(account.acctId, created);
+            return;
+        }
+        await this.accountDAO.associateAccountWithProfile(account.acctId, relatedProfile);
+        return;
+    }
+
     public async refreshToken(tokenString: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
         // todo: kmChangeToLatlong
@@ -145,13 +165,14 @@ class AuthService {
         await refreshToken.save();
     }
 
-    public async verifyEmail(token: string) {
+    public async verifyEmail(token: string): Promise<{ success: boolean; accountEmail: string }> {
         const account: Account | null = await this.accountDAO.getAccountByVerificationToken(token);
         if (account === null) throw new Error("Verification failed");
 
         account.verificationToken = ""; // string value that is closest to 'undefined'
         account.isVerified = true;
         await account.save();
+        return { success: true, accountEmail: account.email };
     }
 
     public async updatePassword(email: string, oldPw: string, newPw: string) {

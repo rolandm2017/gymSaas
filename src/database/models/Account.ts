@@ -15,6 +15,7 @@ interface AccountAttributes {
     isBanned?: boolean | null;
     googleId?: string | null;
     credits: number;
+    ipAddress: string;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -37,6 +38,7 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
     public isBanned!: boolean;
     public googleId!: string | null;
     public credits!: number;
+    public ipAddress!: string;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -97,6 +99,10 @@ export class Account extends Model<AccountAttributes, AccountCreationAttributes>
                 credits: {
                     type: DataTypes.INTEGER,
                     allowNull: true,
+                },
+                ipAddress: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
                 },
             },
             {
