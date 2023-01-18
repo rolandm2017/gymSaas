@@ -42,13 +42,15 @@ class AuthController {
         // tokens
         this.router.post("/refresh-token", this.refreshToken.bind(this));
         // note: /revoke-token === /log-out
-        this.router.post("/revoke-token", authorize(), revokeTokenSchema, this.revokeToken.bind(this));
+        this.router.post("/revoke-token", authorize([Role.User]), revokeTokenSchema, this.revokeToken.bind(this));
         // update pw
-        this.router.post("/update-password", authorize(), updatePasswordSchema, this.updatePassword.bind(this));
+        this.router.post("/update-password", authorize([Role.User]), updatePasswordSchema, this.updatePassword.bind(this));
         // pw reset
         this.router.post("/forgot-password", forgotPasswordSchema, this.forgotPassword.bind(this));
         this.router.post("/validate-reset-token", validateResetTokenSchema, this.validateResetToken.bind(this));
         this.router.post("/reset-password", resetPasswordSchema, this.resetPassword.bind(this));
+        // misc - payment stuff
+        this.router.get("/remaining-credits", authorize([Role.User]), this.getRemainingCredits.bind(this));
         // authorized routes
         this.router.get("/", authorize([Role.Admin]), this.getAllAccounts.bind(this));
         this.router.get("/:id", authorize(), this.getAccountById.bind(this));
@@ -224,6 +226,18 @@ class AuthController {
             const success = await this.authService.resetPassword(token, password);
             if (success) return response.json({ message: "Password reset successful, you can now login" });
             else return response.json({ message: "Reset password failed" });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    public async getRemainingCredits(request: Request, response: Response) {
+        try {
+            if (request.user === undefined) return handleErrorResponse(response, "User missing");
+            const acctId = request.user.acctId;
+
+            const remainingCredits = await this.authService.getRemainingCredits(acctId);
+            return response.status(200).json({ remainingCredits });
         } catch (err) {
             return handleErrorResponse(response, err);
         }

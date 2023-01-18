@@ -232,6 +232,7 @@ describe("full e2e test", () => {
         const revealTargetOne = housingIdsToReveal[0];
         const revealTargetTwo = housingIdsToReveal[1];
         const revealTargetThree = housingIdsToReveal[2];
+        const numOfReveals = [revealTargetOne, revealTargetTwo, revealTargetThree].length;
         // act
         const revealResponseOne = await api.get(getRealUrlPath + revealTargetOne).set("Authorization", `Bearer ${jwtToken}`);
         const revealResponseTwo = await api.get(getRealUrlPath + revealTargetTwo).set("Authorization", `Bearer ${jwtToken}`);
@@ -251,15 +252,18 @@ describe("full e2e test", () => {
         // View the updated reveals list
         const revealedUrlListResTwo = await api.get(revealedUrlPath).set("Authorization", `Bearer ${jwtToken}`);
         const revealedUrlListTwo = revealedUrlListResTwo.body.revealedUrls;
-        expect(revealedUrlListTwo.length).toBe(3); // starting deal
+        expect(revealedUrlListTwo.length).toBe(numOfReveals); // starting deal
 
         // verify credits were deducted
+        const remainingCreditsRoute = "/auth/remaining-credits";
+        const remainingCreditsRes = await api.get(remainingCreditsRoute).set("Authorization", `Bearer ${jwtToken}`);
+        const remainingCredits = remainingCreditsRes.body.remainingCredits;
+        expect(remainingCredits).toBe(FREE_CREDITS - numOfReveals);
 
         // **
         // (6) "visit" the revealed urls by logging them
 
-        console.log(revealedUrlOne);
-        console.log(revealedUrlTwo);
-        console.log(revealedUrlThree);
+        console.log(revealedUrlListTwo);
+        revealedUrlListTwo.map(url => expect(url).toBeDefined());
     }, 40000);
 });

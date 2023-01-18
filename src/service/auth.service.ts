@@ -240,6 +240,14 @@ class AuthService {
         return true;
     }
 
+    public async getRemainingCredits(acctId: number): Promise<number> {
+        const acct = await this.accountDAO.getAccountById(acctId);
+        if (acct === null) {
+            throw Error("No account found for this id");
+        }
+        return acct.credits;
+    }
+
     // authorized
     public async getAllAccounts() {
         const accounts: Account[] = await this.accountDAO.getAllAccounts();
