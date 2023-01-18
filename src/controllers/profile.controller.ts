@@ -68,14 +68,11 @@ class ProfileController {
 
     public async recordAuthedPickHousing(request: Request, response: Response) {
         try {
-            //
-            // const userId =
             if (request.user === undefined) {
                 return handleErrorResponse(response, "User is required");
             }
             const acctId = request.user.acctId;
             const housingId = request.body.housingId;
-            // const housingId = request.body.housingId;
             const newPickId = await this.profileService.recordAuthedPickHousing(acctId, housingId);
             return response.status(200).json({ newPickId, status: "Confirmed" });
         } catch (err) {

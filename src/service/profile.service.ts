@@ -7,7 +7,6 @@ import { Housing } from "../database/models/Housing";
 import { Profile } from "../database/models/Profile";
 import { IHousing } from "../interface/Housing.interface";
 import { removeUrl } from "../util/removeUrl";
-import { throwIfNull } from "../util/throwIfNull";
 
 class ProfileService {
     private profileDAO: ProfileDAO;

@@ -18,6 +18,8 @@ import { emails, passwords } from "../mocks/userCredentials";
 import { app, server } from "../mocks/mockServer";
 import { IDemoHousing } from "../../src/interface/DemoHousing.interface";
 import { IHousing } from "../../src/interface/Housing.interface";
+import { pid } from "process";
+import { FREE_CREDITS } from "../../src/util/constants";
 
 const api = await request(server);
 
@@ -92,7 +94,7 @@ describe("full e2e test", () => {
         // (2) register & authenticate =>
         // (3) view faved aps & gyms => add 3 more of each
         // (4) view updated faves => view the empty 'revealed url' list
-        // (5) reveal url 3x => view the updated reveals list
+        // (5) reveal url 3x => view the updated reveals list => verify credits are deducted
         // (6) "visit" the revealed urls by logging them
         // ** **
         // ** **
@@ -144,6 +146,8 @@ describe("full e2e test", () => {
             acceptsTerms: true,
         };
         const adminSignupRes = await api.post(`${authPath}/register`).set("origin", "testSuite").send(adminCredentials);
+
+        // **
         // now register our first real user,
         const credentials = { ...validCredentials };
         const pw = "hatsaregreaT5%";
@@ -165,6 +169,7 @@ describe("full e2e test", () => {
         expect(authenticationRes.body.email).toBe(credentials.email);
         expect(authenticationRes.body.acctId).toBeDefined();
         expect(authenticationRes.body.isVerified).toBe(true); // the goods! verification successful.
+        expect(authenticationRes.body.credits).toBe(FREE_CREDITS); // because none were used yet.
         console.log(authenticationRes.body, "120rm");
         expect(authenticationRes.body.name).toBeDefined();
         expect(authenticationRes.body.name).toBe(validCredentials.name); // name exists!
@@ -181,12 +186,14 @@ describe("full e2e test", () => {
         // *#*
         // *#* (3) view faves from pre-authed phase and add 3 more picks
 
+        // "View faves from pre-authed phase"
         // this part of the test will confirm whether or not an account is tied to ip on signup.
         const faveRetrievalRoute = "/profile/all/picks/housing";
         const favesResponse = await api.get(faveRetrievalRoute).set("Authorization", `Bearer ${jwtToken}`);
         const stepThreeFaves = favesResponse.body.housingPicks;
         expect(stepThreeFaves.length).toBe(numOfFavorites); // same as the pre-auth picks
 
+        // "Add 3 more picks"
         const availableApsRoute = "/housing/by-location";
         const availableFavoritesRes = await api
             .get(availableApsRoute)
@@ -194,8 +201,65 @@ describe("full e2e test", () => {
             .query({ cityId: destinationCityId });
         const availableFavorites: IHousing[] = availableFavoritesRes.body.apartments;
         expect(availableFavorites.length).toBeGreaterThan(3);
-        for (let i = 0; i < 3; i++) {
+
+        const addFavoriteRoute = "/profile/authed-pick/housing";
+        const furtherFavoritesAdditions = 3;
+        for (let i = 0; i < furtherFavoritesAdditions; i++) {
             const newFavorite = availableFavorites[i];
+            const addedRes = await api.post(addFavoriteRoute).set("Authorization", `Bearer ${jwtToken}`).send({ housingId: newFavorite.housingId });
+            const proofOfAdded = addedRes.body.newPickId;
+            expect(proofOfAdded).toBeDefined();
+            expect(proofOfAdded).toBe(newFavorite.housingId);
         }
+
+        // **
+        // (4) view updated faves => view the empty 'revealed url' list
+        const favesResponseTwo = await api.get(faveRetrievalRoute).set("Authorization", `Bearer ${jwtToken}`);
+        const stepFourFaves = favesResponseTwo.body.housingPicks;
+        // ** Now expect 6 items in the favorites list.
+        expect(stepFourFaves.length).toBe(numOfFavorites + furtherFavoritesAdditions);
+
+        // view empty 'revealed url' list
+        const revealedUrlPath = "/housing/real-url-list";
+        const revealedUrlListRes = await api.get(revealedUrlPath).set("Authorization", `Bearer ${jwtToken}`);
+        const revealedUrlList = revealedUrlListRes.body.revealedUrls;
+        expect(revealedUrlList.length).toBe(0); // starting deal
+
+        // **
+        // (5) reveal url 3x => view the updated reveals list => verify credits are deducted
+        const getRealUrlPath = "/housing/real-url";
+        const housingIdsToReveal = stepFourFaves.map((h: IHousing) => h.housingId);
+        const revealTargetOne = housingIdsToReveal[0];
+        const revealTargetTwo = housingIdsToReveal[1];
+        const revealTargetThree = housingIdsToReveal[2];
+        // act
+        const revealResponseOne = await api.get(getRealUrlPath + revealTargetOne).set("Authorization", `Bearer ${jwtToken}`);
+        const revealResponseTwo = await api.get(getRealUrlPath + revealTargetTwo).set("Authorization", `Bearer ${jwtToken}`);
+        const revealResponseThree = await api.get(getRealUrlPath + revealTargetThree).set("Authorization", `Bearer ${jwtToken}`);
+        // apartmentId, realURL,
+        const revealedResponsePayloadOne = revealResponseOne.body;
+        const revealedResponsePayloadTwo = revealResponseTwo.body;
+        const revealedResponsePayloadThree = revealResponseThree.body;
+        // assert
+        expect(revealedResponsePayloadOne.apartmentId).toBe(revealTargetOne);
+        expect(revealedResponsePayloadOne.realURL).toBeDefined();
+        expect(revealedResponsePayloadTwo.apartmentId).toBe(revealTargetTwo);
+        expect(revealedResponsePayloadTwo.realURL).toBeDefined();
+        expect(revealedResponsePayloadThree.apartmentId).toBe(revealTargetThree);
+        expect(revealedResponsePayloadThree.realURL).toBeDefined();
+
+        // View the updated reveals list
+        const revealedUrlListResTwo = await api.get(revealedUrlPath).set("Authorization", `Bearer ${jwtToken}`);
+        const revealedUrlListTwo = revealedUrlListResTwo.body.revealedUrls;
+        expect(revealedUrlListTwo.length).toBe(3); // starting deal
+
+        // verify credits were deducted
+
+        // **
+        // (6) "visit" the revealed urls by logging them
+
+        console.log(revealedUrlOne);
+        console.log(revealedUrlTwo);
+        console.log(revealedUrlThree);
     }, 40000);
 });

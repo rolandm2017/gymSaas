@@ -10,6 +10,7 @@ import HousingService from "../service/housing.service";
 import TaskQueueService from "../service/taskQueue.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { isEmail, isProvider, isString, isStringInteger } from "../validationSchemas/inputValidation";
+import { IHousing } from "../interface/Housing.interface";
 
 class AdminController {
     public path = "/admin";
@@ -83,7 +84,8 @@ class AdminController {
             const batchNumInput = request.query.batchNum;
             const cityId = isStringInteger(cityIdInput);
             const batchNum = isStringInteger(batchNumInput);
-            const aps: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(cityId, batchNum);
+            const aps: IHousing[] = await this.housingService.getHousingByCityIdAndBatchNum(cityId, batchNum);
+            // todo: make admin controller have access to the urls. but only the admin controller & getRealURL & getRevealedList
             return response.status(200).json({ apartments: aps });
         } catch (err) {
             return handleErrorResponse(response, err);

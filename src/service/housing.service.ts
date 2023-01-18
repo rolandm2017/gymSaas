@@ -8,11 +8,12 @@ import { Profile } from "../database/models/Profile";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
 import { IHousing } from "../interface/Housing.interface";
+import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
 import { IQualificationReport } from "../interface/QualificationReport.interface";
 import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../util/acceptableRadiusForWalking";
 import { createRealUrl } from "../util/createRealUrl";
 import { convertHousingsToDemoHousings } from "../util/housingConverter";
-import { removeBulkURLs, removeUrl, removeURLsBulk } from "../util/removeUrl";
+import { removeBulkURLs } from "../util/removeUrl";
 import CacheService from "./cache.service";
 import ScraperService from "./scraper.service";
 
@@ -56,7 +57,7 @@ class HousingService {
          * ** also handles deducting credit. if there is ever a payment system, I'll move this into a "payment controller"
          */
         const profile = await this.profileDAO.getProfileForAccountId(accountId);
-        if (!profile) {
+        if (profile === null) {
             throw Error("No profile found for this account id");
         }
         const housing = await this.housingDAO.getHousingByHousingId(apartmentId);
@@ -93,6 +94,15 @@ class HousingService {
         this.tryDeductCredit(accountId);
         this.tryAddRevealedTo(profile, housing.housingId);
         return createRealUrl(urlFromApi, ProviderEnum.rentCanada);
+    }
+
+    public async getRevealedRealUrlList(acctId: number): Promise<Housing[]> {
+        const profile = await this.profileDAO.getProfileForAccountId(acctId);
+        if (profile === null) {
+            throw Error("No profile found for this account id");
+        }
+        const housings = await profile.getRevealedToList();
+        return housings;
     }
 
     public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number): Promise<IHousing[]> {

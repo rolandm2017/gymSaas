@@ -30,6 +30,7 @@ class HousingController {
         this.router.get("/demo", this.getDemoContent.bind(this));
         // user queries
         this.router.get("/real-url/:apartmentid", authorize([Role.User]), this.getRealURL.bind(this));
+        this.router.get("/real-url-list", authorize([Role.User]), this.getRevealedRealUrlList.bind(this));
         // admin ish stuff
         this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
         // this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
@@ -121,10 +122,24 @@ class HousingController {
         }
     }
 
+    public async getRevealedRealUrlList(request: Request, response: Response) {
+        try {
+            //
+            const userId = request.user?.acctId;
+            if (userId === undefined) {
+                return handleErrorResponse(response, "No user defined on request");
+            }
+            const revealedUrls = await this.housingService.getRevealedRealUrlList(userId);
+            return response.status(200).json({ revealedUrls });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
     public async getAllApartments(request: Request, response: Response) {
         // Really: "Get ALL."
         try {
-            const apartments: Housing[] = await this.housingService.getAllHousing();
+            const apartments: IHousing[] = await this.housingService.getAllHousing();
             return response.status(200).json({ apartments, length: apartments.length });
         } catch (err) {
             return handleErrorResponse(response, err);
