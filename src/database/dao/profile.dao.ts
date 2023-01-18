@@ -51,6 +51,17 @@ class ProfileDAO {
         }
     }
 
+    public async recordAuthedPickHousing(profileId: number, housing: Housing): Promise<Profile> {
+        const profile = await Profile.findOne({ where: { profileId } });
+        if (profile === null) {
+            throw Error("No profile found for this id");
+        }
+        await profile.addHousingPick(housing);
+        return profile;
+    }
+
+    // **
+    // ** read section
     public async getProfileForAccountId(accountId: number): Promise<Profile | null> {
         return await Profile.findOne({ include: { required: true, model: Account, where: { acctId: accountId }, as: "account" } });
     }

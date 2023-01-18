@@ -5,6 +5,9 @@ import ProfileDAO from "../database/dao/profile.dao";
 import { Gym } from "../database/models/Gym";
 import { Housing } from "../database/models/Housing";
 import { Profile } from "../database/models/Profile";
+import { IHousing } from "../interface/Housing.interface";
+import { removeUrl } from "../util/removeUrl";
+import { throwIfNull } from "../util/throwIfNull";
 
 class ProfileService {
     private profileDAO: ProfileDAO;
@@ -35,12 +38,29 @@ class ProfileService {
         return await this.profileDAO.recordPublicPickGym(ipAddress, gym);
     }
 
-    public async getAllHousingPicks(acctId: number): Promise<Housing[]> {
-        return await this.profileDAO.getAllHousingPicksByAccountId(acctId);
+    public async recordAuthedPickHousing(acctId: number, housingId: number): Promise<number> {
+        const profile = await this.profileDAO.getProfileForAccountId(acctId);
+        if (profile === null) {
+            throw Error("Profile not found for this account id");
+        }
+        const housing = await this.housingDAO.getHousingByHousingId(housingId);
+        if (housing === null) {
+            throw Error("Housing not found for this housing id");
+        }
+        await this.profileDAO.recordAuthedPickHousing(profile.profileId, housing);
+        return housingId; // if returned, success!
     }
 
-    public async getAllHousingPicksByIp(ipAddr: string): Promise<Housing[]> {
-        return await this.profileDAO.getAllHousingPicksByIp(ipAddr);
+    public async getAllHousingPicks(acctId: number): Promise<IHousing[]> {
+        const housings = await this.profileDAO.getAllHousingPicksByAccountId(acctId);
+        const housingWithoutUrls: IHousing[] = housings.map(h => removeUrl(h));
+        return housingWithoutUrls;
+    }
+
+    public async getAllHousingPicksByIp(ipAddr: string): Promise<IHousing[]> {
+        const housings = await this.profileDAO.getAllHousingPicksByIp(ipAddr);
+        const housingWithoutUrls: IHousing[] = housings.map(h => removeUrl(h));
+        return housingWithoutUrls;
     }
 
     public async getAllGymPicks(acctId: number): Promise<Gym[]> {

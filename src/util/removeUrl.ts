@@ -14,3 +14,7 @@ export function removeUrl(housing: Housing): IHousing {
     const withoutUrl: IHousing = { ...housing };
     return withoutUrl;
 }
+
+export function removeBulkURLs(housings: Housing[]): IHousing[] {
+    return housings.map(h => removeUrl(h));
+}

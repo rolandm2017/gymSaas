@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 
 import { HealthCheck } from "../enum/healthCheck.enum";
 import { Role } from "../enum/role.enum";
+import { IHousing } from "../interface/Housing.interface";
 import authorize from "../middleware/authorize.middleware";
 import ProfileService from "../service/profile.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
@@ -17,6 +18,8 @@ class ProfileController {
         this.router.post("/create", this.associateProfileWithUser.bind(this));
         this.router.post("/pick-public/housing", this.recordPublicPickHousing.bind(this));
         this.router.post("/pick-public/gym", this.recordPublicPickGym.bind(this));
+        this.router.post("/authed-pick/housing", this.recordAuthedPickHousing.bind(this));
+        this.router.post("/authed-pick/gym", this.recordPickGymWithAuth.bind(this));
         this.router.get("/all/picks/housing", authorize([Role.User]), this.getAllHousingPicks.bind(this));
         this.router.get("/all/picks/housing/by-ip", this.getAllHousingPicksByIp.bind(this));
         this.router.get("/all/picks/gym", authorize([Role.User]), this.getAllGymPicks.bind(this));
@@ -63,17 +66,36 @@ class ProfileController {
         }
     }
 
-    public async recordPickWithAuth(request: Request, response: Response) {
+    public async recordAuthedPickHousing(request: Request, response: Response) {
         try {
             //
             // const userId =
+            if (request.user === undefined) {
+                return handleErrorResponse(response, "User is required");
+            }
+            const acctId = request.user.acctId;
+            const housingId = request.body.housingId;
             // const housingId = request.body.housingId;
-            return response.status(200).json();
+            const newPickId = await this.profileService.recordAuthedPickHousing(acctId, housingId);
+            return response.status(200).json({ newPickId, status: "Confirmed" });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
     }
 
+    public async recordPickGymWithAuth(request: Request, response: Response) {
+        try {
+            if (request.user === undefined) {
+                return handleErrorResponse(response, "User is required");
+            }
+            // todo
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    // **
+    // ** read section
     public async getAllHousingPicks(request: Request, response: Response) {
         try {
             //
@@ -93,7 +115,7 @@ class ProfileController {
             // probably useful only in testing.
             // jan18 - its also useful for showing the unauthed user what they've picked
             const ip = request.ip;
-            const housingPicks = await this.profileService.getAllHousingPicksByIp(ip);
+            const housingPicks: IHousing[] = await this.profileService.getAllHousingPicksByIp(ip);
             return response.status(200).json({ housingPicks });
         } catch (err) {
             return handleErrorResponse(response, err);

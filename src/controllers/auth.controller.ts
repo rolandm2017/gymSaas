@@ -130,7 +130,9 @@ class AuthController {
             // accept token from request body or cookie
             const token = request.body.token || request.cookies.refreshToken;
             const ipAddress = request.ip;
-            if (request.user === undefined) return handleErrorResponse(response, "User is required");
+            if (request.user === undefined) {
+                return handleErrorResponse(response, "User is required");
+            }
             if (!token) return handleErrorResponse(response, "Token is required");
             // users can revoke their own tokens and admins can revoke any tokens
             const userOwnsToken = await this.authService.userOwnsToken(request.user.acctId, token);
@@ -148,7 +150,12 @@ class AuthController {
         try {
             const token = request.body.token;
             const { success, accountEmail } = await this.authService.verifyEmail(token);
-            if (successfulVerification) {
+            if (success) {
+                try {
+                    await this.authService.createOrAssociateProfile(accountEmail);
+                } catch (err) {
+                    return handleErrorResponse(response, err);
+                }
             }
             return response.json({ message: "Verification successful, you can now login" });
         } catch (err) {

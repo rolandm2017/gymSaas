@@ -16,6 +16,8 @@ import { MontrealGymSeed } from "../../src/seed/gyms/Montreal";
 import { SEED_HOUSING } from "../../src/seed/seedHousing";
 import { emails, passwords } from "../mocks/userCredentials";
 import { app, server } from "../mocks/mockServer";
+import { IDemoHousing } from "../../src/interface/DemoHousing.interface";
+import { IHousing } from "../../src/interface/Housing.interface";
 
 const api = await request(server);
 
@@ -39,6 +41,8 @@ let latMin = 90; // see prev comment
 let longMin = -180;
 let longMax = 0;
 
+let destinationCityId = 0;
+
 const availableDemoHousingForTest = 15;
 const availableGymsForTest = 10;
 
@@ -51,6 +55,7 @@ beforeAll(async () => {
     // populate some fresh data
     // const stateWithId = await stateDAO.createState(SEED_STATES[5]);
     // const cityWithId = await cityDAO.createCity(SEED_CITIES[9]);
+    destinationCityId = MontrealHousingSeed[0].cityId;
     for (let i = 0; i < availableDemoHousingForTest; i++) {
         const housing: HousingCreationAttributes = MontrealHousingSeed[i];
         // record min and max so we can aim the viewport in test
@@ -117,8 +122,8 @@ describe("full e2e test", () => {
         const favoritesByIpResponse = await api.get(getFavoritesByIpPath);
         const favorites = favoritesByIpResponse.body.housingPicks;
         expect(favorites.length).toBe(numOfFavorites);
-        const choicesIds = choices.map(h => h.housingId);
-        const favoritesIds = favorites.map(h => h.housingId);
+        const choicesIds = choices.map((h: IDemoHousing) => h.housingId);
+        const favoritesIds = favorites.map((h: IHousing) => h.housingId);
         for (let i = 0; i < favoritesIds.length; i++) {
             const favoriteWasInChoices = choicesIds.includes(favoritesIds[i]);
             expect(favoriteWasInChoices).toBe(true);
@@ -132,13 +137,16 @@ describe("full e2e test", () => {
 
         // first, get the admin account out of the way.
         const adminCredentials = {
-            name: "Roland Mackintosh", email: "whatever@gmail.com", password: "fooFOO4$", confirmPassword: "fooFOO4$", acceptsTerms: true
-        }
+            name: "Roland Mackintosh",
+            email: "whatever@gmail.com",
+            password: "fooFOO4$",
+            confirmPassword: "fooFOO4$",
+            acceptsTerms: true,
+        };
         const adminSignupRes = await api.post(`${authPath}/register`).set("origin", "testSuite").send(adminCredentials);
-        // now register our first real user
+        // now register our first real user,
         const credentials = { ...validCredentials };
-        credentials.email = "foobarbazgirl2@gmail.com";
-        const pw = "catsDOGS444%%";
+        const pw = "hatsaregreaT5%";
         credentials.password = pw;
         credentials.confirmPassword = pw;
         const createUserRes = await api.post(`${authPath}/register`).set("origin", "testSuite").send(credentials);
@@ -174,7 +182,20 @@ describe("full e2e test", () => {
         // *#* (3) view faves from pre-authed phase and add 3 more picks
 
         // this part of the test will confirm whether or not an account is tied to ip on signup.
-        const faveRetrievalRoute = "/profile/all/picks/housing"
-        const favesResponse = await api.get(faveRetrievalRoute).
+        const faveRetrievalRoute = "/profile/all/picks/housing";
+        const favesResponse = await api.get(faveRetrievalRoute).set("Authorization", `Bearer ${jwtToken}`);
+        const stepThreeFaves = favesResponse.body.housingPicks;
+        expect(stepThreeFaves.length).toBe(numOfFavorites); // same as the pre-auth picks
+
+        const availableApsRoute = "/housing/by-location";
+        const availableFavoritesRes = await api
+            .get(availableApsRoute)
+            .set("Authorization", `Bearer ${jwtToken}`)
+            .query({ cityId: destinationCityId });
+        const availableFavorites: IHousing[] = availableFavoritesRes.body.apartments;
+        expect(availableFavorites.length).toBeGreaterThan(3);
+        for (let i = 0; i < 3; i++) {
+            const newFavorite = availableFavorites[i];
+        }
     }, 40000);
 });

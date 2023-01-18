@@ -11,6 +11,8 @@ import { isLegitCityName, isProvider, isString, isStringInteger } from "../valid
 import { detectViewportWidthSchema, getHousingByCityIdAndBatchNumSchema } from "../validationSchemas/housingSchemas";
 import authorize from "../middleware/authorize.middleware";
 import { Role } from "../enum/role.enum";
+import { IDemoHousing } from "../interface/DemoHousing.interface";
+import { IHousing } from "../interface/Housing.interface";
 
 class HousingController {
     public path = "/housing";
@@ -32,7 +34,7 @@ class HousingController {
         this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
         // this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         // this.router.get("/location", authorize([Role.User]), this.getSavedApartmentsByLocation.bind(this));
-        this.router.get("/by-location", this.getSavedApartmentsByLocation.bind(this));
+        this.router.get("/by-location", this.getScrapedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
         this.router.delete("/all", authorize([Role.Admin]), this.deleteAllApartments.bind(this));
         // step 4 of queuing a scrape - for after the scrape of the city is done
@@ -56,7 +58,7 @@ class HousingController {
             const swLong = isStringInteger(swLongInput); // min long
 
             console.log("sml #, big ####", swLat, neLat);
-            const demoContent = await this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
+            const demoContent: IDemoHousing[] = await this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
             return response.status(200).json({ demoContent });
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -80,14 +82,14 @@ class HousingController {
         try {
             const byBatchNum = request.body.batchNum;
             const byCityId = request.body.cityId;
-            const housing: Housing[] = await this.housingService.getHousingByCityIdAndBatchNum(byCityId, byBatchNum);
+            const housing: IHousing[] = await this.housingService.getHousingByCityIdAndBatchNum(byCityId, byBatchNum);
             return response.status(200).json({ housing });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
     }
 
-    public async getSavedApartmentsByLocation(request: Request, response: Response) {
+    public async getScrapedApartmentsByLocation(request: Request, response: Response) {
         try {
             const cityIdInput = request.query.cityId;
             const cityNameInput = request.query.cityName;
@@ -97,7 +99,7 @@ class HousingController {
             const stateOrProvince = stateOrProvinceInput ? isString(stateOrProvinceInput) : undefined;
             const legitCityName = cityNameInput ? isLegitCityName(cityNameInput) : undefined;
             const cityId = cityIdInput ? isStringInteger(cityIdInput) : undefined;
-            const apartments: Housing[] = await this.housingService.getAllHousing(cityId, legitCityName, stateOrProvince);
+            const apartments: IHousing[] = await this.housingService.getAllHousing(cityId, legitCityName, stateOrProvince);
             return response.status(200).json({ apartments });
         } catch (err) {
             return handleErrorResponse(response, err);

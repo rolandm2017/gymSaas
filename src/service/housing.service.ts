@@ -7,10 +7,12 @@ import { Housing } from "../database/models/Housing";
 import { Profile } from "../database/models/Profile";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
+import { IHousing } from "../interface/Housing.interface";
 import { IQualificationReport } from "../interface/QualificationReport.interface";
 import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../util/acceptableRadiusForWalking";
 import { createRealUrl } from "../util/createRealUrl";
 import { convertHousingsToDemoHousings } from "../util/housingConverter";
+import { removeBulkURLs, removeUrl, removeURLsBulk } from "../util/removeUrl";
 import CacheService from "./cache.service";
 import ScraperService from "./scraper.service";
 
@@ -40,14 +42,13 @@ class HousingService {
 
     public async getDemoHousing(minLat: number, maxLat: number, minLong: number, maxLong: number): Promise<IDemoHousing[]> {
         const housings: Housing[] = await this.housingDAO.readBetween(10, 90, -5, -120);
-        // const housings: Housing[] = await this.housingDAO.readBetween(minLat, maxLat, minLong, maxLong);
-        const demoHousings: IDemoHousing[] = convertHousingsToDemoHousings(housings);
-        return demoHousings;
+        return convertHousingsToDemoHousings(housings);
     }
 
     //
-    public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<Housing[]> {
-        return await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
+    public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<IHousing[]> {
+        const housings = await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
+        return removeBulkURLs(housings);
     }
 
     public async getRealURL(apartmentId: number, accountId: number): Promise<string> {
@@ -94,8 +95,10 @@ class HousingService {
         return createRealUrl(urlFromApi, ProviderEnum.rentCanada);
     }
 
-    public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number): Promise<Housing[]> {
-        return await this.housingDAO.getHousingByCityIdAndBatchNum(cityId, batchNum);
+    public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number): Promise<IHousing[]> {
+        const housings = await this.housingDAO.getHousingByCityIdAndBatchNum(cityId, batchNum);
+        // const housingWithoutUrls: IHousing[] = housings.map(h => removeUrl(h));
+        return removeBulkURLs(housings);
     }
 
     public async getApartmentsByLocation(cityName: string | undefined): Promise<Housing[]> {

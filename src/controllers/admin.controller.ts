@@ -22,6 +22,8 @@ class AdminController {
         this.adminService = adminService;
         this.taskQueueService = taskQueueService;
         this.housingService = housingService;
+        // todo: remove access to housing service, for organizational purposes...
+        // todo: ...make admin service use housing service.
         // batches, apartments, for admin panel
         this.router.get("/batches/all", authorize([Role.Admin]), this.getAllBatchNumbers.bind(this));
         this.router.get("/task-queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
