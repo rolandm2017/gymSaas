@@ -20,6 +20,7 @@ class HousingDAO {
     }
 
     public async createHousing(housing: HousingCreationAttributes) {
+        console.log(housing, "23rm");
         return await Housing.create({ ...housing });
     }
 

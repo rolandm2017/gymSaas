@@ -2,9 +2,10 @@ import { Housing, HousingCreationAttributes } from "../database/models/Housing";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
 import { IHousing } from "../interface/Housing.interface";
+import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
 
 export function convertIHousingToCreationAttr(
-    house: IHousing,
+    house: IHousingWithUrl,
     provider: ProviderEnum,
     taskId: number,
     cityId: number,

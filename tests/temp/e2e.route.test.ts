@@ -20,8 +20,11 @@ import { IDemoHousing } from "../../src/interface/DemoHousing.interface";
 import { IHousing } from "../../src/interface/Housing.interface";
 import { pid } from "process";
 import { FREE_CREDITS } from "../../src/util/constants";
+import TaskDAO from "../../src/database/dao/task.dao";
+import { ProviderEnum } from "../../src/enum/provider.enum";
+import BatchDAO from "../../src/database/dao/batch.dao";
 
-const api = await request(server);
+const api = request(server);
 
 const stateDAO = new StateDAO();
 const cityDAO = new CityDAO();
@@ -29,6 +32,8 @@ let acctDAO: AccountDAO = new AccountDAO();
 const housingDAO: HousingDAO = new HousingDAO(stateDAO, cityDAO);
 const gymDAO: GymDAO = new GymDAO();
 const profileDAO: ProfileDAO = new ProfileDAO();
+const batchDAO: BatchDAO = new BatchDAO();
+const taskDAO: TaskDAO = new TaskDAO();
 
 const validCredentials = {
     name: "Bobby Fisher",
@@ -55,8 +60,14 @@ beforeAll(async () => {
     await app.dropTable("housing");
     await app.dropTable("gym");
     // populate some fresh data
-    // const stateWithId = await stateDAO.createState(SEED_STATES[5]);
-    // const cityWithId = await cityDAO.createCity(SEED_CITIES[9]);
+    // **
+    // first we have to ensure the batch ids are in the db!
+    await batchDAO.addBatchNum(1);
+    // second we have to ensure all the task ids are in the db.
+    const taskIds = MontrealHousingSeed.map((h: HousingCreationAttributes) => h.housingId);
+    for (const taskId of taskIds) {
+        await taskDAO.createTask({ taskId, lat: 0, long: 0, zoomWidth: 0, providerName: ProviderEnum.rentCanada, lastScan: null, ignore: false });
+    }
     destinationCityId = MontrealHousingSeed[0].cityId;
     for (let i = 0; i < availableDemoHousingForTest; i++) {
         const housing: HousingCreationAttributes = MontrealHousingSeed[i];
@@ -264,6 +275,6 @@ describe("full e2e test", () => {
         // (6) "visit" the revealed urls by logging them
 
         console.log(revealedUrlListTwo);
-        revealedUrlListTwo.map(url => expect(url).toBeDefined());
+        revealedUrlListTwo.map((url: string) => expect(url).toBeDefined());
     }, 40000);
 });

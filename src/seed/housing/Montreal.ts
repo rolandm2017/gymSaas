@@ -1,22 +1,5 @@
 export const MontrealHousingSeed = [
     {
-        housingId: 1,
-        buildingType: "apartment",
-        agreementType: "rent",
-        price: 0,
-        address: "38 Rue Maple",
-        url: "",
-        lat: 45.40781,
-        long: -73.9457994,
-        nearAGym: null,
-        source: "rentCanada",
-        idAtSource: 53831,
-        taskId: 69,
-        stateId: null,
-        cityId: 6,
-        batchId: 1,
-    },
-    {
         housingId: 2,
         buildingType: "apartment",
         agreementType: "rent",

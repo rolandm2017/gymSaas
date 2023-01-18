@@ -13,6 +13,7 @@ import { IHousing } from "../interface/Housing.interface";
 import { convertIHousingToCreationAttr } from "../util/housingConverter";
 import BatchDAO from "../database/dao/batch.dao";
 import CacheService from "./cache.service";
+import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
 
 class TaskQueueService {
     private taskDAO: TaskDAO;
@@ -50,6 +51,7 @@ class TaskQueueService {
                     lastScan: null,
                     batchId: batchNum,
                     cityId: correspondingCityId,
+                    ignore: false,
                 });
                 successes.push({});
             }
@@ -90,7 +92,7 @@ class TaskQueueService {
         batchNum?: number, // same story as above: optional so we can bypass a step during tests.
     ): Promise<{ pass: number; fail: number }> {
         const parser = new Parser(provider);
-        const parsedApartmentData: IHousing[] = parser.parse(apartments);
+        const parsedApartmentData: IHousingWithUrl[] = parser.parse(apartments);
         let successes = 0;
         // get city id for this task because its needed in the housing model for foreign key
         const currentTask = await this.taskDAO.getTaskById(taskId);
