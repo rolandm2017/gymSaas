@@ -43,10 +43,10 @@ const validCredentials = {
     acceptsTerms: true,
 };
 
-let latMax = 0; // start w/ 0, the min, so the values always go up
 let latMin = 90; // see prev comment
-let longMin = -180;
-let longMax = 0;
+let latMax = 0; // start w/ 0, the min, so the values always go up
+let longMin = 0;
+let longMax = -180;
 
 let destinationCityId = 0;
 
@@ -69,23 +69,19 @@ beforeAll(async () => {
         await taskDAO.createTask({ taskId, lat: 0, long: 0, zoomWidth: 0, providerName: ProviderEnum.rentCanada, lastScan: null, ignore: false });
     }
     destinationCityId = MontrealHousingSeed[0].cityId;
+    const addedHousingsLat: number[] = [];
+    const addedHousingsLong: number[] = [];
     for (let i = 0; i < availableDemoHousingForTest; i++) {
         const housing: HousingCreationAttributes = MontrealHousingSeed[i];
         // record min and max so we can aim the viewport in test
-        if (housing.lat > latMax) {
-            latMax = housing.lat;
-        }
-        if (housing.lat < latMin) {
-            latMin = housing.lat;
-        }
-        if (housing.long > longMin) {
-            longMin = housing.long;
-        }
-        if (housing.long < longMax) {
-            longMax = housing.long;
-        }
+        addedHousingsLat.push(housing.lat);
+        addedHousingsLong.push(housing.long);
         await housingDAO.createHousing(housing);
     }
+    latMin = Math.min(...addedHousingsLat);
+    latMax = Math.max(...addedHousingsLat);
+    longMin = Math.min(...addedHousingsLong);
+    longMax = Math.max(...addedHousingsLong);
     for (let i = 0; i < availableGymsForTest; i++) {
         const gym: GymCreationAttributes = MontrealGymSeed[i];
         await gymDAO.createGym(gym);
@@ -117,8 +113,12 @@ describe("full e2e test", () => {
         const someLocationsThatWork = await housingDAO.getAllHousing();
         const publicHousingPath = "/housing/demo";
         // act
+        console.log("lat min, max", latMin, latMax, "120rm");
+        console.log("long min, max", longMin, longMax, "120rm");
         const getDemoHousingResponse = await api.get(publicHousingPath).query({ neLat: latMax, neLong: longMax, swLat: latMin, swLong: longMin });
+
         const demoHousing = getDemoHousingResponse.body.demoContent;
+        console.log(demoHousing, "124rm");
         expect(demoHousing.length).toBe(availableDemoHousingForTest); // we gathered ALL the data.
         const numOfFavorites = 4;
         const choices = demoHousing.slice(0, numOfFavorites);

@@ -1,4 +1,5 @@
 import { Cache } from "joi";
+import { max } from "moment";
 import AccountDAO from "../database/dao/account.dao";
 import GymDAO from "../database/dao/gym.dao";
 import HousingDAO from "../database/dao/housing.dao";
@@ -42,7 +43,7 @@ class HousingService {
     }
 
     public async getDemoHousing(minLat: number, maxLat: number, minLong: number, maxLong: number): Promise<IDemoHousing[]> {
-        const housings: Housing[] = await this.housingDAO.readBetween(10, 90, -5, -120);
+        const housings: Housing[] = await this.housingDAO.readBetween(minLat, maxLat, minLong, maxLong);
         return convertHousingsToDemoHousings(housings);
     }
 
@@ -171,6 +172,13 @@ class HousingService {
             console.log(err);
             console.log("Failed to deduct a credit");
         }
+    }
+
+    public confirmIsGiantSquare(minLat: number, maxLat: number, minLong: number, maxLong: number): boolean {
+        console.log("east-west distance:", maxLong - minLong);
+        console.log("north-south distance:", maxLat - minLat);
+        console.log("is a giant square:", maxLong > minLong && maxLat > minLat);
+        return maxLong > minLong && maxLat > minLat;
     }
 }
 

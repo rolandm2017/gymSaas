@@ -12,8 +12,14 @@ const providerArr = z.union([z.literal(ProviderEnum.rentCanada), z.literal(Provi
 
 export function isStringInteger(testSubject: unknown): number {
     const stringInput = stringSchema.parse(testSubject);
-    const toNumber = parseInt(stringInput, 10);
+    const toNumber = parseInt(stringInput);
     return numberSchema.parse(toNumber);
+}
+
+export function isStringFloat(testSubject: unknown): number {
+    const narrowedToString = isString(testSubject);
+    const toFloat = parseFloat(narrowedToString);
+    return numberSchema.parse(toFloat);
 }
 
 export function isInteger(testSubject: unknown): number {

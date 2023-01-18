@@ -7,7 +7,7 @@ import { Housing } from "../database/models/Housing";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
-import { isLegitCityName, isProvider, isString, isStringInteger } from "../validationSchemas/inputValidation";
+import { isLegitCityName, isProvider, isString, isStringFloat, isStringInteger } from "../validationSchemas/inputValidation";
 import { detectViewportWidthSchema, getHousingByCityIdAndBatchNumSchema } from "../validationSchemas/housingSchemas";
 import authorize from "../middleware/authorize.middleware";
 import { Role } from "../enum/role.enum";
@@ -53,12 +53,17 @@ class HousingController {
             const swLatInput = request.query.swLat;
             const swLongInput = request.query.swLong;
 
-            const neLat = isStringInteger(neLatInput); // max lat
-            const neLong = isStringInteger(neLongInput); // max long
-            const swLat = isStringInteger(swLatInput); // min lat
-            const swLong = isStringInteger(swLongInput); // min long
+            const neLat = isStringFloat(neLatInput); // max lat
+            const neLong = isStringFloat(neLongInput); // max long
+            const swLat = isStringFloat(swLatInput); // min lat
+            const swLong = isStringFloat(swLongInput); // min long
 
-            console.log("sml #, big ####", swLat, neLat);
+            console.log("Lat min, lat max", swLat, neLat);
+            console.log("Long min, long max", swLong, neLong);
+            const isGiantSquare = this.housingService.confirmIsGiantSquare(swLat, neLat, swLong, neLong);
+            if (!isGiantSquare) {
+                return response.status(400).json({ message: "No negative area squares" });
+            }
             const demoContent: IDemoHousing[] = await this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
             return response.status(200).json({ demoContent });
         } catch (err) {
