@@ -4,6 +4,7 @@ import GymDAO from "../database/dao/gym.dao";
 import HousingDAO from "../database/dao/housing.dao";
 import ProfileDAO from "../database/dao/profile.dao";
 import { Housing } from "../database/models/Housing";
+import { Profile } from "../database/models/Profile";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
 import { IQualificationReport } from "../interface/QualificationReport.interface";
@@ -61,9 +62,9 @@ class HousingService {
         if (housing === null) {
             throw new Error("No housing found for this id");
         }
-        const revealedToList = await housing.getRevealedToList();
+        const revealedToList = await profile.getRevealedToList();
         // if already revealed, return url
-        const isAlreadyRevealedToAccount = revealedToList.map(profile => profile.profileId).includes(profile.profileId);
+        const isAlreadyRevealedToAccount = revealedToList.map(housing => housing.housingId).includes(housing.housingId);
         if (isAlreadyRevealedToAccount) {
             return createRealUrl(housing.url, housing.source);
         }
@@ -78,7 +79,7 @@ class HousingService {
         if (!isFromRentCanada || alreadyRetrievedUrl) {
             // (a) if the result is already there, return it
             this.tryDeductCredit(accountId);
-            this.tryAddRevealedTo(housing, profile.profileId);
+            this.tryAddRevealedTo(profile, housing.housingId);
             return createRealUrl(housing.url, housing.source);
         }
         if (housing.idAtSource === null) {
@@ -89,7 +90,7 @@ class HousingService {
         const urlFromApi = await this.scraperService.getURLForApartment(housing.idAtSource);
         await this.housingDAO.addUrlToHousing(apartmentId, urlFromApi);
         this.tryDeductCredit(accountId);
-        this.tryAddRevealedTo(housing, accountId);
+        this.tryAddRevealedTo(profile, housing.housingId);
         return createRealUrl(urlFromApi, ProviderEnum.rentCanada);
     }
 
@@ -141,9 +142,9 @@ class HousingService {
         return affected;
     }
 
-    private async tryAddRevealedTo(housing: Housing, profileId: number) {
+    private async tryAddRevealedTo(profile: Profile, housingId: number) {
         try {
-            await this.housingDAO.addRevealedTo(housing, profileId);
+            await this.profileDAO.addRevealedTo(profile, housingId);
         } catch (err) {
             console.log(err);
             console.log("Failed to add user to revealedTo list");

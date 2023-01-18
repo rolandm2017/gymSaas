@@ -118,6 +118,11 @@ class ProfileDAO {
         return await Profile.findOne({ where: { profileId }, include: Account });
     }
 
+    public async addRevealedTo(profile: Profile, housingId: number): Promise<void> {
+        await profile.addRevealedToProfile(housingId);
+    }
+
+    // update
     public async associateProfileWithAccount(profileId: number, account: Account): Promise<Profile> {
         const profile = await Profile.findOne({ where: { profileId } });
         if (profile === null) {

@@ -46,9 +46,6 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public stateId!: ForeignKey<State["stateId"]>;
     public batchId!: ForeignKey<Batch["batchId"]>;
 
-    declare getRevealedToList: HasManyGetAssociationsMixin<Profile>;
-    declare addRevealedToProfile: HasManyAddAssociationMixin<Profile, number>;
-
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
     public readonly deletedAt!: Date;
