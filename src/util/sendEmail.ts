@@ -14,9 +14,29 @@ async function sendEmail({ to, subject, html, from = config.emailFrom }: ISendEm
         port: config.emailPort,
         auth: { user: config.emailUser, pass: config.emailPassword },
     });
-    // todo: enable email for production
-    console.log("Email disabled until near production");
+    console.log("Sending email to", to);
+    console.warn("Email might be enabled");
     await transporter.sendMail({ from, to, subject, html });
+}
+
+export function verifySMTPConnection(): Promise<boolean> {
+    const transporter = nodemailer.createTransport({
+        host: config.emailHost,
+        port: config.emailPort,
+        secure: true,
+        auth: { user: config.emailUser, pass: config.emailPassword },
+    });
+    return new Promise((resolve, reject) => {
+        transporter.verify(function (error, success) {
+            if (error) {
+                console.log(error);
+                resolve(false);
+            } else {
+                console.log("Server is ready to take our messages");
+                resolve(true);
+            }
+        });
+    });
 }
 
 export default sendEmail;

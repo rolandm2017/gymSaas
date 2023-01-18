@@ -12,6 +12,7 @@ export interface TaskAttributes {
     long: number;
     zoomWidth: number; // 0 = default
     lastScan: Date | null;
+    ignore: null | boolean;
     cityId?: number;
     batchId?: number;
     createdAt?: Date;
@@ -30,6 +31,7 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
     public long!: number;
     public zoomWidth!: number;
     public lastScan!: Date | null;
+    public ignore!: boolean | null;
     public cityId!: ForeignKey<City["cityId"]>;
     public batchId!: ForeignKey<Batch["batchId"]>;
 
@@ -63,6 +65,10 @@ export class Task extends Model<TaskAttributes, TaskCreationAttributes> implemen
                 },
                 lastScan: {
                     type: DataTypes.DATE,
+                    allowNull: true,
+                },
+                ignore: {
+                    type: DataTypes.BOOLEAN,
                     allowNull: true,
                 },
             },
