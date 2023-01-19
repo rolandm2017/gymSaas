@@ -59,14 +59,16 @@ class AccountUtil {
         return hash;
     }
 
-    public async attachMissingDetails(params: IRegistrationDetails): Promise<AccountCreationAttributes> {
+    public async attachMissingDetails(params: IRegistrationDetails, ipAddress: string): Promise<AccountCreationAttributes> {
         const start: any = { ...params };
         const pwHash: string = await this.generatePasswordHash(start.password);
         start.passwordHash = pwHash;
         start.verificationToken = "";
         start.updated = 0;
+        // acct has user role unless one is made by the 'make admin' endpoint in admin controller
         start.role = Role.User;
         start.credits = FREE_CREDITS;
+        start.ipAddress = ipAddress;
         const populated = { ...start } as AccountCreationAttributes;
         return populated;
     }

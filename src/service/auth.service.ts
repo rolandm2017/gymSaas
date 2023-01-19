@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { iap } from "googleapis/build/src/apis/iap";
 import AccountDAO from "../database/dao/account.dao";
 import ProfileDAO from "../database/dao/profile.dao";
 import RefreshTokenDAO from "../database/dao/refreshToken.dao";
@@ -76,8 +77,8 @@ class AuthService {
         };
     }
 
-    public async register(params: IRegistrationDetails, origin: string): Promise<IBasicDetails> {
-        console.log("creating account wiht details", params, "76rm");
+    public async register(params: IRegistrationDetails, ipAddr: string, origin: string): Promise<IBasicDetails> {
+        console.log("creating account with details", params, "76rm");
         const acctsWithThisEmail: Account[] = await this.accountDAO.getAccountByEmail(params.email);
         const emailAlreadyExists: boolean = acctsWithThisEmail.length !== 0;
         if (emailAlreadyExists) {
@@ -86,10 +87,9 @@ class AuthService {
             throw new Error("Account with this email already exists");
         }
         // create account object
-        const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params);
+        const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params, ipAddr);
         const acct: Account = await this.accountDAO.createAccount(acctWithPopulatedFields);
         // acct has user role unless one is made by the 'make admin' endpoint in admin controller
-        acct.role = Role.User;
         acct.verificationToken = this.accountUtil.randomTokenString();
 
         // hash password

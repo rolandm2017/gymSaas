@@ -20,6 +20,7 @@ import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
 import { googleAuth, googleAuthCallback, passportJwt } from "../middleware/passport.middleware";
 import { UserFromGoogle } from "../interface/UserFromGoogle.interface";
+import { iap } from "googleapis/build/src/apis/iap";
 
 class AuthController {
     public path = "/auth";
@@ -97,10 +98,11 @@ class AuthController {
         try {
             const origin = request.get("origin") || ""; // fixme: what on earth is origin and do I even need it?
             console.log(origin, "97rm");
+            const ipAddr = request.ip;
             if (origin === undefined) {
                 return handleErrorResponse(response, "Origin is required and was undefined");
             }
-            const accountDetails: IBasicDetails = await this.authService.register(request.body, origin);
+            const accountDetails: IBasicDetails = await this.authService.register(request.body, ipAddr, origin);
             return response.json({
                 message: "Registration successful, please check your email for verification instructions",
                 accountDetails,
