@@ -69,9 +69,9 @@ class TaskDAO {
     public async getAllUnfinishedTasksForProvider(provider: ProviderEnum, batchNum?: number) {
         let conditions;
         if (batchNum) {
-            conditions = { providerName: provider, lastScan: null, batchId: batchNum };
+            conditions = { providerName: provider, lastScan: null, batchId: batchNum, ignore: false };
         } else {
-            conditions = { providerName: provider, lastScan: null };
+            conditions = { providerName: provider, lastScan: null, ignore: false };
         }
         return await Task.findAll({
             where: conditions,
