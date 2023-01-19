@@ -23,11 +23,9 @@ class ProfileService {
 
     public async recordPublicPickHousing(ipAddress: string, housingId: number): Promise<Profile> {
         const housing = await this.housingDAO.getHousingByHousingId(housingId);
-        console.log(housing === null, "26rm");
         if (housing === null) {
             throw Error("No housing found");
         }
-        console.log(ipAddress, "30rm");
         return await this.profileDAO.recordPublicPickHousing(ipAddress, housing);
     }
 

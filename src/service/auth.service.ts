@@ -78,7 +78,6 @@ class AuthService {
     }
 
     public async register(params: IRegistrationDetails, ipAddr: string, origin: string): Promise<IBasicDetails> {
-        console.log("creating account with details", params, "76rm");
         const acctsWithThisEmail: Account[] = await this.accountDAO.getAccountByEmail(params.email);
         const emailAlreadyExists: boolean = acctsWithThisEmail.length !== 0;
         if (emailAlreadyExists) {
@@ -89,7 +88,6 @@ class AuthService {
         // create account object
         const acctWithPopulatedFields = await this.accountUtil.attachMissingDetails(params, ipAddr);
         const acct: Account = await this.accountDAO.createAccount(acctWithPopulatedFields);
-        // acct has user role unless one is made by the 'make admin' endpoint in admin controller
         acct.verificationToken = this.accountUtil.randomTokenString();
 
         // hash password
@@ -100,7 +98,6 @@ class AuthService {
 
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct);
-        console.log("create account finished 99rm");
         await this.emailService.sendVerificationEmail(account, origin);
         return {
             ...this.basicDetails(account),

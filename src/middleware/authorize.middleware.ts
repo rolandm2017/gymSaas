@@ -33,23 +33,18 @@ function authorize(validRoles: Role[] = []) {
             // Note for Jason Watmore: If you're reading this, it looks like, at some point, express-jwt's devs changed things.
             // see https://stackoverflow.com/questions/34775687/express-jwt-setting-user-object-to-req-user-doc-instead-of-just-req-user
             // I discovered this while googling "jwt secret express jwt req.user"
-            console.log(request.auth, "36rm");
             const acctInfo = request.auth;
             if (acctInfo?.acctId === undefined) {
-                console.log(acctInfo, "39rm");
                 return res.status(401).json({ message: "Unauthorized" });
             }
             request.user = {
                 acctId: acctInfo.acctId,
             };
             const account: Account | null = await acctDAO.getAccountById(acctInfo.acctId);
-            console.log(!account, "46rm");
             if (!account) return res.status(401).json({ message: "Unauthorized" });
             const acctRole: Role = account.role as Role;
             const rolesFoundOnRequest = validRoles.length;
-            console.log(validRoles, acctRole, "51rm");
             if (rolesFoundOnRequest && !validRoles.includes(acctRole)) {
-                console.log(rolesFoundOnRequest, !validRoles.includes(acctRole), "52rm");
                 // account no longer exists or role not authorized
                 return res.status(401).json({ message: "Unauthorized" });
             }

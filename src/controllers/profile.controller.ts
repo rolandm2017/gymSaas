@@ -18,8 +18,8 @@ class ProfileController {
         this.router.post("/create", this.associateProfileWithUser.bind(this));
         this.router.post("/pick-public/housing", this.recordPublicPickHousing.bind(this));
         this.router.post("/pick-public/gym", this.recordPublicPickGym.bind(this));
-        this.router.post("/authed-pick/housing", this.recordAuthedPickHousing.bind(this));
-        this.router.post("/authed-pick/gym", this.recordPickGymWithAuth.bind(this));
+        this.router.post("/authed-pick/housing", authorize([Role.User]), this.recordAuthedPickHousing.bind(this));
+        this.router.post("/authed-pick/gym", authorize([Role.User]), this.recordPickGymWithAuth.bind(this));
         this.router.get("/all/picks/housing", authorize([Role.User]), this.getAllHousingPicks.bind(this));
         this.router.get("/all/picks/housing/by-ip", this.getAllHousingPicksByIp.bind(this));
         this.router.get("/all/picks/gym", authorize([Role.User]), this.getAllGymPicks.bind(this));
@@ -48,7 +48,6 @@ class ProfileController {
         try {
             const ip = request.ip;
             const housingId = request.body.housingId;
-            console.log(ip, housingId, "51rm");
             await this.profileService.recordPublicPickHousing(ip, housingId);
             return response.status(200).json({ message: "Success" });
         } catch (err) {
@@ -69,6 +68,7 @@ class ProfileController {
 
     public async recordAuthedPickHousing(request: Request, response: Response) {
         try {
+            console.log(request.user, "71rm");
             if (request.user === undefined) {
                 return handleErrorResponse(response, "User is required");
             }
@@ -101,7 +101,7 @@ class ProfileController {
                 return handleErrorResponse(response, "No user on request");
             }
             const acctId = request.user.acctId;
-            const housingPicks = await this.profileService.getAllHousingPicks(acctId);
+            const housingPicks: IHousing[] = await this.profileService.getAllHousingPicks(acctId);
             return response.status(200).json({ housingPicks });
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -114,8 +114,6 @@ class ProfileController {
             // jan18 - its also useful for showing the unauthed user what they've picked
             const ip = request.ip;
             const housingPicks: IHousing[] = await this.profileService.getAllHousingPicksByIp(ip);
-            console.log(housingPicks, "117rm");
-            console.log(housingPicks[0], "118rm");
             return response.status(200).json({ housingPicks });
         } catch (err) {
             return handleErrorResponse(response, err);

@@ -50,8 +50,8 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
     declare addGymPick: HasManyAddAssociationMixin<Gym, number>;
     declare addGymPicks: HasManyAddAssociationsMixin<Gym, number>;
 
-    declare getRevealedToList: HasManyGetAssociationsMixin<Housing>;
-    declare addRevealedToProfile: HasManyAddAssociationMixin<Housing, number>;
+    declare getReveals: HasManyGetAssociationsMixin<Housing>;
+    declare addReveal: HasManyAddAssociationMixin<Housing, number>;
 
     public readonly housings?: Housing[];
     public readonly gyms?: Gym[];

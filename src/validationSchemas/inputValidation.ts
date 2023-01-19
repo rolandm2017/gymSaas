@@ -40,7 +40,6 @@ export function isProvider(testSubject: unknown): ProviderEnum {
 
 export function isLegitCityName(testSubject: unknown): CityNameEnum {
     const isCityName = Object.values(CityNameEnum).some(name => name == testSubject);
-    console.log(testSubject, isCityName, "38rm");
     if (isCityName) return testSubject as CityNameEnum;
     else throw new Error("Invalid city name");
 }

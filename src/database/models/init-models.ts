@@ -56,8 +56,8 @@ function initModels(sequelize: Sequelize) {
     Profile.belongsToMany(Housing, { through: "Profile_Housings", as: "favoriteApartments" }); // note the 'as' value WORKS!
     Housing.belongsToMany(Profile, { through: "Profile_Housings", as: "favoritedBy" });
 
-    Profile.belongsToMany(Housing, { through: "Housing_Reveals", as: "revealed_aps" });
-    Housing.belongsToMany(Profile, { through: "Housing_Reveals", as: "revealed_to" });
+    Profile.belongsToMany(Housing, { through: "Housing_Reveals", as: "reveals" });
+    Housing.belongsToMany(Profile, { through: "Housing_Reveals", as: "seer" });
 
     Profile.belongsToMany(Gym, { through: "Profile_Gyms", as: "gyms" });
     Gym.belongsToMany(Profile, { through: "Profile_Gyms", as: "profile" });

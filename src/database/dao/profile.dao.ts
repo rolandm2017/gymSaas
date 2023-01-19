@@ -18,12 +18,10 @@ class ProfileDAO {
 
     public async recordPublicPickHousing(ipAddress: string, housing: Housing): Promise<Profile> {
         const profiles = await Profile.findAll({ where: { ipAddress } });
-        // console.log(profiles, "24rm");
         const noProfilesFound = profiles.length === 0;
         // if ip addr is new, create a profile;
         if (noProfilesFound) {
             const newProfile = await Profile.create({ ipAddress });
-            console.log(newProfile, "26rm");
             await newProfile.addFavoriteApartments([housing]);
             return newProfile;
         } else {
@@ -131,7 +129,7 @@ class ProfileDAO {
     }
 
     public async addRevealedTo(profile: Profile, housingId: number): Promise<void> {
-        await profile.addRevealedToProfile(housingId);
+        await profile.addReveal(housingId);
     }
 
     // update

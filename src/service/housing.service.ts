@@ -65,7 +65,7 @@ class HousingService {
         if (housing === null) {
             throw new Error("No housing found for this id");
         }
-        const revealedToList = await profile.getRevealedToList();
+        const revealedToList = await profile.getReveals();
         // if already revealed, return url
         const isAlreadyRevealedToAccount = revealedToList.map(housing => housing.housingId).includes(housing.housingId);
         if (isAlreadyRevealedToAccount) {
@@ -102,7 +102,7 @@ class HousingService {
         if (profile === null) {
             throw Error("No profile found for this account id");
         }
-        const housings = await profile.getRevealedToList();
+        const housings = await profile.getReveals();
         return housings;
     }
 

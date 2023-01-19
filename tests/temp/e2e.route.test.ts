@@ -99,6 +99,8 @@ describe("full e2e test", () => {
         // (4) view updated faves => view the empty 'revealed url' list
         // (5) reveal url 3x => view the updated reveals list => verify credits are deducted
         // (6) "visit" the revealed urls by logging them
+        // (7) save two apartments using the Map feature
+        // (8) save two apartments using the Search feature
         // ** **
         // ** **
 
@@ -111,7 +113,6 @@ describe("full e2e test", () => {
         const getDemoHousingResponse = await api.get(publicHousingPath).query({ neLat: latMax, neLong: longMax, swLat: latMin, swLong: longMin });
 
         const demoHousing = getDemoHousingResponse.body.demoContent;
-        console.log(demoHousing, "124rm");
         expect(demoHousing.length).toBe(availableDemoHousingForTest); // we gathered ALL the data.
         const numOfFavorites = 4;
         const choices = demoHousing.slice(0, numOfFavorites);
@@ -174,7 +175,6 @@ describe("full e2e test", () => {
         expect(authenticationRes.body.acctId).toBeDefined();
         expect(authenticationRes.body.isVerified).toBe(true); // the goods! verification successful.
         expect(authenticationRes.body.credits).toBe(FREE_CREDITS); // because none were used yet.
-        console.log(authenticationRes.body, "120rm");
         expect(authenticationRes.body.name).toBeDefined();
         expect(authenticationRes.body.name).toBe(validCredentials.name); // name exists!
         // check header for jwt and refresh token
@@ -195,6 +195,7 @@ describe("full e2e test", () => {
         const faveRetrievalRoute = "/profile/all/picks/housing";
         const favesResponse = await api.get(faveRetrievalRoute).set("Authorization", `Bearer ${jwtToken}`);
         const stepThreeFaves = favesResponse.body.housingPicks;
+        console.log(stepThreeFaves, "196rm");
         expect(stepThreeFaves.length).toBe(numOfFavorites); // same as the pre-auth picks
 
         // "Add 3 more picks"
@@ -207,9 +208,16 @@ describe("full e2e test", () => {
         expect(availableFavorites.length).toBeGreaterThan(3);
 
         const addFavoriteRoute = "/profile/authed-pick/housing";
+        // avoid favoriting the same ap twice
+        const stepThreeFavesIds = stepThreeFaves.map((h: IHousing) => h.housingId);
         const furtherFavoritesAdditions = 3;
-        for (let i = 0; i < furtherFavoritesAdditions; i++) {
+        let x = furtherFavoritesAdditions;
+        for (let i = 0; i < x; i++) {
             const newFavorite = availableFavorites[i];
+            if (stepThreeFavesIds.includes(newFavorite.housingId)) {
+                x++;
+                continue; // invalid choice! do not duplicate addition
+            }
             const addedRes = await api.post(addFavoriteRoute).set("Authorization", `Bearer ${jwtToken}`).send({ housingId: newFavorite.housingId });
             const proofOfAdded = addedRes.body.newPickId;
             expect(proofOfAdded).toBeDefined();
@@ -227,6 +235,8 @@ describe("full e2e test", () => {
         const revealedUrlPath = "/housing/real-url-list";
         const revealedUrlListRes = await api.get(revealedUrlPath).set("Authorization", `Bearer ${jwtToken}`);
         const revealedUrlList = revealedUrlListRes.body.revealedUrls;
+
+        console.log(revealedUrlListRes.body, "236rm");
         expect(revealedUrlList.length).toBe(0); // starting deal
 
         // **
@@ -238,18 +248,24 @@ describe("full e2e test", () => {
         const revealTargetThree = housingIdsToReveal[2];
         const numOfReveals = [revealTargetOne, revealTargetTwo, revealTargetThree].length;
         // act
-        const revealResponseOne = await api.get(getRealUrlPath + revealTargetOne).set("Authorization", `Bearer ${jwtToken}`);
-        const revealResponseTwo = await api.get(getRealUrlPath + revealTargetTwo).set("Authorization", `Bearer ${jwtToken}`);
-        const revealResponseThree = await api.get(getRealUrlPath + revealTargetThree).set("Authorization", `Bearer ${jwtToken}`);
+        const revealResponseOne = await api.get(getRealUrlPath + "/" + revealTargetOne).set("Authorization", `Bearer ${jwtToken}`);
+        const revealResponseTwo = await api.get(getRealUrlPath + "/" + revealTargetTwo).set("Authorization", `Bearer ${jwtToken}`);
+        const revealResponseThree = await api.get(getRealUrlPath + "/" + revealTargetThree).set("Authorization", `Bearer ${jwtToken}`);
         // apartmentId, realURL,
         const revealedResponsePayloadOne = revealResponseOne.body;
         const revealedResponsePayloadTwo = revealResponseTwo.body;
         const revealedResponsePayloadThree = revealResponseThree.body;
         // assert
+        console.log(revealedResponsePayloadOne, "257rm");
         expect(revealedResponsePayloadOne.apartmentId).toBe(revealTargetOne);
         expect(revealedResponsePayloadOne.realURL).toBeDefined();
+
+        console.log(revealedResponsePayloadOne.realURL);
         expect(revealedResponsePayloadTwo.apartmentId).toBe(revealTargetTwo);
+        console.log(revealedResponsePayloadTwo.realURL);
+        console.log(revealedResponsePayloadThree.realURL);
         expect(revealedResponsePayloadTwo.realURL).toBeDefined();
+
         expect(revealedResponsePayloadThree.apartmentId).toBe(revealTargetThree);
         expect(revealedResponsePayloadThree.realURL).toBeDefined();
 
@@ -268,6 +284,9 @@ describe("full e2e test", () => {
         // (6) "visit" the revealed urls by logging them
 
         console.log(revealedUrlListTwo);
-        revealedUrlListTwo.map((url: string) => expect(url).toBeDefined());
+        revealedUrlListTwo.map((url: string) => {
+            expect(url).toBeDefined();
+            expect(url.length).toBeGreaterThan(1);
+        });
     }, 40000);
 });

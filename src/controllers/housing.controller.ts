@@ -121,6 +121,7 @@ class HousingController {
             const apartmentIdInput = request.params.apartmentid;
             const apartmentId = isStringInteger(apartmentIdInput);
             const realURL = await this.housingService.getRealURL(apartmentId, userId);
+            console.log(apartmentId, realURL, "124rm");
             return response.status(200).json({ apartmentId, realURL, success: realURL !== "No credits available" });
         } catch (err) {
             return handleErrorResponse(response, err);
@@ -134,7 +135,7 @@ class HousingController {
             if (userId === undefined) {
                 return handleErrorResponse(response, "No user defined on request");
             }
-            const revealedUrls = await this.housingService.getRevealedRealUrlList(userId);
+            const revealedUrls: Housing[] = await this.housingService.getRevealedRealUrlList(userId);
             return response.status(200).json({ revealedUrls });
         } catch (err) {
             return handleErrorResponse(response, err);

@@ -50,7 +50,6 @@ class AccountUtil {
         const token = this.randomTokenString();
         const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const createdByIp = ipAddress;
-        console.log(accountId, "53rm");
         return await this.refreshTokenDAO.createRefreshToken(accountId, token, expires, createdByIp);
     }
 

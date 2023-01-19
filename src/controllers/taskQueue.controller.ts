@@ -92,7 +92,6 @@ class TaskQueueController {
 
     async addGridScanToQueue(request: Request, response: Response) {
         try {
-            console.log("here 95rm");
             const providerInput = request.body.provider;
             const coords = request.body.coords;
             const zoomWidthInput = request.body.zoomWidth;
@@ -106,14 +105,12 @@ class TaskQueueController {
             }
             const zoomWidth = isInteger(zoomWidthInput);
             const batchNum = isInteger(batchNumInput);
-            console.log(cityNameInput, "109rm");
             const legitCityName = isLegitCityName(cityNameInput);
             if (!legitCityName) return handleErrorResponse(response, "cityName was not legit");
 
             const queued = await this.taskQueueService.queueGridScan(provider, coords, zoomWidth, legitCityName, batchNum);
             return response.status(200).json({ queued: queued });
         } catch (err) {
-            console.log("here", err, "115rm");
             return handleErrorResponse(response, err);
         }
     }

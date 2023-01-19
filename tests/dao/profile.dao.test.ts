@@ -148,9 +148,7 @@ describe("profileDAO tests", () => {
         const secondProfileHousing = await profileDAO.recordPublicPickHousing(newIp, housingForTestOne);
         const secondProfileHousingTwo = await profileDAO.recordPublicPickHousing(newIp, housingForTestTwo);
         const secondProfileHousingThree = await profileDAO.recordPublicPickHousing(newIp, housingForBothTests);
-        // console.log(secondProfileHousingThree, "146rm");
         expect(secondProfileHousingThree.profileId).toBeDefined();
-        // console.log(created.profileId, "147rm");
         const existingProfileProfileId = created.profileId;
         const existingProfileProfileIdThree = secondProfileHousingThree.profileId;
         expect(existingProfileProfileId).toBeDefined();

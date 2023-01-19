@@ -55,7 +55,6 @@ describe("Test auth controller with supertest", () => {
     test("is active", async () => {
         const fullPath = `${path}/health-check`;
         const res = await request(server).get(fullPath);
-        console.log(res.body, "72rm");
         expect(res.body.message).toBe("ok");
     });
     // describe("POST /register", () => {
@@ -104,7 +103,6 @@ describe("Test auth controller with supertest", () => {
             expect(authenticationRes.body.email).toBe(credentials.email);
             expect(authenticationRes.body.acctId).toBeDefined();
             expect(authenticationRes.body.isVerified).toBe(true); // the goods! verification successful.
-            console.log(authenticationRes.body, "120rm");
             expect(authenticationRes.body.name).toBeDefined();
             expect(authenticationRes.body.name).toBe(validCredentials.name); // name exists!
             // check header for jwt and refresh token

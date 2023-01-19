@@ -97,7 +97,6 @@ class AuthController {
     public async register(request: Request, response: Response, next: NextFunction) {
         try {
             const origin = request.get("origin") || ""; // fixme: what on earth is origin and do I even need it?
-            console.log(origin, "97rm");
             const ipAddr = request.ip;
             if (origin === undefined) {
                 return handleErrorResponse(response, "Origin is required and was undefined");
@@ -114,16 +113,12 @@ class AuthController {
 
     public async refreshToken(request: Request, response: Response) {
         try {
-            console.log("attempting to refresh token... 113rm");
             const token = request.cookies.refreshToken;
             const ipAddress = request.ip;
-            console.log(token, "116rm");
             const { refreshToken, ...account } = await this.authService.refreshToken(token, ipAddress);
             this.setTokenCookie(response, refreshToken);
-            console.log(refreshToken, "118rm");
             return response.json(account);
         } catch (err) {
-            console.log(err, "121rm");
             return handleErrorResponse(response, err);
         }
     }
@@ -314,7 +309,6 @@ class AuthController {
     }
 
     public async healthCheck(request: Request, response: Response) {
-        console.log("HERE 291rm");
         return response.json({ message: "ok" });
     }
 
@@ -326,7 +320,6 @@ class AuthController {
             sameSite: "none" as const,
             secure: true,
         };
-        console.log(token, "293rm");
         response.cookie("refreshToken", token, cookieOptions);
     }
 }
