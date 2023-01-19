@@ -23,12 +23,13 @@ class ProfileDAO {
         // if ip addr is new, create a profile;
         if (noProfilesFound) {
             const newProfile = await Profile.create({ ipAddress });
-            await newProfile.addHousingPicks([housing]);
+            console.log(newProfile, "26rm");
+            await newProfile.addFavoriteApartments([housing]);
             return newProfile;
         } else {
             // if ip addr is previously seen, update their housing ids
             const profile = profiles[0];
-            await profile.addHousingPicks([housing]);
+            await profile.addFavoriteApartments([housing]);
             return profile;
         }
     }
@@ -56,7 +57,7 @@ class ProfileDAO {
         if (profile === null) {
             throw Error("No profile found for this id");
         }
-        await profile.addHousingPick(housing);
+        await profile.addFavoriteApartment(housing);
         return profile;
     }
 
@@ -72,7 +73,7 @@ class ProfileDAO {
         if (profile === null) {
             throw new Error("Profile not found for this account id");
         }
-        return profile.getHousingPicks();
+        return profile.getFavoriteApartments();
     }
 
     public async getAllHousingPicksByIp(ipAddress: string): Promise<Housing[]> {
@@ -80,7 +81,7 @@ class ProfileDAO {
         if (profile === null) {
             throw new Error("Profile not found for this ip address");
         }
-        const housings = await profile.getHousingPicks();
+        const housings = await profile.getFavoriteApartments();
         return housings;
     }
 
@@ -93,7 +94,7 @@ class ProfileDAO {
         if (profile === null) {
             throw new Error("Profile not found for this profile id");
         }
-        const housings = await profile.getHousingPicks();
+        const housings = await profile.getFavoriteApartments();
         return housings;
     }
 

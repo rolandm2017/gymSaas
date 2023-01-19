@@ -42,9 +42,9 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
     declare getAccount: BelongsToGetAssociationMixin<Account>;
     declare setAccount: BelongsToSetAssociationMixin<Account, number>;
 
-    declare getHousingPicks: HasManyGetAssociationsMixin<Housing>; // "picks" == "favorites"
-    declare addHousingPick: HasManyAddAssociationMixin<Housing, number>;
-    declare addHousingPicks: HasManyAddAssociationsMixin<Housing, number>;
+    declare getFavoriteApartments: HasManyGetAssociationsMixin<Housing>; // "picks" == "favorites"
+    declare addFavoriteApartment: HasManyAddAssociationMixin<Housing, number>;
+    declare addFavoriteApartments: HasManyAddAssociationsMixin<Housing, number>;
 
     declare getGymPicks: HasManyGetAssociationsMixin<Gym>; // "picks" == "favorites"
     declare addGymPick: HasManyAddAssociationMixin<Gym, number>;

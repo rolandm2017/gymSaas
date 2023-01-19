@@ -11,7 +11,20 @@ export function removeUrl(housing: Housing): IHousing {
     if (housing.buildingType !== BuildingTypeEnum.apartment && housing.buildingType !== BuildingTypeEnum.house) {
         housing.buildingType = BuildingTypeEnum.unknown;
     }
-    const withoutUrl: IHousing = { ...housing };
+    const withoutUrl: IHousing = {
+        housingId: housing.housingId,
+        buildingType: housing.buildingType,
+        agreementType: housing.agreementType,
+        address: housing.address,
+        cityId: housing.cityId,
+        stateId: housing.stateId,
+        price: housing.price,
+        phone: "",
+        lat: housing.lat,
+        long: housing.long,
+        source: housing.source,
+        nearAGym: housing.nearAGym,
+    };
     return withoutUrl;
 }
 

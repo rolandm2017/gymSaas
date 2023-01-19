@@ -9,6 +9,8 @@ export interface IHousing {
     agreementType: string;
     address?: string;
     cityName?: string;
+    cityId?: number;
+    stateId?: number;
     state?: string;
     price?: number;
     phone?: string;

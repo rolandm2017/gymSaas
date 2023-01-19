@@ -6,19 +6,15 @@ import GymDAO from "../../src/database/dao/gym.dao";
 import ProfileDAO from "../../src/database/dao/profile.dao";
 import StateDAO from "../../src/database/dao/state.dao";
 import CityDAO from "../../src/database/dao/city.dao";
-import { SEED_STATES } from "../../src/seed/seedStates";
-import { SEED_CITIES } from "../../src/seed/seedCities";
 import { HousingCreationAttributes } from "../../src/database/models/Housing";
 import { GymCreationAttributes } from "../../src/database/models/Gym";
 
 import { MontrealHousingSeed } from "../../src/seed/housing/Montreal";
 import { MontrealGymSeed } from "../../src/seed/gyms/Montreal";
-import { SEED_HOUSING } from "../../src/seed/seedHousing";
 import { emails, passwords } from "../mocks/userCredentials";
 import { app, server } from "../mocks/mockServer";
 import { IDemoHousing } from "../../src/interface/DemoHousing.interface";
 import { IHousing } from "../../src/interface/Housing.interface";
-import { pid } from "process";
 import { FREE_CREDITS } from "../../src/util/constants";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { ProviderEnum } from "../../src/enum/provider.enum";
@@ -110,11 +106,8 @@ describe("full e2e test", () => {
         // *#* (1) pick some aps and gyms via ip
         // *#*
         // arrange
-        const someLocationsThatWork = await housingDAO.getAllHousing();
         const publicHousingPath = "/housing/demo";
         // act
-        console.log("lat min, max", latMin, latMax, "120rm");
-        console.log("long min, max", longMin, longMax, "120rm");
         const getDemoHousingResponse = await api.get(publicHousingPath).query({ neLat: latMax, neLong: longMax, swLat: latMin, swLong: longMin });
 
         const demoHousing = getDemoHousingResponse.body.demoContent;
