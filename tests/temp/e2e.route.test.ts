@@ -288,5 +288,15 @@ describe("full e2e test", () => {
             expect(url).toBeDefined();
             expect(url.length).toBeGreaterThan(1);
         });
+
+        // **
+        // (7) get and save two apartments using the Map feature
+        const mapRoute = "/housing/qualified";
+        // TODO
+
+        // **
+        // (8) get and save two apartments using the Search feature
+        const apartmentRoute = "/housing/?????";
+        // TODO
     }, 40000);
 });
