@@ -11,3 +11,4 @@ export const longitudeAtPrimeMeridian = 0; // mostly here as a reminder
 export const minDegreesLongitude = -180;
 
 export const FREE_CREDITS = 5;
+export const MIN_SCRAPES_FOR_REPEAT_SCRAPE = 5;

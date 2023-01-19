@@ -14,6 +14,7 @@ import { convertIHousingToCreationAttr } from "../util/housingConverter";
 import BatchDAO from "../database/dao/batch.dao";
 import CacheService from "./cache.service";
 import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
+import { MIN_SCRAPES_FOR_REPEAT_SCRAPE } from "../util/constants";
 
 class TaskQueueService {
     private taskDAO: TaskDAO;
@@ -96,11 +97,18 @@ class TaskQueueService {
         let successes = 0;
         // get city id for this task because its needed in the housing model for foreign key
         const currentTask = await this.taskDAO.getTaskById(taskId);
-        if (currentTask === null) throw new Error("Orphaned task discovered");
+        if (currentTask === null) {
+            throw new Error("Orphaned task discovered");
+        }
         const cityId = reportedCityId ? reportedCityId : currentTask.cityId;
         const batchId = batchNum ? batchNum : currentTask.batchId;
         // update task's lastScan date
         await this.taskDAO.updateLastScanDate(currentTask, new Date());
+        // mark it ignored if there are too few results to repeat it
+        const tooFewApartmentsToContinueScrape = parsedApartmentData.length < MIN_SCRAPES_FOR_REPEAT_SCRAPE;
+        if (tooFewApartmentsToContinueScrape) {
+            await this.taskDAO.markIgnored(currentTask);
+        }
         // add apartments
         try {
             for (const apartment of parsedApartmentData) {

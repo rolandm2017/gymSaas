@@ -106,12 +106,20 @@ class TaskDAO {
         return await Task.findAll({ where: { providerName }, include: { model: Batch, where: { batchId: batchNum } } });
     }
 
+    // **
+    // ** update section
     public async updateTask(task: TaskCreationAttributes, id: number) {
         return await Task.update(task, { where: { taskId: id } });
     }
 
     public async updateLastScanDate(task: Task, scanDate: Date): Promise<void> {
         task.lastScan = scanDate;
+        await task.save();
+    }
+
+    public async markIgnored(task: Task): Promise<void> {
+        // for when the scraper scans a place and gets 0 to 5 results
+        task.ignore = true;
         await task.save();
     }
 
