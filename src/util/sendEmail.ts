@@ -8,7 +8,7 @@ interface ISendEmail {
     from?: string;
 }
 
-async function sendEmail({ to, subject, html, from = config.emailFrom }: ISendEmail) {
+async function sendEmail({ to, subject, html, from = config.emailFrom }: ISendEmail, resolve?: Function) {
     const transporter = nodemailer.createTransport({
         host: config.emailHost,
         port: config.emailPort,
@@ -16,7 +16,16 @@ async function sendEmail({ to, subject, html, from = config.emailFrom }: ISendEm
     });
     console.log("Sending email to", to);
     console.warn("Email might be enabled");
-    await transporter.sendMail({ from, to, subject, html });
+    await transporter.sendMail({ from, to, subject, html }, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log("Email sent: ", info);
+        }
+        if (resolve) {
+            resolve(true);
+        }
+    });
 }
 
 export function verifySMTPConnection(): Promise<boolean> {

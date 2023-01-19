@@ -17,12 +17,16 @@ describe("send an email to my real email", () => {
             if (myEmail == "fail") {
                 throw Error("fail to load email from env");
             }
-            const payload = { from: senderEmail, to: myEmail, subject: "Test email!", html: "foo!" };
+            const payload = { from: senderEmail, to: myEmail, subject: "Test email!", html: "foo!!!!!" };
             console.log("TESTS 19rm");
-            sendEmail(payload);
+            const waitToSend = new Promise((resolve, reject) => {
+                sendEmail(payload, resolve);
+            });
+            await waitToSend;
             console.warn("You just sent a real email");
             expect(true).toBe(false); // intentional failure to highlight that the test has run.
         } else {
+            console.warn("Skipping email tests");
             expect(true).toBe(true); // do not run test
         }
     }, 40000);
