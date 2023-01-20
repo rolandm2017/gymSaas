@@ -228,7 +228,7 @@ const googlePlacesAPI = new GooglePlacesAPI();
 const locationDiscoveryService: LocationDiscoveryService = new LocationDiscoveryService();
 const accountUtil = new AccountUtil(refreshTokenDAO);
 // services
-const emailService = new EmailService(sendEmail, "testing");
+const emailService = new EmailService(sendEmail, "development");
 const adminService = new AdminService(acctDAO);
 const scraperService = new ScraperService(scraperConnectionFactory, locationDiscoveryService);
 const authService = new AuthService(emailService, accountUtil, acctDAO, profileDAO, resetTokenDAO, refreshTokenDAO);
