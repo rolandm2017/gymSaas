@@ -12,7 +12,7 @@ class EmailService {
         this.testingMode = emailSendingMode === "testing"; // safeguard to prevent accidentally setting to testing mode
     }
 
-    public async sendVerificationEmail(account: IAccount, accountId: string) {
+    public async sendVerificationEmail(account: IAccount, accountId: number) {
         let message;
         if (account.verificationToken === undefined || account.verificationToken === "") throw new Error("Verification token missing");
         // the account id and verification token combination makes a unique url for the user to visit to verify their account.
@@ -43,7 +43,7 @@ class EmailService {
         await this.emailSender(args);
     }
 
-    public async sendAlreadyRegisteredEmail(email: string, accountId: string) {
+    public async sendAlreadyRegisteredEmail(email: string, accountId: number) {
         let message;
         if (accountId) {
             const url = getBackendEndpoint() + `${accountId}/account/forgot-password`;
@@ -67,7 +67,7 @@ class EmailService {
         await this.emailSender(args);
     }
 
-    public async sendPasswordResetEmail(account: IAccount, accountId: string) {
+    public async sendPasswordResetEmail(account: IAccount, accountId: number) {
         let message;
         if (account.resetToken === undefined || account.resetToken.token === undefined || account.resetToken.token === "") {
             throw new Error("Reset token missing");

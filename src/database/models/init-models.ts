@@ -34,7 +34,6 @@ function initModels(sequelize: Sequelize) {
     const Task = _Task.initModel(sequelize);
     const Batch = _Batch.initModel(sequelize);
     //
-    console.log("models are init");
 
     Account.hasMany(RefreshToken, {
         foreignKey: "acctId",
@@ -141,6 +140,8 @@ function initModels(sequelize: Sequelize) {
     // wish
     Profile.hasMany(Wish, { foreignKey: "profileId" });
     Wish.belongsTo(Profile, { foreignKey: "profileId" });
+
+    console.log("models are init");
 
     return { Account, RefreshToken, ResetToken, Housing, Gym, City, Batch, Task, Wish };
 }

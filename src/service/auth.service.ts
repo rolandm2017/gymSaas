@@ -60,8 +60,11 @@ class AuthService {
 
         const acct = acctArr[0];
         const passwordIsCorrect = bcrypt.compareSync(password, acct.passwordHash);
-        if (!acct || !acct.isVerified || !passwordIsCorrect) {
-            throw new Error("Email or password is incorrect, or account is not verified");
+        if (!acct.isVerified) {
+            throw Error("Verify your account to log in");
+        }
+        if (!acct || !passwordIsCorrect) {
+            throw new Error("Email or password is incorrect");
         }
         const account: IAccount = this.accountUtil.convertAccountModelToInterface(acct);
         // authentication successful so generate jwt and refresh tokens
@@ -98,7 +101,7 @@ class AuthService {
 
         // send email
         const account = this.accountUtil.convertAccountModelToInterface(acct);
-        await this.emailService.sendVerificationEmail(account, origin);
+        await this.emailService.sendVerificationEmail(account, account.acctId);
         return {
             ...this.basicDetails(account),
         };

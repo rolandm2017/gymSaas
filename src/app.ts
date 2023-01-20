@@ -68,10 +68,12 @@ class App {
                 await Database.authenticate();
                 console.log("Database Connection Established");
                 await initModels(Database);
+                console.log("syncing");
                 await Database.sync({ alter: true, logging: false });
+                console.log("seeding db");
                 await this.seedDb();
+                console.log("initializing caches");
                 await this.initializeCaches();
-                console.log("Done syncing...");
             } catch (err) {
                 console.log("Database connection failed", err);
             }
@@ -110,11 +112,11 @@ class App {
             if (found) continue;
             City.create(city);
         }
-        for (const user of SEED_USERS) {
-            const found = await Account.findOne({ where: { email: user.email } });
-            if (found) continue;
-            Account.create(user);
-        }
+        // for (const user of SEED_USERS) {
+        //     const found = await Account.findOne({ where: { email: user.email } });
+        //     if (found) continue;
+        //     Account.create(user);
+        // }
         if (alsoGyms) {
             for (const cityGyms of SEED_GYMS_CANADA) {
                 for (const gym of cityGyms) {

@@ -19,7 +19,7 @@ function getEmailMode() {
     } else if (process.env.EMAIL_SENDING_MODE === "production") {
         return "production";
     } else {
-        throw Error("Invalid configuration:", process.env.EMAIL_SENDING_MODE);
+        throw Error("Invalid configuration:" + process.env.EMAIL_SENDING_MODE);
     }
 }
 

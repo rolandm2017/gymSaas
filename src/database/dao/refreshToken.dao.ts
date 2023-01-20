@@ -7,6 +7,7 @@ import { RefreshToken, RefreshTokenCreationAttributes } from "../models/RefreshT
 })
 class RefreshTokenDAO {
     public async createRefreshToken(acctId: number, token: string, expires: Date, createdByIp: string) {
+        console.log(acctId, token, createdByIp, "10rm");
         const rt: RefreshToken = await RefreshToken.create({
             token,
             expires,
