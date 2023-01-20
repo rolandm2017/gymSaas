@@ -85,7 +85,7 @@ class AuthService {
         const emailAlreadyExists: boolean = acctsWithThisEmail.length !== 0;
         if (emailAlreadyExists) {
             // send already registered error in email to prevent account enumeration
-            await this.emailService.sendAlreadyRegisteredEmail(params.email, origin);
+            await this.emailService.sendAlreadyRegisteredEmail(params.email, acctsWithThisEmail[0].acctId);
             throw new Error("Account with this email already exists");
         }
         // create account object
@@ -192,7 +192,7 @@ class AuthService {
         return true;
     }
 
-    public async forgotPassword(email: string, origin: string) {
+    public async forgotPassword(email: string) {
         const acct: Account[] = await this.accountDAO.getAccountByEmail(email);
 
         // always return ok response to prevent email enumeration
@@ -210,7 +210,7 @@ class AuthService {
             token: token,
             expires: expires,
         };
-        await this.emailService.sendPasswordResetEmail(account, origin);
+        await this.emailService.sendPasswordResetEmail(account, account.acctId);
     }
 
     public async validateResetToken(token: string) {

@@ -1,7 +1,7 @@
 import config from "../config/emailConfig";
 import nodemailer from "nodemailer";
 
-interface ISendEmail {
+export interface ISendEmail {
     to: string;
     subject: string;
     html: string;

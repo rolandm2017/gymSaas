@@ -12,6 +12,7 @@ const emailUser = process.env.PRIVATE_EMAIL_USER ? process.env.PRIVATE_EMAIL_USE
 const emailPassword = process.env.PRIVATE_EMAIL_PASSWORD ? process.env.PRIVATE_EMAIL_PASSWORD : failure;
 
 function getEmailMode() {
+    console.log("Email Mode: " + process.env.EMAIL_SENDING_MODE);
     if (process.env.EMAIL_SENDING_MODE === "testing") {
         return "testing";
     } else if (process.env.EMAIL_SENDING_MODE === "development") {

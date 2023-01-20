@@ -3,7 +3,7 @@ dotenv.config({ path: "./.env" });
 
 export function getBackendEndpoint(path?: string) {
     if (process.env.SERVER_ENVIRONMENT === "development") {
-        const pathBase = "http://localhost:8000";
+        const pathBase = "http://localhost:" + process.env.PORT;
         if (path) {
             return pathBase + path;
         } else {
@@ -19,9 +19,9 @@ export function getBackendEndpoint(path?: string) {
     }
 }
 
-export function getFrontendEndpoint(path?: string) {
+export function getFrontendURL(path?: string) {
     if (process.env.SERVER_ENVIRONMENT === "development") {
-        const pathBase = "http://localhost:3002";
+        const pathBase = "http://localhost:" + process.env.FRONTEND_PORT;
         if (path) {
             return pathBase + path;
         } else {

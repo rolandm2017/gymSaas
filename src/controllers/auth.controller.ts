@@ -10,7 +10,6 @@ import {
     revokeTokenSchema,
     updateRoleSchema,
     validateResetTokenSchema,
-    verifyEmailSchema,
 } from "../validationSchemas/userAuthSchemas";
 import authorize from "../middleware/authorize.middleware";
 import { Role } from "../enum/role.enum";
@@ -21,6 +20,8 @@ import { HealthCheck } from "../enum/healthCheck.enum";
 import { googleAuth, googleAuthCallback, passportJwt } from "../middleware/passport.middleware";
 import { UserFromGoogle } from "../interface/UserFromGoogle.interface";
 import { iap } from "googleapis/build/src/apis/iap";
+import { isString } from "../validationSchemas/inputValidation";
+import { getFrontendURL } from "../util/URLMaker";
 
 class AuthController {
     public path = "/auth";
@@ -38,7 +39,7 @@ class AuthController {
         this.router.post("/register", registerUserSchema, this.register.bind(this));
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         // verify email
-        this.router.post("/verify-email", verifyEmailSchema, this.verifyEmail.bind(this));
+        this.router.get("/verify-email/:verificationToken", this.verifyEmail.bind(this));
         this.router.get("/bypass-authentication-token", this.bypassEmail.bind(this));
         // tokens
         this.router.post("/refresh-token", this.refreshToken.bind(this));
@@ -72,7 +73,8 @@ class AuthController {
             const accountDetails: IBasicDetails = await this.authService.grantRefreshToken(newUser, ipAddress);
             if (accountDetails.refreshToken === undefined) throw Error("refresh token missing from authenticate response");
             this.setTokenCookie(response, accountDetails.refreshToken);
-            return response.redirect("http://localhost:3000"); // user gets access token from refresh-token endpoint.
+
+            return response.redirect(getFrontendURL() + "/dashboard"); // user gets access token from refresh-token endpoint.
         } catch (err) {
             return handleErrorResponse(response, err);
         }
@@ -106,6 +108,27 @@ class AuthController {
                 message: "Registration successful, please check your email for verification instructions",
                 accountDetails,
             });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    public async verifyEmail(request: Request, response: Response) {
+        try {
+            const tokenInput = request.params.verificationToken;
+            console.log(tokenInput, "152rm");
+            const token = isString(tokenInput);
+            console.log(token, "152rm");
+            const { success, accountEmail } = await this.authService.verifyEmail(token);
+            if (success) {
+                try {
+                    await this.authService.createOrAssociateProfile(accountEmail);
+                } catch (err) {
+                    return handleErrorResponse(response, err);
+                }
+            }
+            return response.redirect("http://localhost:3002/account/is-verified");
+            // return response.status(200).json({ message: "Verification successful, you can now login" });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
@@ -145,23 +168,6 @@ class AuthController {
         }
     }
 
-    public async verifyEmail(request: Request, response: Response) {
-        try {
-            const token = request.body.token;
-            const { success, accountEmail } = await this.authService.verifyEmail(token);
-            if (success) {
-                try {
-                    await this.authService.createOrAssociateProfile(accountEmail);
-                } catch (err) {
-                    return handleErrorResponse(response, err);
-                }
-            }
-            return response.json({ message: "Verification successful, you can now login" });
-        } catch (err) {
-            return handleErrorResponse(response, err);
-        }
-    }
-
     public async bypassEmail(request: Request, response: Response) {
         try {
             const email = request.body.email;
@@ -194,11 +200,11 @@ class AuthController {
     public async forgotPassword(request: Request, response: Response) {
         try {
             const email = request.body.email;
-            const origin = request.get("origin");
-            if (origin === undefined) {
-                return handleErrorResponse(response, "Origin is required and was undefined");
-            }
-            await this.authService.forgotPassword(email, origin);
+            // const origin = request.get("origin");
+            // if (origin === undefined) {
+            //     return handleErrorResponse(response, "Origin is required and was undefined");
+            // }
+            await this.authService.forgotPassword(email);
             return response.json({ message: "Please check your email for password reset instructions" });
         } catch (err) {
             return handleErrorResponse(response, err);
