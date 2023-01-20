@@ -15,17 +15,20 @@ async function sendEmail({ to, subject, html, from = config.emailFrom }: ISendEm
         auth: { user: config.emailUser, pass: config.emailPassword },
     });
     console.log("Sending email to", to);
-    console.warn("Email might be enabled");
-    await transporter.sendMail({ from, to, subject, html }, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("Email sent: ", info);
-        }
-        if (resolve) {
-            resolve(true);
-        }
-    });
+    const emailIsEnabled = process.env.EMAIL_SENDING_MODE === "development" || process.env.EMAIL_SENDING_MODE === "production";
+    console.warn("Email might be enabled:", emailIsEnabled);
+    if (emailIsEnabled) {
+        await transporter.sendMail({ from, to, subject, html }, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email sent: ", info);
+            }
+            if (resolve) {
+                resolve(true);
+            }
+        });
+    }
 }
 
 export function verifySMTPConnection(): Promise<boolean> {

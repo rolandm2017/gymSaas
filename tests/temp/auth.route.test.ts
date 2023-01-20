@@ -83,7 +83,10 @@ describe("Test auth controller with supertest", () => {
     describe("Complete user registration flow & password reset + refresh token", () => {
         test("works - integration - register => verify email => authenticate => get refresh token (2x) => change pw => login again", async () => {
             const credentials = { ...validCredentials };
-            credentials.email = "foobarbazgirl@gmail.com";
+            credentials.email = process.env.MY_EMAIL ? process.env.MY_EMAIL : "";
+            if (credentials.email === "") {
+                throw Error("failed to load email for test");
+            }
             const pw = "catsDOGS444%%";
             credentials.password = pw;
             credentials.confirmPassword = pw;

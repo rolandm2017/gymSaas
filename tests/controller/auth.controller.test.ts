@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { IBasicDetails } from "../../src/interface/BasicDetails.interface";
 
@@ -11,10 +11,13 @@ import ResetTokenDAO from "../../src/database/dao/resetToken.dao";
 import AccountDAO from "../../src/database/dao/account.dao";
 import sendEmail from "../../src/util/sendEmail";
 import RefreshTokenDAO from "../../src/database/dao/refreshToken.dao";
+import ProfileDAO from "../../src/database/dao/profile.dao";
+import { FREE_CREDITS } from "../../src/util/constants";
 
 let authService: AuthService;
 let controller: AuthController;
 let accountDAO: AccountDAO = new AccountDAO();
+const profileDAO: ProfileDAO = new ProfileDAO();
 let emailService: EmailService = new EmailService(sendEmail, "testing");
 let resetTokenDAO: ResetTokenDAO = new ResetTokenDAO(accountDAO);
 const refreshTokenDAO = new RefreshTokenDAO();
@@ -29,10 +32,12 @@ const fakeButValidAccount: IBasicDetails = {
     role: Role.User,
     jwtToken: "testToken",
     refreshToken: "fakeTestToken",
+    name: "Foobar Baz",
+    credits: FREE_CREDITS,
 };
 
 beforeAll(() => {
-    authService = new AuthService(emailService, accountUtil, accountDAO, resetTokenDAO, refreshTokenDAO);
+    authService = new AuthService(emailService, accountUtil, accountDAO, profileDAO, resetTokenDAO, refreshTokenDAO);
 
     controller = new AuthController(authService);
 });

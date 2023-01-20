@@ -39,7 +39,7 @@ import FeedbackService from "./service/feedback.service";
 import WishService from "./service/wish.service";
 import WishDAO from "./database/dao/wish.dao";
 import RefreshTokenDAO from "./database/dao/refreshToken.dao";
-import { profile } from "console";
+import { emailSendingMode } from "./config/emailConfig";
 
 const port = parseInt(process.env.PORT!, 10);
 
@@ -66,7 +66,7 @@ const scraperFactory: ScraperFactory = new ScraperFactory(taskDAO);
 // services
 // is there a better place to initialize these?
 const adminService = new AdminService(acctDAO);
-const emailService: EmailService = new EmailService(sendEmail, "development");
+const emailService: EmailService = new EmailService(sendEmail, emailSendingMode);
 const scraperService = new ScraperService(scraperFactory, locationDiscoveryService);
 const authService: AuthService = new AuthService(emailService, accountUtil, acctDAO, profileDAO, resetTokenDAO, refreshTokenDAO);
 const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
