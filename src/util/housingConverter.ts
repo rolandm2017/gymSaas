@@ -52,6 +52,7 @@ export function convertHousingToHousingWithUrl(housing: Housing): IHousingWithUr
         housingId: housing.housingId,
         buildingType: housing.buildingType == "apartment" ? housing.buildingType : "house",
         agreementType: housing.agreementType == "rent" ? housing.agreementType : "buy",
+        address: housing.address,
         lat: housing.lat,
         long: housing.long,
         nearAGym: housing.nearAGym,
