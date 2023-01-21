@@ -76,10 +76,12 @@ function initModels(sequelize: Sequelize) {
     Task.hasMany(Housing, {
         foreignKey: "taskId",
         as: "scraped_aps",
+        constraints: false, // optional relationship
     });
     Housing.belongsTo(Task, {
         foreignKey: { name: "taskId", allowNull: false }, // housings must have a task
         as: "from_task",
+        constraints: false, // optional relationship
     });
     City.hasMany(Gym, {
         foreignKey: "cityId",
@@ -123,18 +125,22 @@ function initModels(sequelize: Sequelize) {
     Batch.hasMany(Task, {
         foreignKey: "batchId",
         as: "tasks_for_this_batch",
+        constraints: false, // optional relationship
     });
     Task.belongsTo(Batch, {
         foreignKey: "batchId",
         as: "task_from_batch",
+        constraints: false, // optional relationship
     });
     Batch.hasMany(Housing, {
         foreignKey: "batchId",
         as: "housings_from_this_batch",
+        constraints: false, // optional relationship
     });
     Housing.belongsTo(Batch, {
         foreignKey: "batchId",
         as: "housing_from_batch",
+        constraints: false, // optional relationship
     });
 
     // wish

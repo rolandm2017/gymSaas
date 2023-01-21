@@ -138,6 +138,7 @@ class AuthController {
         try {
             const token = request.cookies.refreshToken;
             const ipAddress = request.ip;
+            console.log(token, ipAddress, "141rm");
             const { refreshToken, ...account } = await this.authService.refreshToken(token, ipAddress);
             this.setTokenCookie(response, refreshToken);
             return response.json(account);

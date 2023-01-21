@@ -124,7 +124,7 @@ export {
     authenticateUserSchema,
     registerUserSchema,
     createAccountSchema,
-    verifyEmailSchema,
+    // verifyEmailSchema,
     updatePasswordSchema,
     forgotPasswordSchema,
     resetPasswordSchema,

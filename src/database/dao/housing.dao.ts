@@ -60,6 +60,35 @@ class HousingDAO {
         } else {
             conditions = {};
         }
+        console.log(conditions, "63rm");
+        return await Housing.findAll({ where: conditions });
+    }
+
+    public async getQualifiedHousing(cityId?: number, cityName?: string, stateOrProvince?: string) {
+        if ([cityId, cityName, stateOrProvince].every(arg => arg === undefined)) return await Housing.findAll({});
+        let conditions;
+        let state;
+        if (stateOrProvince) {
+            state = await this.stateDAO.getStateByName(stateOrProvince);
+            if (state === null || undefined) return [];
+        }
+        if (cityId && stateOrProvince) {
+            if (!state) return [];
+            conditions = { cityId, stateId: state.stateId };
+        } else if (cityName && stateOrProvince) {
+            const city = await this.cityDAO.getCityByName(cityName);
+            if (city === null) return [];
+            if (!state) return [];
+            conditions = { cityId: city.cityId, stateId: state.stateId };
+        } else if (stateOrProvince) {
+            if (!state) return [];
+            conditions = { stateId: state.stateId };
+        } else if (cityId) {
+            conditions = { cityId };
+        } else {
+            conditions = {};
+        }
+        console.log(conditions, "63rm");
         return await Housing.findAll({ where: conditions });
     }
 

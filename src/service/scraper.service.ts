@@ -61,9 +61,15 @@ class ScraperService {
 
     public async getURLForApartment(idFromRentCanada: number): Promise<string> {
         //
-        const scraper: Scraper = this.scraperConnectionFactory.getScraperOfType(ProviderEnum.rentCanada);
-        const url = await scraper.fetchUrlForId(idFromRentCanada);
-        return url;
+        try {
+            const scraper: Scraper = this.scraperConnectionFactory.getScraperOfType(ProviderEnum.rentCanada);
+            const url = await scraper.fetchUrlForId(idFromRentCanada);
+            return url;
+        } catch (err) {
+            console.log(err);
+            console.log("Failed to access scraper");
+            return "";
+        }
     }
 }
 

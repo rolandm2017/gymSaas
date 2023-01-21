@@ -74,6 +74,7 @@ class ProfileController {
             }
             const acctId = request.user.acctId;
             const housingId = request.body.housingId;
+            console.log(acctId, housingId, "77rm");
             const newPickId = await this.profileService.recordAuthedPickHousing(acctId, housingId);
             return response.status(200).json({ newPickId, status: "Confirmed" });
         } catch (err) {
@@ -101,8 +102,8 @@ class ProfileController {
                 return handleErrorResponse(response, "No user on request");
             }
             const acctId = request.user.acctId;
-            const housingPicks: IHousing[] = await this.profileService.getAllHousingPicks(acctId);
-            return response.status(200).json({ housingPicks });
+            const favorites: IHousing[] = await this.profileService.getAllHousingPicks(acctId);
+            return response.status(200).json({ favorites });
         } catch (err) {
             return handleErrorResponse(response, err);
         }

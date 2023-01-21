@@ -1,4 +1,6 @@
-export const MontrealHousingSeed = [
+import { HousingCreationAttributes } from "../../database/models/Housing";
+
+export const MontrealHousingSeed: HousingCreationAttributes[] = [
     {
         housingId: 2,
         buildingType: "apartment",

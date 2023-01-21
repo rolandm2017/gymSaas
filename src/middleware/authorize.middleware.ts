@@ -35,18 +35,20 @@ function authorize(validRoles: Role[] = []) {
             // I discovered this while googling "jwt secret express jwt req.user"
             const acctInfo = request.auth;
             if (acctInfo?.acctId === undefined) {
-                return res.status(401).json({ message: "Unauthorized" });
+                return res.status(401).json({ message: "39 - Unauthorized" });
             }
             request.user = {
                 acctId: acctInfo.acctId,
             };
             const account: Account | null = await acctDAO.getAccountById(acctInfo.acctId);
-            if (!account) return res.status(401).json({ message: "Unauthorized" });
+            if (!account) {
+                return res.status(401).json({ message: "47 - Unauthorized" });
+            }
             const acctRole: Role = account.role as Role;
             const rolesFoundOnRequest = validRoles.length;
             if (rolesFoundOnRequest && !validRoles.includes(acctRole)) {
                 // account no longer exists or role not authorized
-                return res.status(401).json({ message: "Unauthorized" });
+                return res.status(401).json({ message: "54 - Unauthorized" });
             }
 
             // authentication and authorization successful

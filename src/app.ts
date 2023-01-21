@@ -12,19 +12,22 @@ import errorHandler from "./middleware/error.middleware";
 
 import { City } from "./database/models/City";
 import { State } from "./database/models/State";
-import { Account } from "./database/models/Account";
 
 import { SEED_CITIES } from "./seed/seedCities";
 import { SEED_STATES } from "./seed/seedStates";
-import { SEED_USERS } from "./seed/seedUsers";
 import CacheService from "./service/cache.service";
 import CityDAO from "./database/dao/city.dao";
 import BatchDAO from "./database/dao/batch.dao";
 import { SEED_GYMS_CANADA } from "./seed/gyms";
+import { SEED_HOUSING } from "./seed/seedHousing";
 import { Gym } from "./database/models/Gym";
 import passportConfig from "./config/passportConfig";
 import FeedbackDAO from "./database/dao/feedback.dao";
-import { secret } from "./middleware/authorize.middleware";
+import { Housing } from "./database/models/Housing";
+import TaskDAO from "./database/dao/task.dao";
+import GymDAO from "./database/dao/gym.dao";
+import HousingDAO from "./database/dao/housing.dao";
+import StateDAO from "./database/dao/state.dao";
 
 class App {
     public app: Application;
@@ -71,7 +74,7 @@ class App {
                 console.log("syncing");
                 await Database.sync({ alter: true, logging: false });
                 console.log("seeding db");
-                await this.seedDb();
+                await this.seedDb(false, false);
                 console.log("initializing caches");
                 await this.initializeCaches();
             } catch (err) {
@@ -98,7 +101,7 @@ class App {
         });
     }
 
-    private async seedDb(alsoGyms?: boolean) {
+    private async seedDb(alsoGyms?: boolean, alsoAps?: boolean) {
         for (const state of SEED_STATES) {
             const found = await State.findOne({ where: state });
             if (found) continue;
@@ -118,10 +121,42 @@ class App {
         //     Account.create(user);
         // }
         if (alsoGyms) {
+            const gymDAO = new GymDAO();
             for (const cityGyms of SEED_GYMS_CANADA) {
                 for (const gym of cityGyms) {
                     // todo: associate seeded gym with its city. use the city id cache!
+                    const found = await gymDAO.getGymByGymId(gym.gymId);
+                    if (found) continue;
                     Gym.create(gym);
+                }
+            }
+        }
+        if (alsoAps) {
+            // put the batch in
+            console.log("HERE 130rm");
+            const batchDAO = new BatchDAO();
+            const highest = await batchDAO.getHighestBatchNum();
+            if (highest === 1) {
+                //
+            } else {
+                new BatchDAO().addBatchNum(1);
+            }
+            // add the tasks
+            const stateDAO = new StateDAO();
+            const cityDAO = new CityDAO();
+            const housingDAO = new HousingDAO(stateDAO, cityDAO);
+            console.log("HERE 134rm");
+            let count = 0;
+            for (const city of SEED_HOUSING) {
+                for (const ap of city) {
+                    if (ap.housingId) {
+                        const found = await housingDAO.getHousingByHousingId(ap.housingId);
+                        if (found) continue;
+                        delete ap.taskId;
+                        count++;
+                        console.log(`seeding apartment #${count}...`);
+                        housingDAO.createHousing(ap);
+                    }
                 }
             }
         }

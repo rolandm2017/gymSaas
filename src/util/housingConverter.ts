@@ -45,3 +45,18 @@ export function convertHousingsToDemoHousings(housings: Housing[]): IDemoHousing
     }
     return demoHousings;
 }
+
+export function convertHousingToHousingWithUrl(housing: Housing): IHousingWithUrl {
+    // primarily used to remove the "Housing_Reveals" part that causes TypeError: Converting circular structure to JSON
+    const housingWithUrl: IHousingWithUrl = {
+        housingId: housing.housingId,
+        buildingType: housing.buildingType == "apartment" ? housing.buildingType : "house",
+        agreementType: housing.agreementType == "rent" ? housing.agreementType : "buy",
+        lat: housing.lat,
+        long: housing.long,
+        nearAGym: housing.nearAGym,
+        url: housing.url,
+        source: housing.source,
+    };
+    return housingWithUrl;
+}

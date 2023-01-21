@@ -13,7 +13,7 @@ import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
 import { IQualificationReport } from "../interface/QualificationReport.interface";
 import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../util/acceptableRadiusForWalking";
 import { createRealUrl } from "../util/createRealUrl";
-import { convertHousingsToDemoHousings } from "../util/housingConverter";
+import { convertHousingsToDemoHousings, convertHousingToHousingWithUrl } from "../util/housingConverter";
 import { removeBulkURLs } from "../util/removeUrl";
 import CacheService from "./cache.service";
 import ScraperService from "./scraper.service";
@@ -49,7 +49,16 @@ class HousingService {
 
     //
     public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<IHousing[]> {
+        console.log(cityId, cityName, stateOrProvince, "52rm");
         const housings = await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
+        console.log(housings.length, "53rm");
+        return removeBulkURLs(housings);
+    }
+
+    public async getQualifiedAps(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<IHousing[]> {
+        console.log(cityId, cityName, stateOrProvince, "52rm");
+        const housings = await this.housingDAO.getQualifiedHousing(cityId, cityName, stateOrProvince);
+        console.log(housings.length, "53rm");
         return removeBulkURLs(housings);
     }
 
@@ -97,13 +106,26 @@ class HousingService {
         return createRealUrl(urlFromApi, ProviderEnum.rentCanada);
     }
 
-    public async getRevealedRealUrlList(acctId: number): Promise<Housing[]> {
+    public async getRevealedRealUrlList(acctId: number): Promise<IHousingWithUrl[]> {
         const profile = await this.profileDAO.getProfileForAccountId(acctId);
         if (profile === null) {
             throw Error("No profile found for this account id");
         }
         const housings = await profile.getReveals();
-        return housings;
+        // check that they all have their urls. if any don't for whatever reason, go get them.
+        for (const h of housings) {
+            if (h.url === "" && h.idAtSource) {
+                const urlFromApi = await this.scraperService.getURLForApartment(h.idAtSource);
+                await this.housingDAO.addUrlToHousing(h.housingId, urlFromApi);
+                h.url = urlFromApi;
+            }
+        }
+        const housingsWithURLs: IHousingWithUrl[] = housings.map((housing: Housing) => {
+            const apartment = convertHousingToHousingWithUrl(housing);
+            apartment.url = createRealUrl(housing.url, housing.source);
+            return apartment;
+        });
+        return housingsWithURLs;
     }
 
     public async getHousingByCityIdAndBatchNum(cityId: number, batchNum: number): Promise<IHousing[]> {
@@ -175,9 +197,6 @@ class HousingService {
     }
 
     public confirmIsGiantSquare(minLat: number, maxLat: number, minLong: number, maxLong: number): boolean {
-        console.log("east-west distance:", maxLong - minLong);
-        console.log("north-south distance:", maxLat - minLat);
-        console.log("is a giant square:", maxLong > minLong && maxLat > minLat);
         return maxLong > minLong && maxLat > minLat;
     }
 }

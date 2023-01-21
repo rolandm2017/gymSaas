@@ -13,6 +13,7 @@ import authorize from "../middleware/authorize.middleware";
 import { Role } from "../enum/role.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
 import { IHousing } from "../interface/Housing.interface";
+import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
 
 class HousingController {
     public path = "/housing";
@@ -36,6 +37,7 @@ class HousingController {
         // this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         // this.router.get("/location", authorize([Role.User]), this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by-location", this.getScrapedApartmentsByLocation.bind(this));
+        this.router.get("/qualified/by-location", this.getQualifiedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
         this.router.delete("/all", authorize([Role.Admin]), this.deleteAllApartments.bind(this));
         // step 4 of queuing a scrape - for after the scrape of the city is done
@@ -58,8 +60,8 @@ class HousingController {
             const swLat = isStringFloat(swLatInput); // min lat
             const swLong = isStringFloat(swLongInput); // min long
 
-            console.log("Lat min, lat max", swLat, neLat);
-            console.log("Long min, long max", swLong, neLong);
+            // console.log("Lat min, lat max", swLat, neLat);
+            // console.log("Long min, long max", swLong, neLong);
             const isGiantSquare = this.housingService.confirmIsGiantSquare(swLat, neLat, swLong, neLong);
             if (!isGiantSquare) {
                 return response.status(400).json({ message: "No negative area squares" });
@@ -106,7 +108,24 @@ class HousingController {
             const legitCityName = cityNameInput ? isLegitCityName(cityNameInput) : undefined;
             const cityId = cityIdInput ? isStringInteger(cityIdInput) : undefined;
             const apartments: IHousing[] = await this.housingService.getAllHousing(cityId, legitCityName, stateOrProvince);
-            return response.status(200).json({ apartments });
+            return response.status(200).json({ apartments, count: apartments.length });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    public async getQualifiedApartmentsByLocation(request: Request, response: Response) {
+        try {
+            const cityIdInput = request.query.cityId;
+            const cityNameInput = request.query.cityName;
+            const stateOrProvinceInput = request.query.state;
+            // validation
+            // Note it could be an invalid state/province but, not checking that. It could just fail.
+            const stateOrProvince = stateOrProvinceInput ? isString(stateOrProvinceInput) : undefined;
+            const legitCityName = cityNameInput ? isLegitCityName(cityNameInput) : undefined;
+            const cityId = cityIdInput ? isStringInteger(cityIdInput) : undefined;
+            const apartments: IHousing[] = await this.housingService.getQualifiedAps(cityId, legitCityName, stateOrProvince);
+            return response.status(200).json({ apartments, count: apartments.length });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
@@ -135,15 +154,15 @@ class HousingController {
             if (userId === undefined) {
                 return handleErrorResponse(response, "No user defined on request");
             }
-            const revealedUrls: Housing[] = await this.housingService.getRevealedRealUrlList(userId);
-            return response.status(200).json({ revealedUrls });
+            const revealedURLs: IHousingWithUrl[] = await this.housingService.getRevealedRealUrlList(userId);
+            return response.status(200).json({ revealedURLs });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
     }
 
     public async getAllApartments(request: Request, response: Response) {
-        // Really: "Get ALL."
+        // Really: "Get ALL." Intended to be used by tests and admin to inspect stuff.
         try {
             const apartments: IHousing[] = await this.housingService.getAllHousing();
             return response.status(200).json({ apartments, length: apartments.length });
