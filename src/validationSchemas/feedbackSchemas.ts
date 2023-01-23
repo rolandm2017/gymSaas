@@ -5,9 +5,9 @@ import validateRequest from "../middleware/validateRequest.middleware";
 
 export function feedbackSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema = Joi.object({
-        questionOneAnswer: Joi.string(),
-        questionTwoAnswer: Joi.string(),
-        questionThreeAnswer: Joi.string(),
+        questionOneAnswer: Joi.number(),
+        questionTwoAnswer: Joi.number(),
+        questionThreeAnswer: Joi.number(),
         largeTextAnswer: Joi.string(),
     });
     validateRequest(req, next, schema);

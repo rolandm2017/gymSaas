@@ -6,11 +6,11 @@ import { Profile } from "./Profile";
 export interface FeedbackAttributes {
     feedbackId?: number;
     questionOne: string;
-    questionOneAnswer?: string;
+    questionOneAnswer?: number; // number because they are star ratings.
     questionTwo: string;
-    questionTwoAnswer?: string;
+    questionTwoAnswer?: number; // number because they are star ratings.
     questionThree: string;
-    questionThreeAnswer?: string;
+    questionThreeAnswer?: number; // number because they are star ratings.
     largeTextAnswer?: string;
     featureReqOneAnswer?: string;
     featureReqTwoAnswer?: string;
@@ -27,11 +27,11 @@ export type FeedbackCreationAttributes = Optional<FeedbackAttributes, FeedbackOp
 export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttributes> implements FeedbackAttributes {
     public feedbackId!: number;
     public questionOne!: string;
-    public questionOneAnswer!: string;
+    public questionOneAnswer!: number;
     public questionTwo!: string;
-    public questionTwoAnswer!: string;
+    public questionTwoAnswer!: number;
     public questionThree!: string;
-    public questionThreeAnswer!: string;
+    public questionThreeAnswer!: number;
     public largeTextAnswer!: string;
     public featureReqOneAnswer!: string;
     public featureReqTwoAnswer!: string;
@@ -55,7 +55,7 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                     allowNull: false,
                 },
                 questionOneAnswer: {
-                    type: DataTypes.STRING,
+                    type: DataTypes.INTEGER,
                     allowNull: true,
                 },
                 questionTwo: {
@@ -63,7 +63,7 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                     allowNull: false,
                 },
                 questionTwoAnswer: {
-                    type: DataTypes.STRING,
+                    type: DataTypes.INTEGER,
                     allowNull: true,
                 },
                 questionThree: {
@@ -71,7 +71,7 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                     allowNull: false,
                 },
                 questionThreeAnswer: {
-                    type: DataTypes.STRING,
+                    type: DataTypes.INTEGER,
                     allowNull: true,
                 },
                 largeTextAnswer: {

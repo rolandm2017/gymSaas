@@ -1,6 +1,8 @@
 import express, { Request, Response } from "express";
 
 import { HealthCheck } from "../enum/healthCheck.enum";
+import { Role } from "../enum/role.enum";
+import authorize from "../middleware/authorize.middleware";
 import FeedbackService from "../service/feedback.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { featureRequestSchema, feedbackSchema } from "../validationSchemas/feedbackSchemas";
@@ -12,8 +14,8 @@ class FeedbackController {
 
     constructor(feedbackService: FeedbackService) {
         this.feedbackService = feedbackService;
-        this.router.post("/new/customer-feedback", feedbackSchema, this.leaveFeedback.bind(this));
-        this.router.post("/new/feature-req", featureRequestSchema, this.requestFeature.bind(this));
+        this.router.post("/new/customer-feedback", authorize([Role.User]), feedbackSchema, this.leaveFeedback.bind(this));
+        this.router.post("/new/feature-req", authorize([Role.User]), featureRequestSchema, this.requestFeature.bind(this));
         // this.router.put("/update", feedbackSchema, this.continueFeedback.bind(this));
         this.router.get("/all", this.getAllFeedback.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
@@ -27,11 +29,11 @@ class FeedbackController {
                 return handleErrorResponse(response, "Must be logged in");
             }
             const { questionOneAnswer, questionTwoAnswer, questionThreeAnswer, largeTextAnswer } = request.body;
-            const started = await this.feedbackService.leaveFeedback(
+            const success = await this.feedbackService.leaveFeedback(
                 { questionOneAnswer, questionTwoAnswer, questionThreeAnswer, largeTextAnswer },
                 accountId,
             );
-            return response.status(200).json({ started });
+            return response.status(200).json({ success });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
@@ -45,8 +47,8 @@ class FeedbackController {
                 return handleErrorResponse(response, "Must be logged in");
             }
             const { featureReqOneAnswer, featureReqTwoAnswer } = request.body;
-            const started = await this.feedbackService.requestFeature({ featureReqOneAnswer, featureReqTwoAnswer }, accountId);
-            return response.status(200).json({ started });
+            const success = await this.feedbackService.requestFeature({ featureReqOneAnswer, featureReqTwoAnswer }, accountId);
+            return response.status(200).json({ success });
         } catch (err) {
             return handleErrorResponse(response, err);
         }

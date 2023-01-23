@@ -1,7 +1,7 @@
 export interface FeedbackInputs {
-    questionOneAnswer: string;
-    questionTwoAnswer: string;
-    questionThreeAnswer: string;
+    questionOneAnswer: number;
+    questionTwoAnswer: number;
+    questionThreeAnswer: number;
     largeTextAnswer: string;
 }
 

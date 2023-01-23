@@ -143,21 +143,31 @@ class ProfileController {
     }
 
     public async deleteHousingPick(request: Request, response: Response) {
-        const acctId = request.user?.acctId;
-        const exists = isInteger(acctId);
-        const toDeleteIdInput = request.body.toDeleteId;
-        const toDeleteId = isInteger(toDeleteIdInput);
-        const deleted = await this.profileService.deleteHousingPick(exists, toDeleteId);
-        return response.status(200).json({ deleted });
+        try {
+            if (request.user === undefined) {
+                return handleErrorResponse(response, "User is required");
+            }
+            const acctId = request.user.acctId;
+            const housingIdInput = request.body.housingId;
+            const toDeleteId = isInteger(housingIdInput);
+            const deleted = await this.profileService.deleteHousingPick(acctId, toDeleteId);
+            return response.status(200).json({ deleted });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     public async deleteGymPick(request: Request, response: Response) {
-        const acctId = request.user?.acctId;
-        const exists = isInteger(acctId);
-        const toDeleteIdInput = request.body.toDeleteId;
-        const toDeleteId = isInteger(toDeleteIdInput);
-        const deleted = await this.profileService.deleteGymPick(exists, toDeleteId);
-        return response.status(200).json({ deleted });
+        try {
+            const acctId = request.user?.acctId;
+            const exists = isInteger(acctId);
+            const toDeleteIdInput = request.body.toDeleteId;
+            const toDeleteId = isInteger(toDeleteIdInput);
+            const deleted = await this.profileService.deleteGymPick(exists, toDeleteId);
+            return response.status(200).json({ deleted });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
     }
 
     async healthCheck(request: Request, response: Response) {
