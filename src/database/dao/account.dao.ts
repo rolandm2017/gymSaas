@@ -92,6 +92,8 @@ class AccountDAO {
         return await Account.findOne({ where: { verificationToken: token } });
     }
 
+    // **
+    // update section
     public async banUser(userId: number): Promise<number> {
         const affected = await Account.update({ isBanned: true }, { where: { acctId: userId } });
         return affected[0];
@@ -118,6 +120,13 @@ class AccountDAO {
         await Account.update({ credits: currentCredits - 1 }, { where: { acctId: accountId } });
     }
 
+    public async addFreeCredits(acctId: number): Promise<number> {
+        const newAmount = await Account.update({ credits: FREE_CREDITS }, { where: { acctId } });
+        return FREE_CREDITS;
+    }
+
+    // **
+    // delete section **
     public async deleteAccount(id: number): Promise<number> {
         const affected = await Account.destroy({ where: { acctId: id } });
         return affected;

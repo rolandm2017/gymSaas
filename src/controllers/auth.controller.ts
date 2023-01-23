@@ -53,6 +53,7 @@ class AuthController {
         this.router.post("/reset-password", resetPasswordSchema, this.resetPassword.bind(this));
         // misc - payment stuff
         this.router.get("/remaining-credits", authorize([Role.User]), this.getRemainingCredits.bind(this));
+        this.router.put("/free-credits", authorize([Role.User]), this.getFreeCredits.bind(this));
         // authorized routes
         this.router.get("/", authorize([Role.Admin]), this.getAllAccounts.bind(this));
         this.router.get("/:id", authorize(), this.getAccountById.bind(this));
@@ -242,6 +243,18 @@ class AuthController {
 
             const remainingCredits = await this.authService.getRemainingCredits(acctId);
             return response.status(200).json({ remainingCredits });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    public async getFreeCredits(request: Request, response: Response) {
+        try {
+            if (request.user === undefined) return handleErrorResponse(response, "User missing");
+            const acctId = request.user.acctId;
+
+            const newCreditsAmount = await this.authService.addFreeCredits(acctId);
+            return response.status(200).json({ newCreditsAmount });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
