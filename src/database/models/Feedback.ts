@@ -9,7 +9,11 @@ export interface FeedbackAttributes {
     questionOneAnswer?: string;
     questionTwo: string;
     questionTwoAnswer?: string;
+    questionThree: string;
+    questionThreeAnswer?: string;
     largeTextAnswer?: string;
+    featureReqOneAnswer?: string;
+    featureReqTwoAnswer?: string;
     submitted?: boolean | null;
     profileId?: number;
     createdAt?: Date;
@@ -26,7 +30,11 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
     public questionOneAnswer!: string;
     public questionTwo!: string;
     public questionTwoAnswer!: string;
+    public questionThree!: string;
+    public questionThreeAnswer!: string;
     public largeTextAnswer!: string;
+    public featureReqOneAnswer!: string;
+    public featureReqTwoAnswer!: string;
     public submitted!: boolean;
     public profileId!: ForeignKey<Profile["profileId"]>;
 
@@ -58,8 +66,24 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                     type: DataTypes.STRING,
                     allowNull: true,
                 },
+                questionThree: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                questionThreeAnswer: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                },
                 largeTextAnswer: {
                     type: DataTypes.STRING,
+                },
+                featureReqOneAnswer: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                },
+                featureReqTwoAnswer: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
                 },
                 submitted: {
                     type: DataTypes.BOOLEAN,

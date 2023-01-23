@@ -9,7 +9,7 @@ import {
 } from "../database/cache/batchNumCache";
 import CityDAO from "../database/dao/city.dao";
 import BatchDAO from "../database/dao/batch.dao";
-import { getQuestions, setQuestionOne, setQuestionTwo } from "../database/cache/questionsCache";
+import { getQuestions, setQuestionOne, setQuestionThree, setQuestionTwo } from "../database/cache/questionsCache";
 import FeedbackDAO from "../database/dao/feedback.dao";
 
 class CacheService {
@@ -66,6 +66,7 @@ class CacheService {
         }
         setQuestionOne(questions.questionOne);
         setQuestionTwo(questions.questionTwo);
+        setQuestionThree(questions.questionThree);
     }
 
     public async initBatchCache() {
