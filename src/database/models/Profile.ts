@@ -12,6 +12,7 @@ import {
     BelongsToCreateAssociationMixin,
     BelongsToGetAssociationMixin,
     BelongsToSetAssociationMixin,
+    HasManyRemoveAssociationMixin,
 } from "sequelize";
 import { Account } from "./Account";
 import { Gym } from "./Gym";
@@ -45,6 +46,7 @@ export class Profile extends Model<ProfileAttributes, ProfileCreationAttributes>
     declare getFavoriteApartments: HasManyGetAssociationsMixin<Housing>; // "picks" == "favorites"
     declare addFavoriteApartment: HasManyAddAssociationMixin<Housing, number>;
     declare addFavoriteApartments: HasManyAddAssociationsMixin<Housing, number>;
+    declare removeFavoriteApartment: HasManyRemoveAssociationMixin<Housing, number>;
 
     declare getGymPicks: HasManyGetAssociationsMixin<Gym>; // "picks" == "favorites"
     declare addGymPick: HasManyAddAssociationMixin<Gym, number>;

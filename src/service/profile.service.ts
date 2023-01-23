@@ -87,7 +87,16 @@ class ProfileService {
     }
 
     public async deleteHousingPick(accountId: number, toDeleteId: number) {
-        //
+        const profile = await this.profileDAO.getProfileForAccountId(accountId);
+        if (profile === null) {
+            throw Error("Profile not found for this account id");
+        }
+        const housing = await this.housingDAO.getHousingByHousingId(toDeleteId);
+        if (housing === null) {
+            throw Error("Housing not found for this housing id");
+        }
+        await this.profileDAO.removeHousingPick(profile.profileId, housing);
+        return toDeleteId; // if returned, success!
     }
 
     public async deleteGymPick(accountId: number, toDeleteId: number) {

@@ -141,6 +141,15 @@ class ProfileDAO {
         await profile.setAccount(account);
         return profile;
     }
+
+    // delete
+    public async removeHousingPick(profileId: number, housing: Housing): Promise<void> {
+        const profile = await Profile.findOne({ where: { profileId } });
+        if (profile === null) {
+            throw new Error("Profile not found for this profile id");
+        }
+        await profile.removeFavoriteApartment(housing);
+    }
 }
 
 export default ProfileDAO;
