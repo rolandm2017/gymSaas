@@ -139,9 +139,14 @@ class HousingController {
             }
             const apartmentIdInput = request.params.apartmentid;
             const apartmentId = isStringInteger(apartmentIdInput);
-            const realURL = await this.housingService.getRealURL(apartmentId, userId);
-            console.log(apartmentId, realURL, "124rm");
-            return response.status(200).json({ apartmentId, realURL, success: realURL !== "No credits available" });
+            const serviceResponse = await this.housingService.getRealURL(apartmentId, userId);
+            if (serviceResponse === "Dead link detected") {
+                return response.status(500).json({ serviceResponse, success: false });
+            }
+            if (serviceResponse === "No credits available") {
+                return response.status(400).json({ serviceResponse, success: false });
+            }
+            return response.status(200).json({ apartmentId, realURL: serviceResponse, success: true });
         } catch (err) {
             return handleErrorResponse(response, err);
         }

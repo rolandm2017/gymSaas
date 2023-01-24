@@ -77,8 +77,27 @@ class HousingService {
         const revealedToList = await profile.getReveals();
         // if already revealed, return url
         const isAlreadyRevealedToAccount = revealedToList.map(housing => housing.housingId).includes(housing.housingId);
+        const wasBadlyFetched = housing.url === "" || housing.url === null;
+        console.log(isAlreadyRevealedToAccount, apartmentId, "80rm");
         if (isAlreadyRevealedToAccount) {
-            return createRealUrl(housing.url, housing.source);
+            console.log(wasBadlyFetched, housing.idAtSource, "83rm");
+            if (wasBadlyFetched && housing.idAtSource) {
+                // retry
+                const urlFromApi = await this.scraperService.getURLForApartment(housing.idAtSource);
+                if (urlFromApi === "") {
+                    this.handleDeadLink(housing.housingId);
+                    return "Dead link detected";
+                }
+                console.log(urlFromApi, "url from api 87rm");
+                await this.housingDAO.addUrlToHousing(apartmentId, urlFromApi);
+                // do not deduct credit, do not add revealed to (because it already was/is)
+                const realUrl = createRealUrl(urlFromApi, housing.source);
+                console.log(realUrl, housing.idAtSource, "89rm");
+                return realUrl;
+            }
+            console.log(housing.url, housing.source, "81rm");
+            const realUrl = createRealUrl(housing.url, housing.source);
+            return realUrl;
         }
         const availableCredits = await this.accountDAO.getCurrentCredits(accountId);
         if (availableCredits <= 0) {
@@ -87,12 +106,14 @@ class HousingService {
 
         // if provider is rentCanada...
         const isFromRentCanada = housing.source === ProviderEnum.rentCanada;
-        const alreadyRetrievedUrl = housing.url !== null;
+        const alreadyRetrievedUrl = housing.url !== null && housing.url !== "";
         if (!isFromRentCanada || alreadyRetrievedUrl) {
             // (a) if the result is already there, return it
             this.tryDeductCredit(accountId);
             this.tryAddRevealedTo(profile, housing.housingId);
-            return createRealUrl(housing.url, housing.source);
+            console.log(housing.url, housing.source, "97rm");
+            const realUrl = createRealUrl(housing.url, housing.source);
+            return realUrl;
         }
         if (housing.idAtSource === null) {
             // should never happen...
@@ -100,10 +121,17 @@ class HousingService {
         }
         // (b) if the result isn't already there, get the real URL using their API, cache the result, then return it
         const urlFromApi = await this.scraperService.getURLForApartment(housing.idAtSource);
+        if (urlFromApi === "") {
+            this.handleDeadLink(housing.housingId);
+            return "Dead link detected";
+        }
+        console.log(housing.idAtSource, urlFromApi, "107rm");
         await this.housingDAO.addUrlToHousing(apartmentId, urlFromApi);
         this.tryDeductCredit(accountId);
         this.tryAddRevealedTo(profile, housing.housingId);
-        return createRealUrl(urlFromApi, ProviderEnum.rentCanada);
+        console.log(housing.url, housing.source, "110rm");
+        const realUrl = createRealUrl(urlFromApi, housing.source);
+        return realUrl;
     }
 
     public async getRevealedRealUrlList(acctId: number): Promise<IHousingWithUrl[]> {
@@ -198,6 +226,10 @@ class HousingService {
 
     public confirmIsGiantSquare(minLat: number, maxLat: number, minLong: number, maxLong: number): boolean {
         return maxLong > minLong && maxLat > minLat;
+    }
+
+    public async handleDeadLink(housingId: number) {
+        await this.housingDAO.deleteHousingByHousingId(housingId);
     }
 }
 
