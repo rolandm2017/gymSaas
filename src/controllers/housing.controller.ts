@@ -7,8 +7,8 @@ import { Housing } from "../database/models/Housing";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
-import { isLegitCityName, isProvider, isString, isStringFloat, isStringInteger } from "../validationSchemas/inputValidation";
-import { detectViewportWidthSchema, getHousingByCityIdAndBatchNumSchema } from "../validationSchemas/housingSchemas";
+import { isInteger, isLegitCityName, isProvider, isString, isStringFloat, isStringInteger } from "../validationSchemas/inputValidation";
+import { detectViewportWidthSchema, getHousingByCityIdAndBatchNumSchema, searchQuerySchema } from "../validationSchemas/housingSchemas";
 import authorize from "../middleware/authorize.middleware";
 import { Role } from "../enum/role.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
@@ -32,14 +32,15 @@ class HousingController {
         // user queries
         this.router.get("/real-url/:apartmentid", authorize([Role.User]), this.getRealURL.bind(this));
         this.router.get("/real-url-list", authorize([Role.User]), this.getRevealedRealUrlList.bind(this));
-        // admin ish stuff
-        this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
+        this.router.get("/search", authorize([Role.User]), searchQuerySchema, this.searchQuery.bind(this));
         // this.router.get("/saved", this.getSavedApartmentsByLocation.bind(this));
         // this.router.get("/location", authorize([Role.User]), this.getSavedApartmentsByLocation.bind(this));
         this.router.get("/by-location", this.getScrapedApartmentsByLocation.bind(this));
         this.router.get("/qualified/by-location", this.getQualifiedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
         this.router.delete("/all", authorize([Role.Admin]), this.deleteAllApartments.bind(this));
+        // admin ish stuff
+        this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
         // step 4 of queuing a scrape - for after the scrape of the city is done
         this.router.get("/qualify", this.qualifyScrapedApartments.bind(this));
         // step 5 of queuing a scrape - for after the apartments have been qualified
@@ -161,6 +162,23 @@ class HousingController {
             }
             const revealedURLs: IHousingWithUrl[] = await this.housingService.getRevealedRealUrlList(userId);
             return response.status(200).json({ revealedURLs });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    public async searchQuery(request: Request, response: Response) {
+        try {
+            const cityNameInput = request.query.cityName;
+            const minDistanceInput = request.query.minDistance;
+            const maxDistanceInput = request.query.maxDistance;
+            const pageNumInput = request.query.pageNum;
+            const cityName = isLegitCityName(cityNameInput);
+            const minDist = isStringFloat(minDistanceInput);
+            const maxDist = isStringFloat(maxDistanceInput);
+            const pageNum = isInteger(pageNumInput);
+            const results = await this.housingService.getUsingSearchQuery(cityName, minDist, maxDist, pageNum);
+            return response.status(200).json({ pageNum, results });
         } catch (err) {
             return handleErrorResponse(response, err);
         }

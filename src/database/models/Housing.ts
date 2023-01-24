@@ -16,6 +16,7 @@ interface HousingAttributes {
     long: number;
     nearAGym: boolean | null;
     source: string;
+    distanceToNearestGym: number;
     idAtSource: number | null;
     taskId?: number;
     cityId?: number;
@@ -40,6 +41,7 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
     public long!: number;
     public nearAGym!: boolean | null;
     public source!: string; // source as in Provider
+    public distanceToNearestGym!: number;
     public idAtSource!: number | null;
     public taskId!: ForeignKey<Task["taskId"]>;
     public cityId!: ForeignKey<City["cityId"]>;
@@ -99,6 +101,10 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                 source: {
                     type: DataTypes.STRING,
                     allowNull: false,
+                },
+                distanceToNearestGym: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
                 },
                 // idAtSource is used to fill out e.g.
                 // GET https://www.rentcanada.com/api/listing/38422?includeSharedLocationListings=true

@@ -102,6 +102,20 @@ class HousingDAO {
         return await Housing.findAll({ where: { cityId: city.cityId } });
     }
 
+    public async getUsingSearchQuery(cityId: number, minDist: number, maxDist: number, pageNum: number): Promise<Housing[]> {
+        return await Housing.findAll({
+            where: {
+                cityId,
+                distanceToNearestGym: {
+                    [Op.between]: [minDist, maxDist],
+                },
+            },
+            order: [["distanceToNearestGym", "ASC"]],
+            limit: 12,
+            offset: pageNum * 12,
+        });
+    }
+
     public async readBetween(lowerLimitLatitude: number, upperLimitLatitude: number, lowerLimitLongitude: number, upperLimitLongitude: number) {
         return await Housing.findAll({
             where: {

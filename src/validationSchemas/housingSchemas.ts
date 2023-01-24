@@ -19,3 +19,12 @@ export function getHousingByCityIdAndBatchNumSchema(req: Request, res: Response,
     });
     validateRequest(req, next, schema);
 }
+
+export function searchQuerySchema(req: Request, res: Response, next: NextFunction) {
+    const schema: ObjectSchema = Joi.object({
+        cityName: Joi.string(),
+        minDistance: Joi.number(),
+        maxDistance: Joi.number(),
+    });
+    validateRequest(req, next, schema);
+}

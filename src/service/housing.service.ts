@@ -1,5 +1,5 @@
 import { Cache } from "joi";
-import { max } from "moment";
+import { max, min } from "moment";
 import AccountDAO from "../database/dao/account.dao";
 import GymDAO from "../database/dao/gym.dao";
 import HousingDAO from "../database/dao/housing.dao";
@@ -164,6 +164,11 @@ class HousingService {
 
     public async getApartmentsByLocation(cityName: string | undefined): Promise<Housing[]> {
         return await this.housingDAO.getApartmentsByLocation(cityName);
+    }
+
+    public async getUsingSearchQuery(cityName: string, minDist: number, maxDist: number, pageNum: number): Promise<Housing[]> {
+        const cityId = await this.cacheService.getCityId(cityName);
+        return await this.housingDAO.getUsingSearchQuery(cityId, minDist, maxDist, pageNum);
     }
 
     // step 4 of scraping process
