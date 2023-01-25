@@ -38,7 +38,9 @@ class HousingController {
         this.router.get("/by-location", this.getScrapedApartmentsByLocation.bind(this));
         this.router.get("/qualified/by-location", this.getQualifiedApartmentsByLocation.bind(this));
         this.router.get("/all", this.getAllApartments.bind(this));
-        this.router.delete("/all", authorize([Role.Admin]), this.deleteAllApartments.bind(this));
+        // "/delete-all" so "get all" and "delete all" don't have the same route with a different verb.
+        // prevents accidental deletion.
+        this.router.delete("/delete-all", authorize([Role.Admin]), this.deleteAllApartments.bind(this));
         // admin ish stuff
         this.router.get("/by-city-id-and-batch-id", getHousingByCityIdAndBatchNumSchema, this.getHousingByCityIdAndBatchNum.bind(this));
         // step 4 of queuing a scrape - for after the scrape of the city is done

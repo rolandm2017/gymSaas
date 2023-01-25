@@ -50,6 +50,7 @@ class Parser {
 
     parseRentFaster(unprocessed: any): IHousingWithUrl[] {
         // list of objects
+        console.log(unprocessed, "53rm");
         // const mainList = unprocessed.listings; // do not change this
         const mainList = unprocessed.results.listings; // do not change this
         // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
@@ -74,6 +75,7 @@ class Parser {
 
     parseRentSeeker(unprocessed: any): IHousingWithUrl[] {
         // list of objects
+        console.log(unprocessed, "78rm");
         // const mainList = unprocessed.hits; // do not change this
         const mainList = unprocessed.results.hits; // do not change this
         // properties of interest: "name" here is the address (for geolocating), city, link (is url), phone, latitude, longitude
