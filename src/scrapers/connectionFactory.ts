@@ -12,13 +12,13 @@ const scraperAccess = {
     rentFaster: {
         site: "rentfaster.ca",
         scraperIp: "http://127.0.0.1",
-        scraperPort: 5001,
+        scraperPort: 5000,
         type: "lat,long",
     },
     rentSeeker: {
         site: "rentseeker.ca",
         scraperIp: "http://127.0.0.1",
-        scraperPort: 5002,
+        scraperPort: 5000,
         type: "lat,long",
     },
 };

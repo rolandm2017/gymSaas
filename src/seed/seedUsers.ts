@@ -4,7 +4,7 @@ import { Role } from "../enum/role.enum";
 import AccountUtil from "../util/accountUtil";
 import { FREE_CREDITS } from "../util/constants";
 
-export const ADMIN_ACCT_PASSWORD = "testTEST11!!";
+export const ADMIN_ACCT_PASSWORD = process.env.ADMIN_PASSWORD || "foo";
 
 const refreshTokenDAO = new RefreshTokenDAO();
 

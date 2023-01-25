@@ -97,7 +97,7 @@ class TaskQueueController {
             const zoomWidthInput = request.body.zoomWidth;
             const cityNameInput = request.body.cityName;
             const batchNumInput = request.body.batchNum; // admin should have gotten this from the previous endpoint
-
+            console.log(request.body, "100rm");
             const provider = isProvider(providerInput);
             if (!Array.isArray(coords) || coords.length === 0) {
                 // not doing more validation.
@@ -157,7 +157,8 @@ class TaskQueueController {
             const byProvider = byProviderInput ? isProvider(byProviderInput) : undefined;
             const byBatchNum = byBatchNumInput ? isStringInteger(byBatchNumInput) : undefined;
             const tasks: Task[] = await this.taskQueueService.getAllTasks(byProvider, byBatchNum, undefined);
-            return response.status(200).json({ tasks });
+            console.log(tasks.length, "160rm");
+            return response.status(200).json({ tasks, count: tasks.length });
         } catch (err) {
             return handleErrorResponse(response, err);
         }

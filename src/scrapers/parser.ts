@@ -23,7 +23,10 @@ class Parser {
 
     parseRentCanada(unprocessed: any): IHousingWithUrl[] {
         // list of objects
-        const mainList = unprocessed.listings; // do not change this
+        console.log(unprocessed, "26rm");
+        // const mainList = unprocessed.listings; // do not change this
+        const mainList = unprocessed.results.listings; // do not change this
+        console.log(mainList, "28rm");
         const apList: IHousingWithUrl[] = [];
         for (let i = 0; i < mainList.length; i++) {
             const unit = mainList[i];
@@ -47,7 +50,8 @@ class Parser {
 
     parseRentFaster(unprocessed: any): IHousingWithUrl[] {
         // list of objects
-        const mainList = unprocessed.listings; // do not change this
+        // const mainList = unprocessed.listings; // do not change this
+        const mainList = unprocessed.results.listings; // do not change this
         // properties of interest: address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousingWithUrl[] = [];
         for (let i = 0; i < mainList.length; i++) {
@@ -70,7 +74,8 @@ class Parser {
 
     parseRentSeeker(unprocessed: any): IHousingWithUrl[] {
         // list of objects
-        const mainList = unprocessed.hits; // do not change this
+        // const mainList = unprocessed.hits; // do not change this
+        const mainList = unprocessed.results.hits; // do not change this
         // properties of interest: "name" here is the address (for geolocating), city, link (is url), phone, latitude, longitude
         const apList: IHousingWithUrl[] = [];
         for (let i = 0; i < mainList.length; i++) {

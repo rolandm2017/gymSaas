@@ -28,6 +28,9 @@ import TaskDAO from "./database/dao/task.dao";
 import GymDAO from "./database/dao/gym.dao";
 import HousingDAO from "./database/dao/housing.dao";
 import StateDAO from "./database/dao/state.dao";
+import { SEED_USERS } from "./seed/seedUsers";
+import AccountDAO from "./database/dao/account.dao";
+import { SEED_TASKS } from "./seed/seedTasks";
 
 class App {
     public app: Application;
@@ -74,7 +77,7 @@ class App {
                 console.log("syncing");
                 await Database.sync({ alter: true, logging: false });
                 console.log("seeding db");
-                await this.seedDb(false, false);
+                await this.seedDb(false, false, false);
                 console.log("initializing caches");
                 await this.initializeCaches();
             } catch (err) {
@@ -101,7 +104,7 @@ class App {
         });
     }
 
-    private async seedDb(alsoGyms?: boolean, alsoAps?: boolean) {
+    private async seedDb(alsoGyms?: boolean, alsoAps?: boolean, alsoTasks?: boolean) {
         for (const state of SEED_STATES) {
             const found = await State.findOne({ where: state });
             if (found) continue;
@@ -115,11 +118,16 @@ class App {
             if (found) continue;
             City.create(city);
         }
-        // for (const user of SEED_USERS) {
-        //     const found = await Account.findOne({ where: { email: user.email } });
-        //     if (found) continue;
-        //     Account.create(user);
-        // }
+        const accountDAO = new AccountDAO();
+        for (const user of SEED_USERS) {
+            const found = await accountDAO.getAccountByEmail(user.email);
+            if (found) {
+                console.log(user.email, "is in the db");
+                continue;
+            }
+            console.log("Seeding admin");
+            await accountDAO.createAccount(user);
+        }
         if (alsoGyms) {
             const gymDAO = new GymDAO();
             for (const cityGyms of SEED_GYMS_CANADA) {
@@ -133,7 +141,6 @@ class App {
         }
         if (alsoAps) {
             // put the batch in
-            console.log("HERE 130rm");
             const batchDAO = new BatchDAO();
             const highest = await batchDAO.getHighestBatchNum();
             if (highest === 1) {
@@ -154,11 +161,32 @@ class App {
                         if (found) continue;
                         delete ap.taskId;
                         count++;
-                        console.log(`seeding apartment #${count}...`);
                         housingDAO.createHousing(ap);
                     }
                 }
             }
+            console.log("seeded " + count + " apartments");
+        }
+        if (alsoTasks) {
+            // put the batch in
+            const batchDAO = new BatchDAO();
+            const highest = await batchDAO.getHighestBatchNum();
+            if (highest === 1) {
+                //
+            } else {
+                new BatchDAO().addBatchNum(1);
+            }
+            const taskDAO = new TaskDAO();
+            let count = 0;
+            for (const task of SEED_TASKS) {
+                if (task.taskId) {
+                    const found = await taskDAO.getTaskById(task.taskId);
+                    if (found) continue;
+                    count++;
+                    taskDAO.createTask(task);
+                }
+            }
+            console.log("seeded " + count + " tasks");
         }
     }
 

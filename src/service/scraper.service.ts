@@ -38,7 +38,9 @@ class ScraperService {
         try {
             const scraper: Scraper = this.scraperConnectionFactory.getScraperOfType(provider);
             const coords = await this.locationDiscoveryService.geocoding("", city, stateOrProvince, "Canada");
+            console.log(coords, "41rm");
             const results = await scraper.scrape(coords.lat, coords.long, provider);
+            console.log(results.length, "43rm");
             const dimensions = detectViewportSize(results);
             return dimensions;
             // todo: put detected width into db so dont have to keep redoing this.

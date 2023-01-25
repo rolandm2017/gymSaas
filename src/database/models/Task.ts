@@ -7,7 +7,9 @@ import { City } from "./City";
 
 export interface TaskAttributes {
     taskId?: number;
-    providerName: ProviderEnum;
+    // providerName has to be "string" not enum because otherwise
+    // the seed file won't recognize e.g. "rentFaster" as ProviderEnum.rentFaster
+    providerName: string;
     lat: number;
     long: number;
     zoomWidth: number; // 0 = default
