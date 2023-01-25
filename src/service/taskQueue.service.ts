@@ -14,7 +14,7 @@ import { convertIHousingToCreationAttr } from "../util/housingConverter";
 import BatchDAO from "../database/dao/batch.dao";
 import CacheService from "./cache.service";
 import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
-import { MIN_SCRAPES_FOR_REPEAT_SCRAPE } from "../util/constants";
+import { COMPLETE_TASK_TIME_THRESHOLD_IN_DAYS, MIN_SCRAPES_FOR_REPEAT_SCRAPE } from "../util/constants";
 
 class TaskQueueService {
     private taskDAO: TaskDAO;
@@ -155,6 +155,15 @@ class TaskQueueService {
     public async getAllBatchNumbers(): Promise<number[]> {
         const batches = await this.cacheService.getAllBatchNums();
         return batches;
+    }
+
+    public countComplete(tasks: Task[]): { complete: number; incomplete: number } {
+        const now = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(now.getDate() - COMPLETE_TASK_TIME_THRESHOLD_IN_DAYS);
+        const complete = tasks.filter((task: Task) => task.lastScan !== null && task.lastScan < thirtyDaysAgo);
+        const incomplete = tasks.length - complete.length;
+        return { complete: complete.length, incomplete };
     }
 
     public async cleanSpecific(bySpecificTaskIds: number[] | undefined, byRange: number[] | undefined): Promise<number[]> {

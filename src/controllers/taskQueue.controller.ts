@@ -157,8 +157,9 @@ class TaskQueueController {
             const byProvider = byProviderInput ? isProvider(byProviderInput) : undefined;
             const byBatchNum = byBatchNumInput ? isStringInteger(byBatchNumInput) : undefined;
             const tasks: Task[] = await this.taskQueueService.getAllTasks(byProvider, byBatchNum, undefined);
+            const { complete, incomplete } = this.taskQueueService.countComplete(tasks);
             console.log(tasks.length, "160rm");
-            return response.status(200).json({ tasks, count: tasks.length });
+            return response.status(200).json({ tasks, count: tasks.length, complete, incomplete });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
