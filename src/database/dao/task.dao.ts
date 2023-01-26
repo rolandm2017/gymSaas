@@ -51,6 +51,10 @@ class TaskDAO {
         return await Task.findAll({ where: { batchId: batchNum, cityId } });
     }
 
+    public async getTasksByBatchNumAndProvider(batchNum: number, providerName: string): Promise<Task[]> {
+        return await Task.findAll({ where: { batchId: batchNum, providerName } });
+    }
+
     public async getTasksByBatchNumAndCityIdAndProvider(batchNum: number, cityId: number, provider: ProviderEnumOrAll): Promise<Task[]> {
         // it looks like "all" could be passed but ideally it never gets here
         if (provider === ProviderEnumOrAll.all) {

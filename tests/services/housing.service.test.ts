@@ -1,16 +1,21 @@
+import AccountDAO from "../../src/database/dao/account.dao";
 import BatchDAO from "../../src/database/dao/batch.dao";
 import CityDAO from "../../src/database/dao/city.dao";
 import FeedbackDAO from "../../src/database/dao/feedback.dao";
 import GymDAO from "../../src/database/dao/gym.dao";
 import HousingDAO from "../../src/database/dao/housing.dao";
+import ProfileDAO from "../../src/database/dao/profile.dao";
 import StateDAO from "../../src/database/dao/state.dao";
 import TaskDAO from "../../src/database/dao/task.dao";
 import { TaskCreationAttributes } from "../../src/database/models/Task";
 import { ProviderEnum } from "../../src/enum/provider.enum";
 import { IQualificationReport } from "../../src/interface/QualificationReport.interface";
+import ScraperConnectionFactory from "../../src/scrapers/connectionFactory";
 import { SEED_CITIES } from "../../src/seed/seedCities";
 import CacheService from "../../src/service/cache.service";
 import HousingService from "../../src/service/housing.service";
+import LocationDiscoveryService from "../../src/service/locationDiscovery.service";
+import ScraperService from "../../src/service/scraper.service";
 import TaskQueueService from "../../src/service/taskQueue.service";
 import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../../src/util/acceptableRadiusForWalking";
 import { dummyGymData } from "../mocks/dummyGyms/dummyGyms";
@@ -22,14 +27,26 @@ const cityDAO = new CityDAO();
 const batchDAO = new BatchDAO();
 const taskDAO = new TaskDAO();
 const feedbackDAO = new FeedbackDAO();
+const accountDAO = new AccountDAO();
+const profileDAO = new ProfileDAO();
 
 const housingDAO = new HousingDAO(stateDAO, cityDAO);
 const gymDAO = new GymDAO();
 
+const scraperConnectionFactory = new ScraperConnectionFactory(taskDAO);
+const locationDiscoveryService = new LocationDiscoveryService();
+const scraperService = new ScraperService(scraperConnectionFactory, locationDiscoveryService);
 const cacheService: CacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
 
-const housingService: HousingService = new HousingService(housingDAO, gymDAO, cacheService);
-const taskQueueService: TaskQueueService = new TaskQueueService(housingDAO, taskDAO, cacheService);
+// housingDAO: HousingDAO,
+// gymDAO: GymDAO,
+// accountDAO: AccountDAO,
+// profileDAO: ProfileDAO,
+// cacheService: CacheService,
+// scraperService: ScraperService,
+
+const housingService: HousingService = new HousingService(housingDAO, gymDAO, accountDAO, profileDAO, cacheService, scraperService);
+const taskQueueService: TaskQueueService = new TaskQueueService(housingDAO, taskDAO, cityDAO, cacheService);
 
 // find which apartments are within range of a gym
 const minAcceptableLat = dummyGymData[0].lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;

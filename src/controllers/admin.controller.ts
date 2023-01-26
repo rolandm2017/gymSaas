@@ -29,7 +29,7 @@ class AdminController {
         this.router.get("/batches/all", authorize([Role.Admin]), this.getAllBatchNumbers.bind(this));
         this.router.get("/task-queue/all", authorize([Role.Admin]), this.getAllTasks.bind(this));
         // "/admin/task-queue/tasks-by-batch-num";
-        this.router.get("/task-queue/tasks-by-batch-num-and-city-id", authorize([Role.Admin]), this.getTasksByWithSpecifications.bind(this));
+        this.router.get("/task-queue/tasks-by-batch-num-and-city-name", authorize([Role.Admin]), this.getTasksByWithSpecifications.bind(this));
         this.router.get("/housing/by-location", authorize([Role.Admin]), this.getApartmentsByLocation.bind(this));
         this.router.get("/housing/by-city-id-and-batch-num", authorize([Role.Admin]), this.getApartmentsByCityIdAndBatchNum.bind(this));
         // user stuff
@@ -92,13 +92,13 @@ class AdminController {
     public async getTasksByWithSpecifications(request: Request, response: Response) {
         try {
             const batchNumInput = request.query.batchNum;
-            const cityIdInput = request.query.cityId;
+            const cityNameInput = request.query.cityId;
             const providerInput = request.query.provider;
             const batchNum = isStringInteger(batchNumInput);
-            const cityId = isStringInteger(cityIdInput);
+            const cityName = isString(cityNameInput);
             const providerOrAll = isProviderOrAll(providerInput);
 
-            const tasks: Task[] = await this.taskQueueService.getTasksByWithSpecifications(batchNum, cityId, providerOrAll);
+            const tasks: Task[] = await this.taskQueueService.getTasksByWithSpecifications(batchNum, cityName, providerOrAll);
             return response.status(200).json({ tasks });
         } catch (err) {
             return handleErrorResponse(response, err);

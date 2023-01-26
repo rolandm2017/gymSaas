@@ -15,15 +15,18 @@ import BatchDAO from "../database/dao/batch.dao";
 import CacheService from "./cache.service";
 import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
 import { COMPLETE_TASK_TIME_THRESHOLD_IN_DAYS, MIN_SCRAPES_FOR_REPEAT_SCRAPE } from "../util/constants";
+import { CityNameEnum } from "../enum/cityName.enum";
 
 class TaskQueueService {
     private taskDAO: TaskDAO;
     private housingDAO: HousingDAO;
+    private cityDAO: CityDAO;
     private cacheService: CacheService;
 
-    constructor(housingDAO: HousingDAO, taskDAO: TaskDAO, cacheService: CacheService) {
+    constructor(housingDAO: HousingDAO, taskDAO: TaskDAO, cityDAO: CityDAO, cacheService: CacheService) {
         this.housingDAO = housingDAO;
         this.taskDAO = taskDAO;
+        this.cityDAO = cityDAO;
         this.cacheService = cacheService;
     }
 
@@ -80,14 +83,45 @@ class TaskQueueService {
         return tasks;
     }
 
-    public async getTasksByWithSpecifications(batchNum: number, cityId: number, provider: ProviderEnumOrAll): Promise<Task[]> {
-        if (provider === ProviderEnumOrAll.all) {
-            const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityId(batchNum, cityId);
+    public async getTasksByWithSpecifications(batchNum: number, cityName: string, provider: ProviderEnumOrAll): Promise<Task[]> {
+        // handle case where cityName is "all"
+        const cityNameInputIsAll = cityName === "all";
+
+        if (cityNameInputIsAll) {
+            //
+            const correspondingCities = await this.cityDAO.getAllCities();
+            if (correspondingCities.length === 0) throw Error("Unexpected failure from no cities retrieved");
+            if (provider === ProviderEnumOrAll.all) {
+                // all providers, all cities
+                const tasks: Task[] = await this.taskDAO.getTasksByBatchNum(batchNum);
+                return tasks;
+            }
+            // by specific batch num and provider now
+            const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndProvider(batchNum, provider);
             return tasks;
         }
-        const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityIdAndProvider(batchNum, cityId, provider);
+        // **
+        // handle case where cityName is not all and is a valid city name
+        const allValidCities = Object.values(CityNameEnum) as string[];
+        const cityNameIsASpecificCity = allValidCities.includes(cityName);
 
-        return tasks;
+        if (cityNameIsASpecificCity) {
+            //
+            const correspondingCity = await this.cityDAO.getCityByName(cityName);
+            if (correspondingCity === null) throw Error("Invalid city name");
+            if (provider === ProviderEnumOrAll.all) {
+                const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityId(batchNum, correspondingCity.cityId);
+                return tasks;
+            }
+            // by specific provider, cityname, batch num
+            const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityIdAndProvider(batchNum, correspondingCity.cityId, provider);
+
+            return tasks;
+        }
+        // **
+        // handle case where cityName is not all and is overall invalid
+        const invalidCityName = true; // it must be false because otherwise the prev 2 conditions would've handled it.
+        return [];
     }
 
     public async reportFindingsToDb(
