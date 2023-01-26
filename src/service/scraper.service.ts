@@ -14,6 +14,7 @@ import { IBounds } from "../interface/Bounds.interface";
 import LocationDiscoveryService from "./locationDiscovery.service";
 import { ILatLong } from "../interface/LatLong.interface";
 import { generateGrid } from "../util/gridMaker";
+import { AxiosError } from "axios";
 
 // const dotenvConfig = dotenv.config();
 dotenv.config();
@@ -45,7 +46,12 @@ class ScraperService {
             return dimensions;
             // todo: put detected width into db so dont have to keep redoing this.
         } catch (err) {
-            console.log(err);
+            if (err instanceof AxiosError) {
+                console.log("AxiosErrorDetails:");
+                console.log(err.code, err.response?.status);
+            } else {
+                console.log(err);
+            }
             // return something to appease the return type
             return { north: 0, south: 0, east: 0, west: 0, latitudeChange: 0, longitudeChange: 0, kmEastWest: 0, kmNorthSouth: 0 };
         }

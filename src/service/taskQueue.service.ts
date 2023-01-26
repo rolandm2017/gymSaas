@@ -80,8 +80,8 @@ class TaskQueueService {
         return tasks;
     }
 
-    public async getTasksByBatchNum(batchNum: number): Promise<Task[]> {
-        const tasks: Task[] = await this.taskDAO.getTasksByBatchNum(batchNum);
+    public async getTasksByBatchNumAndCityId(batchNum: number, cityId: number): Promise<Task[]> {
+        const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityId(batchNum, cityId);
         return tasks;
     }
 
@@ -94,6 +94,7 @@ class TaskQueueService {
     ): Promise<{ pass: number; fail: number }> {
         const parser = new Parser(provider);
         const parsedApartmentData: IHousingWithUrl[] = parser.parse(apartments);
+        console.log(`adding ${parsedApartmentData.length} apartments`);
         let successes = 0;
         // get city id for this task because its needed in the housing model for foreign key
         const currentTask = await this.taskDAO.getTaskById(taskId);
@@ -107,6 +108,7 @@ class TaskQueueService {
         // mark it ignored if there are too few results to repeat it
         const tooFewApartmentsToContinueScrape = parsedApartmentData.length < MIN_SCRAPES_FOR_REPEAT_SCRAPE;
         if (tooFewApartmentsToContinueScrape) {
+            console.log(`Marking ignored for task with id ${taskId}`);
             await this.taskDAO.markIgnored(currentTask);
         }
         // add apartments

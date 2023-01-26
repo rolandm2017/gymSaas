@@ -47,6 +47,10 @@ class TaskDAO {
         return await Task.findAll({ where: { batchId: batchNum } });
     }
 
+    public async getTasksByBatchNumAndCityId(batchNum: number, cityId: number) {
+        return await Task.findAll({ where: { batchId: batchNum, cityId } });
+    }
+
     // Can't work because it doesn't allow create with associations.
     // public async async  bulkCreateTask = (tasks: TaskCreationAttributes[]) {
     //     return Task.bulkCreate(tasks);

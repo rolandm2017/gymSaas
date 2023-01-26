@@ -142,7 +142,6 @@ class TaskQueueController {
                 return handleErrorResponse(response, "Bad task ID input");
             }
             console.log(apartments, "144rm");
-            console.log(`adding ${apartments.length} apartments...`);
             const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments, cityId, batchNum);
             const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
             return response.status(200).json({ successfullyLogged, markedComplete, taskId });
