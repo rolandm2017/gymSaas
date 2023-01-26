@@ -32,6 +32,7 @@ class TaskQueueController {
         // step 2 of 3 in queuing a scrape
         this.router.post("/plan-grid-scan", authorize([Role.Admin]), this.getGridForScan.bind(this));
         // step 3 of 3 in queuing a scrape
+        // this.router.post("/queue-grid-scan", authorize([Role.Admin]), this.addGridScanToQueue.bind(this)); // admin only
         this.router.post("/queue-grid-scan", authorize([Role.Admin]), this.addGridScanToQueue.bind(this)); // admin only
         // stuff (separate from the 3 step queuing)
         this.router.get("/scrape", this.scrapeApartments.bind(this));

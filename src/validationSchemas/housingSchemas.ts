@@ -8,6 +8,7 @@ export function detectViewportWidthSchema(req: Request, res: Response, next: Nex
         city: Joi.string(),
         state: Joi.string(),
         provider: Joi.string(),
+        zoomWidth: Joi.number(),
     });
     validateRequest(req, next, schema);
 }

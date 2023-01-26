@@ -81,8 +81,9 @@ class HousingController {
             const city = request.body.city;
             const stateOrProvince = request.body.state;
             const providerInput = request.body.provider;
+            const zoomWidthInput = request.body.zoomWidth;
             const provider = isProvider(providerInput); // throws if invalid
-            const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(provider, city, stateOrProvince);
+            const dimensions: IBounds = await this.scraperService.detectProviderViewportWidth(provider, city, stateOrProvince, zoomWidthInput);
             return response.status(200).json(dimensions);
         } catch (err) {
             return handleErrorResponse(response, err);

@@ -11,6 +11,7 @@ import TaskQueueService from "../service/taskQueue.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { isEmail, isProvider, isProviderOrAll, isString, isStringInteger } from "../validationSchemas/inputValidation";
 import { IHousing } from "../interface/Housing.interface";
+import { ProvinceIdEnum } from "../enum/canadaProvinceId.enum";
 
 class AdminController {
     public path = "/admin";
@@ -92,13 +93,15 @@ class AdminController {
     public async getTasksByWithSpecifications(request: Request, response: Response) {
         try {
             const batchNumInput = request.query.batchNum;
-            const cityNameInput = request.query.cityId;
+            const cityNameInput = request.query.cityName;
             const providerInput = request.query.provider;
+            console.log(batchNumInput, cityNameInput, providerInput, "98rm");
             const batchNum = isStringInteger(batchNumInput);
             const cityName = isString(cityNameInput);
             const providerOrAll = isProviderOrAll(providerInput);
-
+            console.log(batchNum, cityName, providerOrAll, "102rm");
             const tasks: Task[] = await this.taskQueueService.getTasksByWithSpecifications(batchNum, cityName, providerOrAll);
+            console.log(`returning tasks of length ${tasks.length}, '104rm'`);
             return response.status(200).json({ tasks });
         } catch (err) {
             return handleErrorResponse(response, err);

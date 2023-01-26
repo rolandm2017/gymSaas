@@ -15,9 +15,9 @@ class Scraper {
         this.port = port;
     }
 
-    async scrape(lat: number, long: number, provider: ProviderEnum): Promise<IHousing[]> {
+    async scrape(lat: number, long: number, provider: ProviderEnum, zoomWidth: number): Promise<IHousing[]> {
         const url: string = this.ip + ":" + this.port + "/";
-        const json: string = JSON.stringify({ id: 0, lat, long, provider });
+        const json: string = JSON.stringify({ id: 0, lat, long, provider, zoomWidth });
         const results: AxiosResponse<any, any> = await axios.post(url, json, {
             headers: {
                 "Content-Type": "application/json",

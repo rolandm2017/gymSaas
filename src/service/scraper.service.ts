@@ -34,13 +34,13 @@ class ScraperService {
         return [];
     }
 
-    public async detectProviderViewportWidth(provider: ProviderEnum, city: string, stateOrProvince: string): Promise<IBounds> {
+    public async detectProviderViewportWidth(provider: ProviderEnum, city: string, stateOrProvince: string, zoomWidth: number): Promise<IBounds> {
         // step 1: discover the viewport width. To be used in the grid maker as "jump" size.
         try {
             const scraper: Scraper = this.scraperConnectionFactory.getScraperOfType(provider);
             const coords = await this.locationDiscoveryService.geocoding("", city, stateOrProvince, "Canada");
             console.log(coords, "41rm");
-            const results = await scraper.scrape(coords.lat, coords.long, provider);
+            const results = await scraper.scrape(coords.lat, coords.long, provider, zoomWidth);
             console.log(results.length, "43rm");
             const dimensions = detectViewportSize(results);
             return dimensions;
