@@ -1,7 +1,7 @@
 import express from "express";
 
 import TaskDAO from "../database/dao/task.dao";
-import { ProviderEnum } from "../enum/provider.enum";
+import { ProviderEnum, ProviderEnumOrAll } from "../enum/provider.enum";
 import { ILatLong } from "../interface/LatLong.interface";
 import { Task } from "../database/models/Task";
 import { ITask } from "../interface/Task.interface";
@@ -80,8 +80,13 @@ class TaskQueueService {
         return tasks;
     }
 
-    public async getTasksByBatchNumAndCityId(batchNum: number, cityId: number): Promise<Task[]> {
-        const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityId(batchNum, cityId);
+    public async getTasksByWithSpecifications(batchNum: number, cityId: number, provider: ProviderEnumOrAll): Promise<Task[]> {
+        if (provider === ProviderEnumOrAll.all) {
+            const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityId(batchNum, cityId);
+            return tasks;
+        }
+        const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityIdAndProvider(batchNum, cityId, provider);
+
         return tasks;
     }
 

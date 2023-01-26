@@ -1,7 +1,7 @@
 import { EagerLoadingError, Op } from "sequelize";
 import moment from "moment";
 //
-import { ProviderEnum } from "../../enum/provider.enum";
+import { ProviderEnum, ProviderEnumOrAll } from "../../enum/provider.enum";
 import { Task, TaskCreationAttributes } from "../models/Task";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { Batch } from "../models/Batch";
@@ -43,12 +43,20 @@ class TaskDAO {
         });
     }
 
-    public async getTasksByBatchNum(batchNum: number) {
+    public async getTasksByBatchNum(batchNum: number): Promise<Task[]> {
         return await Task.findAll({ where: { batchId: batchNum } });
     }
 
-    public async getTasksByBatchNumAndCityId(batchNum: number, cityId: number) {
+    public async getTasksByBatchNumAndCityId(batchNum: number, cityId: number): Promise<Task[]> {
         return await Task.findAll({ where: { batchId: batchNum, cityId } });
+    }
+
+    public async getTasksByBatchNumAndCityIdAndProvider(batchNum: number, cityId: number, provider: ProviderEnumOrAll): Promise<Task[]> {
+        // it looks like "all" could be passed but ideally it never gets here
+        if (provider === ProviderEnumOrAll.all) {
+            throw Error("Unintentional usage");
+        }
+        return await Task.findAll({ where: { batchId: batchNum, cityId, providerName: provider } });
     }
 
     // Can't work because it doesn't allow create with associations.

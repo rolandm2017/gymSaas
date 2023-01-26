@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { CityNameEnum } from "../enum/cityName.enum";
-import { ProviderEnum } from "../enum/provider.enum";
+import { ProviderEnum, ProviderEnumOrAll } from "../enum/provider.enum";
 
 const stringSchema = z.string();
 const emailSchema = z.string().email();
@@ -9,6 +9,12 @@ const dateSchema = z.date();
 const stringArr = z.array(z.string());
 const intArr = z.array(z.number());
 const providerArr = z.union([z.literal(ProviderEnum.rentCanada), z.literal(ProviderEnum.rentFaster), z.literal(ProviderEnum.rentSeeker)]);
+const providerArrIncludingAll = z.union([
+    z.literal(ProviderEnumOrAll.rentCanada),
+    z.literal(ProviderEnumOrAll.rentFaster),
+    z.literal(ProviderEnumOrAll.rentSeeker),
+    z.literal(ProviderEnumOrAll.all),
+]);
 
 export function isStringInteger(testSubject: unknown): number {
     const stringInput = stringSchema.parse(testSubject);
@@ -36,6 +42,10 @@ export function isEmail(testSubject: unknown): string {
 
 export function isProvider(testSubject: unknown): ProviderEnum {
     return providerArr.parse(testSubject);
+}
+
+export function isProviderOrAll(testSubject: unknown): ProviderEnumOrAll {
+    return providerArrIncludingAll.parse(testSubject);
 }
 
 export function isLegitCityName(testSubject: unknown): CityNameEnum {
