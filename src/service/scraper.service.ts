@@ -39,7 +39,6 @@ class ScraperService {
         try {
             const scraper: Scraper = this.scraperConnectionFactory.getScraperOfType(provider);
             const coords = await this.locationDiscoveryService.geocoding("", city, stateOrProvince, "Canada");
-            console.log(coords, "41rm");
             const results = await scraper.scrape(coords.lat, coords.long, provider, zoomWidth);
             console.log(results.length, "43rm");
             const dimensions = detectViewportSize(results);
