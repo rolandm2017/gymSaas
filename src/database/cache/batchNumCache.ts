@@ -28,6 +28,7 @@ export async function setBatchNumForNewBatches(newNum: number, batchDAO: BatchDA
 
 export async function addBatchNumIfNotExists(newNum: number, batchDAO: BatchDAO): Promise<number[]> {
     const exists = _usedBatchNumbers.includes(newNum);
+    console.log(_usedBatchNumbers, "31rm");
     if (exists || _isTooLow(newNum)) {
         return [..._usedBatchNumbers]; // its already in the cache? return it.
     } else {

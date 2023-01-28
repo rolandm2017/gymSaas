@@ -46,7 +46,7 @@ const cacheService: CacheService = new CacheService(cityDAO, batchDAO, feedbackD
 // scraperService: ScraperService,
 
 const housingService: HousingService = new HousingService(housingDAO, gymDAO, accountDAO, profileDAO, cacheService, scraperService);
-const taskQueueService: TaskQueueService = new TaskQueueService(housingDAO, taskDAO, cityDAO, cacheService);
+const taskQueueService: TaskQueueService = new TaskQueueService(housingDAO, taskDAO, cityDAO, batchDAO, cacheService);
 
 // find which apartments are within range of a gym
 const minAcceptableLat = dummyGymData[0].lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;

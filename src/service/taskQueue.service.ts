@@ -21,12 +21,14 @@ class TaskQueueService {
     private taskDAO: TaskDAO;
     private housingDAO: HousingDAO;
     private cityDAO: CityDAO;
+    private batchDAO: BatchDAO;
     private cacheService: CacheService;
 
-    constructor(housingDAO: HousingDAO, taskDAO: TaskDAO, cityDAO: CityDAO, cacheService: CacheService) {
+    constructor(housingDAO: HousingDAO, taskDAO: TaskDAO, cityDAO: CityDAO, batchDAO: BatchDAO, cacheService: CacheService) {
         this.housingDAO = housingDAO;
         this.taskDAO = taskDAO;
         this.cityDAO = cityDAO;
+        this.batchDAO = batchDAO;
         this.cacheService = cacheService;
     }
 
@@ -37,13 +39,21 @@ class TaskQueueService {
         cityName: string,
         batchNum: number,
     ): Promise<{ pass: number; fail: number; batchNum: number }> {
-        const cachedNums = await this.cacheService.addBatchNumIfNotExists(batchNum);
+        // todo: low priority - caching the batch num to cut read/write in half
+        // const cachedNums = await this.cacheService.addBatchNumIfNotExists(batchNum);
+        const all = await this.batchDAO.getAllBatchNums();
+        const alreadyWritten = all.includes(batchNum);
+        if (!alreadyWritten) {
+            await this.batchDAO.addBatchNum(batchNum);
+        }
 
         // step 3: fwd the grid coords to the scraper along with the bounds.
         // the scraper will scan every subdivision of the grid and report back its results.
         const correspondingCityId = await this.cacheService.getCityId(cityName);
 
-        const successes: {}[] = [];
+        // "temp" bandaid
+
+        let successes = 0;
 
         try {
             for (let i = 0; i < coords.length; i++) {
@@ -57,7 +67,7 @@ class TaskQueueService {
                     cityId: correspondingCityId,
                     ignore: false,
                 });
-                successes.push({});
+                successes++;
             }
         } catch (err) {
             console.log(err);
@@ -65,8 +75,8 @@ class TaskQueueService {
         }
 
         const results = {
-            pass: successes.length,
-            fail: coords.length - successes.length,
+            pass: successes,
+            fail: coords.length - successes,
             batchNum,
         };
         return results;
@@ -194,7 +204,9 @@ class TaskQueueService {
     }
 
     public async getAllBatchNumbers(): Promise<number[]> {
-        const batches = await this.cacheService.getAllBatchNums();
+        // FIXME: cache service (low priority)
+        // const batches = await this.cacheService.getAllBatchNums();
+        const batches = await this.batchDAO.getAllBatchNums();
         return batches;
     }
 

@@ -8,15 +8,25 @@ import { ILatLong } from "../interface/LatLong.interface";
 export function generateGrid(startCoords: ILatLong, jump: number, radius: number): ILatLong[] {
     /*
      * jump - the space between the focal point ("center") of any two grid positions
-     * radius - how far from the origin we want to go.
+     * radius - how far from the origin we want to go. a distance in KM
      */
     const ringDistances: number[] = [];
-    let d = 0;
+    let d = 0; // d for distance
+    // Problem statement: A good "radius" might be 0.005 the way it is on 01/26.
+    // But d < 0.005 runs 0 times.
+    // Hence, we'll multiply the loop by ...
+    console.log(startCoords, jump, radius, "18rm");
+    const poorlyUnderstoodAdjustment = 10; // "poorlyUnderstood" because I have no idea what the loop is doing!
     for (let i = 0; d < radius; i++) {
+        // d = (jump * i) / poorlyUnderstoodAdjustment;
         d = jump * i;
         ringDistances.push(d);
     }
+    console.log(d, radius, "25rm");
+    console.log(ringDistances, "26rm");
     const nodes = ringDistances.map(d => getNextRing(startCoords, jump, d));
+    const flat = nodes.flat();
+    console.log(flat.length, "29rm");
     return nodes.flat();
 }
 
@@ -50,7 +60,9 @@ function getNextRing(focalPoint: ILatLong, jump: number, ringDistance: number): 
         leftEdge.push({ long: minX, lat: minY + progressAlongEdge });
     }
 
-    return [topEdge, rightEdge, bottomEdge, leftEdge].flat();
+    const tasks = [topEdge, rightEdge, bottomEdge, leftEdge].flat();
+    console.log("tasks:", tasks.length, "60rm");
+    return tasks;
 }
 
 function generateSimpleGrid(startLong: number, startLat: number, radius: number, jump: number) {

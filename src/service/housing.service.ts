@@ -51,14 +51,12 @@ class HousingService {
     public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<IHousing[]> {
         console.log(cityId, cityName, stateOrProvince, "52rm");
         const housings = await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
-        console.log(housings.length, "53rm");
         return removeBulkURLs(housings);
     }
 
     public async getQualifiedAps(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<IHousing[]> {
         console.log(cityId, cityName, stateOrProvince, "52rm");
         const housings = await this.housingDAO.getQualifiedHousing(cityId, cityName, stateOrProvince);
-        console.log(housings.length, "53rm");
         return removeBulkURLs(housings);
     }
 

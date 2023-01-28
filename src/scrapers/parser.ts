@@ -54,7 +54,6 @@ class Parser {
 
     parseRentFaster(unprocessed: any): IHousingWithUrl[] {
         // list of objects
-        console.log(unprocessed, "53rm");
         const mainList = unprocessed.listings; // do not change this
         if (mainList.length === 0) {
             // handle case where no aps found

@@ -60,6 +60,7 @@ class ScraperService {
     public async planGrid(startCoords: ILatLong, bounds: IBounds, radius: number): Promise<ILatLong[]> {
         // TODO: move this into taskQueueService
         // step 2 of 3: plan the grid pattern the apis will scan in.
+        // 'theSmallerOfTheTwo' was 1.5923049297275473 upon last inspection.
         const theSmallerOfTheTwo = bounds.kmEastWest > bounds.kmNorthSouth ? bounds.kmNorthSouth : bounds.kmEastWest;
         // choose the smaller of the two distances because we prefer some overlap instead of some space between snapshots
         const subdivisionLocations = generateGrid(startCoords, theSmallerOfTheTwo, radius);

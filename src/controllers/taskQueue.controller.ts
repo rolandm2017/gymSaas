@@ -98,7 +98,6 @@ class TaskQueueController {
             const zoomWidthInput = request.body.zoomWidth;
             const cityNameInput = request.body.cityName;
             const batchNumInput = request.body.batchNum; // admin should have gotten this from the previous endpoint
-            console.log(request.body, "100rm");
             const provider = isProvider(providerInput);
             if (!Array.isArray(coords) || coords.length === 0) {
                 // not doing more validation.

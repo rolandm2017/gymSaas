@@ -3,6 +3,7 @@ import passport from "passport";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 import session from "express-session";
 // import cookieSession from "cookie-session";
 //
@@ -48,6 +49,7 @@ class App {
                 credentials: true,
             }),
         );
+        this.app.use(bodyParser.json({ limit: "50mb" }));
         // this.app.use(
         //     session({
         //         secret: "secret",
