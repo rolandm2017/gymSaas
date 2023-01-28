@@ -23,14 +23,12 @@ class Parser {
 
     parseRentCanada(unprocessed: any): IHousingWithUrl[] {
         // list of objects
-        console.log(unprocessed, "26rm");
         const mainList = unprocessed.listings; // do not change this
         if (mainList.length === 0) {
             // handle case where no aps found
             return [];
         }
         // const mainList = unprocessed.results.listings; // do not change this
-        console.log(mainList, "28rm");
         const apList: IHousingWithUrl[] = [];
         for (let i = 0; i < mainList.length; i++) {
             const unit = mainList[i];
@@ -82,7 +80,6 @@ class Parser {
 
     parseRentSeeker(unprocessed: any): IHousingWithUrl[] {
         // list of objects
-        console.log(unprocessed, "78rm");
         const mainList = unprocessed.hits; // do not change this
         if (mainList.length === 0) {
             // handle case where no aps found

@@ -94,7 +94,6 @@ class AdminController {
             const batchNumInput = request.query.batchNum;
             const cityNameInput = request.query.cityName;
             const providerInput = request.query.provider;
-            console.log(batchNumInput, cityNameInput, providerInput, "98rm");
             const batchNum = isStringInteger(batchNumInput);
             const cityName = isString(cityNameInput);
             const providerOrAll = isProviderOrAll(providerInput);

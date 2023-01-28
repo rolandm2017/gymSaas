@@ -15,16 +15,18 @@ export function generateGrid(startCoords: ILatLong, jump: number, radius: number
     // Problem statement: A good "radius" might be 0.005 the way it is on 01/26.
     // But d < 0.005 runs 0 times.
     // Hence, we'll multiply the loop by ...
-    console.log(startCoords, jump, radius, "18rm");
+    const mod = 10; // mod is a modification to stop the massive covers-canada size grids.
+    const jumpWithMod = jump / mod;
+    console.log(startCoords, jumpWithMod, radius, "18rm");
     const poorlyUnderstoodAdjustment = 10; // "poorlyUnderstood" because I have no idea what the loop is doing!
     for (let i = 0; d < radius; i++) {
         // d = (jump * i) / poorlyUnderstoodAdjustment;
-        d = jump * i;
+        d = jumpWithMod * i;
         ringDistances.push(d);
     }
     console.log(d, radius, "25rm");
     console.log(ringDistances, "26rm");
-    const nodes = ringDistances.map(d => getNextRing(startCoords, jump, d));
+    const nodes = ringDistances.map(ringDistance => getNextRing(startCoords, jumpWithMod, ringDistance));
     const flat = nodes.flat();
     console.log(flat.length, "29rm");
     return nodes.flat();
@@ -45,13 +47,16 @@ function getNextRing(focalPoint: ILatLong, jump: number, ringDistance: number): 
 
     // because the distance from the center to the nearest point on the perimeter * 2 = a full side
     const sideLength = ringDistance * 2;
+    console.log(sideLength, jump, "48rm");
     const subdivisions: number = sideLength / jump; // note: expecting integer values
+    console.log("subdivisions:", subdivisions, "49rm");
 
     const topEdge = [];
     const rightEdge = [];
     const bottomEdge = [];
     const leftEdge = [];
     for (let i = 0; i < subdivisions; i++) {
+        // const progressAlongEdge = (i * jump) / 2; // 2 added on 01/27 by guesstimation
         const progressAlongEdge = i * jump;
         // clockwise
         topEdge.push({ long: minX + progressAlongEdge, lat: maxY });
