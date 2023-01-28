@@ -45,6 +45,7 @@ class TaskQueueController {
         this.router.get("/all", this.getAllTasks.bind(this));
         this.router.get("/scorecard", this.getScorecard.bind(this));
         this.router.delete("/cleanup", authorize([Role.Admin]), this.cleanOldTasks.bind(this));
+        this.router.delete("/batch-nums", authorize([Role.Admin]), this.emptyBatchNums.bind(this));
         this.router.delete("/by-id", authorize([Role.Admin]), this.cleanSpecific.bind(this));
         this.router.delete("/all", authorize([Role.Admin]), this.cleanAll.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck.bind(this));
@@ -198,6 +199,11 @@ class TaskQueueController {
     async cleanAll(request: Request, response: Response) {
         const deletedRows = await this.taskQueueService.cleanAll();
         return response.status(200).json({ message: `Deleted ${deletedRows} rows in the task queue` });
+    }
+
+    async emptyBatchNums(request: Request, response: Response) {
+        const deleted = await this.taskQueueService.emptyBatchNums();
+        return response.status(200).json({ message: `Deleted ${deleted} batch nums` });
     }
 
     async cleanOldTasks(request: Request, response: Response) {

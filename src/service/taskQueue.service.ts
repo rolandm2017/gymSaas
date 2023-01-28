@@ -247,6 +247,11 @@ class TaskQueueService {
         return deletedTaskIds;
     }
 
+    public async emptyBatchNums() {
+        const deleted = await this.batchDAO.deleteAll();
+        return deleted;
+    }
+
     public async cleanAll() {
         const numberOfDeletedRows = await this.taskDAO.deleteAll();
         return numberOfDeletedRows;

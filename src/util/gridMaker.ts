@@ -15,9 +15,11 @@ export function generateGrid(startCoords: ILatLong, jump: number, radius: number
     // Problem statement: A good "radius" might be 0.005 the way it is on 01/26.
     // But d < 0.005 runs 0 times.
     // Hence, we'll multiply the loop by ...
-    const mod = 3; // mod is a modification to stop the massive covers-canada size grids.
+    // const mod = 4; // mod is a modification to stop the massive covers-canada size grids.
+    const mod = 2; // mod is a modification to stop the massive covers-canada size grids.
     const jumpWithMod = jump / mod;
     console.log(startCoords, jumpWithMod, radius, "18rm");
+    const poorlyUnderstoodAdjustment = 10; // "poorlyUnderstood" because I have no idea what the loop is doing!
     for (let i = 0; d < radius; i++) {
         // d = (jump * i) / poorlyUnderstoodAdjustment;
         d = jumpWithMod * i;
@@ -29,7 +31,7 @@ export function generateGrid(startCoords: ILatLong, jump: number, radius: number
     const flat = nodes.flat();
     flat.push(startCoords); // push because otherwise theyre missing from the scan!
     console.log(flat.length, "29rm");
-    return nodes.flat();
+    return flat;
 }
 
 function getNextRing(focalPoint: ILatLong, jump: number, ringDistanceInDegreesPreMod: number): ILatLong[] {
@@ -46,7 +48,8 @@ function getNextRing(focalPoint: ILatLong, jump: number, ringDistanceInDegreesPr
     const degreesLongitudeBetweenGrids = changeInEastWestKMToLongitudeDegrees(jump, focalPoint.lat, focalPoint.long);
     const degreesLatitudeBetweenGrids = changeInNorthSouthKMToLatitudeDegrees(jump, focalPoint.lat);
 
-    const modification = 9;
+    // const modification = 15;
+    const modification = 13;
     const ringDistance = ringDistanceInDegreesPreMod / modification;
 
     const minX = focalPoint.long - ringDistance;

@@ -28,6 +28,11 @@ class BatchDAO {
         const justNums: number[] = batches.map(b => b.batchId);
         return justNums;
     }
+
+    public async deleteAll(): Promise<number> {
+        const deleted = await Batch.destroy({ where: {} });
+        return deleted;
+    }
 }
 
 export default BatchDAO;
