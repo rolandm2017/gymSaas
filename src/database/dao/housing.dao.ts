@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, fn, col } from "sequelize";
 import { City } from "../models/City";
 import { Housing, HousingCreationAttributes } from "../models/Housing";
 import { State } from "../models/State";
@@ -25,6 +25,15 @@ class HousingDAO {
 
     public async countHousingsInCity(cityId: number) {
         return await Housing.count({ where: { cityId } });
+    }
+
+    // read section
+    public async getHighestHousingId(): Promise<number> {
+        const highest = await Housing.max("housingId");
+        if (Number(highest) === highest) {
+            return highest;
+        }
+        throw Error("Got something other than a number from housing id");
     }
 
     public async getMultipleHousings(limit?: number, offset?: number): Promise<{ rows: Housing[]; count: number }> {

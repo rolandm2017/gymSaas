@@ -143,7 +143,7 @@ class TaskQueueService {
     ): Promise<{ pass: number; fail: number }> {
         const parser = new Parser(provider);
         const parsedApartmentData: IHousingWithUrl[] = parser.parse(apartments);
-        console.log(`adding ${parsedApartmentData.length} apartments`);
+        // console.log(`adding ${parsedApartmentData.length} apartments`);
         let successes = 0;
         // get city id for this task because its needed in the housing model for foreign key
         const currentTask = await this.taskDAO.getTaskById(taskId);
@@ -161,9 +161,12 @@ class TaskQueueService {
             await this.taskDAO.markIgnored(currentTask);
         }
         // add apartments
+        console.log(`adding ${parsedApartmentData.length} apartments`);
         try {
             for (const apartment of parsedApartmentData) {
                 const apartmentCreationPayload = convertIHousingToCreationAttr(apartment, provider, taskId, cityId, batchId);
+                // solution to race condition on housing id assignment during scraping
+                apartmentCreationPayload.housingId = this.cacheService.getNextHousingId();
                 await this.housingDAO.createHousing(apartmentCreationPayload);
                 successes++;
             }

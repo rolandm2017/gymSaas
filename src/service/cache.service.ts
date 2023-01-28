@@ -11,6 +11,7 @@ import CityDAO from "../database/dao/city.dao";
 import BatchDAO from "../database/dao/batch.dao";
 import { getQuestions, setQuestionOne, setQuestionThree, setQuestionTwo } from "../database/cache/questionsCache";
 import FeedbackDAO from "../database/dao/feedback.dao";
+import { incrementHousingId, readNextHousingId, setHousingIdFromDb } from "../database/cache/housingIdCache";
 
 class CacheService {
     private cityDAO: CityDAO;
@@ -51,6 +52,18 @@ class CacheService {
 
     public clearBatchCache() {
         resetBatchCache();
+    }
+
+    // housing id stuff
+    public getNextHousingId(): number {
+        // solution to race condition on housing id assignment during scraping
+        const next = readNextHousingId();
+        incrementHousingId();
+        return next;
+    }
+
+    public initHousingId(current: number) {
+        setHousingIdFromDb(current);
     }
 
     // feedback stuff

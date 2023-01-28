@@ -199,6 +199,10 @@ class App {
         const cacheService = new CacheService(cityDAO, batchDAO, feedbackDAO);
         await cacheService.initBatchCache();
         await cacheService.initCityIdCache();
+        const stateDAO = new StateDAO();
+        const housingDAO = new HousingDAO(stateDAO, cityDAO);
+        const highest = await housingDAO.getHighestHousingId();
+        cacheService.initHousingId(highest + 1);
     }
 }
 

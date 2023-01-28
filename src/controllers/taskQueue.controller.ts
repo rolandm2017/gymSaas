@@ -117,16 +117,17 @@ class TaskQueueController {
     }
 
     async getNextTasksForScraper(request: Request, response: Response) {
+        const providerInput = request.body.provider;
+        const batchNum = request.body.batchNum; // MIGHT need batch number, but also might not!
         try {
-            const providerInput = request.body.provider;
             // Currently batchNum is an OPTIONAL parameter!
             // If specified: Get that batch's unfinished tasks for provider.
             // If not specified: Get ALL unfinished tasks for provider.
-            const batchNum = request.body.batchNum; // MIGHT need batch number, but also might not!
             const provider = isProvider(providerInput);
             const tasks: Task[] = await this.taskQueueService.getNextTasksForScraper(provider, batchNum);
             return response.status(200).json({ tasks });
         } catch (err) {
+            console.log({ providerInput, batchNum });
             return handleErrorResponse(response, err);
         }
     }
@@ -142,7 +143,6 @@ class TaskQueueController {
             if (typeof taskId !== "number" || taskId < 0) {
                 return handleErrorResponse(response, "Bad task ID input");
             }
-            console.log(apartments, "144rm");
             const successfullyLogged = await this.taskQueueService.reportFindingsToDb(forProvider, taskId, apartments, cityId, batchNum);
             const markedComplete = await this.taskQueueService.markTaskComplete(taskId);
             return response.status(200).json({ successfullyLogged, markedComplete, taskId });
