@@ -190,7 +190,9 @@ class HousingController {
     public async getAllApartments(request: Request, response: Response) {
         // Really: "Get ALL." Intended to be used by tests and admin to inspect stuff.
         try {
+            const justCount = request.query.justCount;
             const apartments: IHousing[] = await this.housingService.getAllHousing();
+            if (justCount) return response.status(200).json({ length: apartments.length });
             return response.status(200).json({ apartments, length: apartments.length });
         } catch (err) {
             return handleErrorResponse(response, err);

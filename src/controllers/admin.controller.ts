@@ -90,11 +90,11 @@ class AdminController {
     }
 
     public async getTasksByWithSpecifications(request: Request, response: Response) {
+        const batchNumInput = request.query.batchNum;
+        const cityNameInput = request.query.cityName;
+        const providerInput = request.query.provider;
+        const successFilterInput = request.query.successFilter;
         try {
-            const batchNumInput = request.query.batchNum;
-            const cityNameInput = request.query.cityName;
-            const providerInput = request.query.provider;
-            const successFilterInput = request.query.successFilter;
             const batchNum = isStringInteger(batchNumInput);
             const cityName = isString(cityNameInput);
             const providerOrAll = isProviderOrAll(providerInput);
@@ -104,6 +104,7 @@ class AdminController {
             // console.log(`returning tasks of length ${tasks.length}, '104rm'`);
             return response.status(200).json({ tasks });
         } catch (err) {
+            console.log({ batchNumInput, cityNameInput, providerInput, successFilterInput });
             return handleErrorResponse(response, err);
         }
     }
