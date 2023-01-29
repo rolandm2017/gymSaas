@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { CityNameEnum } from "../enum/cityName.enum";
 import { ProviderEnum, ProviderEnumOrAll } from "../enum/provider.enum";
+import { SuccessFilterEnum } from "../enum/successFilter.enum";
 
 const stringSchema = z.string();
 const emailSchema = z.string().email();
@@ -15,6 +16,7 @@ const providerArrIncludingAll = z.union([
     z.literal(ProviderEnumOrAll.rentSeeker),
     z.literal(ProviderEnumOrAll.all),
 ]);
+const successFilterArr = z.union([z.literal(SuccessFilterEnum.all), z.literal(SuccessFilterEnum.success), z.literal(SuccessFilterEnum.ignored)]);
 
 export function isStringInteger(testSubject: unknown): number {
     const stringInput = stringSchema.parse(testSubject);
@@ -46,6 +48,10 @@ export function isProvider(testSubject: unknown): ProviderEnum {
 
 export function isProviderOrAll(testSubject: unknown): ProviderEnumOrAll {
     return providerArrIncludingAll.parse(testSubject);
+}
+
+export function isASuccessFilter(testSubject: unknown): SuccessFilterEnum {
+    return successFilterArr.parse(testSubject);
 }
 
 export function isLegitCityName(testSubject: unknown): CityNameEnum {

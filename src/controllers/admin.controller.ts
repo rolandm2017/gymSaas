@@ -9,7 +9,7 @@ import AdminService from "../service/admin.service";
 import HousingService from "../service/housing.service";
 import TaskQueueService from "../service/taskQueue.service";
 import { handleErrorResponse } from "../util/handleErrorResponse";
-import { isEmail, isProvider, isProviderOrAll, isString, isStringInteger } from "../validationSchemas/inputValidation";
+import { isASuccessFilter, isEmail, isProvider, isProviderOrAll, isString, isStringInteger } from "../validationSchemas/inputValidation";
 import { IHousing } from "../interface/Housing.interface";
 import { ProvinceIdEnum } from "../enum/canadaProvinceId.enum";
 
@@ -94,11 +94,13 @@ class AdminController {
             const batchNumInput = request.query.batchNum;
             const cityNameInput = request.query.cityName;
             const providerInput = request.query.provider;
+            const successFilterInput = request.query.successFilter;
             const batchNum = isStringInteger(batchNumInput);
             const cityName = isString(cityNameInput);
             const providerOrAll = isProviderOrAll(providerInput);
+            const successFilter = isASuccessFilter(successFilterInput);
             // console.log(batchNum, cityName, providerOrAll, "102rm");
-            const tasks: Task[] = await this.taskQueueService.getTasksByWithSpecifications(batchNum, cityName, providerOrAll);
+            const tasks: Task[] = await this.taskQueueService.getTasksByWithSpecifications(batchNum, cityName, providerOrAll, successFilter);
             // console.log(`returning tasks of length ${tasks.length}, '104rm'`);
             return response.status(200).json({ tasks });
         } catch (err) {

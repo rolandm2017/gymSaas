@@ -16,6 +16,8 @@ import CacheService from "./cache.service";
 import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
 import { COMPLETE_TASK_TIME_THRESHOLD_IN_DAYS, MIN_SCRAPES_FOR_REPEAT_SCRAPE } from "../util/constants";
 import { CityNameEnum } from "../enum/cityName.enum";
+import { SuccessFilterEnum } from "../enum/successFilter.enum";
+import { applySuccessFilter } from "../util/applySuccessFilter";
 
 class TaskQueueService {
     private taskDAO: TaskDAO;
@@ -93,7 +95,15 @@ class TaskQueueService {
         return tasks;
     }
 
-    public async getTasksByWithSpecifications(batchNum: number, cityName: string, provider: ProviderEnumOrAll): Promise<Task[]> {
+    public async getTasksByWithSpecifications(
+        batchNum: number,
+        cityName: string,
+        provider: ProviderEnumOrAll,
+        successFilter: SuccessFilterEnum,
+    ): Promise<Task[]> {
+        // **
+        // ** If anyone is reading this, and knows how to clean up this gong show of logic forks, please tell me.
+        // **
         // handle case where cityName is "all"
         const cityNameInputIsAll = cityName === "all";
 
@@ -104,11 +114,11 @@ class TaskQueueService {
             if (provider === ProviderEnumOrAll.all) {
                 // all providers, all cities
                 const tasks: Task[] = await this.taskDAO.getTasksByBatchNum(batchNum);
-                return tasks;
+                return applySuccessFilter(tasks, successFilter);
             }
             // by specific batch num and provider now
             const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndProvider(batchNum, provider);
-            return tasks;
+            return applySuccessFilter(tasks, successFilter);
         }
         // **
         // handle case where cityName is not all and is a valid city name
@@ -121,12 +131,12 @@ class TaskQueueService {
             if (correspondingCity === null) throw Error("Invalid city name");
             if (provider === ProviderEnumOrAll.all) {
                 const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityId(batchNum, correspondingCity.cityId);
-                return tasks;
+                return applySuccessFilter(tasks, successFilter);
             }
             // by specific provider, cityname, batch num
             const tasks: Task[] = await this.taskDAO.getTasksByBatchNumAndCityIdAndProvider(batchNum, correspondingCity.cityId, provider);
 
-            return tasks;
+            return applySuccessFilter(tasks, successFilter);
         }
         // **
         // handle case where cityName is not all and is overall invalid
@@ -159,6 +169,9 @@ class TaskQueueService {
         if (tooFewApartmentsToContinueScrape) {
             console.log(`Marking ignored for task with id ${taskId}`);
             await this.taskDAO.markIgnored(currentTask);
+            if (parsedApartmentData.length === 0) {
+                return { pass: 0, fail: 0 };
+            }
         }
         // add apartments
         console.log(`adding ${parsedApartmentData.length} apartments`);
@@ -166,6 +179,7 @@ class TaskQueueService {
             for (const apartment of parsedApartmentData) {
                 const apartmentCreationPayload = convertIHousingToCreationAttr(apartment, provider, taskId, cityId, batchId);
                 // solution to race condition on housing id assignment during scraping
+                // Without this line, Sequelize will try to write more than 1 record at a time per housingId.
                 apartmentCreationPayload.housingId = this.cacheService.getNextHousingId();
                 await this.housingDAO.createHousing(apartmentCreationPayload);
                 successes++;
