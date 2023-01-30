@@ -45,6 +45,10 @@ class HousingDAO {
         return await Housing.findByPk(housingId);
     }
 
+    public async getAllHousingJustByCityId(cityId: number): Promise<Housing[]> {
+        return await Housing.findAll({ where: { cityId } });
+    }
+
     public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string) {
         if ([cityId, cityName, stateOrProvince].every(arg => arg === undefined)) return await Housing.findAll({});
         let conditions;

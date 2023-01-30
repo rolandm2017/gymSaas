@@ -143,6 +143,10 @@ function initModels(sequelize: Sequelize) {
         constraints: false, // optional relationship
     });
 
+    // Qualifications
+    // Housing.belongsToMany(Gym, { through: "Housing_Gyms", as: "housings_gyms" });
+    // Gym.belongsToMany(Housing, { through: "Gyms_Housings", as: "gyms_housings" });
+
     // wish
     Profile.hasMany(Wish, { foreignKey: "profileId" });
     Wish.belongsTo(Profile, { foreignKey: "profileId" });

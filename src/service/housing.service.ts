@@ -4,10 +4,12 @@ import AccountDAO from "../database/dao/account.dao";
 import GymDAO from "../database/dao/gym.dao";
 import HousingDAO from "../database/dao/housing.dao";
 import ProfileDAO from "../database/dao/profile.dao";
+import { Gym } from "../database/models/Gym";
 import { Housing } from "../database/models/Housing";
 import { Profile } from "../database/models/Profile";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
+import { IAssociation } from "../interface/Association.interface";
 import { IHousing } from "../interface/Housing.interface";
 import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
 import { IQualificationReport } from "../interface/QualificationReport.interface";
@@ -17,6 +19,8 @@ import { convertHousingsToDemoHousings, convertHousingToHousingWithUrl } from ".
 import { removeBulkURLs } from "../util/removeUrl";
 import CacheService from "./cache.service";
 import ScraperService from "./scraper.service";
+import { getDistanceInKMFromLatLong } from "../util/conversions";
+import { convertGymModelToIGym } from "../util/convertGymModelToIGym";
 
 class HousingService {
     private housingDAO: HousingDAO;
@@ -54,10 +58,28 @@ class HousingService {
         return removeBulkURLs(housings);
     }
 
-    public async getQualifiedAps(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<IHousing[]> {
-        console.log(cityId, cityName, stateOrProvince, "52rm");
-        const housings = await this.housingDAO.getQualifiedHousing(cityId, cityName, stateOrProvince);
-        return removeBulkURLs(housings);
+    public async getQualifiedAps(cityId: number): Promise<IHousing[]> {
+        // the apartments aren't getting their state id set right now, so ignore it
+        // also don't need cityName since housings are stored by cityId
+
+        const housings = await this.housingDAO.getAllHousingJustByCityId(cityId);
+        const withoutURLs: IHousing[] = removeBulkURLs(housings);
+        // const withGymAssociations = []
+        const apsWithGyms = await Promise.all(
+            withoutURLs.map(async (ap: IHousing) => {
+                // return new Promise((resolve, reject) => {
+                const nearbyGyms: Gym[] = await this.gymDAO.getGymsNear(ap.lat, ap.long);
+                ap.nearbyGyms = nearbyGyms.map((gym: Gym) => {
+                    const newAssociation: IAssociation = {
+                        gym: convertGymModelToIGym(gym),
+                        distanceInKM: getDistanceInKMFromLatLong(ap.lat, ap.long, gym.lat, gym.long),
+                    };
+                    return newAssociation;
+                });
+                return ap;
+            }),
+        );
+        return apsWithGyms;
     }
 
     public async getRealURL(apartmentId: number, accountId: number): Promise<string> {

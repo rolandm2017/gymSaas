@@ -3,6 +3,10 @@
 import { Association, DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
 import { Profile } from "./Profile";
 
+// q1, q2, q3
+// <Rating text="This helped me start or keep up a gym habit." valueReporter={setRatingOne} />
+// <Rating text="I was able to find several apartments near a gym." valueReporter={setRatingTwo} />
+// <Rating text="I would recommend this service to a friend." valueReporter={setRatingThree} />
 export interface FeedbackAttributes {
     feedbackId?: number;
     questionOne: string;
@@ -52,7 +56,7 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                 },
                 questionOne: {
                     type: DataTypes.STRING,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 questionOneAnswer: {
                     type: DataTypes.INTEGER,
@@ -60,7 +64,7 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                 },
                 questionTwo: {
                     type: DataTypes.STRING,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 questionTwoAnswer: {
                     type: DataTypes.INTEGER,
@@ -68,7 +72,7 @@ export class Feedback extends Model<FeedbackAttributes, FeedbackCreationAttribut
                 },
                 questionThree: {
                     type: DataTypes.STRING,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 questionThreeAnswer: {
                     type: DataTypes.INTEGER,

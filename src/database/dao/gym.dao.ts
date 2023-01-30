@@ -1,3 +1,5 @@
+import { Op } from "sequelize";
+import { MAX_ACCEPTABLE_LATITUDE_DIFFERENCE, MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE } from "../../util/acceptableRadiusForWalking";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
 import { Gym, GymCreationAttributes } from "../models/Gym";
 
@@ -30,6 +32,23 @@ class GymDAO {
 
     public async getAllGyms() {
         return await Gym.findAll({});
+    }
+
+    public async getGymsNear(lat: number, long: number): Promise<Gym[]> {
+        const lowerLimitLatitude = lat - MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
+        const upperLimitLatitude = lat + MAX_ACCEPTABLE_LATITUDE_DIFFERENCE;
+        const lowerLimitLongitude = long - MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+        const upperLimitLongitude = long + MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE;
+        return await Gym.findAll({
+            where: {
+                lat: {
+                    [Op.between]: [lowerLimitLatitude, upperLimitLatitude],
+                },
+                long: {
+                    [Op.between]: [lowerLimitLongitude, upperLimitLongitude],
+                },
+            },
+        });
     }
 
     // update
