@@ -74,7 +74,7 @@ class ScraperService {
             const url = await scraper.fetchUrlForId(idFromRentCanada);
             return url;
         } catch (err) {
-            console.log(err);
+            // console.log(err);
             console.log("Failed to access scraper");
             return "";
         }
