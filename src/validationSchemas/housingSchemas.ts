@@ -26,6 +26,7 @@ export function searchQuerySchema(req: Request, res: Response, next: NextFunctio
         cityName: Joi.string(),
         minDistance: Joi.number(),
         maxDistance: Joi.number(),
+        pageNum: Joi.number(),
     });
     validateRequest(req, next, schema);
 }

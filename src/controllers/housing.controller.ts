@@ -172,11 +172,11 @@ class HousingController {
     }
 
     public async searchQuery(request: Request, response: Response) {
+        const cityNameInput = request.query.cityName;
+        const minDistanceInput = request.query.minDistance;
+        const maxDistanceInput = request.query.maxDistance;
+        const pageNumInput = request.query.pageNum;
         try {
-            const cityNameInput = request.query.cityName;
-            const minDistanceInput = request.query.minDistance;
-            const maxDistanceInput = request.query.maxDistance;
-            const pageNumInput = request.query.pageNum;
             const cityName = isLegitCityName(cityNameInput);
             const minDist = isStringFloat(minDistanceInput);
             const maxDist = isStringFloat(maxDistanceInput);
@@ -184,6 +184,7 @@ class HousingController {
             const results = await this.housingService.getUsingSearchQuery(cityName, minDist, maxDist, pageNum);
             return response.status(200).json({ pageNum, results });
         } catch (err) {
+            console.log({ cityNameInput, minDistanceInput, maxDistanceInput, pageNumInput });
             return handleErrorResponse(response, err);
         }
     }
