@@ -50,13 +50,6 @@ class App {
             }),
         );
         this.app.use(bodyParser.json({ limit: "50mb" }));
-        // this.app.use(
-        //     session({
-        //         secret: "secret",
-        //         resave: false,
-        //         saveUninitialized: true,
-        //     }),
-        // );
 
         this.app.use(morgan("dev"));
         this.app.use(cookieParser("someSecretIllChangeLater"));

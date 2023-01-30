@@ -8,7 +8,7 @@ const MAX_WALK_TIME_IN_MINS = 4;
 // 2.5 mph to kmh = 4.02 km/h
 // 4.02 km/h * 4 min / h = 0.268 km walked in 4 min
 // hence we are now looking for 0.268 km traveled east-west at canadian latitudes,
-// and 0.268 km traveled north-south at any longitude (because it is always the same!)
+// and 0.268 km traveled north-south at any longitude (because the km traveled is always the same at any point on the globe!)
 
 const MAX_KM_TRAVELED = 0.268;
 
