@@ -21,12 +21,14 @@ import CacheService from "./cache.service";
 import ScraperService from "./scraper.service";
 import { getDistanceInKMFromLatLong } from "../util/conversions";
 import { convertGymModelToIGym } from "../util/convertGymModelToIGym";
+import CityDAO from "../database/dao/city.dao";
 
 class HousingService {
     private housingDAO: HousingDAO;
     private gymDAO: GymDAO;
     private accountDAO: AccountDAO;
     private profileDAO: ProfileDAO;
+    private cityDAO: CityDAO;
     private cacheService: CacheService;
     private scraperService: ScraperService;
 
@@ -35,6 +37,7 @@ class HousingService {
         gymDAO: GymDAO,
         accountDAO: AccountDAO,
         profileDAO: ProfileDAO,
+        cityDAO: CityDAO,
         cacheService: CacheService,
         scraperService: ScraperService,
     ) {
@@ -42,6 +45,7 @@ class HousingService {
         this.gymDAO = gymDAO;
         this.accountDAO = accountDAO;
         this.profileDAO = profileDAO;
+        this.cityDAO = cityDAO;
         this.cacheService = cacheService;
         this.scraperService = scraperService;
     }
@@ -61,6 +65,8 @@ class HousingService {
     public async getQualifiedAps(cityId: number): Promise<IHousing[]> {
         // the apartments aren't getting their state id set right now, so ignore it
         // also don't need cityName since housings are stored by cityId
+        const cityForIGym = await this.cityDAO.getCityById(cityId);
+        if (cityForIGym === null) throw Error("No city for this id");
 
         const housings = await this.housingDAO.getAllHousingJustByCityId(cityId);
         const withoutURLs: IHousing[] = removeBulkURLs(housings);
@@ -71,7 +77,7 @@ class HousingService {
                 const nearbyGyms: Gym[] = await this.gymDAO.getGymsNear(ap.lat, ap.long);
                 ap.nearbyGyms = nearbyGyms.map((gym: Gym) => {
                     const newAssociation: IAssociation = {
-                        gym: convertGymModelToIGym(gym),
+                        gym: convertGymModelToIGym(gym, cityForIGym.cityName),
                         distanceInKM: getDistanceInKMFromLatLong(ap.lat, ap.long, gym.lat, gym.long),
                     };
                     return newAssociation;

@@ -1,9 +1,13 @@
 import { Gym } from "../database/models/Gym";
 import { IGym } from "../interface/Gym.interface";
 
-export function convertGymModelToIGym(gym: Gym): IGym {
+export function convertGymModelToIGym(gym: Gym, cityName: string): IGym {
     const asInterface: IGym = {
-        ...gym,
+        cityId: gym.cityId,
+        name: "",
+        cityName,
+        lat: gym.lat,
+        long: gym.long,
         business_status: "OPERATIONAL",
         formatted_address: gym.address,
         geometry: {
