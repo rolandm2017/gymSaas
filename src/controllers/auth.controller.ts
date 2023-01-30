@@ -227,6 +227,9 @@ class AuthController {
         try {
             const token = request.body.token;
             const password = request.body.password;
+            const confirmed = request.body.confirmPassword;
+            console.log(password, confirmed, "231rm");
+            if (confirmed !== password) return response.status(400).json({ message: "Passwords don't match" });
             const success = await this.authService.resetPassword(token, password);
             if (success) return response.json({ message: "Password reset successful, you can now login" });
             else return response.json({ message: "Reset password failed" });
