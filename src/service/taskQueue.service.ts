@@ -228,10 +228,10 @@ class TaskQueueService {
     }
 
     public countComplete(tasks: Task[]): { complete: number; incomplete: number } {
-        const now = new Date();
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(now.getDate() - COMPLETE_TASK_TIME_THRESHOLD_IN_DAYS);
-        const complete = tasks.filter((task: Task) => task.lastScan !== null && task.lastScan < thirtyDaysAgo);
+        // const now = new Date();
+        // const thirtyDaysAgo = new Date();
+        // thirtyDaysAgo.setDate(now.getDate() - COMPLETE_TASK_TIME_THRESHOLD_IN_DAYS);
+        const complete = tasks.filter((task: Task) => task.lastScan !== null);
         const incomplete = tasks.length - complete.length;
         return { complete: complete.length, incomplete };
     }
