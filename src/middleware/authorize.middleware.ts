@@ -46,7 +46,12 @@ function authorize(validRoles: Role[] = []) {
             }
             const acctRole: Role = account.role as Role;
             const rolesFoundOnRequest = validRoles.length;
-            if (rolesFoundOnRequest && !validRoles.includes(acctRole)) {
+            let allowThrough = false;
+            if (validRoles[0] === Role.User && account.role === Role.Admin) {
+                // if user is admin, and the access point is "user", treat admin like a user.
+                allowThrough = true;
+            }
+            if (rolesFoundOnRequest && !validRoles.includes(acctRole) && !allowThrough) {
                 // account no longer exists or role not authorized
                 return res.status(401).json({ message: "54 - Unauthorized" });
             }

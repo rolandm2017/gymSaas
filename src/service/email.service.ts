@@ -78,7 +78,7 @@ class EmailService {
         if (accountId) {
             // send them to the frontend url with the reset token in the url.
             // the frontend will send the reset token to the backend with the 'reset pw to new value' request to validate the change.
-            const resetUrl = getFrontendURL() + `${accountId}/account/reset-password?token=${account.resetToken.token}`;
+            const resetUrl = getFrontendURL() + `/account/reset-password?token=${account.resetToken.token}&accountId=${accountId}`;
             message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
                 <p><a href="${resetUrl}">${resetUrl}</a></p>`;
         } else {
