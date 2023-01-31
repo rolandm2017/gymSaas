@@ -103,7 +103,7 @@ export class Housing extends Model<HousingAttributes, HousingCreationAttributes>
                     allowNull: false,
                 },
                 distanceToNearestGym: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.FLOAT,
                     allowNull: true,
                 },
                 // idAtSource is used to fill out e.g.

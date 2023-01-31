@@ -80,23 +80,6 @@ export function changeInEastWestKMToLongitudeDegrees(kmEast: number, currentLat:
     return changeInLongitude;
 }
 
-// // Zombie code from Aug 1 - replaced by the stackOverflow solution
-// export function convertLatitudeChangeToKM(latitudeChange: number): number {
-//     return latitudeChange * KMDistanceBetweenOneDegreeLatitude;
-// }
-
-// export function convertLongitudeChangeToKM(longitudeChange: number, currentLat: number): number {
-//     // https://gis.stackexchange.com/questions/251643/approx-distance-between-any-2-longitudes-at-a-given-latitude
-//     // "To convert a given latitude into the approximate distance in miles between 1 longitude at that point:
-//     // (90 - Decimal degrees) * Pi / 180 * 69.172"
-//     const degreesFromEquator = currentLat;
-//     // const progressTowardsNorthPoleAsPercentage = convertProgressTowardsNorthPoleAsPercentage(degreesFromEquator);
-//     const changeInMiles = (((maxDegreesLatitude - longitudeChange) * 3.1415927) / 180) * milesBetweenOneDegreeOfLongitudeAtMax;
-//     // Note: I have no idea what the "180" represents. It's from the stackExchange discussion linked above.
-//     const changeInKilometers = changeInMiles * oneMileAsKM;
-//     return changeInKilometers;
-// }
-
 // Source: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
 export function getDistanceInKMFromLatLong(lat1: number, long1: number, lat2: number, long2: number): number {
     // "Convert lat long change into km change".
@@ -113,7 +96,7 @@ function deg2rad(deg: number): number {
     return deg * (Math.PI / 180);
 }
 
-// second answer:
+// second answer, supposedly a faster computation:
 // https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
 export function convertLatLongDifferenceIntoKM(lat1: number, lon1: number, lat2: number, lon2: number) {
     var p = 0.017453292519943295; // Math.PI / 180

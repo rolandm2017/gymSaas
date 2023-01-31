@@ -19,7 +19,7 @@ import { convertHousingsToDemoHousings, convertHousingToHousingWithUrl } from ".
 import { removeBulkURLs } from "../util/removeUrl";
 import CacheService from "./cache.service";
 import ScraperService from "./scraper.service";
-import { getDistanceInKMFromLatLong } from "../util/conversions";
+import { convertLatLongDifferenceIntoKM, getDistanceInKMFromLatLong } from "../util/conversions";
 import { convertGymModelToIGym } from "../util/convertGymModelToIGym";
 import CityDAO from "../database/dao/city.dao";
 
@@ -233,6 +233,28 @@ class HousingService {
         const relevantCityId = await this.cacheService.getCityId(cityName);
         const deletedHousings = await this.housingDAO.deleteUnqualifiedHousingByCityId(relevantCityId);
         return deletedHousings;
+    }
+
+    // step 6 of qualification process.
+    public async addDistances(): Promise<number[]> {
+        // go over qualified housings and add the distances to the gyms
+        const all = await this.housingDAO.getAllHousing();
+        const allDistances = []; // returning for curiosity.
+        for (const ap of all) {
+            if (ap.distanceToNearestGym) {
+                continue; // no need to rerun loop; it's already been set.
+            }
+            const nearbyGyms = await this.gymDAO.getGymsNear(ap.lat, ap.long);
+            const distances = nearbyGyms.map((gym: Gym, index: number) => {
+                const distance = convertLatLongDifferenceIntoKM(ap.lat, ap.long, gym.lat, gym.long);
+                return { distance, index };
+            });
+            const smallestDistance = Math.min(...distances.map(({ distance }) => distance));
+            allDistances.push(smallestDistance);
+            ap.distanceToNearestGym = smallestDistance;
+            ap.save();
+        }
+        return allDistances;
     }
 
     public async deleteAllHousing() {

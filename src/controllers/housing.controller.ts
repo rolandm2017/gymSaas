@@ -47,6 +47,8 @@ class HousingController {
         this.router.get("/qualify", this.qualifyScrapedApartments.bind(this));
         // step 5 of queuing a scrape - for after the apartments have been qualified
         this.router.delete("/unqualified", this.deleteUnqualifiedApartments.bind(this));
+        // step 6 of queuing a scrape - add the distances
+        this.router.get("/add-distances", this.addDistances.bind(this));
         this.router.get(HealthCheck.healthCheck, this.healthCheck);
         // this.router.post("/task", this.queueScrape);
     }
@@ -200,6 +202,12 @@ class HousingController {
         } catch (err) {
             return handleErrorResponse(response, err);
         }
+    }
+
+    public async addDistances(request: Request, response: Response) {
+        //
+        const distances = await this.housingService.addDistances();
+        return response.status(200).json({ message: "done", distances });
     }
 
     public async deleteAllApartments(request: Request, response: Response) {
