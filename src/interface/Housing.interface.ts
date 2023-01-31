@@ -21,4 +21,5 @@ export interface IHousing {
     nearbyGyms?: IAssociation[];
     idAtSource?: number | null; // for the id as detected at the provider. used in RentCanada to scrape apartment URL
     nearAGym?: boolean | null;
+    distanceToNearestGym: number;
 }

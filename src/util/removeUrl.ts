@@ -24,6 +24,7 @@ export function removeUrl(housing: Housing): IHousing {
         long: housing.long,
         source: housing.source,
         nearAGym: housing.nearAGym,
+        distanceToNearestGym: housing.distanceToNearestGym,
     };
     return withoutUrl;
 }

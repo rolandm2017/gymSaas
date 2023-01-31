@@ -192,12 +192,13 @@ class HousingService {
         return await this.housingDAO.getApartmentsByLocation(cityName);
     }
 
-    public async getUsingSearchQuery(cityName: string, minDistInMin: number, maxDistInMin: number, pageNum: number): Promise<Housing[]> {
+    public async getUsingSearchQuery(cityName: string, minDistInMin: number, maxDistInMin: number, pageNum: number): Promise<IHousing[]> {
         const cityId = await this.cacheService.getCityId(cityName);
         console.log(minDistInMin, maxDistInMin, "197rm");
         const minDistInKM = convertMinutesWalkedToKMTraveled(minDistInMin);
         const maxDistInKM = convertMinutesWalkedToKMTraveled(maxDistInMin);
-        return await this.housingDAO.getUsingSearchQuery(cityId, minDistInKM, maxDistInKM, pageNum);
+        const housing = await this.housingDAO.getUsingSearchQuery(cityId, minDistInKM, maxDistInKM, pageNum);
+        return removeBulkURLs(housing);
     }
 
     // step 4 of scraping process
