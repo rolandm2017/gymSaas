@@ -183,9 +183,9 @@ class HousingController {
             const minDist = isStringFloat(minDistanceInput);
             const maxDist = isStringFloat(maxDistanceInput);
             const pageNum = isStringInteger(pageNumInput);
-            const results = await this.housingService.getUsingSearchQuery(cityName, minDist, maxDist, pageNum);
-            console.log(results, "185rm");
-            return response.status(200).json({ pageNum, results });
+            const { results, totalPages } = await this.housingService.getUsingSearchQuery(cityName, minDist, maxDist, pageNum);
+            console.log(results, totalPages, "185rm");
+            return response.status(200).json({ pageNum, results, totalPages });
         } catch (err) {
             console.log({ cityNameInput, minDistanceInput, maxDistanceInput, pageNumInput });
             return handleErrorResponse(response, err);

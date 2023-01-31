@@ -5,6 +5,7 @@ import { State } from "../models/State";
 import CityDAO from "./city.dao";
 import StateDAO from "./state.dao";
 import { TryCatchClassDecorator } from "../../util/tryCatchClassDecorator";
+import { RESULTS_PER_PAGE } from "../../util/constants";
 
 @TryCatchClassDecorator(Error, (err, context) => {
     console.log(context, err);
@@ -124,9 +125,22 @@ class HousingDAO {
                 },
             },
             order: [["distanceToNearestGym", "ASC"]],
-            limit: 12,
-            offset: pageNum * 12,
+            limit: RESULTS_PER_PAGE,
+            offset: pageNum * RESULTS_PER_PAGE,
         });
+    }
+
+    public async getCountOfSearchQuery(cityId: number, minDist: number, maxDist: number): Promise<number> {
+        const all = await Housing.findAll({
+            where: {
+                cityId,
+                distanceToNearestGym: {
+                    [Op.between]: [minDist, maxDist],
+                },
+            },
+            order: [["distanceToNearestGym", "ASC"]],
+        });
+        return all.length / RESULTS_PER_PAGE;
     }
 
     public async readBetween(lowerLimitLatitude: number, upperLimitLatitude: number, lowerLimitLongitude: number, upperLimitLongitude: number) {

@@ -13,3 +13,5 @@ export const minDegreesLongitude = -180;
 export const FREE_CREDITS = 5;
 export const MIN_SCRAPES_FOR_REPEAT_SCRAPE = 1;
 export const COMPLETE_TASK_TIME_THRESHOLD_IN_DAYS = 30;
+
+export const RESULTS_PER_PAGE = 12;
