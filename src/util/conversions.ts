@@ -105,3 +105,10 @@ export function convertLatLongDifferenceIntoKM(lat1: number, lon1: number, lat2:
 
     return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
 }
+
+export function convertMinutesWalkedToKMTraveled(mins: number): number {
+    // average walking speed = 2.5 mph to 4 mph
+    // 2.5 mph to kmh = 4.02 km/h
+    // 4.02 km/h * 4 min / h = 0.268 km walked in 4 min
+    return mins * 0.268;
+}

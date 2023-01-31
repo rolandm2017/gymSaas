@@ -10,7 +10,9 @@ const MAX_WALK_TIME_IN_MINS = 4;
 // hence we are now looking for 0.268 km traveled east-west at canadian latitudes,
 // and 0.268 km traveled north-south at any longitude (because the km traveled is always the same at any point on the globe!)
 
-const MAX_KM_TRAVELED = 0.268;
+// const MAX_KM_TRAVELED = 0.268;
+const ORIG_MAX_KM_TRAVELED = 0.268;
+const MAX_KM_TRAVELED = ORIG_MAX_KM_TRAVELED * 2; // was prev 0.268 but that was TOO SHORT of a walk
 
 const startingLat = SEED_CITIES[0].centerLat;
 const startingLong = SEED_CITIES[0].centerLong;
@@ -28,3 +30,5 @@ export const MAX_ACCEPTABLE_LATITUDE_DIFFERENCE = degChangeLatitude; //
 export const MAX_ACCEPTABLE_LONGITUDE_DIFFERENCE = degChangeLongitude; //
 
 export const ACCEPTABLE_RADIUS_FOR_WALKING = 0;
+
+export default { ORIG_MAX_KM_TRAVELED, MAX_KM_TRAVELED };

@@ -19,7 +19,7 @@ import { convertHousingsToDemoHousings, convertHousingToHousingWithUrl } from ".
 import { removeBulkURLs } from "../util/removeUrl";
 import CacheService from "./cache.service";
 import ScraperService from "./scraper.service";
-import { convertLatLongDifferenceIntoKM, getDistanceInKMFromLatLong } from "../util/conversions";
+import { convertLatLongDifferenceIntoKM, convertMinutesWalkedToKMTraveled, getDistanceInKMFromLatLong } from "../util/conversions";
 import { convertGymModelToIGym } from "../util/convertGymModelToIGym";
 import CityDAO from "../database/dao/city.dao";
 
@@ -195,8 +195,8 @@ class HousingService {
     public async getUsingSearchQuery(cityName: string, minDistInMin: number, maxDistInMin: number, pageNum: number): Promise<Housing[]> {
         const cityId = await this.cacheService.getCityId(cityName);
         console.log(minDistInMin, maxDistInMin, "197rm");
-        const minDistInKM = convertDistanceInMinToKm(minDistInMin);
-        const maxDistInKM = convertDistanceInMinToKm(maxDistInMin);
+        const minDistInKM = convertMinutesWalkedToKMTraveled(minDistInMin);
+        const maxDistInKM = convertMinutesWalkedToKMTraveled(maxDistInMin);
         return await this.housingDAO.getUsingSearchQuery(cityId, minDistInKM, maxDistInKM, pageNum);
     }
 
