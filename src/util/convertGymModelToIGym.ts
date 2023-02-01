@@ -4,7 +4,7 @@ import { IGym } from "../interface/Gym.interface";
 export function convertGymModelToIGym(gym: Gym, cityName: string): IGym {
     const asInterface: IGym = {
         cityId: gym.cityId,
-        name: "",
+        name: gym.name,
         cityName,
         lat: gym.lat,
         long: gym.long,
