@@ -1,8 +1,12 @@
+import GymDAO from "../database/dao/gym.dao";
+import { Gym } from "../database/models/Gym";
 import { Housing, HousingCreationAttributes } from "../database/models/Housing";
 import { ProviderEnum } from "../enum/provider.enum";
 import { IDemoHousing } from "../interface/DemoHousing.interface";
 import { IHousing } from "../interface/Housing.interface";
 import { IHousingWithUrl } from "../interface/HousingWithUrl.interface";
+import { convertLatLongDifferenceIntoKM } from "./conversions";
+import { convertGymModelToIGym } from "./convertGymModelToIGym";
 
 export function convertIHousingToCreationAttr(
     house: IHousingWithUrl,
@@ -30,9 +34,17 @@ export function convertIHousingToCreationAttr(
     return creationPayload;
 }
 
-export function convertHousingsToDemoHousings(housings: Housing[]): IDemoHousing[] {
+export async function convertHousingsToDemoHousings(housings: Housing[], gymDAO: GymDAO): Promise<IDemoHousing[]> {
     const demoHousings: IDemoHousing[] = [];
     for (const housing of housings) {
+        const nearbyGyms = await gymDAO.getGymsNear(housing.lat, housing.long);
+        const distances = nearbyGyms.map((gym: Gym, index: number) => {
+            const distance = convertLatLongDifferenceIntoKM(housing.lat, housing.long, gym.lat, gym.long);
+            return { distance, index };
+        });
+        const smallestDistanceIndex = distances.find(el => el.distance)?.index;
+        if (smallestDistanceIndex === undefined) throw Error("Will never happen error");
+        const nearestGym = nearbyGyms[smallestDistanceIndex];
         const demoContent: IDemoHousing = {
             housingId: housing.housingId,
             buildingType: housing.buildingType == "apartment" ? housing.buildingType : "house",
@@ -41,6 +53,7 @@ export function convertHousingsToDemoHousings(housings: Housing[]): IDemoHousing
             long: housing.long,
             nearAGym: housing.nearAGym,
             distanceToNearestGym: housing.distanceToNearestGym,
+            nearbyGym: convertGymModelToIGym(nearestGym, "irrelevant"),
         };
         demoHousings.push(demoContent);
     }

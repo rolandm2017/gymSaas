@@ -1,5 +1,6 @@
 import { ProviderEnum } from "../enum/provider.enum";
 import { IAssociation } from "./Association.interface";
+import { IGym } from "./Gym.interface";
 
 export interface IDemoHousing {
     housingId?: number; // same property name as in db
@@ -12,7 +13,7 @@ export interface IDemoHousing {
     lat: number;
     long: number;
     // source: ProviderEnum; // not included in demo!
-    nearbyGyms?: IAssociation[];
+    nearbyGym: IGym;
     // idAtSource?: number; // for the id as detected at the provider. used in RentCanada to scrape apartment URL
     nearAGym?: boolean | null;
     distanceToNearestGym: number;
