@@ -40,6 +40,7 @@ export function convertHousingsToDemoHousings(housings: Housing[]): IDemoHousing
             lat: housing.lat,
             long: housing.long,
             nearAGym: housing.nearAGym,
+            distanceToNearestGym: housing.distanceToNearestGym,
         };
         demoHousings.push(demoContent);
     }
