@@ -44,6 +44,7 @@ class Parser {
                 lat: unit.latitude,
                 long: unit.longitude,
                 idAtSource: unit.id, // this is correct. it is "id"
+                distanceToNearestGym: 0,
             };
             apList.push(ap);
         }
@@ -72,6 +73,7 @@ class Parser {
                 lat: unit.latitude,
                 long: unit.longitude,
                 source: this.provider,
+                distanceToNearestGym: 0,
             };
             apList.push(ap);
         }
@@ -100,6 +102,7 @@ class Parser {
                 lat: unit._geoloc.lat,
                 long: unit._geoloc.lng,
                 source: this.provider,
+                distanceToNearestGym: 0,
             };
             apList.push(ap);
         }

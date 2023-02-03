@@ -20,7 +20,6 @@ import CacheService from "./service/cache.service";
 import CityDAO from "./database/dao/city.dao";
 import BatchDAO from "./database/dao/batch.dao";
 import { SEED_GYMS_CANADA } from "./seed/gyms";
-import { SEED_HOUSING } from "./seed/seedHousing";
 import { Gym } from "./database/models/Gym";
 import passportConfig from "./config/passportConfig";
 import FeedbackDAO from "./database/dao/feedback.dao";
@@ -134,33 +133,7 @@ class App {
                 }
             }
         }
-        if (alsoAps) {
-            // put the batch in
-            const batchDAO = new BatchDAO();
-            const highest = await batchDAO.getHighestBatchNum();
-            if (highest === 1) {
-                //
-            } else {
-                new BatchDAO().addBatchNum(1);
-            }
-            // add the tasks
-            const stateDAO = new StateDAO();
-            const cityDAO = new CityDAO();
-            const housingDAO = new HousingDAO(stateDAO, cityDAO);
-            let count = 0;
-            for (const city of SEED_HOUSING) {
-                for (const ap of city) {
-                    if (ap.housingId) {
-                        const found = await housingDAO.getHousingByHousingId(ap.housingId);
-                        if (found) continue;
-                        delete ap.taskId;
-                        count++;
-                        housingDAO.createHousing(ap);
-                    }
-                }
-            }
-            console.log("seeded " + count + " apartments");
-        }
+
         if (alsoTasks) {
             // put the batch in
             const batchDAO = new BatchDAO();

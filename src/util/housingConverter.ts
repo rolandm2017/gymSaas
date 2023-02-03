@@ -30,6 +30,7 @@ export function convertIHousingToCreationAttr(
         cityId,
         batchId: batchNum,
         nearAGym: house.nearAGym !== undefined ? house.nearAGym : null,
+        distanceToNearestGym: house.distanceToNearestGym,
     };
     return creationPayload;
 }
@@ -72,6 +73,7 @@ export function convertHousingToHousingWithUrl(housing: Housing): IHousingWithUr
         nearAGym: housing.nearAGym,
         url: housing.url,
         source: housing.source,
+        distanceToNearestGym: housing.distanceToNearestGym,
     };
     return housingWithUrl;
 }
