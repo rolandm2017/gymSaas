@@ -195,7 +195,6 @@ describe("full e2e test", () => {
         const faveRetrievalRoute = "/profile/all/picks/housing";
         const favesResponse = await api.get(faveRetrievalRoute).set("Authorization", `Bearer ${jwtToken}`);
         const stepThreeFaves = favesResponse.body.housingPicks;
-        console.log(stepThreeFaves, "196rm");
         expect(stepThreeFaves.length).toBe(numOfFavorites); // same as the pre-auth picks
 
         // "Add 3 more picks"
@@ -236,7 +235,6 @@ describe("full e2e test", () => {
         const revealedUrlListRes = await api.get(revealedUrlPath).set("Authorization", `Bearer ${jwtToken}`);
         const revealedUrlList = revealedUrlListRes.body.revealedUrls;
 
-        console.log(revealedUrlListRes.body, "236rm");
         expect(revealedUrlList.length).toBe(0); // starting deal
 
         // **
@@ -256,7 +254,6 @@ describe("full e2e test", () => {
         const revealedResponsePayloadTwo = revealResponseTwo.body;
         const revealedResponsePayloadThree = revealResponseThree.body;
         // assert
-        console.log(revealedResponsePayloadOne, "257rm");
         expect(revealedResponsePayloadOne.apartmentId).toBe(revealTargetOne);
         expect(revealedResponsePayloadOne.realURL).toBeDefined();
 

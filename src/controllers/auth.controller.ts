@@ -117,9 +117,7 @@ class AuthController {
     public async verifyEmail(request: Request, response: Response) {
         try {
             const tokenInput = request.params.verificationToken;
-            console.log(tokenInput, "152rm");
             const token = isString(tokenInput);
-            console.log(token, "152rm");
             const { success, accountEmail } = await this.authService.verifyEmail(token);
             if (success) {
                 try {
@@ -228,7 +226,6 @@ class AuthController {
             const token = request.body.token;
             const password = request.body.password;
             const confirmed = request.body.confirmPassword;
-            console.log(password, confirmed, "231rm");
             if (confirmed !== password) return response.status(400).json({ message: "Passwords don't match" });
             const success = await this.authService.resetPassword(token, password);
             if (success) return response.json({ message: "Password reset successful, you can now login" });

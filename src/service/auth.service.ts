@@ -230,7 +230,6 @@ class AuthService {
         const account = await this.accountDAO.getAccountById(resetToken.acctId);
         if (!account) throw new Error("Invalid token");
         // update password and remove reset token
-        console.log(token, password, "233rm");
         account.passwordHash = this.accountUtil.hash(password);
         account.passwordReset = Date.now();
         const resetTokenForAccount = await this.resetTokenDAO.getAllResetTokensForAccount(account.acctId);

@@ -51,7 +51,6 @@ const passportConfig = (passport: any) => {
                     // note that google ids are 20 digit string integers, so they must be stored as a string, not an integer.
                     const googleIdString: string = profile.id;
                     const fullName = profile.firstName + profile.lastName;
-                    throw Error("TODO error: get profile shape, 54rm");
 
                     const newMember = await accountDAO.createGoogleLoginAccount(fullName, googleIdString, profile.emails[0].value);
 

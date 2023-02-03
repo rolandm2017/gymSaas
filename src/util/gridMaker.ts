@@ -18,19 +18,15 @@ export function generateGrid(startCoords: ILatLong, jump: number, radius: number
     // const mod = 4; // mod is a modification to stop the massive covers-canada size grids.
     const mod = 2; // mod is a modification to stop the massive covers-canada size grids.
     const jumpWithMod = jump / mod;
-    console.log(startCoords, jumpWithMod, radius, "18rm");
     const poorlyUnderstoodAdjustment = 10; // "poorlyUnderstood" because I have no idea what the loop is doing!
     for (let i = 0; d < radius; i++) {
         // d = (jump * i) / poorlyUnderstoodAdjustment;
         d = jumpWithMod * i;
         ringDistances.push(d);
     }
-    console.log(d, radius, "25rm");
-    console.log(ringDistances, "26rm");
     const nodes: ILatLong[][] = ringDistances.map(ringDistance => getNextRing(startCoords, jumpWithMod, ringDistance));
     const flat = nodes.flat();
     flat.push(startCoords); // push because otherwise theyre missing from the scan!
-    console.log(flat.length, "29rm");
     return flat;
 }
 
@@ -43,8 +39,6 @@ function getNextRing(focalPoint: ILatLong, jump: number, ringDistanceInDegreesPr
      * ** ringDistance is in degrees lat/long! you can tell because
      * ** minX is focalPoint.long - ringDistance, minY = .lat - ringDistance
      */
-    console.log("start values: 44rm");
-    console.log(focalPoint, jump, ringDistanceInDegreesPreMod, "45rm");
     const degreesLongitudeBetweenGrids = changeInEastWestKMToLongitudeDegrees(jump, focalPoint.lat, focalPoint.long);
     const degreesLatitudeBetweenGrids = changeInNorthSouthKMToLatitudeDegrees(jump, focalPoint.lat);
 
@@ -63,8 +57,6 @@ function getNextRing(focalPoint: ILatLong, jump: number, ringDistanceInDegreesPr
     const sideLength = ringDistance * 2;
     const subdivisionsNorthSouth: number = sideLength / degreesLatitudeBetweenGrids / magicMathAdjustment; // note: expecting integer values
     const subdivisionsEastWest: number = sideLength / degreesLongitudeBetweenGrids / magicMathAdjustment;
-    console.log(subdivisionsEastWest, subdivisionsNorthSouth, sideLength, jump, "48rm");
-    // console.log("subdivisions:", subdivisions, "49rm");
 
     const topEdge = [];
     const bottomEdge = [];
@@ -92,6 +84,5 @@ function getNextRing(focalPoint: ILatLong, jump: number, ringDistanceInDegreesPr
     }
 
     const tasks = [topEdge, rightEdge, bottomEdge, leftEdge].flat();
-    console.log("tasks:", tasks.length, "60rm");
     return tasks;
 }

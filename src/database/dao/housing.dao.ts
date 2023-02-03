@@ -74,7 +74,6 @@ class HousingDAO {
         } else {
             conditions = {};
         }
-        console.log(conditions, "63rm");
         return await Housing.findAll({ where: conditions });
     }
 
@@ -102,7 +101,6 @@ class HousingDAO {
         } else {
             conditions = {};
         }
-        console.log(conditions, "63rm");
         return await Housing.findAll({ where: conditions });
     }
 

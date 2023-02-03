@@ -56,25 +56,24 @@ class ProfileController {
     }
 
     public async recordPublicPickGym(request: Request, response: Response) {
+        const ip = request.ip;
+        const gymId = request.body.gymId;
         try {
-            const ip = request.ip;
-            const gymId = request.body.gymId;
             await this.profileService.recordPublicPickGym(ip, gymId);
             return response.status(200).json({ message: "Success" });
         } catch (err) {
+            console.log({ ip, gymId });
             return handleErrorResponse(response, err);
         }
     }
 
     public async recordAuthedPickHousing(request: Request, response: Response) {
         try {
-            console.log(request.user, "71rm");
             if (request.user === undefined) {
                 return handleErrorResponse(response, "User is required");
             }
             const acctId = request.user.acctId;
             const housingId = request.body.housingId;
-            console.log(acctId, housingId, "77rm");
             const newPickId = await this.profileService.recordAuthedPickHousing(acctId, housingId);
             return response.status(200).json({ newPickId, status: "Confirmed" });
         } catch (err) {

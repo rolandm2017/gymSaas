@@ -44,7 +44,6 @@ class AdminController {
     }
 
     public async getAllBatchNumbers(request: Request, response: Response) {
-        console.log("getting all batches 51rm");
         const batchNums: number[] = await this.taskQueueService.getAllBatchNumbers();
         return response.status(200).json({ batchNums });
     }
@@ -99,9 +98,7 @@ class AdminController {
             const cityName = isString(cityNameInput);
             const providerOrAll = isProviderOrAll(providerInput);
             const successFilter = isASuccessFilter(successFilterInput);
-            // console.log(batchNum, cityName, providerOrAll, "102rm");
             const tasks: Task[] = await this.taskQueueService.getTasksByWithSpecifications(batchNum, cityName, providerOrAll, successFilter);
-            // console.log(`returning tasks of length ${tasks.length}, '104rm'`);
             return response.status(200).json({ tasks });
         } catch (err) {
             console.log({ batchNumInput, cityNameInput, providerInput, successFilterInput });

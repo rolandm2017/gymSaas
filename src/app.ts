@@ -147,7 +147,6 @@ class App {
             const stateDAO = new StateDAO();
             const cityDAO = new CityDAO();
             const housingDAO = new HousingDAO(stateDAO, cityDAO);
-            console.log("HERE 134rm");
             let count = 0;
             for (const city of SEED_HOUSING) {
                 for (const ap of city) {

@@ -22,7 +22,6 @@ class EmailService {
             // send the proper user facing sequence
             // const verifyUrl = getBackendEndpoint() + `/auth/${accountId}/account/verify-email?token=${account.verificationToken}`;
             const verifyUrl = getBackendEndpoint() + "/auth/verify-email/" + account.verificationToken;
-            console.log(verifyUrl, "23rm");
             message = `<p>Please click the below link to verify your email address:</p>
                        <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
         } else {
@@ -38,7 +37,6 @@ class EmailService {
                    <p>Thanks for registering!</p>
                    ${message}`,
         };
-        console.log(this.testingMode, args, "40rm");
         if (this.testingMode) {
             this.emailSenderReached(args);
             return;

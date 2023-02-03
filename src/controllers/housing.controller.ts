@@ -123,13 +123,7 @@ class HousingController {
     public async getQualifiedApartmentsByLocation(request: Request, response: Response) {
         try {
             const cityIdInput = request.query.cityId;
-            console.log(cityIdInput, "124rm");
-            // const cityNameInput = request.query.cityName;
-            // const stateOrProvinceInput = request.query.state;
-            // validation
-            // Note it could be an invalid state/province but, not checking that. It could just fail.
-            // const stateOrProvince = stateOrProvinceInput ? isString(stateOrProvinceInput) : undefined;
-            // const legitCityName = cityNameInput ? isLegitCityName(cityNameInput) : undefined;
+
             const cityId = isStringInteger(cityIdInput);
             const apartments: IHousing[] = await this.housingService.getQualifiedAps(cityId);
             return response.status(200).json({ apartments, count: apartments.length });
@@ -184,7 +178,6 @@ class HousingController {
             const maxDist = isStringFloat(maxDistanceInput);
             const pageNum = isStringInteger(pageNumInput);
             const { results, totalPages } = await this.housingService.getUsingSearchQuery(cityName, minDist, maxDist, pageNum);
-            console.log(results, totalPages, "185rm");
             return response.status(200).json({ pageNum, results, totalPages });
         } catch (err) {
             console.log({ cityNameInput, minDistanceInput, maxDistanceInput, pageNumInput });

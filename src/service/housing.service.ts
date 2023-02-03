@@ -60,7 +60,6 @@ class HousingService {
 
     //
     public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<IHousing[]> {
-        console.log(cityId, cityName, stateOrProvince, "52rm");
         const housings = await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);
         return removeBulkURLs(housings);
     }
@@ -107,9 +106,7 @@ class HousingService {
         // if already revealed, return url
         const isAlreadyRevealedToAccount = revealedToList.map(housing => housing.housingId).includes(housing.housingId);
         const wasBadlyFetched = housing.url === "" || housing.url === null;
-        console.log(isAlreadyRevealedToAccount, apartmentId, "80rm");
         if (isAlreadyRevealedToAccount) {
-            console.log(wasBadlyFetched, housing.idAtSource, "83rm");
             if (wasBadlyFetched && housing.idAtSource) {
                 // retry
                 const urlFromApi = await this.scraperService.getURLForApartment(housing.idAtSource);
@@ -117,14 +114,11 @@ class HousingService {
                     this.handleDeadLink(housing.housingId);
                     return "Dead link detected";
                 }
-                console.log(urlFromApi, "url from api 87rm");
                 await this.housingDAO.addUrlToHousing(apartmentId, urlFromApi);
                 // do not deduct credit, do not add revealed to (because it already was/is)
                 const realUrl = createRealUrl(urlFromApi, housing.source);
-                console.log(realUrl, housing.idAtSource, "89rm");
                 return realUrl;
             }
-            console.log(housing.url, housing.source, "81rm");
             const realUrl = createRealUrl(housing.url, housing.source);
             return realUrl;
         }
@@ -140,7 +134,6 @@ class HousingService {
             // (a) if the result is already there, return it
             this.tryDeductCredit(accountId);
             this.tryAddRevealedTo(profile, housing.housingId);
-            console.log(housing.url, housing.source, "97rm");
             const realUrl = createRealUrl(housing.url, housing.source);
             return realUrl;
         }
@@ -154,11 +147,9 @@ class HousingService {
             this.handleDeadLink(housing.housingId);
             return "Dead link detected";
         }
-        console.log(housing.idAtSource, urlFromApi, "107rm");
         await this.housingDAO.addUrlToHousing(apartmentId, urlFromApi);
         this.tryDeductCredit(accountId);
         this.tryAddRevealedTo(profile, housing.housingId);
-        console.log(housing.url, housing.source, "110rm");
         const realUrl = createRealUrl(urlFromApi, housing.source);
         return realUrl;
     }
@@ -202,7 +193,6 @@ class HousingService {
         pageNum: number,
     ): Promise<{ results: IHousing[]; totalPages: number }> {
         const cityId = await this.cacheService.getCityId(cityName);
-        console.log(minDistInMin, maxDistInMin, "197rm");
         const minDistInKM = convertMinutesWalkedToKMTraveled(minDistInMin);
         const maxDistInKM = convertMinutesWalkedToKMTraveled(maxDistInMin);
         const housing = await this.housingDAO.getUsingSearchQuery(cityId, minDistInKM, maxDistInKM, pageNum);

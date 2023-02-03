@@ -13,12 +13,10 @@ describe("send an email to my real email", () => {
             const myEmail = process.env.MY_EMAIL ? process.env.MY_EMAIL : "fail";
             const senderEmail = process.env.PRIVATE_EMAIL;
             expect(senderEmail).toBeDefined();
-            console.log("TESTS 14rm");
             if (myEmail == "fail") {
                 throw Error("fail to load email from env");
             }
             const payload = { from: senderEmail, to: myEmail, subject: "Test email!", html: "foo!!!!!" };
-            console.log("TESTS 19rm");
             const waitToSend = new Promise((resolve, reject) => {
                 sendEmail(payload, resolve);
             });
