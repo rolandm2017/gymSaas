@@ -42,7 +42,7 @@ class App {
         this.port = appInit.port;
         this.app.use(
             cors({
-                origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
+                origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "https://www.apartmentsneargyms.com"],
                 methods: "GET, POST, PATCH, DELETE, PUT",
                 allowedHeaders: "Content-Type, Authorization",
                 credentials: true,
