@@ -17,9 +17,8 @@ import AuthService from "../service/auth.service";
 import { IBasicDetails } from "../interface/BasicDetails.interface";
 import { handleErrorResponse } from "../util/handleErrorResponse";
 import { HealthCheck } from "../enum/healthCheck.enum";
-import { googleAuth, googleAuthCallback, passportJwt } from "../middleware/passport.middleware";
+import { googleAuth, googleAuthCallback } from "../middleware/passport.middleware";
 import { UserFromGoogle } from "../interface/UserFromGoogle.interface";
-import { iap } from "googleapis/build/src/apis/iap";
 import { isString } from "../validationSchemas/inputValidation";
 import { getFrontendURL } from "../util/URLMaker";
 

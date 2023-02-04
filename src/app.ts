@@ -30,7 +30,7 @@ import HousingDAO from "./database/dao/housing.dao";
 import StateDAO from "./database/dao/state.dao";
 import { SEED_USERS } from "./seed/seedUsers";
 import AccountDAO from "./database/dao/account.dao";
-import { SEED_TASKS } from "./seed/seedTasks";
+// import { SEED_TASKS } from "./seed/seedTasks";
 
 class App {
     public app: Application;
@@ -134,27 +134,27 @@ class App {
             }
         }
 
-        if (alsoTasks) {
-            // put the batch in
-            const batchDAO = new BatchDAO();
-            const highest = await batchDAO.getHighestBatchNum();
-            if (highest === 1) {
-                //
-            } else {
-                new BatchDAO().addBatchNum(1);
-            }
-            const taskDAO = new TaskDAO();
-            let count = 0;
-            for (const task of SEED_TASKS) {
-                if (task.taskId) {
-                    const found = await taskDAO.getTaskById(task.taskId);
-                    if (found) continue;
-                    count++;
-                    taskDAO.createTask(task);
-                }
-            }
-            console.log("seeded " + count + " tasks");
-        }
+        // if (alsoTasks) {
+        //     // put the batch in
+        //     const batchDAO = new BatchDAO();
+        //     const highest = await batchDAO.getHighestBatchNum();
+        //     if (highest === 1) {
+        //         //
+        //     } else {
+        //         new BatchDAO().addBatchNum(1);
+        //     }
+        //     const taskDAO = new TaskDAO();
+        //     let count = 0;
+        //     for (const task of SEED_TASKS) {
+        //         if (task.taskId) {
+        //             const found = await taskDAO.getTaskById(task.taskId);
+        //             if (found) continue;
+        //             count++;
+        //             taskDAO.createTask(task);
+        //         }
+        //     }
+        //     console.log("seeded " + count + " tasks");
+        // }
     }
 
     public async initializeCaches() {
