@@ -72,7 +72,6 @@ class AuthController {
             const ipAddress = request.ip;
             const accountDetails: IBasicDetails = await this.authService.grantRefreshToken(newUser, ipAddress);
             // make a profile for them
-            console.log(newUser, ipAddress, "75rm");
             try {
                 await this.authService.createProfileForGoogleUser(newUser.email, ipAddress);
             } catch (err) {
@@ -134,7 +133,7 @@ class AuthController {
                 }
             }
             // todo-Important - replace localhost with prod url based on flag
-            return response.redirect("http://localhost:3002/account/is-verified");
+            return response.redirect(getFrontendURL("/account/is-verified"));
             // return response.status(200).json({ message: "Verification successful, you can now login" });
         } catch (err) {
             return handleErrorResponse(response, err);

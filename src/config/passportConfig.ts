@@ -56,7 +56,6 @@ const passportConfig = (passport: any) => {
                     } else {
                         fullName = profile.firstName + profile.lastName;
                     }
-                    console.log(profile.firstName, profile.lastName, "54rm");
                     const newMember = await accountDAO.createGoogleLoginAccount(fullName, googleIdString, profile.emails[0].value);
 
                     req.accessToken = accessToken; // q: where does req go next?
