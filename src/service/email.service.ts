@@ -25,6 +25,7 @@ class EmailService {
             console.log(backendEndpoint, "25rm");
             const verifyUrl = backendEndpoint + "/auth/verify-email/" + account.verificationToken;
             message = `Hi, your verification code is 9876543`;
+            console.log(message, "28rm");
             // message = `<p>Please click the below link to verify your email address:</p>
             //    <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
         } else {
