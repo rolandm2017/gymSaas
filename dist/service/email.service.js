@@ -26,7 +26,9 @@ class EmailService {
             if (accountId) {
                 // send the proper user facing sequence
                 // const verifyUrl = getBackendEndpoint() + `/auth/${accountId}/account/verify-email?token=${account.verificationToken}`;
-                const verifyUrl = (0, URLMaker_1.getBackendEndpoint)() + "/auth/verify-email/" + account.verificationToken;
+                const backendEndpoint = (0, URLMaker_1.getBackendEndpoint)();
+                console.log(backendEndpoint, "25rm");
+                const verifyUrl = backendEndpoint + "/auth/verify-email/" + account.verificationToken;
                 message = `<p>Please click the below link to verify your email address:</p>
                        <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
             }

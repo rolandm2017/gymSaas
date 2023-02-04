@@ -17,7 +17,7 @@ function getBackendEndpoint(path) {
         }
     }
     else {
-        const pathBase = "https://www.api.apartmentsneargyms.com";
+        const pathBase = "https://www.apartmentsneargyms.com/api";
         if (path) {
             return pathBase + path;
         }
