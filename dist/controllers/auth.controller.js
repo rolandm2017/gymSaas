@@ -79,6 +79,13 @@ class AuthController {
                 const newUser = request.user;
                 const ipAddress = request.ip;
                 const accountDetails = yield this.authService.grantRefreshToken(newUser, ipAddress);
+                // make a profile for them
+                try {
+                    yield this.authService.createProfileForGoogleUser(newUser.email, ipAddress);
+                }
+                catch (err) {
+                    return (0, handleErrorResponse_1.handleErrorResponse)(response, err);
+                }
                 if (accountDetails.refreshToken === undefined)
                     throw Error("refresh token missing from authenticate response");
                 this.setTokenCookie(response, accountDetails.refreshToken);
@@ -142,7 +149,8 @@ class AuthController {
                         return (0, handleErrorResponse_1.handleErrorResponse)(response, err);
                     }
                 }
-                return response.redirect("http://localhost:3002/account/is-verified");
+                // todo-Important - replace localhost with prod url based on flag
+                return response.redirect((0, URLMaker_1.getFrontendURL)("/account/is-verified"));
                 // return response.status(200).json({ message: "Verification successful, you can now login" });
             }
             catch (err) {

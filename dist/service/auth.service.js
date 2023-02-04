@@ -112,6 +112,24 @@ class AuthService {
             return;
         });
     }
+    createProfileForGoogleUser(email, ipAddress) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const accountArr = yield this.accountDAO.getAccountByEmail(email);
+            if (accountArr.length === 0)
+                throw new Error("No account found for this email");
+            if (accountArr.length >= 2)
+                throw new Error("More than one account found for this email");
+            const account = accountArr[0];
+            const relatedProfile = yield this.profileDAO.getProfileByIp(ipAddress);
+            if (relatedProfile === null) {
+                const created = yield this.profileDAO.createProfileByIp(ipAddress);
+                yield this.accountDAO.associateAccountWithProfile(account.acctId, created);
+                return;
+            }
+            yield this.accountDAO.associateAccountWithProfile(account.acctId, relatedProfile);
+            return;
+        });
+    }
     refreshToken(tokenString, ipAddress) {
         return __awaiter(this, void 0, void 0, function* () {
             const refreshToken = yield this.accountUtil.getRefreshTokenByTokenString(tokenString);

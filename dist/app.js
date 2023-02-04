@@ -34,19 +34,18 @@ const gyms_1 = require("./seed/gyms");
 const Gym_1 = require("./database/models/Gym");
 const passportConfig_1 = __importDefault(require("./config/passportConfig"));
 const feedback_dao_1 = __importDefault(require("./database/dao/feedback.dao"));
-const task_dao_1 = __importDefault(require("./database/dao/task.dao"));
 const gym_dao_1 = __importDefault(require("./database/dao/gym.dao"));
 const housing_dao_1 = __importDefault(require("./database/dao/housing.dao"));
 const state_dao_1 = __importDefault(require("./database/dao/state.dao"));
 const seedUsers_1 = require("./seed/seedUsers");
 const account_dao_1 = __importDefault(require("./database/dao/account.dao"));
-const seedTasks_1 = require("./seed/seedTasks");
+// import { SEED_TASKS } from "./seed/seedTasks";
 class App {
     constructor(appInit) {
         this.app = (0, express_1.default)();
         this.port = appInit.port;
         this.app.use((0, cors_1.default)({
-            origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
+            origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "https://www.apartmentsneargyms.com"],
             methods: "GET, POST, PATCH, DELETE, PUT",
             allowedHeaders: "Content-Type, Authorization",
             credentials: true,
@@ -133,29 +132,27 @@ class App {
                     }
                 }
             }
-            if (alsoTasks) {
-                // put the batch in
-                const batchDAO = new batch_dao_1.default();
-                const highest = yield batchDAO.getHighestBatchNum();
-                if (highest === 1) {
-                    //
-                }
-                else {
-                    new batch_dao_1.default().addBatchNum(1);
-                }
-                const taskDAO = new task_dao_1.default();
-                let count = 0;
-                for (const task of seedTasks_1.SEED_TASKS) {
-                    if (task.taskId) {
-                        const found = yield taskDAO.getTaskById(task.taskId);
-                        if (found)
-                            continue;
-                        count++;
-                        taskDAO.createTask(task);
-                    }
-                }
-                console.log("seeded " + count + " tasks");
-            }
+            // if (alsoTasks) {
+            //     // put the batch in
+            //     const batchDAO = new BatchDAO();
+            //     const highest = await batchDAO.getHighestBatchNum();
+            //     if (highest === 1) {
+            //         //
+            //     } else {
+            //         new BatchDAO().addBatchNum(1);
+            //     }
+            //     const taskDAO = new TaskDAO();
+            //     let count = 0;
+            //     for (const task of SEED_TASKS) {
+            //         if (task.taskId) {
+            //             const found = await taskDAO.getTaskById(task.taskId);
+            //             if (found) continue;
+            //             count++;
+            //             taskDAO.createTask(task);
+            //         }
+            //     }
+            //     console.log("seeded " + count + " tasks");
+            // }
         });
     }
     initializeCaches() {

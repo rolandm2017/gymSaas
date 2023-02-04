@@ -55,7 +55,13 @@ const passportConfig = (passport) => {
             console.log(profile.emails[0]); // presuming the email they clicked on is the one sent in 0th position
             // note that google ids are 20 digit string integers, so they must be stored as a string, not an integer.
             const googleIdString = profile.id;
-            const fullName = profile.firstName + profile.lastName;
+            let fullName = "";
+            if (profile.firstName === undefined || profile.lastName === undefined) {
+                fullName = "No name found";
+            }
+            else {
+                fullName = profile.firstName + profile.lastName;
+            }
             const newMember = yield accountDAO.createGoogleLoginAccount(fullName, googleIdString, profile.emails[0].value);
             req.accessToken = accessToken; // q: where does req go next?
             return done(null, newMember);
