@@ -82,7 +82,7 @@ class AuthService {
             // create account object
             const acctWithPopulatedFields = yield this.accountUtil.attachMissingDetails(params, ipAddr);
             const acct = yield this.accountDAO.createAccount(acctWithPopulatedFields);
-            acct.verificationToken = this.accountUtil.randomTokenString();
+            acct.verificationToken = this.accountUtil.randomTokenString().slice(0, 6);
             // hash password
             acct.passwordHash = this.accountUtil.hash(params.password);
             // save account
