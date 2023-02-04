@@ -20,14 +20,7 @@ class EmailService {
         // hence the backend needs a url that handles verifying the account, that redirects to a "account successfully verified" endpoint.
         if (accountId) {
             // send the proper user facing sequence
-            // const verifyUrl = getBackendEndpoint() + `/auth/${accountId}/account/verify-email?token=${account.verificationToken}`;
-            const backendEndpoint = getBackendEndpoint();
-            console.log(backendEndpoint, "25rm");
-            const verifyUrl = backendEndpoint + "/auth/verify-email/" + account.verificationToken;
-            message = `Hi, your verification code is 9876543`;
-            console.log(message, "28rm");
-            // message = `<p>Please click the below link to verify your email address:</p>
-            //    <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
+            message = `Hi, your verification code is ${account.verificationToken}`;
         } else {
             // send the code so user can hit the endpoint using Postman
             message = `<p>Please use the below token to verify your email address with the <code>/account/verify-email</code> api route:</p>
@@ -37,8 +30,8 @@ class EmailService {
         const args = {
             to: account.email,
             subject: "Sign-up Verification - Verify Email",
-            html: `<h4>Verify Email</h4>
-                   <p>Thanks for registering!</p>
+            html: `<h4>Verify Your Email</h4>
+                   <p>Thanks for registering with Apartments Near Gyms!</p>
                    ${message}`,
         };
         if (this.testingMode) {
