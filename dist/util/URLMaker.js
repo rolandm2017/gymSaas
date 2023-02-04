@@ -7,6 +7,7 @@ exports.getFrontendURL = exports.getBackendEndpoint = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ path: "./.env" });
 function getBackendEndpoint(path) {
+    console.log(process.env.SERVER_ENVIRONMENT, "5rm");
     if (process.env.SERVER_ENVIRONMENT === "development") {
         const pathBase = "http://localhost:" + process.env.PORT;
         if (path) {

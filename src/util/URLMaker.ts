@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
 export function getBackendEndpoint(path?: string) {
+    console.log(process.env.SERVER_ENVIRONMENT, "5rm");
     if (process.env.SERVER_ENVIRONMENT === "development") {
         const pathBase = "http://localhost:" + process.env.PORT;
         if (path) {
