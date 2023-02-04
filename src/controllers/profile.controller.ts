@@ -47,6 +47,7 @@ class ProfileController {
     public async recordPublicPickHousing(request: Request, response: Response) {
         try {
             const ip = request.ip;
+            console.log("record public pick for ip", ip, "50rm");
             const housingId = request.body.housingId;
             await this.profileService.recordPublicPickHousing(ip, housingId);
             return response.status(200).json({ message: "Success" });

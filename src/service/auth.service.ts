@@ -123,6 +123,21 @@ class AuthService {
         return;
     }
 
+    public async createProfileForGoogleUser(email: string, ipAddress: string): Promise<void> {
+        const accountArr = await this.accountDAO.getAccountByEmail(email);
+        if (accountArr.length === 0) throw new Error("No account found for this email");
+        if (accountArr.length >= 2) throw new Error("More than one account found for this email");
+        const account = accountArr[0];
+        const relatedProfile = await this.profileDAO.getProfileByIp(ipAddress);
+        if (relatedProfile === null) {
+            const created = await this.profileDAO.createProfileByIp(ipAddress);
+            await this.accountDAO.associateAccountWithProfile(account.acctId, created);
+            return;
+        }
+        await this.accountDAO.associateAccountWithProfile(account.acctId, relatedProfile);
+        return;
+    }
+
     public async refreshToken(tokenString: string, ipAddress: string) {
         const refreshToken = await this.accountUtil.getRefreshTokenByTokenString(tokenString);
         // todo: kmChangeToLatlong
