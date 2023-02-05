@@ -54,7 +54,7 @@ function createAccountSchema(req: Request, res: Response, next: NextFunction) {
 
 function verifyEmailSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema = Joi.object({
-        verificationToken: Joi.string().required(),
+        verificationCode: Joi.string().required(),
     });
     validateRequest(req, next, schema);
 }

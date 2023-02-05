@@ -60,7 +60,7 @@ function createAccountSchema(req, res, next) {
 exports.createAccountSchema = createAccountSchema;
 function verifyEmailSchema(req, res, next) {
     const schema = joi_1.default.object({
-        verificationToken: joi_1.default.string().required(),
+        verificationCode: joi_1.default.string().required(),
     });
     (0, validateRequest_middleware_1.default)(req, next, schema);
 }

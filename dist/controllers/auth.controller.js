@@ -138,7 +138,7 @@ class AuthController {
     verifyEmail(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const tokenInput = request.body.verificationToken;
+                const tokenInput = request.body.verificationCode;
                 const token = (0, inputValidation_1.isString)(tokenInput);
                 const { success, accountEmail } = yield this.authService.verifyEmail(token);
                 if (success) {

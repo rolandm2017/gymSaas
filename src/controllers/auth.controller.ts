@@ -123,7 +123,7 @@ class AuthController {
 
     public async verifyEmail(request: Request, response: Response) {
         try {
-            const tokenInput = request.body.verificationToken;
+            const tokenInput = request.body.verificationCode;
             const token = isString(tokenInput);
             const { success, accountEmail } = await this.authService.verifyEmail(token);
             if (success) {
