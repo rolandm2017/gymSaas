@@ -112,7 +112,7 @@ class AuthController {
             }
             const accountDetails: IBasicDetails = await this.authService.register(request.body, ipAddr, origin);
             return response.json({
-                message: "Registration successful, please check your email for verification instructions",
+                message: "Registration successful, please check your email for a verification code",
                 accountDetails,
             });
         } catch (err) {
