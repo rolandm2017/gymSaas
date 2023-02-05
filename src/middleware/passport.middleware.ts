@@ -1,7 +1,9 @@
 import passport from "passport";
 import { getFrontendURL } from "../util/URLMaker";
 
-export const googleAuth = passport.authenticate("google", { scope: ["email", "profile"], successRedirect: getFrontendURL("/dashboard") });
+const successRedirectURL = getFrontendURL("/dashboard");
+console.log("success redirect url", successRedirectURL);
+export const googleAuth = passport.authenticate("google", { scope: ["email", "profile"], successRedirect: successRedirectURL });
 
 export const googleAuthCallback = passport.authenticate("google", { session: false });
 
