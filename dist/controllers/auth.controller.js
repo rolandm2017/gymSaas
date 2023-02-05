@@ -89,7 +89,9 @@ class AuthController {
                 if (accountDetails.refreshToken === undefined)
                     throw Error("refresh token missing from authenticate response");
                 this.setTokenCookie(response, accountDetails.refreshToken);
-                return response.redirect((0, URLMaker_1.getFrontendURL)() + "/dashboard"); // user gets access token from refresh-token endpoint.
+                const redirectURL = (0, URLMaker_1.getFrontendURL)() + "/dashboard";
+                console.log(redirectURL, "should say apartmentsneargyms.com, 85rm");
+                return response.redirect(redirectURL); // user gets access token from refresh-token endpoint.
             }
             catch (err) {
                 return (0, handleErrorResponse_1.handleErrorResponse)(response, err);
