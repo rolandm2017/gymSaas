@@ -46,7 +46,7 @@ class AuthController {
         this.router.post("/register", userAuthSchemas_1.registerUserSchema, this.register.bind(this));
         this.router.post("/authenticate", userAuthSchemas_1.authenticateUserSchema, this.authenticate.bind(this));
         // verify email
-        this.router.get("/verify-email/:verificationToken", this.verifyEmail.bind(this));
+        this.router.get("/verify-email", userAuthSchemas_1.verifyEmailSchema, this.verifyEmail.bind(this));
         this.router.get("/bypass-authentication-token", this.bypassEmail.bind(this));
         // tokens
         this.router.post("/refresh-token", this.refreshToken.bind(this));
@@ -138,20 +138,21 @@ class AuthController {
     verifyEmail(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const tokenInput = request.params.verificationToken;
+                const tokenInput = request.body.verificationToken;
                 const token = (0, inputValidation_1.isString)(tokenInput);
                 const { success, accountEmail } = yield this.authService.verifyEmail(token);
                 if (success) {
                     try {
                         yield this.authService.createOrAssociateProfile(accountEmail);
+                        return response.status(200).json({ message: "Verified!" });
                     }
                     catch (err) {
                         return (0, handleErrorResponse_1.handleErrorResponse)(response, err);
                     }
                 }
-                // todo-Important - replace localhost with prod url based on flag
-                return response.redirect((0, URLMaker_1.getFrontendURL)("/account/is-verified"));
-                // return response.status(200).json({ message: "Verification successful, you can now login" });
+                else {
+                    return response.status(500).json({ message: "Failed to verify" });
+                }
             }
             catch (err) {
                 return (0, handleErrorResponse_1.handleErrorResponse)(response, err);

@@ -52,12 +52,12 @@ function createAccountSchema(req: Request, res: Response, next: NextFunction) {
     validateRequest(req, next, schema);
 }
 
-// function verifyEmailSchema(req: Request, res: Response, next: NextFunction) {
-//     const schema: ObjectSchema = Joi.object({
-//         token: Joi.string().required(),
-//     });
-//     validateRequest(req, next, schema);
-// }
+function verifyEmailSchema(req: Request, res: Response, next: NextFunction) {
+    const schema: ObjectSchema = Joi.object({
+        verificationToken: Joi.string().required(),
+    });
+    validateRequest(req, next, schema);
+}
 
 function forgotPasswordSchema(req: Request, res: Response, next: NextFunction) {
     const schema: ObjectSchema = Joi.object({
@@ -124,7 +124,7 @@ export {
     authenticateUserSchema,
     registerUserSchema,
     createAccountSchema,
-    // verifyEmailSchema,
+    verifyEmailSchema,
     updatePasswordSchema,
     forgotPasswordSchema,
     resetPasswordSchema,

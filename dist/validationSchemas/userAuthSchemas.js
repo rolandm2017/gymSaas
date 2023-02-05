@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateRoleSchema = exports.revokeTokenSchema = exports.validateResetTokenSchema = exports.resetPasswordSchema = exports.forgotPasswordSchema = exports.updatePasswordSchema = exports.createAccountSchema = exports.registerUserSchema = exports.authenticateUserSchema = exports.isEmail = void 0;
+exports.updateRoleSchema = exports.revokeTokenSchema = exports.validateResetTokenSchema = exports.resetPasswordSchema = exports.forgotPasswordSchema = exports.updatePasswordSchema = exports.verifyEmailSchema = exports.createAccountSchema = exports.registerUserSchema = exports.authenticateUserSchema = exports.isEmail = void 0;
 const joi_1 = __importDefault(require("joi"));
 const validateRequest_middleware_1 = __importDefault(require("../middleware/validateRequest.middleware"));
 const role_enum_1 = require("../enum/role.enum");
@@ -58,12 +58,13 @@ function createAccountSchema(req, res, next) {
     (0, validateRequest_middleware_1.default)(req, next, schema);
 }
 exports.createAccountSchema = createAccountSchema;
-// function verifyEmailSchema(req: Request, res: Response, next: NextFunction) {
-//     const schema: ObjectSchema = Joi.object({
-//         token: Joi.string().required(),
-//     });
-//     validateRequest(req, next, schema);
-// }
+function verifyEmailSchema(req, res, next) {
+    const schema = joi_1.default.object({
+        verificationToken: joi_1.default.string().required(),
+    });
+    (0, validateRequest_middleware_1.default)(req, next, schema);
+}
+exports.verifyEmailSchema = verifyEmailSchema;
 function forgotPasswordSchema(req, res, next) {
     const schema = joi_1.default.object({
         email: joi_1.default.string().email().required(),

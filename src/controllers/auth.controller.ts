@@ -10,6 +10,7 @@ import {
     revokeTokenSchema,
     updateRoleSchema,
     validateResetTokenSchema,
+    verifyEmailSchema,
 } from "../validationSchemas/userAuthSchemas";
 import authorize from "../middleware/authorize.middleware";
 import { Role } from "../enum/role.enum";
@@ -38,7 +39,7 @@ class AuthController {
         this.router.post("/register", registerUserSchema, this.register.bind(this));
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         // verify email
-        this.router.get("/verify-email/:verificationToken", this.verifyEmail.bind(this));
+        this.router.get("/verify-email", verifyEmailSchema, this.verifyEmail.bind(this));
         this.router.get("/bypass-authentication-token", this.bypassEmail.bind(this));
         // tokens
         this.router.post("/refresh-token", this.refreshToken.bind(this));
@@ -122,19 +123,19 @@ class AuthController {
 
     public async verifyEmail(request: Request, response: Response) {
         try {
-            const tokenInput = request.params.verificationToken;
+            const tokenInput = request.body.verificationToken;
             const token = isString(tokenInput);
             const { success, accountEmail } = await this.authService.verifyEmail(token);
             if (success) {
                 try {
                     await this.authService.createOrAssociateProfile(accountEmail);
+                    return response.status(200).json({ message: "Verified!" });
                 } catch (err) {
                     return handleErrorResponse(response, err);
                 }
+            } else {
+                return response.status(500).json({ message: "Failed to verify" });
             }
-            // todo-Important - replace localhost with prod url based on flag
-            return response.redirect(getFrontendURL("/account/is-verified"));
-            // return response.status(200).json({ message: "Verification successful, you can now login" });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
