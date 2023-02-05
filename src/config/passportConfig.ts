@@ -2,6 +2,7 @@ import PassportGoogleAuth from "passport-google-oauth2";
 import { Strategy as JwtStrategy } from "passport-jwt";
 import { ExtractJwt } from "passport-jwt";
 import AccountDAO from "../database/dao/account.dao";
+import { getBackendEndpoint } from "../util/URLMaker";
 
 // https://www.makeuseof.com/nodejs-google-authentication/ may be useful if this breaks. The code is from there.
 
@@ -23,7 +24,7 @@ const passportConfig = (passport: any) => {
             {
                 clientID: googleClientId,
                 clientSecret: googleClientSecret,
-                callbackURL: "http://localhost:8000/auth/google/callback",
+                callbackURL: getBackendEndpoint("/auth/google/callback"),
                 passReqToCallback: true,
             },
             async (req: any, accessToken: string, refreshToken: any, profile: any, done: Function) => {
