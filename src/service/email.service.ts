@@ -20,7 +20,7 @@ class EmailService {
         // hence the backend needs a url that handles verifying the account, that redirects to a "account successfully verified" endpoint.
         if (accountId) {
             // send the proper user facing sequence
-            message = `Hi, your verification code is ${account.verificationToken}`;
+            message = `Your verification code is ${account.verificationToken}`;
         } else {
             // send the code so user can hit the endpoint using Postman
             message = `<p>Please use the below token to verify your email address with the <code>/account/verify-email</code> api route:</p>
