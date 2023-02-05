@@ -16,6 +16,7 @@ const passport_google_oauth2_1 = __importDefault(require("passport-google-oauth2
 const passport_jwt_1 = require("passport-jwt");
 const passport_jwt_2 = require("passport-jwt");
 const account_dao_1 = __importDefault(require("../database/dao/account.dao"));
+const URLMaker_1 = require("../util/URLMaker");
 // https://www.makeuseof.com/nodejs-google-authentication/ may be useful if this breaks. The code is from there.
 const accountDAO = new account_dao_1.default();
 const GoogleStrategy = passport_google_oauth2_1.default.Strategy;
@@ -29,7 +30,7 @@ const passportConfig = (passport) => {
     passport.use(new GoogleStrategy({
         clientID: googleClientId,
         clientSecret: googleClientSecret,
-        callbackURL: "http://localhost:8000/auth/google/callback",
+        callbackURL: (0, URLMaker_1.getBackendEndpoint)("/auth/google/callback"),
         passReqToCallback: true,
     }, (req, accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
         // refresh token is undefined
