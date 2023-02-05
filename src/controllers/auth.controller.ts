@@ -39,7 +39,7 @@ class AuthController {
         this.router.post("/register", registerUserSchema, this.register.bind(this));
         this.router.post("/authenticate", authenticateUserSchema, this.authenticate.bind(this));
         // verify email
-        this.router.get("/verify-email", verifyEmailSchema, this.verifyEmail.bind(this));
+        this.router.post("/verify-email", verifyEmailSchema, this.verifyEmail.bind(this));
         this.router.get("/bypass-authentication-token", this.bypassEmail.bind(this));
         // tokens
         this.router.post("/refresh-token", this.refreshToken.bind(this));
