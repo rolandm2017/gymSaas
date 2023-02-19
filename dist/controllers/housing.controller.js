@@ -30,6 +30,7 @@ class HousingController {
         this.router.post("/viewport-width", housingSchemas_1.detectViewportWidthSchema, this.detectProviderViewportWidth.bind(this));
         // public endpoint for demo
         this.router.get("/demo", this.getDemoContent.bind(this));
+        this.router.get("/map-page", this.getMapPageContent.bind(this));
         // user queries
         this.router.get("/real-url/:apartmentid", (0, authorize_middleware_1.default)([role_enum_1.Role.User]), this.getRealURL.bind(this));
         this.router.get("/real-url-list", (0, authorize_middleware_1.default)([role_enum_1.Role.User]), this.getRevealedRealUrlList.bind(this));
@@ -72,6 +73,29 @@ class HousingController {
                 }
                 const demoContent = yield this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
                 return response.status(200).json({ demoContent });
+            }
+            catch (err) {
+                return (0, handleErrorResponse_1.handleErrorResponse)(response, err);
+            }
+        });
+    }
+    getMapPageContent(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const neLatInput = request.query.neLat;
+                const neLongInput = request.query.neLong;
+                const swLatInput = request.query.swLat;
+                const swLongInput = request.query.swLong;
+                const neLat = (0, inputValidation_1.isStringFloat)(neLatInput); // max lat
+                const neLong = (0, inputValidation_1.isStringFloat)(neLongInput); // max long
+                const swLat = (0, inputValidation_1.isStringFloat)(swLatInput); // min lat
+                const swLong = (0, inputValidation_1.isStringFloat)(swLongInput); // min long
+                const isGiantSquare = this.housingService.confirmIsGiantSquare(swLat, neLat, swLong, neLong);
+                if (!isGiantSquare) {
+                    return response.status(400).json({ message: "No negative area squares" });
+                }
+                const mapPageContent = yield this.housingService.getMapPageHousing(swLat, neLat, swLong, neLong);
+                return response.status(200).json({ mapPageContent });
             }
             catch (err) {
                 return (0, handleErrorResponse_1.handleErrorResponse)(response, err);

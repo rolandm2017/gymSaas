@@ -35,6 +35,12 @@ class HousingService {
             return yield (0, housingConverter_1.convertHousingsToDemoHousings)(housings.slice(0, 30), this.gymDAO);
         });
     }
+    getMapPageHousing(minLat, maxLat, minLong, maxLong) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const housings = yield this.housingDAO.readBetween(minLat, maxLat, minLong, maxLong);
+            return (0, removeUrl_1.removeBulkURLs)(housings);
+        });
+    }
     //
     getAllHousing(cityId, cityName, stateOrProvince) {
         return __awaiter(this, void 0, void 0, function* () {
