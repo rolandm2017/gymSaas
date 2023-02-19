@@ -58,6 +58,12 @@ class HousingService {
         return await convertHousingsToDemoHousings(housings.slice(0, 30), this.gymDAO);
     }
 
+    public async getMapPageHousing(minLat: number, maxLat: number, minLong: number, maxLong: number): Promise<IHousing[]> {
+        const housings: Housing[] = await this.housingDAO.readBetween(minLat, maxLat, minLong, maxLong);
+        return removeBulkURLs(housings)
+    }
+
+
     //
     public async getAllHousing(cityId?: number, cityName?: string, stateOrProvince?: string): Promise<IHousing[]> {
         const housings = await this.housingDAO.getAllHousing(cityId, cityName, stateOrProvince);

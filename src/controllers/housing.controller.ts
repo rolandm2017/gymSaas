@@ -29,6 +29,7 @@ class HousingController {
         this.router.post("/viewport-width", detectViewportWidthSchema, this.detectProviderViewportWidth.bind(this));
         // public endpoint for demo
         this.router.get("/demo", this.getDemoContent.bind(this));
+        this.router.get("/map-page", this.getMapPageContent.bind(this));
         // user queries
         this.router.get("/real-url/:apartmentid", authorize([Role.User]), this.getRealURL.bind(this));
         this.router.get("/real-url-list", authorize([Role.User]), this.getRevealedRealUrlList.bind(this));
@@ -73,6 +74,29 @@ class HousingController {
             }
             const demoContent: IDemoHousing[] = await this.housingService.getDemoHousing(swLat, neLat, swLong, neLong);
             return response.status(200).json({ demoContent });
+        } catch (err) {
+            return handleErrorResponse(response, err);
+        }
+    }
+
+    public async getMapPageContent(request: Request, response: Response) {
+        try {
+            const neLatInput = request.query.neLat;
+            const neLongInput = request.query.neLong;
+            const swLatInput = request.query.swLat;
+            const swLongInput = request.query.swLong;
+
+            const neLat = isStringFloat(neLatInput); // max lat
+            const neLong = isStringFloat(neLongInput); // max long
+            const swLat = isStringFloat(swLatInput); // min lat
+            const swLong = isStringFloat(swLongInput); // min long
+
+            const isGiantSquare = this.housingService.confirmIsGiantSquare(swLat, neLat, swLong, neLong);
+            if (!isGiantSquare) {
+                return response.status(400).json({ message: "No negative area squares" });
+            }
+            const mapPageContent: IHousing[] = await this.housingService.getMapPageHousing(swLat, neLat, swLong, neLong);
+            return response.status(200).json({ mapPageContent });
         } catch (err) {
             return handleErrorResponse(response, err);
         }
