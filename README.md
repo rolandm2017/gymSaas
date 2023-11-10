@@ -1,6 +1,6 @@
 # The Apartments Near Gyms Backend
 
-This is the majority of the backend for the Apartments Near Gyms software program.
+This is the majority of the backend for the Apartments Near Gyms software program. The other portion is the web scraper, linked below.
 
 Apartments Near Gyms is a program that helps weightlifters find an apartment with a gym in a convenient location.
 
