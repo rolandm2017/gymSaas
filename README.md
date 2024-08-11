@@ -8,8 +8,8 @@ The program scrapes apartment data from Canadian rental sites and uses gym data 
 
 The backend handles user authentication, the control of scraping tasks for the scraper, and acquisition of gym data. It uses a controller, service, and data access layer to keep the program organized.
 
-You can view the web scraper portion of the program here: https://github.com/plutownium/apScraper
+You can view the web scraper portion of the program here: https://github.com/rolandm2017/apScraper
 
-And the client side code here: https://github.com/plutownium/gymsFE
+And the client side code here: https://github.com/rolandm2017/gymsFE
 
 Happy reading!
